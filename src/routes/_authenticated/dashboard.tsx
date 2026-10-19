@@ -232,7 +232,7 @@ function Dashboard() {
 
           {/* 4. TRES PILARES */}
           <Tabs defaultValue="aprender" className="mt-4">
-            <TabsList className="grid h-auto w-full grid-cols-3 rounded-2xl p-1">
+            <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-2xl p-1 sm:grid-cols-4">
               <TabsTrigger value="aprender" className="rounded-xl py-2.5 text-xs sm:text-sm">
                 📚 Aprender
               </TabsTrigger>
@@ -241,6 +241,9 @@ function Dashboard() {
               </TabsTrigger>
               <TabsTrigger value="herramientas" className="rounded-xl py-2.5 text-xs sm:text-sm">
                 🛠️ Herramientas
+              </TabsTrigger>
+              <TabsTrigger value="noticias" className="rounded-xl py-2.5 text-xs sm:text-sm">
+                📰 Noticias
               </TabsTrigger>
             </TabsList>
 
@@ -264,7 +267,6 @@ function Dashboard() {
                 <FreeCard to="/trivia" emoji="🧠" title="Preguntados paraguayo" desc="Girá la ruleta: gastronomía, mitos, deportes, música y más." accent="accent" inValidation />
                 <FreeCard to="/juegos" emoji="⚽" title="Juegos de vocabulario" desc="Penales, Palabra del día, Ahorcado, Sopa de letras y Memoria." accent="accent" />
                 <FreeCard to="/ranking" emoji="🏆" title="Ranking semanal" desc="Mirá quiénes estudiaron más esta semana en tu grupo." accent="primary" />
-                <FreeCard to="/nhe-rape" emoji="📖" title="Ñe'ẽ Rape" desc="El camino de la palabra. Tributo al Prof. Ramón Silva." accent="primary" />
               </div>
               <div className="mt-6 grid grid-cols-2 gap-3">
                 <Link
@@ -301,10 +303,11 @@ function Dashboard() {
                 <FreeCard to="/nhe-mbytepe" emoji="🗣️" title="Ñe'ẽ Mbytépe" desc="El guaraní que se habla en la calle." accent="primary" inValidation />
               </div>
             </TabsContent>
-          </Tabs>
 
-          {/* 6. NOTICIAS */}
-          <NhandeMarandu />
+            <TabsContent value="noticias" className="mt-6">
+              <NhandeMarandu className="" />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
       <SiteFooter />

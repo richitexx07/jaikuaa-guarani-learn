@@ -15,6 +15,28 @@ type NewsItem = {
 // convenio SPL–líderes indígenas del Bajo Chaco y convenio Cancillería–Academia.
 const NEWS: NewsItem[] = [
   {
+    id: "puka-miami-2026",
+    title: "Una obra coral en guaraní se estrenó en Miami",
+    summary:
+      "La compositora y pianista paraguaya Nancy Luzko estrenó «Puká», una obra coral escrita en guaraní, con unas 150 voces de cuatro coros de los Estados Unidos.",
+    date: "Octubre 2026",
+    category: "Cultura",
+    emoji: "🎶",
+    source: "Fuente: ABC Color",
+    url: "https://www.abc.com.py/espectaculos/musica/2026/10/18/nancy-luzko-estrenara-puka-una-obra-coral-en-guarani-en-miami/",
+  },
+  {
+    id: "tesis-juridica-guarani-2026",
+    title: "Tesis doctoral de contenido jurídico en guaraní",
+    summary:
+      "El Dr. Mario Milciades Pavetti Cristaldo defendió en el Ateneo de Lengua y Cultura Guaraní una tesis doctoral de contenido jurídico en guaraní, con la máxima calificación.",
+    date: "Abril 2026",
+    category: "Educación",
+    emoji: "⚖️",
+    source: "Fuente: TuCronista",
+    url: "https://tucronista.com/info/2/notireel.php?id=1540",
+  },
+  {
     id: "arandupy-2026",
     title: "AranduPy 2026: premio a la mejor investigación lingüística",
     summary:
@@ -56,9 +78,9 @@ const CATEGORY_STYLES: Record<NewsItem["category"], string> = {
 };
 
 
-export function NhandeMarandu() {
+export function NhandeMarandu({ className = "mt-12" }: { className?: string }) {
   return (
-    <section className="mt-12 select-none" style={{ WebkitTouchCallout: "none" }}>
+    <section className={`${className} select-none`} style={{ WebkitTouchCallout: "none" }}>
       <div className="flex items-baseline justify-between gap-4">
         <div>
           <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">

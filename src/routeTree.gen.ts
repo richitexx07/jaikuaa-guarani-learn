@@ -33,7 +33,6 @@ import { Route as AuthenticatedGuaraniEscolarRouteImport } from './routes/_authe
 import { Route as AuthenticatedLaboratorioRouteImport } from './routes/_authenticated/laboratorio'
 import { Route as AuthenticatedLogrosRouteImport } from './routes/_authenticated/logros'
 import { Route as AuthenticatedNheMbytepeRouteImport } from './routes/_authenticated/nhe-mbytepe'
-import { Route as AuthenticatedNheRapeRouteImport } from './routes/_authenticated/nhe-rape'
 import { Route as AuthenticatedRankingRouteImport } from './routes/_authenticated/ranking'
 import { Route as AuthenticatedTraductorRouteImport } from './routes/_authenticated/traductor'
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
@@ -189,11 +188,6 @@ const AuthenticatedLogrosRoute = AuthenticatedLogrosRouteImport.update({
 const AuthenticatedNheMbytepeRoute = AuthenticatedNheMbytepeRouteImport.update({
   id: '/nhe-mbytepe',
   path: '/nhe-mbytepe',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedNheRapeRoute = AuthenticatedNheRapeRouteImport.update({
-  id: '/nhe-rape',
-  path: '/nhe-rape',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedRankingRoute = AuthenticatedRankingRouteImport.update({
@@ -416,7 +410,6 @@ export interface FileRoutesByFullPath {
   '/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/logros': typeof AuthenticatedLogrosRoute
   '/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
-  '/nhe-rape': typeof AuthenticatedNheRapeRoute
   '/ranking': typeof AuthenticatedRankingRoute
   '/traductor': typeof AuthenticatedTraductorRoute
   '/tutor': typeof AuthenticatedTutorRoute
@@ -475,7 +468,6 @@ export interface FileRoutesByTo {
   '/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/logros': typeof AuthenticatedLogrosRoute
   '/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
-  '/nhe-rape': typeof AuthenticatedNheRapeRoute
   '/ranking': typeof AuthenticatedRankingRoute
   '/traductor': typeof AuthenticatedTraductorRoute
   '/tutor': typeof AuthenticatedTutorRoute
@@ -535,7 +527,6 @@ export interface FileRoutesById {
   '/_authenticated/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/_authenticated/logros': typeof AuthenticatedLogrosRoute
   '/_authenticated/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
-  '/_authenticated/nhe-rape': typeof AuthenticatedNheRapeRoute
   '/_authenticated/ranking': typeof AuthenticatedRankingRoute
   '/_authenticated/traductor': typeof AuthenticatedTraductorRoute
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
@@ -597,7 +588,6 @@ export interface FileRouteTypes {
     | '/laboratorio'
     | '/logros'
     | '/nhe-mbytepe'
-    | '/nhe-rape'
     | '/ranking'
     | '/traductor'
     | '/tutor'
@@ -656,7 +646,6 @@ export interface FileRouteTypes {
     | '/laboratorio'
     | '/logros'
     | '/nhe-mbytepe'
-    | '/nhe-rape'
     | '/ranking'
     | '/traductor'
     | '/tutor'
@@ -715,7 +704,6 @@ export interface FileRouteTypes {
     | '/_authenticated/laboratorio'
     | '/_authenticated/logros'
     | '/_authenticated/nhe-mbytepe'
-    | '/_authenticated/nhe-rape'
     | '/_authenticated/ranking'
     | '/_authenticated/traductor'
     | '/_authenticated/tutor'
@@ -943,13 +931,6 @@ declare module '@tanstack/react-router' {
       path: '/nhe-mbytepe'
       fullPath: '/nhe-mbytepe'
       preLoaderRoute: typeof AuthenticatedNheMbytepeRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/nhe-rape': {
-      id: '/_authenticated/nhe-rape'
-      path: '/nhe-rape'
-      fullPath: '/nhe-rape'
-      preLoaderRoute: typeof AuthenticatedNheRapeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/ranking': {
@@ -1260,7 +1241,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLaboratorioRoute: typeof AuthenticatedLaboratorioRoute
   AuthenticatedLogrosRoute: typeof AuthenticatedLogrosRoute
   AuthenticatedNheMbytepeRoute: typeof AuthenticatedNheMbytepeRoute
-  AuthenticatedNheRapeRoute: typeof AuthenticatedNheRapeRoute
   AuthenticatedRankingRoute: typeof AuthenticatedRankingRoute
   AuthenticatedTraductorRoute: typeof AuthenticatedTraductorRoute
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
@@ -1295,7 +1275,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLaboratorioRoute: AuthenticatedLaboratorioRoute,
   AuthenticatedLogrosRoute: AuthenticatedLogrosRoute,
   AuthenticatedNheMbytepeRoute: AuthenticatedNheMbytepeRoute,
-  AuthenticatedNheRapeRoute: AuthenticatedNheRapeRoute,
   AuthenticatedRankingRoute: AuthenticatedRankingRoute,
   AuthenticatedTraductorRoute: AuthenticatedTraductorRoute,
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,

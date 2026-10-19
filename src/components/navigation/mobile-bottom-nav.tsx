@@ -4,7 +4,7 @@ import { showsBottomNav } from "@/lib/bottom-nav";
 
 const ITEMS = [
   { to: "/dashboard", label: "Aprender", icon: BookOpen, match: ["/dashboard", "/curso", "/guarani-escolar", "/cuaderno"] },
-  { to: "/juegos", label: "Juegos", icon: Gamepad2, match: ["/juegos", "/trivia", "/nhe-rape"] },
+  { to: "/juegos", label: "Juegos", icon: Gamepad2, match: ["/juegos", "/trivia"] },
   { to: "/ranking", label: "Ranking", icon: Trophy, match: ["/ranking"] },
   { to: "/logros", label: "Logros", icon: Award, match: ["/logros"] },
 ] as const;
