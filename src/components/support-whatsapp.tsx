@@ -15,7 +15,7 @@ import {
 } from "@/lib/jai-faq";
 import { logJaiQuestion } from "@/lib/jai.functions";
 import { JAI_OPEN_EVENT } from "@/lib/jai-events";
-import jaiImg from "@/assets/jai-atencion.webp";
+import jaiImg from "@/assets/jai-atencion-3d.webp";
 
 // En los juegos y en el panel de administración el botón molestaría, así que no se muestra.
 const HIDDEN_PREFIXES = ["/juegos", "/admin", "/piloto-ateneo", "/certificado"];
@@ -246,9 +246,9 @@ export function SupportWhatsApp() {
           aria-label="Atención al cliente con Jai"
           className="jai-msg-in mb-3 flex h-[min(600px,calc(100dvh-8rem))] w-[min(390px,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-border bg-card text-card-foreground shadow-lift"
         >
-          <header className="flex items-center gap-3 bg-gradient-to-br from-primary to-primary/85 px-4 py-3 text-primary-foreground">
+          <header className="jai-header relative flex items-center gap-3 overflow-hidden px-4 py-3 text-primary-foreground">
             <div className="relative">
-              <img src={jaiImg} alt="" width={48} height={48} className="h-12 w-12 rounded-full bg-background object-cover object-top ring-2 ring-primary-foreground/40" />
+              <img src={jaiImg} alt="" width={56} height={56} className="jai-breathe h-14 w-14 rounded-full bg-gradient-to-b from-accent/40 to-background object-cover object-top ring-2 ring-primary-foreground/40" />
               <span className="jai-whatsapp absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ring-2 ring-primary" aria-hidden />
             </div>
             <div className="flex-1">
@@ -279,8 +279,8 @@ export function SupportWhatsApp() {
                   {m.text}
                 </div>
               ) : i === 0 ? (
-                <div key={m.id} className="jai-msg-in flex flex-col items-center px-2 pt-1 text-center">
-                  <img src={jaiImg} alt="Jai, el jaguareté de Jaikuaa" width={128} height={137} className="jai-wave h-32 w-32 object-contain drop-shadow-xl" />
+                <div key={m.id} className="jai-msg-in jai-welcome flex flex-col items-center rounded-3xl px-3 pb-4 pt-2 text-center">
+                  <img src={jaiImg} alt="Jai, el jaguareté de Jaikuaa" width={128} height={137} className="jai-float h-40 w-40 object-contain drop-shadow-2xl" />
                   <p className="mt-1 font-display text-lg font-bold text-primary">{m.lead}</p>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{m.text}</p>
                 </div>
@@ -430,11 +430,12 @@ export function SupportWhatsApp() {
             setTeaser(false);
           }}
           aria-label="Abrir atención al cliente con Jai"
-          className="ml-auto flex items-center gap-2 rounded-full bg-primary py-1.5 pl-1.5 pr-4 text-sm font-semibold text-primary-foreground shadow-lift transition hover:scale-105"
+          className="group relative ml-auto block h-24 w-24 focus:outline-none"
         >
-          <img src={jaiImg} alt="" width={48} height={48} className="jai-wave h-12 w-12 rounded-full bg-background object-cover object-top ring-2 ring-primary-foreground/50" />
-          <span className="hidden sm:inline">¿Te ayudo? Soy Jai</span>
-          <span className="sm:hidden">Jai</span>
+          <span className="jai-halo absolute inset-x-2 bottom-1 top-6 rounded-full" aria-hidden />
+          <span className="absolute inset-x-1 bottom-0 h-16 rounded-full bg-primary shadow-lift ring-4 ring-background transition group-hover:scale-105" aria-hidden />
+          <img src={jaiImg} alt="" width={96} height={98} className="jai-float absolute bottom-1 left-1/2 h-24 w-24 -translate-x-1/2 object-contain drop-shadow-xl transition group-hover:scale-110" />
+          <span className="jai-whatsapp absolute bottom-2 right-2 h-4 w-4 rounded-full ring-2 ring-background" aria-hidden />
         </button>
       )}
     </div>
