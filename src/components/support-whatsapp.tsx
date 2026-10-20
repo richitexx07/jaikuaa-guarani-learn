@@ -69,7 +69,7 @@ export function SupportWhatsApp() {
           <header className="flex items-center gap-3 bg-primary px-4 py-3 text-primary-foreground">
             <img src={jaiImg} alt="" className="h-10 w-10 rounded-full bg-background object-contain" />
             <div className="flex-1">
-              <p className="font-heading text-base font-bold leading-tight">Jai · Atención</p>
+              <p className="text-base font-bold leading-tight">Jai · Atención</p>
               <p className="text-xs opacity-80">Respuestas al instante</p>
             </div>
             <button
