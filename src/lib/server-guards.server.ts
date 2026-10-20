@@ -37,6 +37,17 @@ export async function verifyBearer(
   return { userId, isAdmin: admin === true };
 }
 
+/** Solo el id del usuario de la sesión (sin consultar su rol): para pedidos rápidos como los audios. */
+export async function verifyBearerUserId(headers: Headers): Promise<string | null> {
+  const auth = headers.get("authorization") ?? "";
+  if (!auth.startsWith("Bearer ")) return null;
+  const token = auth.slice(7);
+  if (token.split(".").length !== 3) return null;
+  const { data, error } = await userClient(token).auth.getClaims(token);
+  const userId = data?.claims?.sub;
+  return error || !userId ? null : userId;
+}
+
 /** Suma un uso de IA del día (hora de Paraguay). false = tope alcanzado. Admin sin tope. */
 export async function consumeAiQuota(
   user: { userId: string; isAdmin: boolean },

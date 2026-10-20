@@ -51,3 +51,49 @@ export const getAudioSignedUrl = createServerFn({ method: "POST" })
       return { signedUrl: null as string | null, denied: null };
     }
   });
+
+const BatchInput = z.object({ gns: z.array(z.string().min(1).max(120)).min(1).max(60) });
+const LIMIT_BATCH_SIGNED_IN = 400; // tandas por hora por usuario
+const LIMIT_BATCH_ANON = 60; // tandas por hora por IP
+
+/**
+ * Enlaces firmados para VARIAS palabras en un solo viaje al servidor (una tanda por pantalla).
+ * Sin sesión solo se firman las palabras públicas; las demás vuelven en `denied`.
+ * Las palabras sin grabación vuelven como null (silencio intencional, nunca voz de máquina).
+ */
+export const getAudioSignedUrls = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => BatchInput.parse(d))
+  .handler(async ({ data }) => {
+    const { verifyBearerUserId, consumeRateLimit, clientIp } = await import(
+      "@/lib/server-guards.server"
+    );
+    const headers = getRequest()?.headers ?? new Headers();
+    const userId = await verifyBearerUserId(headers).catch(() => null);
+    const user = userId ? { userId } : null;
+
+    const slugs = [...new Set(data.gns.map(slugifyAudio).filter(Boolean))];
+    const allowed = user ? slugs : slugs.filter((s) => PUBLIC_SLUGS.has(s));
+    const denied = slugs.filter((s) => !allowed.includes(s));
+    const urls: Record<string, string | null> = {};
+    if (allowed.length === 0) return { urls, denied, limited: false };
+
+    const ok = user
+      ? await consumeRateLimit(`audio-batch:user:${user.userId}`, LIMIT_BATCH_SIGNED_IN, 3600)
+      : await consumeRateLimit(`audio-batch:ip:${clientIp(headers)}`, LIMIT_BATCH_ANON, 3600);
+    if (!ok) return { urls, denied: slugs, limited: true };
+
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: signed } = await supabaseAdmin.storage
+        .from("guarani-audio")
+        .createSignedUrls(allowed.map((s) => `${s}.mp3`), URL_TTL_SECONDS);
+      for (const s of allowed) urls[s] = null;
+      for (const item of signed ?? []) {
+        const slug = (item.path ?? "").replace(/\.mp3$/, "");
+        if (slug && !item.error && item.signedUrl) urls[slug] = item.signedUrl;
+      }
+    } catch {
+      for (const s of allowed) urls[s] = null;
+    }
+    return { urls, denied, limited: false };
+  });

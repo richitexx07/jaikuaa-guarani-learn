@@ -16,8 +16,9 @@ export function SpeakerButton({ gn, size = "sm", className }: Props) {
 
   const [url, setUrl] = useState<string | null | undefined>(undefined);
   // Todos los hooks van antes de cualquier return (regla de React).
-  const hoverTimer = useRef<number | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
+  // El enlace se pide en tanda con las demás palabras de la pantalla.
   useEffect(() => {
     let alive = true;
     void getHumanAudioUrl(gn).then((u) => {
@@ -27,6 +28,27 @@ export function SpeakerButton({ gn, size = "sm", className }: Props) {
       alive = false;
     };
   }, [gn]);
+
+  // Cuando el botón se ve en pantalla, el audio se baja de antemano para que suene al instante.
+  useEffect(() => {
+    const el = buttonRef.current;
+    if (!url || !el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      void prefetchAudio(gn);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          void prefetchAudio(gn);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [gn, url]);
 
   const loading = url === undefined;
   const hasAudio = Boolean(url);
@@ -49,26 +71,11 @@ export function SpeakerButton({ gn, size = "sm", className }: Props) {
     );
   }
 
-  const startHoverPrefetch = () => {
-    if (hoverTimer.current !== null) return;
-    hoverTimer.current = window.setTimeout(() => {
-      void prefetchAudio(gn);
-      hoverTimer.current = null;
-    }, 200);
-  };
-  const cancelHoverPrefetch = () => {
-    if (hoverTimer.current !== null) {
-      window.clearTimeout(hoverTimer.current);
-      hoverTimer.current = null;
-    }
-  };
-
   return (
     <button
+      ref={buttonRef}
       type="button"
       disabled={loading}
-      onMouseEnter={startHoverPrefetch}
-      onMouseLeave={cancelHoverPrefetch}
       onFocus={() => void prefetchAudio(gn)}
       onTouchStart={() => void prefetchAudio(gn)}
       onClick={() => {
