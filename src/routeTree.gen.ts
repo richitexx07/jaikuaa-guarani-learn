@@ -44,6 +44,7 @@ import { Route as StudioSplatRouteImport } from './routes/studio.$'
 import { Route as VerificarCodeRouteImport } from './routes/verificar.$code'
 import { Route as AuthenticatedAdminCorpusRouteImport } from './routes/_authenticated/admin.corpus'
 import { Route as AuthenticatedAdminInformeAuspicianteRouteImport } from './routes/_authenticated/admin.informe-auspiciante'
+import { Route as AuthenticatedAdminJaiRouteImport } from './routes/_authenticated/admin.jai'
 import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
 import { Route as AuthenticatedCursoLangRouteImport } from './routes/_authenticated/curso.$lang'
 import { Route as AuthenticatedGuaraniEscolarIndexRouteImport } from './routes/_authenticated/guarani-escolar.index'
@@ -249,6 +250,11 @@ const AuthenticatedAdminInformeAuspicianteRoute =
     path: '/admin/informe-auspiciante',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminJaiRoute = AuthenticatedAdminJaiRouteImport.update({
+  id: '/admin/jai',
+  path: '/admin/jai',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminNoticiasRoute =
   AuthenticatedAdminNoticiasRouteImport.update({
     id: '/admin/noticias',
@@ -434,6 +440,7 @@ export interface FileRoutesByFullPath {
   '/studio/': typeof StudioIndexRoute
   '/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
+  '/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/curso/$lang': typeof AuthenticatedCursoLangRouteWithChildren
   '/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
@@ -494,6 +501,7 @@ export interface FileRoutesByTo {
   '/studio': typeof StudioIndexRoute
   '/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
+  '/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
   '/guarani-escolar/semanal': typeof AuthenticatedGuaraniEscolarSemanalRoute
@@ -555,6 +563,7 @@ export interface FileRoutesById {
   '/studio/': typeof StudioIndexRoute
   '/_authenticated/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/_authenticated/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
+  '/_authenticated/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/_authenticated/curso/$lang': typeof AuthenticatedCursoLangRouteWithChildren
   '/_authenticated/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
@@ -618,6 +627,7 @@ export interface FileRouteTypes {
     | '/studio/'
     | '/admin/corpus'
     | '/admin/informe-auspiciante'
+    | '/admin/jai'
     | '/admin/noticias'
     | '/curso/$lang'
     | '/guarani-escolar/rescate'
@@ -678,6 +688,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/admin/corpus'
     | '/admin/informe-auspiciante'
+    | '/admin/jai'
     | '/admin/noticias'
     | '/guarani-escolar/rescate'
     | '/guarani-escolar/semanal'
@@ -738,6 +749,7 @@ export interface FileRouteTypes {
     | '/studio/'
     | '/_authenticated/admin/corpus'
     | '/_authenticated/admin/informe-auspiciante'
+    | '/_authenticated/admin/jai'
     | '/_authenticated/admin/noticias'
     | '/_authenticated/curso/$lang'
     | '/_authenticated/guarani-escolar/rescate'
@@ -1035,6 +1047,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminInformeAuspicianteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/jai': {
+      id: '/_authenticated/admin/jai'
+      path: '/admin/jai'
+      fullPath: '/admin/jai'
+      preLoaderRoute: typeof AuthenticatedAdminJaiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/noticias': {
       id: '/_authenticated/admin/noticias'
       path: '/admin/noticias'
@@ -1287,6 +1306,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedValidacionRoute: typeof AuthenticatedValidacionRoute
   AuthenticatedAdminCorpusRoute: typeof AuthenticatedAdminCorpusRoute
   AuthenticatedAdminInformeAuspicianteRoute: typeof AuthenticatedAdminInformeAuspicianteRoute
+  AuthenticatedAdminJaiRoute: typeof AuthenticatedAdminJaiRoute
   AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
   AuthenticatedCursoLangRoute: typeof AuthenticatedCursoLangRouteWithChildren
   AuthenticatedJuegosAhorcadoRoute: typeof AuthenticatedJuegosAhorcadoRoute
@@ -1324,6 +1344,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminCorpusRoute: AuthenticatedAdminCorpusRoute,
   AuthenticatedAdminInformeAuspicianteRoute:
     AuthenticatedAdminInformeAuspicianteRoute,
+  AuthenticatedAdminJaiRoute: AuthenticatedAdminJaiRoute,
   AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
   AuthenticatedCursoLangRoute: AuthenticatedCursoLangRouteWithChildren,
   AuthenticatedJuegosAhorcadoRoute: AuthenticatedJuegosAhorcadoRoute,

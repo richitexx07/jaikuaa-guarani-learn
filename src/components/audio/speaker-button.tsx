@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getHumanAudioUrl, prefetchAudio, playGuarani } from "@/lib/audio";
+import { openJai } from "@/lib/jai-events";
 import { cn } from "@/lib/utils";
 
 
@@ -20,6 +21,8 @@ export function SpeakerButton({ gn, size = "sm", className }: Props) {
   const [failed, setFailed] = useState(false);
   // Todos los hooks van antes de cualquier return (regla de React).
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  // Fallas seguidas de una palabra que SÍ tiene grabación (no cuenta el silencio intencional).
+  const failsRef = useRef(0);
 
   // El enlace se pide en tanda con las demás palabras de la pantalla.
   useEffect(() => {
@@ -69,12 +72,16 @@ export function SpeakerButton({ gn, size = "sm", className }: Props) {
       onFocus={() => void prefetchAudio(gn)}
       onTouchStart={() => void prefetchAudio(gn)}
       onClick={async () => {
+        const hadRecording = !!url || failed;
         setPlaying(true);
         const ok = await playGuarani(gn);
         setPlaying(false);
-        setFailed(!ok);
+        setFailed(!ok && hadRecording);
         if (!ok) setUrl(null);
         else void getHumanAudioUrl(gn).then(setUrl);
+        failsRef.current = ok ? 0 : hadRecording ? failsRef.current + 1 : 0;
+        // Si el audio falla dos veces seguidas, Jai aparece con la solución (volumen, modo silencio…).
+        if (failsRef.current === 2) openJai("audio");
       }}
       aria-label={`${unavailable ? "Reintentar audio de" : "Escuchar"} ${gn}`}
       title={unavailable ? "No se pudo reproducir. Tocá para reintentar." : "Escuchar grabación humana"}

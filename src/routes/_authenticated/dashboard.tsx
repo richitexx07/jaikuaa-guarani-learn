@@ -54,6 +54,11 @@ function StaffShortcuts() {
             <Link to="/admin/noticias">📰 Noticias para aprobar</Link>
           </Button>
         )}
+        {data.isAdmin && (
+          <Button asChild variant="outline" className="h-12 w-full justify-start">
+            <Link to="/admin/jai">🐆 Qué le preguntan a Jai</Link>
+          </Button>
+        )}
       </div>
     </section>
   );
