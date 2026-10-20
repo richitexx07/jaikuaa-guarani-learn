@@ -17,6 +17,8 @@ export { slugify };
 
 // Los enlaces firmados vencen a la hora en el servidor; se usan como máximo 50 minutos.
 const URL_TTL_MS = 50 * 60 * 1000;
+// «Sin grabación» se recuerda poco tiempo: si fue una falla pasajera, se vuelve a intentar pronto.
+const NULL_TTL_MS = 2 * 60 * 1000;
 const urlCache = new Map<string, { url: string | null; exp: number }>();
 
 const LS_KEY = "jaikuaa:audio-urls:v3";
@@ -27,7 +29,7 @@ function loadPersistedUrls() {
     if (!raw) return;
     const obj = JSON.parse(raw) as Record<string, { url: string | null; exp: number }>;
     const now = Date.now();
-    for (const [k, v] of Object.entries(obj)) if (v && v.exp > now) urlCache.set(k, v);
+    for (const [k, v] of Object.entries(obj)) if (v?.url && v.exp > now) urlCache.set(k, v);
   } catch {}
 }
 let persistTimer: number | null = null;
@@ -39,7 +41,7 @@ function persistUrls() {
       const now = Date.now();
       const obj: Record<string, { url: string | null; exp: number }> = {};
       urlCache.forEach((v, k) => {
-        if (v.exp > now) obj[k] = v;
+        if (v.url && v.exp > now) obj[k] = v;
       });
       window.localStorage.setItem(LS_KEY, JSON.stringify(obj));
     } catch {}
@@ -94,11 +96,12 @@ async function flush() {
     try {
       const res = await getAudioSignedUrls({ data: { gns: chunk.map((s) => batch.get(s)!.gn) } });
       const denied = new Set(res.denied);
-      const exp = Date.now() + URL_TTL_MS;
+      const now = Date.now();
       for (const slug of chunk) {
-        const url = res.urls[slug] ?? null;
+        let url = res.urls[slug] ?? null;
         // Sin sesión o con el límite alcanzado no se guarda: se reintenta más tarde.
-        if (!denied.has(slug)) urlCache.set(slug, { url, exp });
+        if (!denied.has(slug)) urlCache.set(slug, { url, exp: now + (url ? URL_TTL_MS : NULL_TTL_MS) });
+        if (!url) url = await findOfflineAudio(slug);
         done(slug, url);
       }
       persistUrls();
@@ -198,6 +201,17 @@ export function usePrefetchAudios(gns: string[], max = 24) {
   }, [gns.join("|"), max]);
 }
 
+/** Si una reproducción falla, se olvida lo guardado de esa palabra para reintentar limpio. */
+function forget(slug: string) {
+  urlCache.delete(slug);
+  const blob = blobCache.get(slug);
+  if (blob) {
+    blobCache.delete(slug);
+    URL.revokeObjectURL(blob);
+  }
+  persistUrls();
+}
+
 function playSrc(src: string): Promise<boolean> {
   return new Promise<boolean>((resolve) => {
     try {
@@ -218,15 +232,19 @@ export async function playGuarani(gn: string): Promise<boolean> {
   const slug = slugify(gn);
   // Camino rápido y sin esperas: así el toque del usuario habilita el sonido también en iPhone.
   const ready = blobCache.get(slug);
-  if (ready) return playSrc(ready);
-  const known = cachedUrl(slug);
-  if (known) {
+  const known = ready ? undefined : cachedUrl(slug);
+  let ok: boolean;
+  if (ready) {
+    ok = await playSrc(ready);
+  } else if (known) {
     void preloadBytes(slug, known);
-    return playSrc(known);
+    ok = await playSrc(known);
+  } else {
+    const url = await getHumanAudioUrl(gn);
+    if (!url) return false; // sin grabación: silencio intencional — nunca TTS
+    void preloadBytes(slug, url);
+    ok = await playSrc(url);
   }
-  if (known === null) return false; // sin grabación: silencio intencional — nunca TTS
-  const url = await getHumanAudioUrl(gn);
-  if (!url) return false;
-  void preloadBytes(slug, url);
-  return playSrc(url);
+  if (!ok) forget(slug);
+  return ok;
 }

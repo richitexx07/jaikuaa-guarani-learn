@@ -164,6 +164,48 @@ export type Database = {
           },
         ]
       }
+      content_reports: {
+        Row: {
+          created_at: string
+          estado: string
+          id: string
+          lugar: string
+          mensaje: string
+          reported_by: string
+          revisado_at: string | null
+          revisado_por: string | null
+          tipo: string
+          word_es: string
+          word_gn: string
+        }
+        Insert: {
+          created_at?: string
+          estado?: string
+          id?: string
+          lugar: string
+          mensaje: string
+          reported_by: string
+          revisado_at?: string | null
+          revisado_por?: string | null
+          tipo: string
+          word_es?: string
+          word_gn: string
+        }
+        Update: {
+          created_at?: string
+          estado?: string
+          id?: string
+          lugar?: string
+          mensaje?: string
+          reported_by?: string
+          revisado_at?: string | null
+          revisado_por?: string | null
+          tipo?: string
+          word_es?: string
+          word_gn?: string
+        }
+        Relationships: []
+      }
       content_reviewers: {
         Row: {
           added_by: string | null

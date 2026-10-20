@@ -54,11 +54,24 @@ describe("Audios: un solo pedido por pantalla", () => {
     expect(calls[0]).toEqual(["aguyje"]);
   });
 
-  it("una palabra sin grabación queda en silencio y no se vuelve a pedir", async () => {
+  it("una palabra sin grabación queda en silencio y no se pide de nuevo enseguida", async () => {
     const { getHumanAudioUrl } = await import("./audio");
     expect(await getHumanAudioUrl("muda")).toBeNull();
     expect(await getHumanAudioUrl("muda")).toBeNull();
     expect(calls).toHaveLength(1);
+  });
+
+  it("después de una falla pasajera sin enlace, se vuelve a intentar pasados dos minutos", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    try {
+      const { getHumanAudioUrl } = await import("./audio");
+      expect(await getHumanAudioUrl("muda-temporal")).toBeNull();
+      vi.setSystemTime(Date.now() + 3 * 60 * 1000);
+      await getHumanAudioUrl("muda-temporal");
+      expect(calls).toHaveLength(2);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("lo negado por falta de sesión no se guarda: se vuelve a intentar", async () => {
