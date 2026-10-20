@@ -119,6 +119,12 @@ export function SupportWhatsApp() {
                 >
                   {m.text}
                 </div>
+              ) : i === 0 ? (
+                <div key={m.id} className="jai-msg-in flex flex-col items-center px-2 pt-1 text-center">
+                  <img src={jaiImg} alt="Jai, el jaguareté de Jaikuaa" className="jai-wave h-32 w-32 object-contain drop-shadow-xl" />
+                  <p className="mt-1 font-display text-lg font-bold text-primary">{m.lead}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{m.text}</p>
+                </div>
               ) : (
                 <div key={m.id} className="jai-msg-in flex items-end gap-2">
                   <img src={jaiImg} alt="" className="h-8 w-8 shrink-0 rounded-full bg-background object-cover object-top ring-1 ring-border shadow-sm" />
