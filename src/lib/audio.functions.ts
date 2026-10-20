@@ -4,8 +4,8 @@ import { z } from "zod";
 
 const Input = z.object({ gn: z.string().min(1).max(120) });
 
-/** Audios que la bienvenida /comenzar puede reproducir sin sesión (lista cerrada). */
-const PUBLIC_SLUGS = new Set(["mbaeichapa", "ipora", "aguyje"]);
+/** Audios que se escuchan sin sesión: los de /comenzar y las seis palabras de muestra de la portada. */
+const PUBLIC_SLUGS = new Set(["mbaeichapa", "ipora", "aguyje", "jaguarete", "kuarahy", "yvoty", "che-vya"]);
 const URL_TTL_SECONDS = 60 * 60; // 1 hora como máximo
 const LIMIT_SIGNED_IN = 300; // por hora por usuario
 const LIMIT_ANON = 30; // por hora por IP

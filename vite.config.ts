@@ -43,13 +43,22 @@ export default defineConfig({
               // Audios humanos: el enlace firmado cambia, se identifica por nombre de archivo.
               urlPattern: ({ url }) =>
                 url.pathname.includes("/storage/v1/object/sign/guarani-audio/"),
+              // Se pide el archivo COMPLETO y en modo CORS: así la copia guardada se puede leer y
+              // recortar para el reproductor. Una copia «opaca» (estado 0) no se puede reproducir
+              // desde el caché y dejaba los audios mudos a partir de la segunda vez.
               handler: "CacheFirst",
               options: {
-                cacheName: "jaikuaa-audio",
+                cacheName: "jaikuaa-audio-v2",
                 matchOptions: { ignoreSearch: true },
                 expiration: { maxEntries: 600, maxAgeSeconds: 90 * 24 * 3600 },
-                cacheableResponse: { statuses: [0, 200] },
+                cacheableResponse: { statuses: [200] },
                 rangeRequests: true,
+                plugins: [
+                  {
+                    requestWillFetch: async ({ request }) =>
+                      new Request(request.url, { mode: "cors", credentials: "omit" }),
+                  },
+                ],
               },
             },
             {

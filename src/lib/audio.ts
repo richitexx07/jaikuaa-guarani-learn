@@ -29,11 +29,20 @@ function loadPersistedUrls() {
     for (const [k, v] of Object.entries(obj)) if (v && v.exp > now) urlCache.set(k, v);
   } catch {}
 }
+// Caché de audios del service worker. La versión vieja («jaikuaa-audio») guardaba copias
+// opacas que el reproductor no puede usar: se borra una vez para no ocupar lugar.
+const AUDIO_CACHE = "jaikuaa-audio-v2";
+function dropOldAudioCache() {
+  if (typeof window === "undefined" || !("caches" in window)) return;
+  void caches.delete("jaikuaa-audio").catch(() => {});
+}
+
 let loaded = false;
 function ensureLoaded() {
   if (loaded) return;
   loaded = true;
   loadPersistedUrls();
+  dropOldAudioCache();
 }
 function persistUrls() {
   if (typeof window === "undefined") return;
@@ -84,7 +93,7 @@ export async function getHumanAudioUrl(gn: string): Promise<string | null> {
 async function findOfflineAudio(slug: string): Promise<string | null> {
   if (typeof window === "undefined" || !("caches" in window)) return null;
   try {
-    const cache = await caches.open("jaikuaa-audio");
+    const cache = await caches.open(AUDIO_CACHE);
     const keys = await cache.keys();
     const hit = keys.find((r) => new URL(r.url).pathname.endsWith(`/${slug}.mp3`));
     return hit?.url ?? null;
