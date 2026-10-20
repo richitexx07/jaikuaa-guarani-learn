@@ -404,8 +404,28 @@ export const updateCorpusWord = createServerFn({ method: "POST" })
       patch.validated_by = null;
       patch.validated_at = null;
     }
+    const { data: before } = await supabaseAdmin
+      .from("corpus_words")
+      .select("es, notes, category, status")
+      .eq("id", id)
+      .maybeSingle();
     const { error } = await supabaseAdmin.from("corpus_words").update(patch as never).eq("id", id);
     if (error) throw new Error(error.message);
+
+    // Registro de cambios: quién cambió qué (antes → después). Solo lo ven los administradores.
+    const changes: Record<string, { antes: unknown; despues: unknown }> = {};
+    for (const key of ["es", "notes", "category", "status"] as const) {
+      if (rest[key] === undefined) continue;
+      const prev = (before as Record<string, unknown> | null)?.[key] ?? null;
+      if (prev !== rest[key]) changes[key] = { antes: prev, despues: rest[key] };
+    }
+    if (Object.keys(changes).length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: logError } = await (supabaseAdmin as any)
+        .from("corpus_word_changes")
+        .insert({ word_id: id, changed_by: context.userId, changes });
+      if (logError) console.error("corpus_word_changes:", logError.message);
+    }
     return { ok: true };
   });
 

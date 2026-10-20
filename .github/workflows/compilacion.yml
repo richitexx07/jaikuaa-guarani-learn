@@ -37,6 +37,6 @@ jobs:
         continue-on-error: true
         run: |
           bunx tsc --noEmit -p tsconfig.json 2>&1 \
-            | grep -E "src/(lib/morph|routes/_authenticated/(laboratorio|validacion|admin\.noticias|dashboard)|lib/(laboratorio|validation-circuit|news)|components/nhande-marandu)" \
+            | grep -E "src/(lib/morph|routes/_authenticated/(laboratorio|validacion|admin\.noticias|dashboard)|lib/(laboratorio|validation-circuit|news|corpus\.functions|security-headers)|server\.ts|components/nhande-marandu)" \
             | sed -E 's/^([^(]+)\(([0-9]+),[0-9]+\): (.*)$/::warning file=\1,line=\2::\3/' \
             || echo "Sin errores de tipos en el motor, el Laboratorio, el circuito de validación ni las noticias"
