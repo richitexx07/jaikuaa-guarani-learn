@@ -434,7 +434,7 @@ export function SupportWhatsApp() {
         >
           <span className="jai-halo absolute inset-x-2 bottom-1 top-6 rounded-full" aria-hidden />
           <span className="absolute inset-x-1 bottom-0 h-16 rounded-full bg-primary shadow-lift ring-4 ring-background transition group-hover:scale-105" aria-hidden />
-          <img src={jaiImg} alt="" width={96} height={98} className="jai-float absolute bottom-1 left-1/2 h-24 w-24 object-contain drop-shadow-xl transition group-hover:scale-110" />
+          <img src={jaiImg} alt="" width={96} height={98} className="jai-float-c absolute inset-x-0 bottom-1 mx-auto h-24 w-24 object-contain drop-shadow-xl transition group-hover:scale-110" />
           <span className="jai-whatsapp absolute bottom-2 right-2 h-4 w-4 rounded-full ring-2 ring-background" aria-hidden />
         </button>
       )}

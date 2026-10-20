@@ -332,6 +332,7 @@ body { background-image: radial-gradient(circle at 0% 0%, color-mix(in oklab, va
 @keyframes jai-float { 0%,100% { transform: translate(-50%,0) rotate(-2deg); } 50% { transform: translate(-50%,-6px) rotate(2deg); } }
 .jai-float { animation: jai-float 3.2s ease-in-out infinite; }
 .jai-welcome .jai-float { animation-name: jai-float-c; }
+.jai-float-c { animation: jai-float-c 3.2s ease-in-out infinite; }
 @keyframes jai-float-c { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
 @keyframes jai-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 .jai-breathe { animation: jai-breathe 3s ease-in-out infinite; }
