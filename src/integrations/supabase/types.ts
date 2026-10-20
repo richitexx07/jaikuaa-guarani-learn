@@ -493,6 +493,33 @@ export type Database = {
           },
         ]
       }
+      jai_consultas: {
+        Row: {
+          created_at: string
+          faq_id: string | null
+          id: string
+          resultado: string
+          ruta: string
+          texto: string
+        }
+        Insert: {
+          created_at?: string
+          faq_id?: string | null
+          id?: string
+          resultado: string
+          ruta?: string
+          texto: string
+        }
+        Update: {
+          created_at?: string
+          faq_id?: string | null
+          id?: string
+          resultado?: string
+          ruta?: string
+          texto?: string
+        }
+        Relationships: []
+      }
       lesson_words: {
         Row: {
           created_at: string
