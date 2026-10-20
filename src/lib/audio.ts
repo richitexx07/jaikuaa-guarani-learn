@@ -13,6 +13,7 @@ export { slugify };
 // Signed URLs expire after 1 hour on the server, so cached entries carry an expiry.
 const URL_TTL_MS = 50 * 60 * 1000;
 const urlCache = new Map<string, { url: string | null; exp: number }>();
+const pendingUrls = new Map<string, Promise<string | null>>();
 const audioCache = new Map<string, HTMLAudioElement>();
 const MAX_AUDIO_CACHE = 50;
 
@@ -26,7 +27,7 @@ function loadPersistedUrls() {
     if (!raw) return;
     const obj = JSON.parse(raw) as Record<string, { url: string | null; exp: number }>;
     const now = Date.now();
-    for (const [k, v] of Object.entries(obj)) if (v && v.exp > now) urlCache.set(k, v);
+    for (const [k, v] of Object.entries(obj)) if (v?.url && v.exp > now) urlCache.set(k, v);
   } catch {}
 }
 // Caché de audios del service worker. La versión vieja («jaikuaa-audio») guardaba copias
@@ -64,26 +65,28 @@ function touchAudio(slug: string, audio: HTMLAudioElement) {
   }
 }
 
-export async function getHumanAudioUrl(gn: string): Promise<string | null> {
+export function getHumanAudioUrl(gn: string): Promise<string | null> {
   ensureLoaded();
   const slug = slugify(gn);
   const hit = urlCache.get(slug);
-  if (hit && hit.exp > Date.now()) return hit.url;
+  if (hit?.url && hit.exp > Date.now()) return Promise.resolve(hit.url);
+  const pending = pendingUrls.get(slug);
+  if (pending) return pending;
+  const request = resolveHumanAudioUrl(gn, slug).finally(() => pendingUrls.delete(slug));
+  pendingUrls.set(slug, request);
+  return request;
+}
+
+async function resolveHumanAudioUrl(gn: string, slug: string): Promise<string | null> {
   try {
     const { signedUrl, denied } = await getAudioSignedUrl({ data: { gn } });
     const url = signedUrl ?? null;
     // Denied (sin sesión / límite) no se cachea, para reintentar luego.
-    if (!denied) {
+    if (url && !denied) {
       urlCache.set(slug, { url, exp: Date.now() + URL_TTL_MS });
       persistUrls();
     }
-    if (typeof window !== "undefined") {
-      // eslint-disable-next-line no-console
-      console.log(
-        `[audio] Buscando audio para: ${gn} → slug: ${slug} → URL: ${url ?? "—"} → encontrado: ${Boolean(url)}`,
-      );
-    }
-    return url;
+    return url ?? await findOfflineAudio(slug);
   } catch {
     // Sin señal: buscar el audio guardado en el teléfono por nombre de archivo.
     return findOfflineAudio(slug);
@@ -120,7 +123,8 @@ export async function prefetchAudio(gn: string): Promise<string | null> {
       touchAudio(slug, el);
     } catch {}
   } else {
-    touchAudio(slug, audioCache.get(slug)!);
+    const cached = audioCache.get(slug);
+    if (cached) touchAudio(slug, cached);
   }
   return url;
 }
@@ -148,7 +152,9 @@ export function usePrefetchAudios(gns: string[], max = 10) {
 export async function playGuarani(gn: string): Promise<boolean> {
   if (typeof window === "undefined") return false;
   const slug = slugify(gn);
-  const url = await getHumanAudioUrl(gn);
+  const cached = urlCache.get(slug);
+  // Con una URL vigente, play() ocurre dentro del toque (importante en celulares).
+  const url = cached?.url && cached.exp > Date.now() ? cached.url : await getHumanAudioUrl(gn);
   if (!url) return false; // silencio intencional — nunca TTS
   try {
     let audio = audioCache.get(slug);
@@ -167,6 +173,9 @@ export async function playGuarani(gn: string): Promise<boolean> {
     });
     return true;
   } catch {
+    urlCache.delete(slug);
+    audioCache.delete(slug);
+    persistUrls();
     return false;
   }
 }
