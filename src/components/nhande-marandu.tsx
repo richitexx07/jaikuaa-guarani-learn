@@ -1,3 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { listPublishedNews, type NewsRow } from "@/lib/news.functions";
+
 type NewsItem = {
   id: string;
   title: string;
@@ -9,6 +13,8 @@ type NewsItem = {
   url: string;
 };
 
+// Respaldo: se muestra mientras cargan las noticias de la base (tabla «noticias»), o si fallan.
+// Las nuevas se cargan como «pendiente» y un administrador las publica desde /admin/noticias.
 // Solo noticias verificadas, con enlace a la fuente original.
 // Antes de agregar una, comprobá la fecha real del artículo (no la fecha de visita de la página).
 // Quedaron fuera, hasta encontrar la fuente: "Rincón SPL" en la Biblioteca Nacional,
@@ -78,7 +84,37 @@ const CATEGORY_STYLES: Record<NewsItem["category"], string> = {
 };
 
 
+const MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+/** «2026-10-18» → «Octubre 2026». */
+export function monthYear(isoDate: string): string {
+  const [y, m] = isoDate.split("-");
+  const month = MONTHS[Number(m) - 1];
+  return month && y ? `${month} ${y}` : isoDate;
+}
+
+function fromRow(r: NewsRow): NewsItem {
+  return {
+    id: r.id,
+    title: r.titulo,
+    summary: r.resumen,
+    date: monthYear(r.fecha_nota),
+    category: r.categoria,
+    emoji: r.emoji,
+    source: `Fuente: ${r.fuente}`,
+    url: r.url,
+  };
+}
+
 export function NhandeMarandu({ className = "mt-12" }: { className?: string }) {
+  const fetchNews = useServerFn(listPublishedNews);
+  const { data } = useQuery({
+    queryKey: ["nhande-marandu"],
+    queryFn: () => fetchNews(),
+    staleTime: 10 * 60 * 1000,
+    retry: 1,
+  });
+  const items = data?.items.length ? data.items.slice(0, 12).map(fromRow) : NEWS;
   return (
     <section className={`${className} select-none`} style={{ WebkitTouchCallout: "none" }}>
       <div className="flex items-baseline justify-between gap-4">
@@ -93,7 +129,7 @@ export function NhandeMarandu({ className = "mt-12" }: { className?: string }) {
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {NEWS.map((n) => (
+        {items.map((n) => (
           <article
             key={n.id}
             className="group flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card shadow-elegant card-hover hover:shadow-lift select-none"

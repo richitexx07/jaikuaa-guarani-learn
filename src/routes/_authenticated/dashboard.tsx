@@ -46,6 +46,11 @@ function StaffShortcuts() {
         <Button asChild variant="outline" className="h-12 w-full justify-start">
           <Link to="/admin/corpus">✅ Bandeja de validación</Link>
         </Button>
+        {data.isAdmin && (
+          <Button asChild variant="outline" className="h-12 w-full justify-start">
+            <Link to="/admin/noticias">📰 Noticias para aprobar</Link>
+          </Button>
+        )}
       </div>
     </section>
   );
