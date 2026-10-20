@@ -268,6 +268,38 @@ export type Database = {
           },
         ]
       }
+      corpus_word_changes: {
+        Row: {
+          changed_by: string
+          changes: Json
+          created_at: string
+          id: string
+          word_id: string
+        }
+        Insert: {
+          changed_by: string
+          changes: Json
+          created_at?: string
+          id?: string
+          word_id: string
+        }
+        Update: {
+          changed_by?: string
+          changes?: Json
+          created_at?: string
+          id?: string
+          word_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corpus_word_changes_word_id_fkey"
+            columns: ["word_id"]
+            isOneToOne: false
+            referencedRelation: "corpus_words"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       corpus_word_levels: {
         Row: {
           created_at: string
@@ -577,6 +609,54 @@ export type Database = {
           stage?: string
           units?: Json
           updated_at?: string
+        }
+        Relationships: []
+      }
+      noticias: {
+        Row: {
+          cargada_por: string
+          categoria: string
+          created_at: string
+          emoji: string
+          estado: string
+          fecha_nota: string
+          fuente: string
+          id: string
+          resumen: string
+          revisada_at: string | null
+          revisada_por: string | null
+          titulo: string
+          url: string
+        }
+        Insert: {
+          cargada_por?: string
+          categoria?: string
+          created_at?: string
+          emoji?: string
+          estado?: string
+          fecha_nota: string
+          fuente: string
+          id?: string
+          resumen: string
+          revisada_at?: string | null
+          revisada_por?: string | null
+          titulo: string
+          url: string
+        }
+        Update: {
+          cargada_por?: string
+          categoria?: string
+          created_at?: string
+          emoji?: string
+          estado?: string
+          fecha_nota?: string
+          fuente?: string
+          id?: string
+          resumen?: string
+          revisada_at?: string | null
+          revisada_por?: string | null
+          titulo?: string
+          url?: string
         }
         Relationships: []
       }
