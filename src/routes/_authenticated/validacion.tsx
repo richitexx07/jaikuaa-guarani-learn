@@ -28,6 +28,7 @@ import {
   type VerificationState,
   type VerificationWord,
 } from "@/lib/validation-circuit.functions";
+import { listContentReports, setContentReportStatus, type ContentReport, type ReportStatus } from "@/lib/content-reports.functions";
 
 export const Route = createFileRoute("/_authenticated/validacion")({
   head: () => ({
@@ -91,6 +92,7 @@ function ValidationCircuitPage() {
           <TabsTrigger value="mias">Mis propuestas</TabsTrigger>
           {r?.canReview && <TabsTrigger value="verificar">Palabras para verificar</TabsTrigger>}
           {r?.canReview && <TabsTrigger value="revisar">Revisar</TabsTrigger>}
+          {r?.canReview && <TabsTrigger value="errores">Errores señalados</TabsTrigger>}
           {r?.canValidate && <TabsTrigger value="validar">Validar</TabsTrigger>}
           {r?.isAdmin && <TabsTrigger value="revisores">Revisores</TabsTrigger>}
         </TabsList>
@@ -108,6 +110,11 @@ function ValidationCircuitPage() {
         {r?.canReview && (
           <TabsContent value="revisar">
             <Queue step="revisar" />
+          </TabsContent>
+        )}
+        {r?.canReview && (
+          <TabsContent value="errores">
+            <ReportsInbox />
           </TabsContent>
         )}
         {r?.canValidate && (
@@ -499,6 +506,94 @@ function HistoryToggle({ id }: { id: string }) {
             </li>
           ))}
         </ol>
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------- Errores señalados ---------------------------- */
+
+const REPORT_TYPE_LABEL: Record<ContentReport["tipo"], string> = {
+  escritura: "Escritura",
+  significado: "Significado",
+  audio: "Audio",
+  otro: "Otra cosa",
+};
+
+/**
+ * Avisos de «Señalar un error» que mandan docentes y usuarios desde las lecciones y el glosario.
+ * Nada se corrige solo: si el aviso tiene razón, la corrección se propone en la pestaña Proponer.
+ */
+function ReportsInbox() {
+  const qc = useQueryClient();
+  const listFn = useServerFn(listContentReports);
+  const setFn = useServerFn(setContentReportStatus);
+  const q = useQuery({ queryKey: ["content-reports"], queryFn: () => listFn() });
+  const mark = useMutation({
+    mutationFn: (v: { id: string; estado: ReportStatus }) => setFn({ data: v }),
+    onSuccess: (d) => {
+      if (!d.ok) return toast.error(d.error);
+      qc.invalidateQueries({ queryKey: ["content-reports"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  if (q.isLoading) return <Loader2 className="mx-auto mt-8 h-5 w-5 animate-spin text-primary" />;
+  const open = q.data?.open ?? [];
+  const done = q.data?.done ?? [];
+  const busy = mark.isPending ? mark.variables?.id : null;
+  return (
+    <div className="mt-4 space-y-6">
+      <p className="text-sm text-muted-foreground">
+        Avisos que llegan desde las lecciones y el glosario. Si el aviso tiene razón, proponé la corrección en la
+        pestaña <strong>Proponer → Corregir una palabra</strong> y marcalo como resuelto: así sigue los tres pasos.
+      </p>
+      {open.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No hay avisos abiertos.</p>
+      ) : (
+        <ul className="space-y-3">
+          {open.map((x) => (
+            <li key={x.id} className="rounded-xl border border-border/60 bg-card p-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="outline">{REPORT_TYPE_LABEL[x.tipo]}</Badge>
+                <span className="text-xs text-muted-foreground">
+                  {x.reporterName} · {x.lugar} · {fmt(x.created_at)}
+                </span>
+              </div>
+              <p className="mt-2 text-lg">
+                <strong>{x.word_gn}</strong>
+                {x.word_es && <span className="text-muted-foreground"> — {x.word_es}</span>}
+              </p>
+              <p className="mt-1 whitespace-pre-line text-sm">{x.mensaje}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button size="sm" onClick={() => mark.mutate({ id: x.id, estado: "resuelto" })} disabled={busy === x.id}>
+                  <CheckCircle2 className="mr-1 h-4 w-4" /> Resuelto
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => mark.mutate({ id: x.id, estado: "descartado" })} disabled={busy === x.id}>
+                  <XCircle className="mr-1 h-4 w-4" /> Descartar
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      {done.length > 0 && (
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">Últimos revisados</h3>
+          <ul className="mt-2 divide-y rounded-xl border border-border/60">
+            {done.map((x) => (
+              <li key={x.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
+                <span>
+                  <strong>{x.word_gn}</strong> · {REPORT_TYPE_LABEL[x.tipo]} ·{" "}
+                  {x.estado === "resuelto" ? "Resuelto" : "Descartado"}
+                  {x.reviewerName ? ` por ${x.reviewerName}` : ""}
+                </span>
+                <Button size="sm" variant="ghost" onClick={() => mark.mutate({ id: x.id, estado: "abierto" })} disabled={busy === x.id}>
+                  <RotateCcw className="mr-1 h-4 w-4" /> Reabrir
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );

@@ -49,6 +49,7 @@ export const Route = createFileRoute("/_authenticated/curso/$lang/leccion/$n")({
 });
 
 import { SpeakerButton } from "@/components/audio/speaker-button";
+import { ReportErrorButton } from "@/components/report-error-button";
 
 type Phase = "intro" | "vocab" | "choice" | "match" | "done";
 
@@ -173,7 +174,7 @@ function VocabStep({
   lesson,
   onNext,
 }: {
-  lesson: { vocab: VocabItem[] };
+  lesson: { n: number; vocab: VocabItem[] };
   onNext: () => void;
 }) {
   return (
@@ -199,11 +200,14 @@ function VocabStep({
                 <div className="text-sm text-muted-foreground">{v.es}</div>
               </div>
             </div>
-            {v.validated && (
-              <span className="shrink-0 text-[11px] font-medium text-primary/80">
-                ✓ Validado por docente
-              </span>
-            )}
+            <div className="flex shrink-0 items-center gap-1">
+              {v.validated && (
+                <span className="text-[11px] font-medium text-primary/80">
+                  ✓ Validado por docente
+                </span>
+              )}
+              <ReportErrorButton gn={v.gn} es={v.es} lugar={`Lección ${lesson.n}`} />
+            </div>
           </li>
         ))}
       </ul>

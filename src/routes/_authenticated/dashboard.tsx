@@ -298,6 +298,7 @@ function Dashboard() {
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <FreeCard to="/teclado" emoji="⌨️" title="Teclado Guaraní" desc="Escribí con ã, g̃ y puso, y mandalo por WhatsApp." accent="primary" />
+                <FreeCard to="/glosario" emoji="📖" title="Glosario" desc="Las palabras publicadas, con su significado y su audio." accent="primary" />
                 <FreeCard to="/agro" emoji="🌾" title="Jaikuaa Agro-Rural" desc="Guaraní técnico del campo: suelo, cultivos y ganado." accent="primary" />
                 {AI_GUARANI_TOOLS_ENABLED && (
                   <>
