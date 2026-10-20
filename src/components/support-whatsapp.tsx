@@ -430,11 +430,11 @@ export function SupportWhatsApp() {
             setTeaser(false);
           }}
           aria-label="Abrir atención al cliente con Jai"
-          className="group relative ml-auto block h-24 w-24 focus:outline-none"
+          className="group relative ml-auto block h-20 w-20 rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-24 sm:w-24"
         >
           <span className="jai-halo absolute inset-x-2 bottom-1 top-6 rounded-full" aria-hidden />
-          <span className="absolute inset-x-1 bottom-0 h-16 rounded-full bg-primary shadow-lift ring-4 ring-background transition group-hover:scale-105" aria-hidden />
-          <img src={jaiImg} alt="" width={96} height={98} className="jai-float-c absolute inset-x-0 bottom-1 mx-auto h-24 w-24 object-contain drop-shadow-xl transition group-hover:scale-110" />
+          <span className="absolute inset-x-1 bottom-0 h-14 rounded-full bg-primary shadow-lift ring-4 ring-background transition group-hover:scale-105 sm:h-16" aria-hidden />
+          <img src={jaiImg} alt="" width={96} height={98} decoding="async" className="jai-float-c absolute inset-x-0 bottom-1 mx-auto h-20 w-20 object-contain drop-shadow-xl transition group-hover:scale-110 sm:h-24 sm:w-24" />
           <span className="jai-whatsapp absolute bottom-2 right-2 h-4 w-4 rounded-full ring-2 ring-background" aria-hidden />
         </button>
       )}
