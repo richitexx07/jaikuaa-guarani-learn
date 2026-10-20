@@ -3,7 +3,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, ChevronUp, MessageCircle, Send, X } from "lucide-react";
 import { showsBottomNav } from "@/lib/bottom-nav";
 import { JAI_FAQS, findFaq, whatsappLink, type JaiFaq } from "@/lib/jai-faq";
-import jaiImg from "@/assets/jai-tradicional.png";
+import jaiImg from "@/assets/jai-atencion.png";
 
 // En los juegos y en el panel de administración el botón molestaría, así que no se muestra.
 const HIDDEN_PREFIXES = ["/juegos", "/admin", "/piloto-ateneo", "/certificado"];
@@ -97,7 +97,7 @@ export function SupportWhatsApp() {
         >
           <header className="flex items-center gap-3 bg-gradient-to-br from-primary to-primary/85 px-4 py-3 text-primary-foreground">
             <div className="relative">
-              <img src={jaiImg} alt="" className="jai-wave h-11 w-11 rounded-full bg-background object-contain ring-2 ring-primary-foreground/40" />
+              <img src={jaiImg} alt="" className="jai-wave h-12 w-12 rounded-full bg-background object-cover object-top ring-2 ring-primary-foreground/40" />
               <span className="jai-whatsapp absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ring-2 ring-primary" aria-hidden />
             </div>
             <div className="flex-1">
@@ -119,9 +119,15 @@ export function SupportWhatsApp() {
                 >
                   {m.text}
                 </div>
+              ) : i === 0 ? (
+                <div key={m.id} className="jai-msg-in flex flex-col items-center px-2 pt-1 text-center">
+                  <img src={jaiImg} alt="Jai, el jaguareté de Jaikuaa" className="jai-wave h-32 w-32 object-contain drop-shadow-xl" />
+                  <p className="mt-1 font-display text-lg font-bold text-primary">{m.lead}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{m.text}</p>
+                </div>
               ) : (
                 <div key={m.id} className="jai-msg-in flex items-end gap-2">
-                  <img src={jaiImg} alt="" className="h-7 w-7 shrink-0 rounded-full bg-background object-contain shadow-sm" />
+                  <img src={jaiImg} alt="" className="h-8 w-8 shrink-0 rounded-full bg-background object-cover object-top ring-1 ring-border shadow-sm" />
                   <div className="max-w-[85%] space-y-2 rounded-2xl rounded-bl-md bg-card px-3.5 py-2.5 text-sm leading-relaxed shadow-elegant">
                     {m.lead && <p className="font-semibold text-primary">{m.lead}</p>}
                     <p>{m.text}</p>
@@ -154,7 +160,7 @@ export function SupportWhatsApp() {
 
             {typing && (
               <div className="jai-msg-in flex items-end gap-2" aria-label="Jai está escribiendo">
-                <img src={jaiImg} alt="" className="h-7 w-7 rounded-full bg-background object-contain" />
+                <img src={jaiImg} alt="" className="h-8 w-8 rounded-full bg-background object-cover object-top ring-1 ring-border" />
                 <div className="flex gap-1 rounded-2xl rounded-bl-md bg-card px-4 py-3 shadow-elegant">
                   <span className="jai-dot h-2 w-2 rounded-full bg-primary" />
                   <span className="jai-dot h-2 w-2 rounded-full bg-primary" />
@@ -218,7 +224,7 @@ export function SupportWhatsApp() {
           aria-label="Abrir atención al cliente con Jai"
           className="ml-auto flex items-center gap-2 rounded-full bg-primary py-1.5 pl-1.5 pr-4 text-sm font-semibold text-primary-foreground shadow-lift transition hover:scale-105"
         >
-          <img src={jaiImg} alt="" className="jai-wave h-10 w-10 rounded-full bg-background object-contain" />
+          <img src={jaiImg} alt="" className="jai-wave h-12 w-12 rounded-full bg-background object-cover object-top ring-2 ring-primary-foreground/50" />
           <span className="hidden sm:inline">¿Te ayudo? Soy Jai</span>
           <span className="sm:hidden">Jai</span>
         </button>
