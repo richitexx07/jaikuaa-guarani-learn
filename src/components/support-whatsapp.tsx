@@ -32,7 +32,7 @@ export function SupportWhatsApp() {
   const [showChips, setShowChips] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastQuestionRef = useRef<HTMLDivElement>(null);
-  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Lleva la vista al comienzo de la última pregunta, así la respuesta se lee desde arriba.
   useEffect(() => {
