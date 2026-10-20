@@ -1,5 +1,5 @@
 - [x] Piloto Ateneo: bandeja de Validación docente en el panel.
-- [ ] Audio: corregir bloqueo tras fallas temporales y verificar reproducción y reintento sin modificar grabaciones.
+- [x] Audio: corregir bloqueo tras fallas temporales y verificar reproducción y reintento sin modificar grabaciones.
 - [x] Piloto Ateneo: Cuaderno digital del docente (/cuaderno) con semáforo y planilla.
 - [x] Modo sin conexión: app guardada, audios escuchados y avances que se sincronizan al volver la señal.
 - [ ] Juegos Duelo Cara a Cara y Relámpago Guaraní.
