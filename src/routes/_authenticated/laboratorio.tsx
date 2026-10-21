@@ -178,6 +178,8 @@ function LaboratorioPage() {
     setSubmitted(w || null);
     setResults(w ? analyze(w) : []);
     setShowAll(false);
+    // Lleva directo al resultado: nada de buscar bajando la pantalla.
+    if (w) requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
   const onSubmit = (e: FormEvent) => {
@@ -315,26 +317,7 @@ function LaboratorioPage() {
         <div ref={resultsRef} className="scroll-mt-4" />
         {submitted && (
           <section className="mt-8" aria-live="polite">
-            <OrthographyPanel word={submitted} />
             {closed.length > 0 && <ClosedClassPanel matches={closed} />}
-            {book && bookQ.data && (
-              <BookPanel
-                word={submitted}
-                book={book}
-                observaciones={bookQ.data.observaciones}
-                showCompounds={![...ranked, ...nominalRanked].some((r) => r.attestation.level !== "none") && closed.length === 0}
-              />
-            )}
-            {dict && <SplPanel word={submitted} dict={dict} />}
-            {wik && wikQ.data && (
-              <WiktionaryPanel
-                word={submitted}
-                wik={wik}
-                attribution={wikQ.data.source.atribucion}
-                license={wikQ.data.source.licencia}
-                roots={[...ranked.slice(0, 3).map((r) => r.reading.root), ...nominalRanked.slice(0, 3).map((r) => r.reading.root)]}
-              />
-            )}
             {results.length === 0 && nominal.length === 0 && closed.length === 0 ? (
               <Card className="border-amber-300/60 bg-amber-50/60 dark:bg-amber-500/10">
                 <CardContent className="flex items-start gap-3 pt-6">
@@ -354,7 +337,6 @@ function LaboratorioPage() {
                     </p>
                   )}
                 </div>
-                <CorpusStatus loading={corpus.isLoading} failed={corpus.isError} size={index?.size ?? 0} word={submitted} inWord={wordInCorpus} />
                 <div className="mt-4 space-y-4">
                   {(showAll ? ranked : ranked.slice(0, VISIBLE_READINGS)).map(({ reading: a, attestation }, i) => (
                     <AnalysisCard
@@ -374,7 +356,34 @@ function LaboratorioPage() {
               </>
             )}
             {nominal.length > 0 && <NominalReadings readings={nominalRanked} />}
-            <AlanMotorPanel word={submitted} lab={results.map((a) => ({ person: a.person, root: a.root, suffixes: a.suffixes.map((s) => s.form) }))} />
+            <details className="mt-6 rounded-xl border bg-muted/30 p-3 [&_section]:mt-3">
+              <summary className="cursor-pointer text-sm font-semibold text-foreground">
+                Ver fuentes, ortografía y cómo se ordenaron las lecturas
+              </summary>
+              {results.length > 0 && (
+                <CorpusStatus loading={corpus.isLoading} failed={corpus.isError} size={index?.size ?? 0} word={submitted} inWord={wordInCorpus} />
+              )}
+              <OrthographyPanel word={submitted} />
+              {book && bookQ.data && (
+                <BookPanel
+                  word={submitted}
+                  book={book}
+                  observaciones={bookQ.data.observaciones}
+                  showCompounds={![...ranked, ...nominalRanked].some((r) => r.attestation.level !== "none") && closed.length === 0}
+                />
+              )}
+              {dict && <SplPanel word={submitted} dict={dict} />}
+              {wik && wikQ.data && (
+                <WiktionaryPanel
+                  word={submitted}
+                  wik={wik}
+                  attribution={wikQ.data.source.atribucion}
+                  license={wikQ.data.source.licencia}
+                  roots={[...ranked.slice(0, 3).map((r) => r.reading.root), ...nominalRanked.slice(0, 3).map((r) => r.reading.root)]}
+                />
+              )}
+              <AlanMotorPanel word={submitted} lab={results.map((a) => ({ person: a.person, root: a.root, suffixes: a.suffixes.map((s) => s.form) }))} />
+            </details>
           </section>
         )}
 
