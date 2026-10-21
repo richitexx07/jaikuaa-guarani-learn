@@ -317,6 +317,7 @@ function LaboratorioPage() {
         <div ref={resultsRef} className="scroll-mt-4" />
         {submitted && (
           <section className="mt-8" aria-live="polite">
+            {closed.length > 0 && <ClosedClassPanel matches={closed} />}
             {results.length === 0 && nominal.length === 0 && closed.length === 0 ? (
               <Card className="border-amber-300/60 bg-amber-50/60 dark:bg-amber-500/10">
                 <CardContent className="flex items-start gap-3 pt-6">
