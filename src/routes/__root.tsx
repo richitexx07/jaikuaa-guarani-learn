@@ -16,6 +16,7 @@ import { SplashScreen } from "@/components/splash-screen";
 import { supabase } from "@/integrations/supabase/client";
 import { redeemPendingPilotCode } from "@/lib/pilot-code";
 import { SupportWhatsApp } from "@/components/support-whatsapp";
+import { BackButton } from "@/components/navigation/back-button";
 import { applyDisplayPrefs, readDisplayPrefs } from "@/lib/display-prefs";
 import { registerOfflineSupport } from "@/lib/pwa";
 import { syncStats } from "@/lib/gamification";
@@ -182,6 +183,7 @@ function RootComponent() {
       <SplashScreen />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <BackButton />
       <SupportWhatsApp />
     </QueryClientProvider>
   );
