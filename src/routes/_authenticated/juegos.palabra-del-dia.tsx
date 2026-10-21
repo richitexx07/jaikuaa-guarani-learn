@@ -11,6 +11,7 @@ import { answerWordOfDay, getWordOfDay, type WordOfDayPackItem } from "@/lib/gam
 import { isNetworkError, isOffline, readOfflineCopy } from "@/lib/offline-data";
 import { K } from "@/lib/offline-pack";
 import { localWotdPlay, queueWotdAnswer, rememberWotdPlay } from "@/lib/offline-sync";
+import { logAnswer } from "@/lib/answer-log";
 import { ShareResult } from "@/components/games/share-result";
 import { syncStats } from "@/lib/gamification";
 
@@ -97,6 +98,7 @@ function WordOfDayContent() {
     if (!d || !answer) return false;
     const correct = choice === answer;
     rememberWotdPlay({ day: d.day, choice, correct, answer });
+    if (d.word) logAnswer(d.word.gn, correct, "wotd", d.day);
     queueWotdAnswer(d.day, choice);
     setResult({ choice, correct, answer });
     feedback(correct ? "victory" : "error");
@@ -115,6 +117,7 @@ function WordOfDayContent() {
         const r = await answerFn({ data: { choice } });
         setResult({ choice, correct: r.correct, answer: r.answer });
         feedback(r.correct ? "victory" : "error");
+        if (d?.word) logAnswer(d.word.gn, r.correct, "wotd", d.day);
         void syncStats();
         void qc.invalidateQueries({ queryKey: ["word-of-day"] });
       } catch (e) {

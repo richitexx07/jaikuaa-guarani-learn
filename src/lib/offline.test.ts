@@ -76,6 +76,14 @@ vi.mock("./games.functions", () => ({
   }),
 }));
 vi.mock("./certificates.functions", () => ({ issueCertificate: vi.fn(async () => ({ code: "ABC" })) }));
+const answerBatches: number[] = [];
+vi.mock("./answers.functions", () => ({
+  recordAnswers: vi.fn(async ({ data }: { data: { answers: unknown[] } }) => {
+    serverError();
+    answerBatches.push(data.answers.length);
+    return { saved: data.answers.length };
+  }),
+}));
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
 async function settle() {
@@ -95,6 +103,7 @@ beforeEach(async () => {
   server.fail = null;
   server.xp = 0;
   wotdCalls.length = 0;
+  answerBatches.length = 0;
   session.current = null;
   setOnline(true);
   const store = await import("./offline-store");
@@ -288,5 +297,31 @@ describe("Lección a medias", () => {
     ];
     expect(d.draftFitsLesson(draft, vocab)).toBe(true);
     expect(d.draftFitsLesson(draft, [{ gn: "jasy", es: "Luna" }])).toBe(false);
+  });
+});
+
+describe("Respuestas para el cuaderno del docente", () => {
+  it("se guardan sin señal y se envían en tandas de hasta 200 al volver", async () => {
+    setOnline(false);
+    const log = await import("./answer-log");
+    for (let i = 0; i < 450; i++) log.logAnswer("Kuarahy", i % 3 !== 0, "lesson", "guarani:2");
+    expect(log.pendingAnswersCount()).toBe(450);
+    await log.flushAnswers();
+    expect(answerBatches).toEqual([]);
+    setOnline(true);
+    await log.flushAnswers();
+    expect(answerBatches).toEqual([200, 200, 50]);
+    expect(log.pendingAnswersCount()).toBe(0);
+  });
+
+  it("si se corta la señal al enviar, no se pierde ninguna respuesta", async () => {
+    const log = await import("./answer-log");
+    log.logAnswer("Aguyje", true, "wotd", "2026-10-21");
+    server.fail = "network";
+    await log.flushAnswers();
+    expect(log.pendingAnswersCount()).toBe(1);
+    server.fail = null;
+    await log.flushAnswers();
+    expect(log.pendingAnswersCount()).toBe(0);
   });
 });

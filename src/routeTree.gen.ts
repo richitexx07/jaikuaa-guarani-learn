@@ -38,6 +38,7 @@ import { Route as AuthenticatedRankingRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedTraductorRouteImport } from './routes/_authenticated/traductor'
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
 import { Route as AuthenticatedValidacionRouteImport } from './routes/_authenticated/validacion'
+import { Route as AuthenticatedValidarRouteImport } from './routes/_authenticated/validar'
 import { Route as ApiTutorRouteImport } from './routes/api/tutor'
 import { Route as StudioIndexRouteImport } from './routes/studio.index'
 import { Route as StudioSplatRouteImport } from './routes/studio.$'
@@ -216,6 +217,11 @@ const AuthenticatedTutorRoute = AuthenticatedTutorRouteImport.update({
 const AuthenticatedValidacionRoute = AuthenticatedValidacionRouteImport.update({
   id: '/validacion',
   path: '/validacion',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedValidarRoute = AuthenticatedValidarRouteImport.update({
+  id: '/validar',
+  path: '/validar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiTutorRoute = ApiTutorRouteImport.update({
@@ -434,6 +440,7 @@ export interface FileRoutesByFullPath {
   '/traductor': typeof AuthenticatedTraductorRoute
   '/tutor': typeof AuthenticatedTutorRoute
   '/validacion': typeof AuthenticatedValidacionRoute
+  '/validar': typeof AuthenticatedValidarRoute
   '/api/tutor': typeof ApiTutorRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar/$code': typeof VerificarCodeRoute
@@ -495,6 +502,7 @@ export interface FileRoutesByTo {
   '/traductor': typeof AuthenticatedTraductorRoute
   '/tutor': typeof AuthenticatedTutorRoute
   '/validacion': typeof AuthenticatedValidacionRoute
+  '/validar': typeof AuthenticatedValidarRoute
   '/api/tutor': typeof ApiTutorRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar/$code': typeof VerificarCodeRoute
@@ -557,6 +565,7 @@ export interface FileRoutesById {
   '/_authenticated/traductor': typeof AuthenticatedTraductorRoute
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
   '/_authenticated/validacion': typeof AuthenticatedValidacionRoute
+  '/_authenticated/validar': typeof AuthenticatedValidarRoute
   '/api/tutor': typeof ApiTutorRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar/$code': typeof VerificarCodeRoute
@@ -621,6 +630,7 @@ export interface FileRouteTypes {
     | '/traductor'
     | '/tutor'
     | '/validacion'
+    | '/validar'
     | '/api/tutor'
     | '/studio/$'
     | '/verificar/$code'
@@ -682,6 +692,7 @@ export interface FileRouteTypes {
     | '/traductor'
     | '/tutor'
     | '/validacion'
+    | '/validar'
     | '/api/tutor'
     | '/studio/$'
     | '/verificar/$code'
@@ -743,6 +754,7 @@ export interface FileRouteTypes {
     | '/_authenticated/traductor'
     | '/_authenticated/tutor'
     | '/_authenticated/validacion'
+    | '/_authenticated/validar'
     | '/api/tutor'
     | '/studio/$'
     | '/verificar/$code'
@@ -1003,6 +1015,13 @@ declare module '@tanstack/react-router' {
       path: '/validacion'
       fullPath: '/validacion'
       preLoaderRoute: typeof AuthenticatedValidacionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/validar': {
+      id: '/_authenticated/validar'
+      path: '/validar'
+      fullPath: '/validar'
+      preLoaderRoute: typeof AuthenticatedValidarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/tutor': {
@@ -1304,6 +1323,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTraductorRoute: typeof AuthenticatedTraductorRoute
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
   AuthenticatedValidacionRoute: typeof AuthenticatedValidacionRoute
+  AuthenticatedValidarRoute: typeof AuthenticatedValidarRoute
   AuthenticatedAdminCorpusRoute: typeof AuthenticatedAdminCorpusRoute
   AuthenticatedAdminInformeAuspicianteRoute: typeof AuthenticatedAdminInformeAuspicianteRoute
   AuthenticatedAdminJaiRoute: typeof AuthenticatedAdminJaiRoute
@@ -1341,6 +1361,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTraductorRoute: AuthenticatedTraductorRoute,
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
   AuthenticatedValidacionRoute: AuthenticatedValidacionRoute,
+  AuthenticatedValidarRoute: AuthenticatedValidarRoute,
   AuthenticatedAdminCorpusRoute: AuthenticatedAdminCorpusRoute,
   AuthenticatedAdminInformeAuspicianteRoute:
     AuthenticatedAdminInformeAuspicianteRoute,

@@ -20,6 +20,7 @@ import { BackButton } from "@/components/navigation/back-button";
 import { applyDisplayPrefs, readDisplayPrefs } from "@/lib/display-prefs";
 import { registerOfflineSupport } from "@/lib/pwa";
 import { syncAllPending, totalPending } from "@/lib/offline-sync";
+import { pendingAnswersCount } from "@/lib/answer-log";
 
 function NotFoundComponent() {
   return (
@@ -169,9 +170,10 @@ function RootComponent() {
     const onOnline = () => void syncAllPending();
     window.addEventListener("online", onOnline);
     // Al abrir la app con señal, se envía enseguida lo que quedó de antes.
-    if (navigator.onLine && totalPending() > 0) void syncAllPending();
+    const hasPending = () => totalPending() > 0 || pendingAnswersCount() > 0;
+    if (navigator.onLine && hasPending()) void syncAllPending();
     const timer = window.setInterval(() => {
-      if (navigator.onLine && totalPending() > 0) void syncAllPending();
+      if (navigator.onLine && hasPending()) void syncAllPending();
     }, 60_000);
     return () => {
       window.removeEventListener("online", onOnline);

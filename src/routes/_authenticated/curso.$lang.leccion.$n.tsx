@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { getLanguage } from "@/lib/languages";
 import { getCourseLesson, type CourseLesson, type CourseVocabItem as VocabItem } from "@/lib/lessons.functions";
 import { useRecordOnMount, useRecordVisit } from "@/lib/gamification";
+import { logAnswer } from "@/lib/answer-log";
 import { OfflineMissingError, withOfflineCache } from "@/lib/offline-data";
 import { K } from "@/lib/offline-pack";
 import {
@@ -210,6 +211,7 @@ function LessonPage() {
             <ChoiceStep
               key={`c${round}`}
               lesson={lesson}
+              lessonRef={`${lang.slug}:${lesson.n}`}
               initial={draft.current.choice}
               onChange={(choice) => persist({ choice })}
               onNext={() => setPhase("match")}
@@ -219,6 +221,7 @@ function LessonPage() {
             <MatchStep
               key={`m${round}`}
               lesson={lesson}
+              lessonRef={`${lang.slug}:${lesson.n}`}
               initial={draft.current.match}
               onChange={(match) => persist({ match })}
               onNext={() => setPhase("done")}
@@ -313,8 +316,10 @@ function ChoiceStep({
   onNext,
   initial,
   onChange,
+  lessonRef,
 }: {
   lesson: { vocab: VocabItem[] };
+  lessonRef?: string;
   onNext: () => void;
   initial?: ChoiceDraft;
   onChange?: (d: ChoiceDraft) => void;
@@ -404,6 +409,7 @@ function ChoiceStep({
                 onClick={() => {
                   setPicked(opt);
                   if (opt === q.item.es) setCorrect((c) => c + 1);
+                  logAnswer(q.item.gn, opt === q.item.es, "lesson", lessonRef);
                 }}
                 className={cls}
               >
@@ -438,8 +444,10 @@ function MatchStep({
   onNext,
   initial,
   onChange,
+  lessonRef,
 }: {
   lesson: { vocab: VocabItem[] };
+  lessonRef?: string;
   onNext: () => void;
   initial?: MatchDraft;
   onChange?: (d: MatchDraft) => void;
@@ -472,7 +480,9 @@ function MatchStep({
 
   function tryMatch(es: string) {
     if (!selectedGn) return;
-    if (lookup.get(selectedGn) === es) {
+    const ok = lookup.get(selectedGn) === es;
+    logAnswer(selectedGn, ok, "lesson", lessonRef);
+    if (ok) {
       setMatched((prev) => new Set(prev).add(selectedGn));
       setSelectedGn(null);
       setWrong(null);

@@ -957,3 +957,60 @@ export const uploadWordAudio = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true, path };
   });
+
+/**
+ * Validación rápida (una palabra por pantalla). «Aprobar» publica la palabra y registra al docente
+ * que la validó. «Deshacer» vale solo para la propia aprobación de los últimos 15 minutos y
+ * devuelve la palabra exactamente como estaba (publicada o en borrador).
+ */
+export const quickValidateWord = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        action: z.enum(["approve", "undo"]),
+        prevStatus: z.enum(["draft", "published"]).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertRole(context.supabase, context.userId, "editor");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: before } = await supabaseAdmin
+      .from("corpus_words")
+      .select("status, validated_by, validated_at")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!before) throw new Error("No encontramos la palabra");
+
+    let patch: Record<string, unknown>;
+    if (data.action === "approve") {
+      if (before.validated_by) return { ok: true, prevStatus: before.status as "draft" | "published", already: true };
+      patch = { status: "published", validated_by: context.userId, validated_at: new Date().toISOString() };
+    } else {
+      const recent =
+        before.validated_by === context.userId &&
+        !!before.validated_at &&
+        Date.now() - new Date(before.validated_at).getTime() < 15 * 60 * 1000;
+      if (!recent) throw new Error("Solo se puede deshacer tu propia aprobación de los últimos 15 minutos");
+      patch = { status: data.prevStatus ?? "draft", validated_by: null, validated_at: null };
+    }
+    const { error } = await supabaseAdmin.from("corpus_words").update(patch as never).eq("id", data.id);
+    if (error) throw new Error(error.message);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: logError } = await (supabaseAdmin as any).from("corpus_word_changes").insert({
+      word_id: data.id,
+      changed_by: context.userId,
+      changes: {
+        validacion: {
+          antes: before.validated_by ? "validada" : "sin validar",
+          despues: data.action === "approve" ? "validada" : "sin validar",
+        },
+        ...(before.status !== patch.status ? { status: { antes: before.status, despues: patch.status } } : {}),
+      },
+    });
+    if (logError) console.error("corpus_word_changes:", logError.message);
+    return { ok: true, prevStatus: before.status as "draft" | "published", already: false };
+  });

@@ -44,6 +44,9 @@ function StaffShortcuts() {
         <Button asChild variant="outline" className="h-12 w-full justify-start">
           <Link to="/cuaderno">📒 Cuaderno digital del aula</Link>
         </Button>
+        <Button asChild variant="cta" className="h-12 w-full justify-start">
+          <Link to="/validar">⚡ Validación rápida</Link>
+        </Button>
         <Button asChild variant="outline" className="h-12 w-full justify-start">
           <Link to="/admin/corpus">✅ Bandeja de validación</Link>
         </Button>

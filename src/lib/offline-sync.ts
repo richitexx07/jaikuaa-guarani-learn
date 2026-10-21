@@ -5,6 +5,7 @@ import { answerWordOfDayFor } from "./games.functions";
 import { issueCertificate } from "./certificates.functions";
 import { PENDING_EVENT, pendingCount, syncStats } from "./gamification";
 import { isNetworkError, isOffline } from "./offline-data";
+import { flushAnswers } from "./answer-log";
 
 const WOTD_KEY = "jaikuaa:pending-wotd";
 const WOTD_PLAYED = "jaikuaa:wotd-played";
@@ -109,6 +110,7 @@ export function syncAllPending(): Promise<void> {
     await syncStats();
     await flushWotd();
     await flushCertificate();
+    await flushAnswers();
   })()
     .catch(() => {})
     .finally(() => {
