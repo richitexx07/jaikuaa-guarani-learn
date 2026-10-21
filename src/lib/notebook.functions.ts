@@ -81,13 +81,13 @@ export const getTeacherNotebook = createServerFn({ method: "POST" })
         .limit(20000),
       supabaseAdmin.from("user_stats").select("user_id, xp, current_streak").in("user_id", ids),
       supabaseAdmin
-        .from("practice_answers" as never)
+        .from("practice_answers")
         .select("user_id, gn, correct")
         .in("user_id", ids)
         .gte("answered_at", since30)
         .limit(50000),
     ]);
-    const answers = ((ansRes.data ?? []) as unknown as { user_id: string; gn: string; correct: boolean }[]);
+    const answers = ansRes.data ?? [];
 
     // Palabras que más le cuestan al grupo (últimos 30 días, con al menos 3 respuestas).
     const byWord = new Map<string, { attempts: number; wrong: number; students: Set<string> }>();

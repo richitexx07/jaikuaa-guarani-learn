@@ -729,6 +729,39 @@ export type Database = {
         }
         Relationships: []
       }
+      practice_answers: {
+        Row: {
+          answered_at: string
+          correct: boolean
+          created_at: string
+          gn: string
+          id: string
+          source: string
+          source_ref: string | null
+          user_id: string
+        }
+        Insert: {
+          answered_at: string
+          correct: boolean
+          created_at?: string
+          gn: string
+          id: string
+          source: string
+          source_ref?: string | null
+          user_id: string
+        }
+        Update: {
+          answered_at?: string
+          correct?: boolean
+          created_at?: string
+          gn?: string
+          id?: string
+          source?: string
+          source_ref?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           cohort: string | null

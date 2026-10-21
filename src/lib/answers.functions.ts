@@ -37,8 +37,8 @@ export const recordAnswers = createServerFn({ method: "POST" })
     }));
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
-      .from("practice_answers" as never)
-      .upsert(rows as never, { onConflict: "id", ignoreDuplicates: true });
+      .from("practice_answers")
+      .upsert(rows, { onConflict: "id", ignoreDuplicates: true });
     if (error) throw new Error("No se pudieron guardar las respuestas");
     return { saved: rows.length };
   });
