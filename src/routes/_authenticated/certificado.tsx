@@ -9,6 +9,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getCertificateStatus } from "@/lib/community.functions";
 import { issueCertificate } from "@/lib/certificates.functions";
+import { isOffline, readOfflineCopy, withOfflineCache } from "@/lib/offline-data";
+import { K } from "@/lib/offline-pack";
+import { pendingLessonRefs } from "@/lib/gamification";
+import { pendingCertificateName, queueCertificate } from "@/lib/offline-sync";
+
+type CertStatus = {
+  eligible: boolean;
+  completed: number;
+  required: number;
+  name?: string | null;
+  code?: string | null;
+  issuedAt?: string | null;
+};
+
+/**
+ * Estado del certificado. Sin señal se usa la última copia y se suman las lecciones terminadas
+ * en el teléfono que todavía no llegaron al servidor.
+ */
+async function loadStatus(fn: () => Promise<CertStatus>): Promise<CertStatus & { offline?: boolean }> {
+  const d = await withOfflineCache(K.certificate, fn, { label: "El certificado" });
+  if (!isOffline() || d.eligible) return d;
+  const lessons = (await readOfflineCopy<{ lessons: { n: number; completed: boolean }[] }>(K.lessons))?.lessons ?? [];
+  const pend = pendingLessonRefs();
+  const doneHere = lessons.filter((l) => l.completed || pend.has(`guarani:${l.n}`)).length;
+  const completed = Math.max(d.completed, doneHere);
+  return { ...d, completed, eligible: d.required > 0 && completed >= d.required, offline: true };
+}
 
 export const Route = createFileRoute("/_authenticated/certificado")({
   head: () => ({ meta: [{ title: "Jaikuaa — Certificado" }] }),
@@ -18,7 +45,11 @@ export const Route = createFileRoute("/_authenticated/certificado")({
 function CertificadoPage() {
   const fn = useServerFn(getCertificateStatus);
   const issue = useServerFn(issueCertificate);
-  const q = useQuery({ queryKey: ["certificate-status"], queryFn: () => fn() });
+  const q = useQuery({
+    queryKey: ["certificate-status"],
+    queryFn: () => loadStatus(() => fn() as Promise<CertStatus>),
+  });
+  const [queued, setQueued] = useState<string | null>(() => pendingCertificateName());
   const d = q.data;
   const [typedName, setTypedName] = useState("");
   const [issuing, setIssuing] = useState(false);
@@ -46,7 +77,11 @@ function CertificadoPage() {
       </header>
       <main className="flex-1 px-4 py-10 sm:px-6 print:p-0">
         <div className="mx-auto max-w-4xl">
-          {q.isLoading || !d ? (
+          {q.error ? (
+            <p className="mx-auto max-w-lg rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+              Sin conexión. Cuando tengas señal vas a ver acá cuántas lecciones te faltan para tu certificado.
+            </p>
+          ) : q.isLoading || !d ? (
             <div className="flex justify-center py-10">
               <Loader2 className="h-5 w-5 animate-spin text-primary" />
             </div>
@@ -87,6 +122,22 @@ function CertificadoPage() {
                 {d.code ? (
                   <Button variant="cta" onClick={() => window.print()}>
                     <Printer aria-hidden /> Descargar o imprimir
+                  </Button>
+                ) : queued ? (
+                  <p className="max-w-md rounded-xl border border-primary/30 bg-primary/5 p-4 text-center text-sm text-foreground">
+                    📜 ¡Lo ganaste! Tu certificado a nombre de <strong>{queued}</strong> se emite solo cuando vuelva la
+                    señal. Después lo descargás desde esta misma pantalla.
+                  </p>
+                ) : isOffline() ? (
+                  <Button
+                    variant="cta"
+                    disabled={!name}
+                    onClick={() => {
+                      queueCertificate(name);
+                      setQueued(name);
+                    }}
+                  >
+                    <BadgeCheck aria-hidden /> Pedir mi certificado
                   </Button>
                 ) : (
                   <Button

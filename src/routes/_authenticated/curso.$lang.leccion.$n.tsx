@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, X } from "lucide-react";
 import { celebrate } from "@/lib/confetti";
 
@@ -8,6 +8,17 @@ import { Button } from "@/components/ui/button";
 import { getLanguage } from "@/lib/languages";
 import { getCourseLesson, type CourseLesson, type CourseVocabItem as VocabItem } from "@/lib/lessons.functions";
 import { useRecordOnMount, useRecordVisit } from "@/lib/gamification";
+import { OfflineMissingError, withOfflineCache } from "@/lib/offline-data";
+import { K } from "@/lib/offline-pack";
+import {
+  clearLessonDraft,
+  draftFitsLesson,
+  readLessonDraft,
+  saveLessonDraft,
+  type ChoiceDraft,
+  type LessonDraft,
+  type MatchDraft,
+} from "@/lib/lesson-draft";
 
 export const Route = createFileRoute("/_authenticated/curso/$lang/leccion/$n")({
   head: ({ params }) => ({
@@ -21,7 +32,9 @@ export const Route = createFileRoute("/_authenticated/curso/$lang/leccion/$n")({
     }
     const n = Number(params.n);
     if (!Number.isInteger(n) || n < 1) throw notFound();
-    const { lesson } = await getCourseLesson({ data: { n } });
+    const { lesson } = await withOfflineCache(K.lesson(n), () => getCourseLesson({ data: { n } }), {
+      label: `La lección ${n}`,
+    });
     if (!lesson) throw notFound();
     return { lang, lesson };
   },
@@ -35,16 +48,31 @@ export const Route = createFileRoute("/_authenticated/curso/$lang/leccion/$n")({
       </div>
     </div>
   ),
-  errorComponent: ({ reset }) => (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 text-center">
-      <div>
-        <h1 className="font-display text-2xl font-bold">Ocurrió un error</h1>
-        <Button variant="cta" className="mt-4" onClick={() => reset()}>
-          Reintentar
-        </Button>
+  errorComponent: ({ error, reset }) =>
+    error instanceof OfflineMissingError || (error as Error)?.name === "OfflineMissingError" ? (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4 text-center">
+        <div className="max-w-md">
+          <div className="text-5xl" aria-hidden>📶</div>
+          <h1 className="mt-3 font-display text-2xl font-bold">Sin conexión</h1>
+          <p className="mt-2 text-muted-foreground">
+            Esta lección todavía no está descargada en tu teléfono. Cuando tengas señal, tocá
+            «Descargar para usar sin internet» en tu panel y vas a poder hacerla en cualquier lugar.
+          </p>
+          <Button asChild variant="cta" className="mt-6">
+            <Link to="/dashboard">Ir al panel</Link>
+          </Button>
+        </div>
       </div>
-    </div>
-  ),
+    ) : (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4 text-center">
+        <div>
+          <h1 className="font-display text-2xl font-bold">Ocurrió un error</h1>
+          <Button variant="cta" className="mt-4" onClick={() => reset()}>
+            Reintentar
+          </Button>
+        </div>
+      </div>
+    ),
   component: LessonPage,
 });
 
@@ -59,8 +87,41 @@ function LessonPage() {
     lesson: CourseLesson | null;
   };
   const navigate = useNavigate();
-  const [phase, setPhase] = useState<Phase>("intro");
+  const [phase, setPhaseState] = useState<Phase>("intro");
+  const [resumed, setResumed] = useState(false);
+  const [round, setRound] = useState(0);
+  const draft = useRef<Omit<LessonDraft, "savedAt">>({ phase: "intro" });
   useRecordVisit(`${lang.slug ?? "curso"}:${lesson?.n ?? 0}`);
+
+  // Si quedó una lección a medias en este teléfono, se sigue desde la misma pregunta.
+  useEffect(() => {
+    if (!lesson) return;
+    const d = readLessonDraft(lang.slug, lesson.n);
+    if (d && d.phase !== "intro" && d.phase !== "done" && draftFitsLesson(d, lesson.vocab)) {
+      draft.current = { phase: d.phase, choice: d.choice, match: d.match };
+      setPhaseState(d.phase);
+      setResumed(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const persist = (patch: Partial<Omit<LessonDraft, "savedAt">>) => {
+    if (!lesson) return;
+    draft.current = { ...draft.current, ...patch };
+    if (draft.current.phase === "done") clearLessonDraft(lang.slug, lesson.n);
+    else if (draft.current.phase !== "intro") saveLessonDraft(lang.slug, lesson.n, draft.current);
+  };
+  const setPhase = (p: Phase) => {
+    persist({ phase: p });
+    setPhaseState(p);
+  };
+  const restart = () => {
+    if (lesson) clearLessonDraft(lang.slug, lesson.n);
+    draft.current = { phase: "intro" };
+    setResumed(false);
+    setRound((r) => r + 1);
+    setPhaseState("intro");
+  };
 
   if (!lesson) {
     return (
@@ -131,6 +192,14 @@ function LessonPage() {
             <p className="mt-1 text-sm text-muted-foreground">{lesson.theme}</p>
           </div>
 
+          {resumed && phase !== "done" && (
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
+              <span className="text-foreground">↩︎ Seguís donde habías quedado.</span>
+              <button type="button" onClick={restart} className="font-semibold text-primary underline-offset-2 hover:underline">
+                Empezar de nuevo
+              </button>
+            </div>
+          )}
           {phase === "intro" && (
             <IntroStep lesson={lesson} onStart={() => setPhase("vocab")} />
           )}
@@ -138,10 +207,22 @@ function LessonPage() {
             <VocabStep lesson={lesson} onNext={() => setPhase("choice")} />
           )}
           {phase === "choice" && (
-            <ChoiceStep lesson={lesson} onNext={() => setPhase("match")} />
+            <ChoiceStep
+              key={`c${round}`}
+              lesson={lesson}
+              initial={draft.current.choice}
+              onChange={(choice) => persist({ choice })}
+              onNext={() => setPhase("match")}
+            />
           )}
           {phase === "match" && (
-            <MatchStep lesson={lesson} onNext={() => setPhase("done")} />
+            <MatchStep
+              key={`m${round}`}
+              lesson={lesson}
+              initial={draft.current.match}
+              onChange={(match) => persist({ match })}
+              onNext={() => setPhase("done")}
+            />
           )}
           {phase === "done" && <DoneStep lesson={lesson} langSlug={lang.slug} />}
         </div>
@@ -230,11 +311,19 @@ function shuffle<T>(arr: T[]): T[] {
 function ChoiceStep({
   lesson,
   onNext,
+  initial,
+  onChange,
 }: {
   lesson: { vocab: VocabItem[] };
   onNext: () => void;
+  initial?: ChoiceDraft;
+  onChange?: (d: ChoiceDraft) => void;
 }) {
   const questions = useMemo(() => {
+    if (initial) {
+      const byGn = new Map(lesson.vocab.map((v) => [v.gn, v]));
+      return initial.questions.map((q) => ({ item: byGn.get(q.gn)!, options: q.options }));
+    }
     const pool = lesson.vocab;
     const items = shuffle(pool).slice(0, Math.min(5, pool.length));
     return items.map((item) => {
@@ -245,9 +334,20 @@ function ChoiceStep({
     });
   }, [lesson]);
 
-  const [i, setI] = useState(0);
-  const [picked, setPicked] = useState<string | null>(null);
-  const [correct, setCorrect] = useState(0);
+  const [i, setI] = useState(initial?.i ?? 0);
+  const [picked, setPicked] = useState<string | null>(initial?.picked ?? null);
+  const [correct, setCorrect] = useState(initial?.correct ?? 0);
+
+  // Cada respuesta queda guardada en el teléfono.
+  useEffect(() => {
+    onChange?.({
+      questions: questions.map((q) => ({ gn: q.item.gn, options: q.options })),
+      i,
+      correct,
+      picked,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i, correct, picked]);
 
   if (i >= questions.length) {
     return (
@@ -336,19 +436,32 @@ function ChoiceStep({
 function MatchStep({
   lesson,
   onNext,
+  initial,
+  onChange,
 }: {
   lesson: { vocab: VocabItem[] };
   onNext: () => void;
+  initial?: MatchDraft;
+  onChange?: (d: MatchDraft) => void;
 }) {
-  const pairs = useMemo(
-    () => shuffle(lesson.vocab).slice(0, Math.min(6, lesson.vocab.length)),
-    [lesson],
-  );
-  const leftItems = useMemo(() => shuffle(pairs).map((p) => p.gn), [pairs]);
-  const rightItems = useMemo(() => shuffle(pairs).map((p) => p.es), [pairs]);
+  const pairs = useMemo(() => {
+    if (initial) {
+      const byGn = new Map(lesson.vocab.map((v) => [v.gn, v]));
+      return initial.pairs.map((g) => byGn.get(g)!);
+    }
+    return shuffle(lesson.vocab).slice(0, Math.min(6, lesson.vocab.length));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lesson]);
+  const leftItems = useMemo(() => initial?.left ?? shuffle(pairs).map((p) => p.gn), [pairs, initial]);
+  const rightItems = useMemo(() => initial?.right ?? shuffle(pairs).map((p) => p.es), [pairs, initial]);
 
   const [selectedGn, setSelectedGn] = useState<string | null>(null);
-  const [matched, setMatched] = useState<Set<string>>(new Set());
+  const [matched, setMatched] = useState<Set<string>>(() => new Set(initial?.matched ?? []));
+
+  useEffect(() => {
+    onChange?.({ pairs: pairs.map((p) => p.gn), left: leftItems, right: rightItems, matched: [...matched] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matched]);
   const [wrong, setWrong] = useState<{ gn: string; es: string } | null>(null);
 
   const lookup = useMemo(() => {

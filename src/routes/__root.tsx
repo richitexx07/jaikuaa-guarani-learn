@@ -19,7 +19,7 @@ import { SupportWhatsApp } from "@/components/support-whatsapp";
 import { BackButton } from "@/components/navigation/back-button";
 import { applyDisplayPrefs, readDisplayPrefs } from "@/lib/display-prefs";
 import { registerOfflineSupport } from "@/lib/pwa";
-import { syncStats } from "@/lib/gamification";
+import { syncAllPending, totalPending } from "@/lib/offline-sync";
 
 function NotFoundComponent() {
   return (
@@ -164,10 +164,19 @@ function RootComponent() {
   useEffect(() => {
     applyDisplayPrefs(readDisplayPrefs());
     void registerOfflineSupport();
-    // Al recuperar señal, se envían los avances guardados en el teléfono.
-    const onOnline = () => void syncStats();
+    // Al recuperar señal se envía todo lo hecho sin conexión; además se reintenta cada minuto
+    // por si el aviso de «hay señal» del teléfono no llega (pasa en algunos Android).
+    const onOnline = () => void syncAllPending();
     window.addEventListener("online", onOnline);
-    return () => window.removeEventListener("online", onOnline);
+    // Al abrir la app con señal, se envía enseguida lo que quedó de antes.
+    if (navigator.onLine && totalPending() > 0) void syncAllPending();
+    const timer = window.setInterval(() => {
+      if (navigator.onLine && totalPending() > 0) void syncAllPending();
+    }, 60_000);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.clearInterval(timer);
+    };
   }, []);
 
   useEffect(() => {

@@ -23,7 +23,7 @@ export default defineConfig({
         filename: "sw.js",
         outDir: "dist/client",
         workbox: {
-          globPatterns: ["**/*.{js,css,png,svg,ico,woff2,webmanifest}"],
+          globPatterns: ["**/*.{js,css,png,svg,ico,woff2,webp,webmanifest}", "offline.html"],
           navigateFallback: null,
           cleanupOutdatedCaches: true,
           maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
@@ -36,7 +36,16 @@ export default defineConfig({
               options: {
                 cacheName: "jaikuaa-pages",
                 networkTimeoutSeconds: 4,
-                expiration: { maxEntries: 60, maxAgeSeconds: 30 * 24 * 3600 },
+                // Las pantallas descargadas para usar sin internet no deben borrarse por cantidad.
+                expiration: { maxEntries: 150, maxAgeSeconds: 60 * 24 * 3600 },
+                matchOptions: { ignoreVary: true },
+                plugins: [
+                  {
+                    // Sin señal y sin copia de esa pantalla: una página propia con enlaces a lo descargado.
+                    handlerDidError: async () =>
+                      (await caches.match("/offline.html", { ignoreSearch: true })) ?? undefined,
+                  },
+                ],
               },
             },
             {

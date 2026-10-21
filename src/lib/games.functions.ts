@@ -60,7 +60,9 @@ function seeded(seedStr: string) {
 }
 
 /** Elección determinística por fecha de Paraguay: misma palabra y opciones para todos. */
-async function wordOfDay(day: string) {
+type WotdWord = { id: number | string; gn: string; es: string; has_audio: boolean };
+
+async function loadWotdWords(): Promise<WotdWord[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
     .from("corpus_words")
@@ -69,7 +71,11 @@ async function wordOfDay(day: string) {
     .order("id")
     .limit(2000);
   if (error) throw new Error(error.message);
-  const all = data ?? [];
+  return (data ?? []) as WotdWord[];
+}
+
+async function wordOfDay(day: string, preloaded?: WotdWord[]) {
+  const all = preloaded ?? (await loadWotdWords());
   const withAudio = all.filter((w) => w.has_audio);
   if (withAudio.length === 0) return null;
   const rnd = seeded(`jaikuaa:${day}`);
@@ -127,6 +133,67 @@ export const answerWordOfDay = createServerFn({ method: "POST" })
       _source_ref: "palabra-del-dia",
       _sync_id: syncIdFor(day),
       _metadata: { choice: data.choice, correct },
+      _perfect: false,
+    } as never);
+    if (error) throw new Error("No se pudo guardar la partida");
+    const duplicate = !!(res as { duplicate?: boolean } | null)?.duplicate;
+    return { correct, answer: w.es, duplicate };
+  });
+
+/* ------------------- PALABRA DEL DÍA SIN CONEXIÓN ------------------- */
+
+function addDays(day: string, n: number): string {
+  const d = new Date(`${day}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+export type WordOfDayPackItem = { day: string; gn: string; options: string[]; answer: string };
+
+/**
+ * Las Palabras del día de las próximas semanas, para jugar sin señal. Incluye la respuesta para
+ * poder mostrar el resultado en el teléfono; los puntos los decide siempre el servidor al enviar.
+ */
+export const getWordOfDayPack = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ days: z.number().int().min(1).max(42).default(28) }).parse(d))
+  .handler(async ({ data }) => {
+    const today = asuncionToday();
+    const all = await loadWotdWords();
+    const items: WordOfDayPackItem[] = [];
+    for (let i = 0; i < data.days; i++) {
+      const day = addDays(today, i);
+      const w = await wordOfDay(day, all);
+      if (w) items.push({ day, gn: w.gn, options: w.options, answer: w.es });
+    }
+    return { today, items };
+  });
+
+/**
+ * Respuesta de una Palabra del día jugada sin señal, enviada después. Solo vale para el día de hoy
+ * o los 14 anteriores; la corrección y los puntos se calculan acá, nunca en el teléfono.
+ */
+export const answerWordOfDayFor = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({ day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), choice: z.string().trim().max(300) })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const today = asuncionToday();
+    if (data.day > today || data.day < addDays(today, -14)) throw new Error("Fecha fuera de rango");
+    const w = await wordOfDay(data.day);
+    if (!w) throw new Error("No hay palabra para esa fecha");
+    const correct = data.choice === w.es;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: res, error } = await supabaseAdmin.rpc("record_activity", {
+      _user_id: context.userId,
+      _amount: correct ? 5 : 0,
+      _source: "game",
+      _source_ref: "palabra-del-dia",
+      _sync_id: syncIdFor(data.day),
+      _metadata: { choice: data.choice, correct, offline: true },
       _perfect: false,
     } as never);
     if (error) throw new Error("No se pudo guardar la partida");

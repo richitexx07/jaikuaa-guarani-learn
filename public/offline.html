@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1E3A5F">
+<title>Jaikuaa — Sin conexión</title>
+<style>
+  :root { --p:#1E3A5F; --a:#C8102E; --bg:#ffffff; --fg:#1f2937; --mut:#6b7280; --card:#f5f7fb; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f172a; --fg:#e5e7eb; --mut:#9ca3af; --card:#1e293b; --p:#93b4e0; } }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px;
+         background:var(--bg); color:var(--fg); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 420px; width:100%; text-align:center; }
+  .icon { font-size: 52px; }
+  h1 { margin:12px 0 6px; font-size:24px; color:var(--p); }
+  p { margin:0 0 18px; color:var(--mut); line-height:1.5; }
+  nav { display:grid; gap:10px; }
+  a { display:block; padding:14px 16px; border-radius:14px; background:var(--card); color:var(--fg); text-decoration:none;
+      font-weight:600; border:1px solid rgba(127,127,127,.2); }
+  a.main { background:var(--p); color:#fff; border:none; }
+  button { margin-top:18px; background:none; border:none; color:var(--p); font-weight:600; font-size:15px; text-decoration:underline; cursor:pointer; }
+</style>
+</head>
+<body>
+<main>
+  <div class="icon" aria-hidden="true">📶</div>
+  <h1>Sin conexión</h1>
+  <p>Esta pantalla no está descargada en tu teléfono. Podés seguir con lo que ya bajaste:</p>
+  <nav>
+    <a class="main" href="/dashboard">Ir a mi panel</a>
+    <a href="/curso/guarani">📚 Curso de guaraní</a>
+    <a href="/juegos">🎮 Juegos</a>
+    <a href="/glosario">📖 Glosario</a>
+  </nav>
+  <button type="button" onclick="location.reload()">Reintentar</button>
+</main>
+</body>
+</html>

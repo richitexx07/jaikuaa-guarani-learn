@@ -73,8 +73,9 @@ export const JAI_FAQS: JaiFaq[] = [
     category: "Empezar",
     question: "¿Funciona sin internet?",
     answer:
-      "Sí, en parte. Una vez instalada, la app guarda las páginas y los audios que ya abriste, y tu avance se sincroniza cuando vuelve la señal.",
-    keywords: ["sin internet", "sin señal", "sin conexion", "offline", "fuera de linea", "sin datos", "sin wifi"],
+      "Sí. Con señal, entrá a tu panel y tocá «Descargar para usar sin internet»: se bajan las lecciones, los audios, los juegos, el glosario y la Palabra del día de las próximas semanas. Después estudiás sin señal y tus avances se envían solos cuando vuelve la conexión. Lo único que necesita internet es crear la cuenta, jugar contra otra persona a distancia y ver el ranking al día. En iPhone, agregá Jaikuaa a la pantalla de inicio para que lo descargado no se borre.",
+    keywords: ["sin internet", "sin señal", "sin conexion", "offline", "fuera de linea", "sin datos", "sin wifi", "descargar"],
+    link: { label: "Ir a mi panel", to: "/dashboard" },
     related: ["instalar", "audio"],
   },
   {

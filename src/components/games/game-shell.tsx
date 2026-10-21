@@ -6,6 +6,8 @@ import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
 import { listCourseLessons } from "@/lib/lessons.functions";
 import { getGameWords, type GameWord } from "@/lib/games.functions";
+import { withOfflineCache } from "@/lib/offline-data";
+import { K } from "@/lib/offline-pack";
 import { GameKit, GameCompanion, GameSoundButton, LaceBackground } from './game-kit';
 import { GameHelp } from './game-help';
 import { SponsorLine } from './sponsor-line';
@@ -51,7 +53,10 @@ export function GameShell({ title, emoji, children, sponsorSlot, companion = tru
 /** Selector "Todas las palabras" o una lección publicada. */
 export function LessonFilter({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
   const fn = useServerFn(listCourseLessons);
-  const q = useQuery({ queryKey: ["course-lessons"], queryFn: () => fn() });
+  const q = useQuery({
+    queryKey: ["course-lessons"],
+    queryFn: () => withOfflineCache(K.lessons, () => fn(), { label: "El curso" }),
+  });
   const lessons = (q.data?.lessons ?? []).filter((l) => l.publishedWords > 0);
   return (
     <label className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
@@ -76,7 +81,8 @@ export function useGameWords(lesson: number | null) {
   const fn = useServerFn(getGameWords);
   return useQuery({
     queryKey: ["game-words", lesson],
-    queryFn: () => fn({ data: { lesson } }),
+    queryFn: () =>
+      withOfflineCache(K.gameWords(lesson), () => fn({ data: { lesson } }), { label: "Las palabras del juego" }),
     staleTime: 5 * 60_000,
   });
 }

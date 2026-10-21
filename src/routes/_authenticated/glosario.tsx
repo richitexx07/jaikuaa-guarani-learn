@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { withOfflineCache } from "@/lib/offline-data";
+import { K } from "@/lib/offline-pack";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Search } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
@@ -31,7 +33,10 @@ function plain(s: string) {
 
 function GlossaryPage() {
   const listFn = useServerFn(listGlossary);
-  const { data, isLoading, error } = useQuery({ queryKey: ["glossary"], queryFn: () => listFn() });
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["glossary"],
+    queryFn: () => withOfflineCache(K.glossary, () => listFn(), { label: "El glosario" }),
+  });
   const [q, setQ] = useState("");
 
   const items = data?.items ?? [];
@@ -82,7 +87,9 @@ function GlossaryPage() {
           )}
           {error && (
             <p className="mt-8 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
-              No se pudo cargar el glosario. Probá de nuevo en un momento.
+              {error.name === "OfflineMissingError"
+                ? "Sin conexión: el glosario todavía no está descargado. Con señal, tocá «Descargar para usar sin internet» en tu panel."
+                : "No se pudo cargar el glosario. Probá de nuevo en un momento."}
             </p>
           )}
 

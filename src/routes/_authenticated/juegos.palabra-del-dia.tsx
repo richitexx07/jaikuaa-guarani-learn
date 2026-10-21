@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import { GameShell, XpNote } from "@/components/games/game-shell";
-import { answerWordOfDay, getWordOfDay } from "@/lib/games.functions";
+import { answerWordOfDay, getWordOfDay, type WordOfDayPackItem } from "@/lib/games.functions";
+import { isNetworkError, isOffline, readOfflineCopy } from "@/lib/offline-data";
+import { K } from "@/lib/offline-pack";
+import { localWotdPlay, queueWotdAnswer, rememberWotdPlay } from "@/lib/offline-sync";
 import { ShareResult } from "@/components/games/share-result";
 import { syncStats } from "@/lib/gamification";
 
@@ -27,27 +30,96 @@ export const Route = createFileRoute("/_authenticated/juegos/palabra-del-dia")({
 
 function WordOfDay() { return <GameShell title="Palabra del día" emoji="📅" sponsorSlot="palabra-del-dia"><WordOfDayContent/></GameShell>; }
 
+type WotdView = {
+  day: string;
+  word: { gn: string; options: string[] } | null;
+  played: { choice: string; correct: boolean; answer: string } | null;
+  /** Solo sin señal: la respuesta sale del paquete descargado. */
+  offlineAnswer?: string;
+  missing?: boolean;
+};
+
+function asuncionToday(): string {
+  return new Date().toLocaleDateString("en-CA", { timeZone: "America/Asuncion" });
+}
+
+/** Sin señal: la palabra de hoy sale del paquete de las próximas semanas guardado en el teléfono. */
+async function offlineWordOfDay(): Promise<WotdView> {
+  const day = asuncionToday();
+  const pack = await readOfflineCopy<{ items: WordOfDayPackItem[] }>(K.wotd);
+  const item = pack?.items.find((x) => x.day === day);
+  if (!item) return { day, word: null, played: null, missing: true };
+  const local = localWotdPlay(day);
+  return {
+    day,
+    word: { gn: item.gn, options: item.options },
+    played: local ? { choice: local.choice, correct: local.correct, answer: local.answer } : null,
+    offlineAnswer: item.answer,
+  };
+}
+
+async function loadWordOfDay(getFn: () => Promise<WotdView>): Promise<WotdView> {
+  if (isOffline()) return offlineWordOfDay();
+  try {
+    const d = await getFn();
+    // Una jugada hecha sin señal que todavía no llegó al servidor se sigue mostrando.
+    const local = localWotdPlay(d.day);
+    return !d.played && local ? { ...d, played: local } : d;
+  } catch (e) {
+    if (isNetworkError(e)) return offlineWordOfDay();
+    throw e;
+  }
+}
+
 function WordOfDayContent() {
   const feedback = useGameFeedback();
   const getFn = useServerFn(getWordOfDay);
   const answerFn = useServerFn(answerWordOfDay);
   const qc = useQueryClient();
-  const q = useQuery({ queryKey: ["word-of-day"], queryFn: () => getFn() });
+  const q = useQuery({
+    queryKey: ["word-of-day"],
+    queryFn: () => loadWordOfDay(() => getFn() as Promise<WotdView>),
+  });
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ choice: string; correct: boolean; answer: string } | null>(null);
 
   const d = q.data;
   const played = result ?? d?.played ?? null;
 
+  // Sin señal se corrige con el paquete y la jugada queda guardada; los puntos los confirma el
+  // servidor cuando vuelve la conexión.
+  async function playOffline(choice: string) {
+    let answer = d?.offlineAnswer;
+    if (!answer && d) {
+      const pack = await readOfflineCopy<{ items: WordOfDayPackItem[] }>(K.wotd);
+      answer = pack?.items.find((x) => x.day === d.day)?.answer;
+    }
+    if (!d || !answer) return false;
+    const correct = choice === answer;
+    rememberWotdPlay({ day: d.day, choice, correct, answer });
+    queueWotdAnswer(d.day, choice);
+    setResult({ choice, correct, answer });
+    feedback(correct ? "victory" : "error");
+    return true;
+  }
+
   async function choose(choice: string) {
     if (played || busy) return;
     setBusy(true);
     try {
-      const r = await answerFn({ data: { choice } });
-      setResult({ choice, correct: r.correct, answer: r.answer });
-      feedback(r.correct ? "victory" : "error");
-      void syncStats();
-      void qc.invalidateQueries({ queryKey: ["word-of-day"] });
+      if (isOffline() || d?.offlineAnswer) {
+        await playOffline(choice);
+        return;
+      }
+      try {
+        const r = await answerFn({ data: { choice } });
+        setResult({ choice, correct: r.correct, answer: r.answer });
+        feedback(r.correct ? "victory" : "error");
+        void syncStats();
+        void qc.invalidateQueries({ queryKey: ["word-of-day"] });
+      } catch (e) {
+        if (!isNetworkError(e) || !(await playOffline(choice))) throw e;
+      }
     } finally {
       setBusy(false);
     }
@@ -58,7 +130,11 @@ function WordOfDayContent() {
       {q.isLoading || !d ? (
         <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>
       ) : !d.word ? (
-        <p className="text-center text-sm text-muted-foreground">Todavía no hay palabras con audio publicadas.</p>
+        <p className="text-center text-sm text-muted-foreground">
+          {d.missing
+            ? "Sin conexión: la Palabra del día de hoy no está descargada. Con señal, tocá «Descargar para usar sin internet» en tu panel."
+            : "Todavía no hay palabras con audio publicadas."}
+        </p>
       ) : (
         <div className="space-y-6">
           <p className="text-center text-xs text-muted-foreground">La misma palabra para todos hoy</p>
@@ -108,6 +184,9 @@ function WordOfDayContent() {
                 {played.correct ? "¡Correcto!" : `Era: ${played.answer}`}
               </p>
               {played.correct && <XpNote xp={5} />}
+              {d.offlineAnswer && (
+                <p className="text-xs text-muted-foreground">Sin conexión: tu jugada quedó guardada y se envía cuando vuelva la señal.</p>
+              )}
               {played.correct && <div className="pt-1"><ShareResult text="¡Acerté la Palabra del día en guaraní de Jaikuaa! ¿Vos la sabés?" /></div>}
               <p className="text-sm text-muted-foreground">Volvé mañana para una palabra nueva.</p>
             </div>

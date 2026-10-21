@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listCourseLessons } from "@/lib/lessons.functions";
+import { withOfflineCache } from "@/lib/offline-data";
+import { K } from "@/lib/offline-pack";
+import { pendingLessonRefs } from "@/lib/gamification";
 import { getLanguage } from "@/lib/languages";
 
 export const Route = createFileRoute("/_authenticated/curso/$lang/")({
@@ -23,10 +26,14 @@ function CourseIndex() {
   const listFn = useServerFn(listCourseLessons);
   const lessonsQ = useQuery({
     queryKey: ["course-lessons"],
-    queryFn: () => listFn(),
+    queryFn: () => withOfflineCache(K.lessons, () => listFn(), { label: "El curso" }),
     enabled: isGuarani,
   });
-  const dbLessons = lessonsQ.data?.lessons ?? [];
+  // Las lecciones terminadas sin señal cuentan ya: así se desbloquea la siguiente en el momento.
+  const pendingDone = pendingLessonRefs();
+  const dbLessons = (lessonsQ.data?.lessons ?? []).map((l) =>
+    pendingDone.has(`guarani:${l.n}`) ? { ...l, completed: true } : l,
+  );
   const byN = new Map(dbLessons.map((l) => [l.n, l]));
   const firstN = dbLessons[0]?.n ?? 1;
   const lessons = isGuarani

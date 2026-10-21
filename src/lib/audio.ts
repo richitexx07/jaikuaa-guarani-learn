@@ -88,6 +88,14 @@ async function flush() {
   const batch = queue;
   queue = new Map();
   const slugs = [...batch.keys()];
+  // Sin señal no se pregunta al servidor: se usa directo el audio descargado en el teléfono.
+  if (typeof navigator !== "undefined" && navigator.onLine === false) {
+    for (const slug of slugs) {
+      const url = await findOfflineAudio(slug);
+      for (const w of batch.get(slug)?.waiters ?? []) w(url);
+    }
+    return;
+  }
   for (let i = 0; i < slugs.length; i += BATCH_MAX) {
     const chunk = slugs.slice(i, i + BATCH_MAX);
     const done = (slug: string, url: string | null) => {

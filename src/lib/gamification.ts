@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyStats, migrateLocalProgress, recordActivity } from "@/lib/progress.functions";
+import { getStoredUser, isNetworkError, isOffline } from "@/lib/offline-data";
 
 export type BadgeId =
   | "primer-paso"
@@ -61,6 +62,12 @@ export type ActivitySource = "lesson" | "exam" | "trivia" | "weekly" | "onboardi
 const STORAGE_KEY = "aranduka:stats";
 const PENDING_KEY = "aranduka:pending-activity";
 const EVENT_NAME = "aranduka:stats-changed";
+/** Aviso cuando cambia la cantidad de avances guardados en el teléfono esperando señal. */
+export const PENDING_EVENT = "jaikuaa:pending-changed";
+/** Tope de avances en espera: alcanza para meses de uso sin señal. */
+const MAX_PENDING = 2000;
+/** Un avance que el servidor rechaza por un motivo que no es la red se descarta tras estos intentos. */
+const MAX_REJECTIONS = 8;
 
 function emptyStats(): Stats {
   return { xp: 0, streak: 0, lastActiveDate: "", badges: [], guaraniLessonsCompleted: 0 };
@@ -114,6 +121,10 @@ type PendingEvent = {
   syncId: string;
   isGuaraniLesson: boolean;
   perfectExam: boolean;
+  /** Cuándo se hizo de verdad (puede ser días antes de enviarse). */
+  at?: number;
+  /** Rechazos del servidor que no fueron por falta de señal. */
+  rejected?: number;
 };
 
 function readPending(): PendingEvent[] {
@@ -125,8 +136,21 @@ function readPending(): PendingEvent[] {
 }
 function writePending(list: PendingEvent[]) {
   try {
-    window.localStorage.setItem(PENDING_KEY, JSON.stringify(list.slice(-50)));
+    window.localStorage.setItem(PENDING_KEY, JSON.stringify(list.slice(-MAX_PENDING)));
+    window.dispatchEvent(new CustomEvent(PENDING_EVENT));
   } catch {}
+}
+
+/** Cantidad de avances guardados en el teléfono que todavía no llegaron al servidor. */
+export function pendingCount(): number {
+  if (typeof window === "undefined") return 0;
+  return readPending().filter((e) => e.source !== "visit").length;
+}
+
+/** Lecciones terminadas en este teléfono que el servidor todavía no recibió (p. ej. "guarani:3"). */
+export function pendingLessonRefs(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  return new Set(readPending().filter((e) => e.source === "lesson").map((e) => e.sourceRef));
 }
 
 async function hasSession(): Promise<boolean> {
@@ -138,6 +162,11 @@ async function hasSession(): Promise<boolean> {
   }
 }
 
+/** Hay alguien con sesión en este teléfono, aunque su permiso venció y no hay señal para renovarlo. */
+async function hasUser(): Promise<boolean> {
+  return (await hasSession()) || !!getStoredUser();
+}
+
 function newSyncId(): string {
   try {
     return crypto.randomUUID();
@@ -146,23 +175,65 @@ function newSyncId(): string {
   }
 }
 
-/** Envía al servidor; si falla queda en cola y se reintenta con el mismo sync_id. */
-async function send(ev: PendingEvent): Promise<boolean> {
+type SendResult = "ok" | "network" | "rejected";
+type ServerStats = Parameters<typeof fromServer>[0];
+
+/** Números del servidor más lo que todavía espera señal en el teléfono (para no «perder» XP en pantalla). */
+function withPending(server: ServerStats): Stats {
+  const base = fromServer(server);
+  const pend = readPending();
+  return {
+    ...base,
+    xp: base.xp + pend.reduce((a, e) => a + e.xp, 0),
+    guaraniLessonsCompleted:
+      base.guaraniLessonsCompleted + pend.filter((e) => e.isGuaraniLesson).length,
+  };
+}
+
+let lastServer: ServerStats | null = null;
+
+/** Envía al servidor. El sync_id hace que repetir un envío nunca sume dos veces. */
+async function send(ev: PendingEvent): Promise<SendResult> {
+  if (isOffline()) return "network";
   try {
-    const res = await recordActivity({ data: ev });
-    write(fromServer(res));
-    return true;
-  } catch {
-    return false;
+    const { at: _at, rejected: _r, ...data } = ev;
+    lastServer = await recordActivity({ data });
+    return "ok";
+  } catch (e) {
+    if (isNetworkError(e)) return "network";
+    // Sesión vencida: se reintenta cuando se renueve, sin contarlo como rechazo.
+    if (/unauthori|jwt|token|session/i.test(String((e as Error)?.message ?? ""))) return "network";
+    return "rejected";
   }
 }
 
-async function flushPending() {
-  const list = readPending();
-  if (list.length === 0) return;
-  const left: PendingEvent[] = [];
-  for (const ev of list) if (!(await send(ev))) left.push(ev);
-  writePending(left);
+let flushing: Promise<void> | null = null;
+
+/** Envía en orden los avances guardados; se frena al primer corte de señal. */
+function flushPending(): Promise<void> {
+  if (flushing) return flushing;
+  flushing = (async () => {
+    const list = readPending();
+    if (list.length === 0 || isOffline()) return;
+    const sent = new Set<string>();
+    const bumped = new Map<string, number>();
+    for (const ev of list) {
+      const r = await send(ev);
+      if (r === "network") break;
+      if (r === "ok") sent.add(ev.syncId);
+      else bumped.set(ev.syncId, (ev.rejected ?? 0) + 1);
+    }
+    // Se relee la cola: mientras se enviaba pudieron agregarse avances nuevos.
+    const now = readPending()
+      .filter((e) => !sent.has(e.syncId))
+      .map((e) => (bumped.has(e.syncId) ? { ...e, rejected: bumped.get(e.syncId) } : e))
+      .filter((e) => (e.rejected ?? 0) < MAX_REJECTIONS);
+    writePending(now);
+    if (lastServer) write(withPending(lastServer));
+  })().finally(() => {
+    flushing = null;
+  });
+  return flushing;
 }
 
 let syncPromise: Promise<void> | null = null;
@@ -171,7 +242,7 @@ let syncPromise: Promise<void> | null = null;
 export function syncStats(): Promise<void> {
   if (syncPromise) return syncPromise;
   syncPromise = (async () => {
-    if (!(await hasSession())) return;
+    if (isOffline() || !(await hasSession())) return;
     await flushPending();
     const local = read();
     let server = await getMyStats();
@@ -190,7 +261,7 @@ export function syncStats(): Promise<void> {
         });
       } catch {}
     }
-    write(fromServer(server));
+    write(withPending(server));
   })()
     .catch(() => {})
     .finally(() => {
@@ -217,8 +288,10 @@ export function recordCompletion(opts: CompleteOpts): void {
     isGuaraniLesson: !!opts.isGuaraniLesson,
     perfectExam: !!opts.perfectExam,
   };
+  // Primero se guarda en el teléfono y recién después se intenta enviar: si se corta la señal
+  // o se cierra la app al instante, el avance no se pierde.
   void (async () => {
-    if (!(await hasSession())) {
+    if (!(await hasUser())) {
       // Sin sesión (p. ej. onboarding): se guarda solo en el dispositivo y
       // se sube una única vez como "local-migration" al iniciar sesión.
       const s = read();
@@ -231,15 +304,28 @@ export function recordCompletion(opts: CompleteOpts): void {
       }
       return;
     }
-    if (!(await send(ev))) writePending([...readPending(), ev]);
+    writePending([...readPending(), { ...ev, at: Date.now() }]);
+    bumpLocal(ev);
+    await flushPending();
   })();
+}
+
+/** Muestra el avance al instante en la pantalla; el servidor manda los números finales al sincronizar. */
+function bumpLocal(ev: PendingEvent) {
+  const s = read();
+  write({
+    ...s,
+    xp: s.xp + ev.xp,
+    guaraniLessonsCompleted: s.guaraniLessonsCompleted + (ev.isGuaraniLesson ? 1 : 0),
+  });
 }
 
 /** Marca al usuario como activo hoy (máximo una visita por día, la controla el servidor). */
 export function recordVisit(sourceRef: string): void {
   void (async () => {
-    if (!(await hasSession())) return;
-    await send({
+    if (isOffline() || !(await hasSession())) return;
+    lastServer = null;
+    const r = await send({
       source: "visit",
       sourceRef,
       xp: 0,
@@ -247,6 +333,7 @@ export function recordVisit(sourceRef: string): void {
       isGuaraniLesson: false,
       perfectExam: false,
     });
+    if (r === "ok" && lastServer) write(withPending(lastServer));
   })();
 }
 
