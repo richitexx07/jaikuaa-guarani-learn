@@ -61,10 +61,12 @@ function StaffShortcuts() {
         <Button asChild variant="outline" className="h-12 w-full justify-start">
           <Link to="/validacion">🔁 Circuito de validación</Link>
         </Button>
-        {/* Studio es otra aplicación (el motor de Alan): enlace común para que el navegador la cargue completa. */}
-        <Button asChild variant="outline" className="h-auto min-h-12 w-full justify-start whitespace-normal py-2 text-left">
-          <a href="/studio">🔬 Jaikuaa Studio · motor en desarrollo</a>
-        </Button>
+        {/* Studio (motor de Alan): solo administradores lo ven. */}
+        {data.isAdmin && (
+          <Button asChild variant="outline" className="h-auto min-h-12 w-full justify-start whitespace-normal py-2 text-left">
+            <a href="/studio">🔬 Jaikuaa Studio · motor en desarrollo</a>
+          </Button>
+        )}
         {data.isAdmin && (
           <Button asChild variant="outline" className="h-12 w-full justify-start">
             <Link to="/admin/noticias">📰 Noticias para aprobar</Link>
