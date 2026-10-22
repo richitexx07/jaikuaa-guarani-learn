@@ -1,4 +1,5 @@
-- [ ] Google OAuth propio: identificar el bloqueo y verificar ingreso; pendiente de corregir la URI autorizada en Google Cloud si no coincide.
+- [x] Google OAuth propio: bloqueo reproducido en www.jaikuaa.com; Google devuelve redirect_uri_mismatch, sin errores de JavaScript; portada e ingreso cargan con HTTP 200.
+- [ ] Google OAuth propio: autorizar exactamente https://www.jaikuaa.com/~oauth/callback en el cliente de Google Cloud y repetir ingreso completo; requiere acceso del propietario a Google Cloud.
 - [x] Piloto Ateneo: bandeja de Validación docente en el panel.
 - [x] Práctica: detectar aprobación en la pantalla abierta mediante actualización periódica de permisos pendientes, también en Docente y Panel.
 - [x] Audio: corregir bloqueo tras fallas temporales y verificar reproducción y reintento sin modificar grabaciones.
