@@ -320,6 +320,26 @@ function Dashboard() {
             <BigAction to="/juegos/palabra-del-dia" emoji="⭐" title="Palabra del día" desc="Una palabra nueva, en 1 minuto" tone="card" />
           </nav>
 
+          {/* INVITAR — tarjeta protagonista */}
+          <Link
+            to="/embajadores"
+            className="group relative mt-5 flex items-center gap-4 overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-accent p-5 text-primary-foreground shadow-elegant transition-transform hover:-translate-y-0.5 active:scale-[0.98] sm:p-6"
+          >
+            <span aria-hidden className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-primary-foreground/10 blur-2xl motion-safe:animate-pulse" />
+            <span aria-hidden className="pointer-events-none absolute -bottom-12 left-1/3 h-32 w-32 rounded-full bg-accent/40 blur-2xl" />
+            <img src={jaiAsset.url} alt="" className="relative h-20 w-20 shrink-0 object-contain drop-shadow-lg motion-safe:animate-bounce sm:h-24 sm:w-24" style={{ animationDuration: "2.4s" }} />
+            <div className="relative min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary-foreground/80">Compartí Jaikuaa</p>
+              <h2 className="mt-0.5 font-display text-xl font-bold leading-tight sm:text-2xl">
+                ¿Querés invitar a un amigo o familiar?
+              </h2>
+              <p className="mt-1 text-sm text-primary-foreground/85">Aprender guaraní juntos es más lindo.</p>
+              <span className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary-foreground px-5 py-2.5 text-sm font-bold text-primary shadow-md transition-transform group-hover:scale-105">
+                Invitar a alguien →
+              </span>
+            </div>
+          </Link>
+
           <div className="mt-6 space-y-3">
             <StatsBar />
             <StreakBanner />
