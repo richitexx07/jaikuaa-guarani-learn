@@ -331,7 +331,7 @@ function Dashboard() {
               <svg viewBox="0 0 24 24" className="relative h-5 w-5" fill="currentColor"><path d="M12 21s-7-4.35-9.5-8.5C.9 9.6 2.6 6 6 6c2 0 3.2 1.1 4 2.3h4C14.8 7.1 16 6 18 6c3.4 0 5.1 3.6 3.5 6.5C19 16.65 12 21 12 21z"/></svg>
             </span>
             <div className="relative min-w-0 flex-1">
-              <p className="font-display text-sm font-bold leading-tight text-foreground">¿Querés aprender con alguien?</p>
+              <p className="font-display text-sm font-bold leading-tight text-foreground">¿Querés aprender y jugar?</p>
               <p className="text-xs text-muted-foreground">Invitá a un amigo o familiar</p>
             </div>
             <span className="relative inline-flex shrink-0 items-center gap-1 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm transition-transform group-hover:scale-105">
