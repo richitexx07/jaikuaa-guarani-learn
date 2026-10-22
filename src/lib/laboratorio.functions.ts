@@ -87,29 +87,9 @@ export const getAlanMotorReadings = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     if (isAdmin !== true) throw new Error("Forbidden");
-    const url = process.env.ALAN_MOTOR_URL;
-    const token = process.env.ALAN_MOTOR_TOKEN;
-    if (!url || !token) return { status: "apagado" as const };
-    const { parseMotorResponse } = await import("@/lib/morph/motor-contract");
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 4000);
-    try {
-      const res = await fetch(`${url.replace(/\/+$/, "")}/v1/analizar`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ texto: data.text }),
-        signal: controller.signal,
-      });
-      const body: unknown = await res.json().catch(() => null);
-      const parsed = parseMotorResponse(body);
-      if (!parsed.ok) return { status: "error" as const, message: res.ok ? parsed.error : `HTTP ${res.status}: ${parsed.error}` };
-      return { status: "ok" as const, response: parsed.value };
-    } catch (e) {
-      const aborted = e instanceof Error && e.name === "AbortError";
-      return { status: "error" as const, message: aborted ? "El motor HFST no respondió en 4 segundos" : "No se pudo conectar con el motor HFST" };
-    } finally {
-      clearTimeout(timer);
-    }
+    // Misma llamada que usa la barrera de aprobación: rechaza !res.ok antes de leer el cuerpo.
+    const { callAlanMotor } = await import("@/lib/deterministic-gate.server");
+    return callAlanMotor(data.text);
   });
 
 /**
