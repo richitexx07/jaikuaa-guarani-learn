@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import { WordAudioRecorder } from "@/components/corpus/word-audio-recorder";
 import { quickValidateWord } from "@/lib/corpus.functions";
+import { GateNotice, useDeterministicGate } from "@/components/corpus/gate-notice";
 import { listValidationQueue } from "@/lib/teacher.functions";
 import { FOUR_QUESTIONS } from "@/lib/validation-checklist";
 import { OfflineMissingError, isNetworkError, withOfflineCache } from "@/lib/offline-data";
@@ -118,6 +119,7 @@ function QuickValidatePage() {
   }, [q.data, handled, skipped]);
   const myTotal = (q.data?.myTotal ?? 0) + sessionDelta;
   const word = queue[0];
+  const gate = useDeterministicGate(word?.gn);
   const total = queue.length;
 
   const next = useCallback((id: string) => {
@@ -127,6 +129,10 @@ function QuickValidatePage() {
 
   const approve = useCallback(async () => {
     if (!word || busy) return;
+    if (!gate.accepted) {
+      toast.error(gate.reason ?? "El motor determinista no aceptó esta palabra.");
+      return;
+    }
     setBusy(true);
     try {
       const r = await validateFn({ data: { id: word.id, action: "approve" } });
@@ -157,7 +163,7 @@ function QuickValidatePage() {
     } finally {
       setBusy(false);
     }
-  }, [word, busy, validateFn, count, next]);
+  }, [word, busy, validateFn, count, next, gate.accepted, gate.reason]);
 
   const skip = useCallback(() => {
     if (!word) return;
@@ -380,10 +386,11 @@ function QuickValidatePage() {
             <Button variant="outline" className="h-14" onClick={skip} disabled={busy}>
               <SkipForward aria-hidden /> Saltar
             </Button>
-            <Button variant="cta" className="h-14" onClick={() => void approve()} disabled={busy}>
+            <Button variant="cta" className="h-14" onClick={() => void approve()} disabled={busy || !gate.accepted}>
               {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Check aria-hidden />} Está bien
             </Button>
           </div>
+          <GateNotice reason={gate.reason} />
           <p className="mt-2 hidden text-center text-xs text-muted-foreground md:block">
             Teclado: → aprobar · ← error · S saltar · Z deshacer
           </p>

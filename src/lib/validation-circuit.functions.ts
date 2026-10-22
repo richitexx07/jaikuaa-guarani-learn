@@ -292,6 +292,13 @@ export const validateProposal = createServerFn({ method: "POST" })
     }
     const now = new Date().toISOString();
 
+    if (data.decision === "aprobar") {
+      // Barrera determinista antes de "tomar" la propuesta: si el motor no acepta, no cambia nada.
+      const { checkDeterministicAcceptance } = await import("@/lib/deterministic-gate.server");
+      const gate = await checkDeterministicAcceptance(prop.gn ?? "");
+      if (!gate.accepted) return { ok: false as const, error: `Bloqueado por el motor determinista: ${gate.reason}` };
+    }
+
     if (data.decision !== "aprobar") {
       const status: ProposalStatus = data.decision === "devolver" ? "devuelta" : "rechazada";
       const paso = data.decision === "devolver" ? "devuelta_en_validacion" : "rechazada_en_validacion";
