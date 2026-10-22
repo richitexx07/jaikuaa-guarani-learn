@@ -50,55 +50,25 @@ function EmbajadoresPage() {
         </div>
       </header>
       <main className="mx-auto max-w-3xl px-4 py-8">
-        <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
-          <Award className="h-4 w-4" /> Embajadores de Jaikuaa
-        </div>
-        <h1 className="mt-3 font-display text-3xl font-bold text-foreground">Invitá a aprender guaraní</h1>
+        <h1 className="font-display text-3xl font-bold text-foreground">¿Querés invitar a un amigo o familiar?</h1>
         <p className="mt-2 text-muted-foreground">
-          Compartí tu enlace. Cuando la persona que invitaste crea su cuenta y hace su primera actividad,
-          sumás {XP_PER_ACTIVATED_INVITE} XP de embajador. Este XP es aparte de tu avance de aprendizaje.
+          Compartí tu enlace acá para que también aprenda guaraní en Jaikuaa.
         </p>
 
         {isLoading && <p className="mt-6 text-muted-foreground">Cargando tu enlace…</p>}
         {isError && <p className="mt-6 text-destructive">No pudimos cargar tu enlace. Probá de nuevo con señal.</p>}
 
         {data && (
-          <>
-            <section className="mt-6 rounded-2xl border border-border bg-card p-5">
-              <p className="text-sm font-semibold text-foreground">Tu enlace personal</p>
-              <p className="mt-2 break-all rounded-lg bg-muted px-3 py-2 font-mono text-sm text-foreground">{link}</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Button onClick={share}><Share2 className="mr-2 h-4 w-4" /> Compartir</Button>
-                <Button variant="outline" onClick={copy}><Copy className="mr-2 h-4 w-4" /> Copiar enlace</Button>
-              </div>
-            </section>
-
-            <section className="mt-4 grid grid-cols-3 gap-3">
-              <Stat icon={<Users className="h-5 w-5" />} label="Se registraron" value={data.invited} />
-              <Stat icon={<Sparkles className="h-5 w-5" />} label="Ya empezaron" value={data.started} />
-              <Stat icon={<Award className="h-5 w-5" />} label="XP de embajador" value={data.ambassadorXp} />
-            </section>
-
-            <section className="mt-4 rounded-2xl border border-border bg-card p-5">
-              <p className="text-sm text-muted-foreground">Tu distinción</p>
-              <p className="font-display text-2xl font-bold text-primary">{level.current.name}</p>
-              {level.next && (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Te faltan {level.next.min - data.started} persona(s) que empiecen para ser «{level.next.name}».
-                </p>
-              )}
-            </section>
-
-            <section className="mt-4 text-sm text-muted-foreground">
-              <p className="font-semibold text-foreground">Reglas claras</p>
-              <ul className="mt-1 list-disc space-y-1 pl-5">
-                <li>Solo cuentan personas nuevas que hacen al menos una actividad real.</li>
-                <li>Máximo {MAX_REWARDED_INVITES_PER_MONTH} invitaciones con XP por mes.</li>
-                <li>No ves datos de las personas que invitaste, solo los totales.</li>
-                <li>No hay ranking público de embajadores ni premios en dinero.</li>
-              </ul>
-            </section>
-          </>
+          <section className="mt-6 rounded-2xl border border-border bg-card p-5">
+            <Button size="lg" className="h-14 w-full text-base" onClick={share}>
+              <Share2 className="mr-2 h-5 w-5" /> Invitar a alguien
+            </Button>
+            <p className="mt-4 text-sm font-semibold text-foreground">Tu enlace</p>
+            <p className="mt-2 break-all rounded-lg bg-muted px-3 py-2 font-mono text-sm text-foreground">{link}</p>
+            <Button variant="outline" className="mt-3 w-full" onClick={copy}>
+              <Copy className="mr-2 h-4 w-4" /> Copiar enlace
+            </Button>
+          </section>
         )}
       </main>
     </div>

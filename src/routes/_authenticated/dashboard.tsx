@@ -359,7 +359,7 @@ function Dashboard() {
                 <FreeCard to="/curso/guarani" emoji="📚" title="Curso de Guaraní" desc="10 lecciones con audio humano real. Empezá desde cero y sumá XP." accent="accent" />
                 <FreeCard to="/guarani-escolar" emoji="🎒" title="Guaraní Escolar" desc="Organizado según los grados escolares." accent="accent" inValidation />
                 <FreeCard to="/logros" emoji="🏅" title="Mis logros" desc="Tus insignias, racha y avance." accent="primary" />
-                <FreeCard to="/embajadores" emoji="🤝" title="Invitá a aprender" desc="Sé Embajador de Jaikuaa y sumá XP de embajador." accent="primary" />
+                <FreeCard to="/embajadores" emoji="🤝" title="Invitar a alguien" desc="¿Querés invitar a un amigo o familiar? Compartí tu enlace acá." accent="primary" />
                 <FreeCard to="/certificado" emoji="📜" title="Certificado" desc="Terminá el Curso de Guaraní y descargá tu certificado." accent="primary" />
               </div>
             </TabsContent>
