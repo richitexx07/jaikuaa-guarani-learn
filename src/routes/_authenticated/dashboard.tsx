@@ -22,6 +22,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { checkCorpusAdmin } from "@/lib/corpus.functions";
+import { getMyStaffStatus } from "@/lib/teacher.functions";
+import { StaffRequestCard } from "@/components/pilot/staff-request-card";
 import { OfflinePackCard } from "@/components/offline/offline-pack-card";
 import jaiImg from "@/assets/jai-tradicional.png";
 const jaiAsset = { url: jaiImg };
@@ -40,12 +42,15 @@ function StaffShortcuts() {
       <p className="text-xs font-semibold uppercase tracking-[0.15em] text-primary">
         Docentes y validadores
       </p>
+      <Button asChild variant="cta" className="mt-3 h-14 w-full justify-start text-base">
+        <Link to="/docente">🧑‍🏫 Panel del docente: todo en una pantalla</Link>
+      </Button>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <Button asChild variant="outline" className="h-12 w-full justify-start">
-          <Link to="/cuaderno">📒 Cuaderno digital del aula</Link>
-        </Button>
-        <Button asChild variant="cta" className="h-12 w-full justify-start">
           <Link to="/validar">⚡ Validación rápida</Link>
+        </Button>
+        <Button asChild variant="outline" className="h-12 w-full justify-start">
+          <Link to="/cuaderno">📒 Cuaderno digital del aula</Link>
         </Button>
         <Button asChild variant="outline" className="h-12 w-full justify-start">
           <Link to="/admin/corpus">✅ Bandeja de validación</Link>
@@ -65,6 +70,47 @@ function StaffShortcuts() {
         )}
       </div>
     </section>
+  );
+}
+
+/**
+ * Lugar en el piloto para quien todavía no es docente: acceso al Panel de práctica, estado del pedido
+ * o un enlace discreto para pedir acceso (solo si ya está en un grupo del piloto).
+ */
+function PilotCard() {
+  const fn = useServerFn(getMyStaffStatus);
+  const { data } = useQuery({
+    queryKey: ["my-staff-status"],
+    queryFn: () => fn(),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+  if (!data || data.isTeacher) return null;
+  if (data.isPractice) {
+    return (
+      <section className="mt-6 rounded-2xl border border-primary/30 bg-card p-5 shadow-elegant">
+        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-primary">Práctica supervisada</p>
+        <Button asChild variant="cta" className="mt-3 h-14 w-full justify-start text-base">
+          <Link to="/practica">🎓 Panel de práctica: todo en una pantalla</Link>
+        </Button>
+      </section>
+    );
+  }
+  if (data.request) {
+    return (
+      <div className="mt-6">
+        <StaffRequestCard request={data.request} defaultName={data.fullName} compact />
+      </div>
+    );
+  }
+  if (!data.cohort) return null;
+  return (
+    <p className="mt-6 text-center text-sm text-muted-foreground">
+      ¿Sos docente o estudiante del Ateneo en el piloto?{" "}
+      <Link to="/docente" className="font-semibold text-primary underline-offset-4 hover:underline">
+        Pedí tu acceso
+      </Link>
+    </p>
   );
 }
 
@@ -247,6 +293,7 @@ function Dashboard() {
 
           {/* 3. ACCESO DOCENTE */}
           <StaffShortcuts />
+          <PilotCard />
 
           {/* 4. TRES PILARES */}
           <Tabs defaultValue="aprender" className="mt-4">

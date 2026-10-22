@@ -18,7 +18,8 @@ import { JAI_OPEN_EVENT } from "@/lib/jai-events";
 import jaiImg from "@/assets/jai-atencion-3d.webp";
 
 // En los juegos y en el panel de administración el botón molestaría, así que no se muestra.
-const HIDDEN_PREFIXES = ["/juegos", "/admin", "/piloto-ateneo", "/certificado"];
+// En /validar los botones de decisión van abajo: Jai no debe taparlos.
+const HIDDEN_PREFIXES = ["/juegos", "/admin", "/piloto-ateneo", "/certificado", "/validar"];
 
 
 type Msg =

@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import { WordAudioRecorder } from "@/components/corpus/word-audio-recorder";
-import { listCorpusWords, quickValidateWord } from "@/lib/corpus.functions";
+import { quickValidateWord } from "@/lib/corpus.functions";
+import { listValidationQueue } from "@/lib/teacher.functions";
+import { FOUR_QUESTIONS } from "@/lib/validation-checklist";
 import { reportContentError } from "@/lib/content-reports.functions";
 
 export const Route = createFileRoute("/_authenticated/validar")({
@@ -26,12 +28,14 @@ type Word = {
   notes: string | null;
   category: string | null;
   validated_by: string | null;
+  lesson: { n: number; title: string; published: boolean } | null;
 };
 type Done = { id: string; gn: string; prevStatus: "draft" | "published" };
 type ReportKind = "escritura" | "significado" | "audio" | "otro";
 
 const SKIP_KEY = "jaikuaa:validar-saltadas";
 const COUNT_KEY = "jaikuaa:validar-hoy";
+const GUIDE_KEY = "jaikuaa:validar-guia-vista";
 
 function today() {
   return new Date().toLocaleDateString("en-CA", { timeZone: "America/Asuncion" });
@@ -51,14 +55,14 @@ function saveCount(n: number) {
 }
 
 function QuickValidatePage() {
-  const listFn = useServerFn(listCorpusWords);
+  const listFn = useServerFn(listValidationQueue);
   const validateFn = useServerFn(quickValidateWord);
   const reportFn = useServerFn(reportContentError);
   const qc = useQueryClient();
 
   const q = useQuery({
     queryKey: ["quick-validate"],
-    queryFn: () => listFn({ data: { onlyPendingValidation: true, limit: 500 } }),
+    queryFn: () => listFn(),
     retry: false,
   });
 
@@ -72,6 +76,8 @@ function QuickValidatePage() {
   const [handled, setHandled] = useState<Set<string>>(new Set());
   const [history, setHistory] = useState<Done[]>([]);
   const [count, setCount] = useState(0);
+  const [sessionDelta, setSessionDelta] = useState(0);
+  const [guide, setGuide] = useState(false);
   const [busy, setBusy] = useState(false);
   const [reporting, setReporting] = useState(false);
   const [drag, setDrag] = useState(0);
@@ -80,18 +86,28 @@ function QuickValidatePage() {
   useEffect(() => setCount(readCount()), []);
   useEffect(() => {
     try {
+      if (!localStorage.getItem(GUIDE_KEY)) setGuide(true);
+    } catch {}
+  }, []);
+  const closeGuide = useCallback(() => {
+    setGuide(false);
+    try {
+      localStorage.setItem(GUIDE_KEY, "1");
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try {
       sessionStorage.setItem(SKIP_KEY, JSON.stringify([...skipped]));
     } catch {}
   }, [skipped]);
 
-  // Primero las palabras con audio (se pueden escuchar y validar completas), después el resto.
+  // El servidor ya las ordena como las ven los alumnos: lección 1, lección 2… y después el resto.
+  // Las saltadas pasan al final.
   const queue = useMemo(() => {
     const words = ((q.data?.words ?? []) as Word[]).filter((w) => !w.validated_by && !handled.has(w.id));
-    const fresh = words.filter((w) => !skipped.has(w.id));
-    const later = words.filter((w) => skipped.has(w.id));
-    const byAudio = (a: Word, b: Word) => Number(b.has_audio) - Number(a.has_audio);
-    return [...fresh.sort(byAudio), ...later.sort(byAudio)];
+    return [...words.filter((w) => !skipped.has(w.id)), ...words.filter((w) => skipped.has(w.id))];
   }, [q.data, handled, skipped]);
+  const myTotal = (q.data?.myTotal ?? 0) + sessionDelta;
   const word = queue[0];
   const total = queue.length;
 
@@ -109,6 +125,7 @@ function QuickValidatePage() {
       const n = count + 1;
       setCount(n);
       saveCount(n);
+      if (!r.already) setSessionDelta((x) => x + 1);
       next(word.id);
     } catch {
       toast.error("No se pudo validar. Revisá la conexión y probá de nuevo.");
@@ -145,6 +162,7 @@ function QuickValidatePage() {
       const n = Math.max(0, count - 1);
       setCount(n);
       saveCount(n);
+      setSessionDelta((x) => x - 1);
       void qc.invalidateQueries({ queryKey: ["quick-validate"] });
       toast.success(`Se deshizo la validación de «${last.gn}».`);
     } catch (e) {
@@ -157,7 +175,7 @@ function QuickValidatePage() {
   // Atajos de teclado para validar rápido desde la computadora.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (reporting) return;
+      if (reporting || guide) return;
       const t = e.target as HTMLElement | null;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
       if (e.key === "ArrowRight" || e.key === "Enter") void approve();
@@ -167,7 +185,7 @@ function QuickValidatePage() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [approve, skip, undo, reporting]);
+  }, [approve, skip, undo, reporting, guide]);
 
   if (q.isLoading) {
     return (
@@ -181,11 +199,11 @@ function QuickValidatePage() {
       <div className="mx-auto max-w-md px-4 py-20 text-center">
         <h1 className="font-display text-2xl font-bold">Solo para docentes validadores</h1>
         <p className="mt-2 text-muted-foreground">
-          Esta pantalla es para los docentes que validan las palabras de Jaikuaa. Si sos docente, pedí al
-          administrador que te habilite.
+          Esta pantalla es para los docentes que validan las palabras de Jaikuaa. Si sos docente, pedí tu acceso
+          con un toque: lo aprobamos en el día.
         </p>
         <Button asChild variant="cta" className="mt-6">
-          <Link to="/dashboard">Volver al panel</Link>
+          <Link to="/docente">Pedir acceso de docente</Link>
         </Button>
       </div>
     );
@@ -196,12 +214,17 @@ function QuickValidatePage() {
   return (
     <div className="mx-auto flex min-h-[calc(100dvh-5rem)] max-w-lg flex-col px-4 pb-24 pt-5">
       <div className="flex items-center justify-between">
-        <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary">
-          ← Panel
+        <Link to="/docente" className="text-sm font-medium text-muted-foreground hover:text-primary">
+          ← Panel del docente
         </Link>
-        <Button variant="ghost" size="sm" onClick={() => void undo()} disabled={!history.length || busy}>
-          <Undo2 aria-hidden /> Deshacer
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="sm" onClick={() => setGuide(true)} aria-label="Cómo se usa">
+            ?
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => void undo()} disabled={!history.length || busy}>
+            <Undo2 aria-hidden /> Deshacer
+          </Button>
+        </div>
       </div>
       <h1 className="mt-2 font-display text-2xl font-bold text-foreground">⚡ Validación rápida</h1>
       <p className="text-sm text-muted-foreground">
@@ -209,7 +232,9 @@ function QuickValidatePage() {
       </p>
 
       <div className="mt-4 flex items-center justify-between text-sm">
-        <span className="font-semibold text-primary">Hoy validaste {count}</span>
+        <span className="font-semibold text-primary">
+          Hoy validaste {count} <span className="font-normal text-muted-foreground">· en total {myTotal}</span>
+        </span>
         <span className="text-muted-foreground">Quedan {total}</span>
       </div>
       <div className="mt-1 h-2 rounded-full bg-muted">
@@ -253,6 +278,13 @@ function QuickValidatePage() {
             }}
           >
             <div className="flex flex-wrap gap-2">
+              {word.lesson ? (
+                <Badge className="bg-primary/15 text-primary hover:bg-primary/15">
+                  📘 Lección {word.lesson.n} · {word.lesson.title}
+                </Badge>
+              ) : (
+                <Badge variant="outline">Fuera de las lecciones</Badge>
+              )}
               {word.status === "draft" ? (
                 <Badge variant="outline">En borrador: los alumnos todavía no la ven</Badge>
               ) : (
@@ -279,7 +311,17 @@ function QuickValidatePage() {
                 />
               </div>
             )}
-            <p className="mt-6 text-center text-xs text-muted-foreground">
+            <ul className="mt-6 grid grid-cols-2 gap-1.5 text-xs" aria-label="Las cuatro preguntas">
+              {FOUR_QUESTIONS.map((x, i) => (
+                <li key={x.id} className="flex items-center gap-1.5 rounded-lg bg-muted/50 px-2 py-1.5 text-foreground">
+                  <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                    {i + 1}
+                  </span>
+                  {x.q}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-center text-xs text-muted-foreground">
               Deslizá → si está bien · ← si tiene un error
             </p>
           </article>
@@ -301,6 +343,8 @@ function QuickValidatePage() {
         </>
       )}
 
+      {guide && <Walkthrough onClose={closeGuide} />}
+
       {reporting && word && (
         <ReportSheet
           gn={word.gn}
@@ -317,6 +361,55 @@ function QuickValidatePage() {
           }}
         />
       )}
+    </div>
+  );
+}
+
+const GUIDE_STEPS: { emoji: string; title: string; text: string }[] = [
+  {
+    emoji: "👂",
+    title: "Escuchá y leé",
+    text: "Aparece una palabra por pantalla, en el orden de las lecciones que ven los alumnos. Tocá el parlante para escucharla.",
+  },
+  {
+    emoji: "✅",
+    title: "Hacete las cuatro preguntas",
+    text: "¿Está bien escrita? ¿El significado es correcto? ¿El audio suena bien? ¿Sirve para enseñar? Si las cuatro son sí, tocá «Está bien».",
+  },
+  {
+    emoji: "🚩",
+    title: "Si algo no está bien, avisá",
+    text: "Tocá «Error» y contá qué viste. Si dudás, «Saltar» la deja para después. Si te equivocaste, «Deshacer» la vuelve atrás.",
+  },
+];
+
+function Walkthrough({ onClose }: { onClose: () => void }) {
+  const [i, setI] = useState(0);
+  const step = GUIDE_STEPS[i];
+  const last = i === GUIDE_STEPS.length - 1;
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center" role="dialog" aria-label="Cómo se usa">
+      <div className="w-full max-w-md rounded-t-3xl bg-card p-6 text-center shadow-lift sm:rounded-3xl">
+        <div className="text-5xl" aria-hidden>{step.emoji}</div>
+        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.15em] text-primary">
+          Paso {i + 1} de {GUIDE_STEPS.length}
+        </p>
+        <h2 className="mt-1 font-display text-xl font-bold text-foreground">{step.title}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{step.text}</p>
+        <div className="mt-4 flex justify-center gap-1.5" aria-hidden>
+          {GUIDE_STEPS.map((_, k) => (
+            <span key={k} className={`h-1.5 w-6 rounded-full ${k === i ? "bg-primary" : "bg-muted"}`} />
+          ))}
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-2">
+          <Button variant="ghost" className="h-12" onClick={onClose}>
+            Saltar guía
+          </Button>
+          <Button variant="cta" className="h-12" onClick={() => (last ? onClose() : setI(i + 1))} autoFocus>
+            {last ? "¡Empezar!" : "Siguiente"}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

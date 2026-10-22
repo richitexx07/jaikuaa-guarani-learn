@@ -831,6 +831,45 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_requests: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          full_name: string
+          id: string
+          institution: string
+          kind: string
+          note: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          full_name: string
+          id?: string
+          institution?: string
+          kind: string
+          note?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          full_name?: string
+          id?: string
+          institution?: string
+          kind?: string
+          note?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trivia_categories: {
         Row: {
           created_at: string

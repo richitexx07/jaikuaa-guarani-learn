@@ -1,5 +1,5 @@
 // Rutas donde se muestra la barra inferior móvil (solo pantallas de navegación, no juegos activos).
-const NAV_PREFIXES = ["/dashboard", "/juegos", "/ranking", "/logros", "/curso", "/guarani-escolar", "/trivia", "/cuaderno"];
+const NAV_PREFIXES = ["/dashboard", "/juegos", "/ranking", "/logros", "/curso", "/guarani-escolar", "/trivia", "/cuaderno", "/docente", "/practica"];
 
 export function showsBottomNav(pathname: string): boolean {
   const p = pathname.replace(/\/+$/, "") || "/";

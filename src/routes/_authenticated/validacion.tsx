@@ -38,8 +38,13 @@ export const Route = createFileRoute("/_authenticated/validacion")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): { tab?: CircuitTab } =>
+    TABS.includes(s.tab as CircuitTab) ? { tab: s.tab as CircuitTab } : {},
   component: ValidationCircuitPage,
 });
+
+const TABS = ["proponer", "mias", "verificar", "revisar", "errores", "validar", "revisores"] as const;
+type CircuitTab = (typeof TABS)[number];
 
 const STATUS_LABEL: Record<ProposalStatus, { label: string; cls: string }> = {
   propuesta: { label: "Esperando revisión", cls: "bg-muted text-foreground" },
@@ -66,6 +71,7 @@ const fmt = (iso: string | null) =>
 function ValidationCircuitPage() {
   const rolesFn = useServerFn(getCircuitRoles);
   const roles = useQuery({ queryKey: ["circuit-roles"], queryFn: () => rolesFn() });
+  const { tab } = Route.useSearch();
 
   if (roles.isLoading) {
     return (
@@ -86,7 +92,17 @@ function ValidationCircuitPage() {
       </p>
 
       <div className="mt-6"><GuaraniCharBar /></div>
-      <Tabs defaultValue="proponer">
+      <Tabs
+        defaultValue={
+          tab === "validar" || tab === "revisores"
+            ? (tab === "validar" ? r?.canValidate : r?.isAdmin)
+              ? tab
+              : "proponer"
+            : tab && tab !== "proponer" && tab !== "mias" && !r?.canReview
+              ? "proponer"
+              : (tab ?? "proponer")
+        }
+      >
         <TabsList className="flex h-auto flex-wrap justify-start">
           <TabsTrigger value="proponer">Proponer</TabsTrigger>
           <TabsTrigger value="mias">Mis propuestas</TabsTrigger>

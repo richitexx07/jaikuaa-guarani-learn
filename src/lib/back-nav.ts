@@ -4,6 +4,8 @@ const HIDDEN = new Set(["/", "/dashboard", "/auth"]);
 export function showsBackButton(pathname: string): boolean {
   const p = pathname.replace(/\/+$/, "") || "/";
   if (p.startsWith("/studio")) return false;
+  // Pantallas de trabajo del piloto: ya tienen su enlace arriba y los botones de acción abajo.
+  if (["/validar", "/docente", "/practica"].some((x) => p === x || p.startsWith(x + "/"))) return false;
   return !HIDDEN.has(p);
 }
 

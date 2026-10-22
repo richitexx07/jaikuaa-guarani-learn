@@ -48,6 +48,8 @@ import { Route as AuthenticatedAdminInformeAuspicianteRouteImport } from './rout
 import { Route as AuthenticatedAdminJaiRouteImport } from './routes/_authenticated/admin.jai'
 import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
 import { Route as AuthenticatedCursoLangRouteImport } from './routes/_authenticated/curso.$lang'
+import { Route as AuthenticatedDocenteIndexRouteImport } from './routes/_authenticated/docente.index'
+import { Route as AuthenticatedDocenteConstanciaRouteImport } from './routes/_authenticated/docente.constancia'
 import { Route as AuthenticatedGuaraniEscolarIndexRouteImport } from './routes/_authenticated/guarani-escolar.index'
 import { Route as AuthenticatedGuaraniEscolarRescateRouteImport } from './routes/_authenticated/guarani-escolar.rescate'
 import { Route as AuthenticatedGuaraniEscolarSemanalRouteImport } from './routes/_authenticated/guarani-escolar.semanal'
@@ -65,6 +67,8 @@ import { Route as AuthenticatedJuegosTaangaRouteImport } from './routes/_authent
 import { Route as AuthenticatedJuegosTekojojaRouteImport } from './routes/_authenticated/juegos.tekojoja'
 import { Route as AuthenticatedJuegosTembiuRouteImport } from './routes/_authenticated/juegos.tembiu'
 import { Route as AuthenticatedJuegosTriviaDueloRouteImport } from './routes/_authenticated/juegos.trivia-duelo'
+import { Route as AuthenticatedPracticaIndexRouteImport } from './routes/_authenticated/practica.index'
+import { Route as AuthenticatedPracticaRegistroRouteImport } from './routes/_authenticated/practica.registro'
 import { Route as AuthenticatedTriviaIndexRouteImport } from './routes/_authenticated/trivia.index'
 import { Route as AuthenticatedTriviaCategoryRouteImport } from './routes/_authenticated/trivia.$category'
 import { Route as AuthenticatedCursoLangIndexRouteImport } from './routes/_authenticated/curso.$lang.index'
@@ -272,6 +276,18 @@ const AuthenticatedCursoLangRoute = AuthenticatedCursoLangRouteImport.update({
   path: '/curso/$lang',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDocenteIndexRoute =
+  AuthenticatedDocenteIndexRouteImport.update({
+    id: '/docente/',
+    path: '/docente/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDocenteConstanciaRoute =
+  AuthenticatedDocenteConstanciaRouteImport.update({
+    id: '/docente/constancia',
+    path: '/docente/constancia',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedGuaraniEscolarIndexRoute =
   AuthenticatedGuaraniEscolarIndexRouteImport.update({
     id: '/',
@@ -374,6 +390,18 @@ const AuthenticatedJuegosTriviaDueloRoute =
     path: '/juegos/trivia-duelo',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPracticaIndexRoute =
+  AuthenticatedPracticaIndexRouteImport.update({
+    id: '/practica/',
+    path: '/practica/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPracticaRegistroRoute =
+  AuthenticatedPracticaRegistroRouteImport.update({
+    id: '/practica/registro',
+    path: '/practica/registro',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTriviaIndexRoute =
   AuthenticatedTriviaIndexRouteImport.update({
     id: '/trivia/',
@@ -450,6 +478,7 @@ export interface FileRoutesByFullPath {
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/curso/$lang': typeof AuthenticatedCursoLangRouteWithChildren
+  '/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
   '/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
   '/guarani-escolar/semanal': typeof AuthenticatedGuaraniEscolarSemanalRoute
   '/guarani-escolar/tema': typeof AuthenticatedGuaraniEscolarTemaRouteWithChildren
@@ -465,9 +494,12 @@ export interface FileRoutesByFullPath {
   '/juegos/tekojoja': typeof AuthenticatedJuegosTekojojaRoute
   '/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
+  '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
+  '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/guarani-escolar/': typeof AuthenticatedGuaraniEscolarIndexRoute
   '/juegos/': typeof AuthenticatedJuegosIndexRoute
+  '/practica/': typeof AuthenticatedPracticaIndexRoute
   '/trivia/': typeof AuthenticatedTriviaIndexRoute
   '/guarani-escolar/tema/$topic': typeof AuthenticatedGuaraniEscolarTemaTopicRoute
   '/curso/$lang/': typeof AuthenticatedCursoLangIndexRoute
@@ -511,6 +543,7 @@ export interface FileRoutesByTo {
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
   '/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
   '/guarani-escolar/semanal': typeof AuthenticatedGuaraniEscolarSemanalRoute
   '/juegos/ahorcado': typeof AuthenticatedJuegosAhorcadoRoute
@@ -525,9 +558,12 @@ export interface FileRoutesByTo {
   '/juegos/tekojoja': typeof AuthenticatedJuegosTekojojaRoute
   '/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
+  '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
+  '/docente': typeof AuthenticatedDocenteIndexRoute
   '/guarani-escolar': typeof AuthenticatedGuaraniEscolarIndexRoute
   '/juegos': typeof AuthenticatedJuegosIndexRoute
+  '/practica': typeof AuthenticatedPracticaIndexRoute
   '/trivia': typeof AuthenticatedTriviaIndexRoute
   '/guarani-escolar/tema/$topic': typeof AuthenticatedGuaraniEscolarTemaTopicRoute
   '/curso/$lang': typeof AuthenticatedCursoLangIndexRoute
@@ -575,6 +611,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/_authenticated/curso/$lang': typeof AuthenticatedCursoLangRouteWithChildren
+  '/_authenticated/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
   '/_authenticated/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
   '/_authenticated/guarani-escolar/semanal': typeof AuthenticatedGuaraniEscolarSemanalRoute
   '/_authenticated/guarani-escolar/tema': typeof AuthenticatedGuaraniEscolarTemaRouteWithChildren
@@ -590,9 +627,12 @@ export interface FileRoutesById {
   '/_authenticated/juegos/tekojoja': typeof AuthenticatedJuegosTekojojaRoute
   '/_authenticated/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/_authenticated/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
+  '/_authenticated/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/_authenticated/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
+  '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/guarani-escolar/': typeof AuthenticatedGuaraniEscolarIndexRoute
   '/_authenticated/juegos/': typeof AuthenticatedJuegosIndexRoute
+  '/_authenticated/practica/': typeof AuthenticatedPracticaIndexRoute
   '/_authenticated/trivia/': typeof AuthenticatedTriviaIndexRoute
   '/_authenticated/guarani-escolar/tema/$topic': typeof AuthenticatedGuaraniEscolarTemaTopicRoute
   '/_authenticated/curso/$lang/': typeof AuthenticatedCursoLangIndexRoute
@@ -640,6 +680,7 @@ export interface FileRouteTypes {
     | '/admin/jai'
     | '/admin/noticias'
     | '/curso/$lang'
+    | '/docente/constancia'
     | '/guarani-escolar/rescate'
     | '/guarani-escolar/semanal'
     | '/guarani-escolar/tema'
@@ -655,9 +696,12 @@ export interface FileRouteTypes {
     | '/juegos/tekojoja'
     | '/juegos/tembiu'
     | '/juegos/trivia-duelo'
+    | '/practica/registro'
     | '/trivia/$category'
+    | '/docente/'
     | '/guarani-escolar/'
     | '/juegos/'
+    | '/practica/'
     | '/trivia/'
     | '/guarani-escolar/tema/$topic'
     | '/curso/$lang/'
@@ -701,6 +745,7 @@ export interface FileRouteTypes {
     | '/admin/informe-auspiciante'
     | '/admin/jai'
     | '/admin/noticias'
+    | '/docente/constancia'
     | '/guarani-escolar/rescate'
     | '/guarani-escolar/semanal'
     | '/juegos/ahorcado'
@@ -715,9 +760,12 @@ export interface FileRouteTypes {
     | '/juegos/tekojoja'
     | '/juegos/tembiu'
     | '/juegos/trivia-duelo'
+    | '/practica/registro'
     | '/trivia/$category'
+    | '/docente'
     | '/guarani-escolar'
     | '/juegos'
+    | '/practica'
     | '/trivia'
     | '/guarani-escolar/tema/$topic'
     | '/curso/$lang'
@@ -764,6 +812,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/jai'
     | '/_authenticated/admin/noticias'
     | '/_authenticated/curso/$lang'
+    | '/_authenticated/docente/constancia'
     | '/_authenticated/guarani-escolar/rescate'
     | '/_authenticated/guarani-escolar/semanal'
     | '/_authenticated/guarani-escolar/tema'
@@ -779,9 +828,12 @@ export interface FileRouteTypes {
     | '/_authenticated/juegos/tekojoja'
     | '/_authenticated/juegos/tembiu'
     | '/_authenticated/juegos/trivia-duelo'
+    | '/_authenticated/practica/registro'
     | '/_authenticated/trivia/$category'
+    | '/_authenticated/docente/'
     | '/_authenticated/guarani-escolar/'
     | '/_authenticated/juegos/'
+    | '/_authenticated/practica/'
     | '/_authenticated/trivia/'
     | '/_authenticated/guarani-escolar/tema/$topic'
     | '/_authenticated/curso/$lang/'
@@ -1087,6 +1139,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCursoLangRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/docente/': {
+      id: '/_authenticated/docente/'
+      path: '/docente'
+      fullPath: '/docente/'
+      preLoaderRoute: typeof AuthenticatedDocenteIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/docente/constancia': {
+      id: '/_authenticated/docente/constancia'
+      path: '/docente/constancia'
+      fullPath: '/docente/constancia'
+      preLoaderRoute: typeof AuthenticatedDocenteConstanciaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/guarani-escolar/': {
       id: '/_authenticated/guarani-escolar/'
       path: '/'
@@ -1204,6 +1270,20 @@ declare module '@tanstack/react-router' {
       path: '/juegos/trivia-duelo'
       fullPath: '/juegos/trivia-duelo'
       preLoaderRoute: typeof AuthenticatedJuegosTriviaDueloRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/practica/': {
+      id: '/_authenticated/practica/'
+      path: '/practica'
+      fullPath: '/practica/'
+      preLoaderRoute: typeof AuthenticatedPracticaIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/practica/registro': {
+      id: '/_authenticated/practica/registro'
+      path: '/practica/registro'
+      fullPath: '/practica/registro'
+      preLoaderRoute: typeof AuthenticatedPracticaRegistroRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/trivia/': {
@@ -1329,6 +1409,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminJaiRoute: typeof AuthenticatedAdminJaiRoute
   AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
   AuthenticatedCursoLangRoute: typeof AuthenticatedCursoLangRouteWithChildren
+  AuthenticatedDocenteConstanciaRoute: typeof AuthenticatedDocenteConstanciaRoute
   AuthenticatedJuegosAhorcadoRoute: typeof AuthenticatedJuegosAhorcadoRoute
   AuthenticatedJuegosDueloRoute: typeof AuthenticatedJuegosDueloRoute
   AuthenticatedJuegosKaraokeRoute: typeof AuthenticatedJuegosKaraokeRoute
@@ -1341,8 +1422,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedJuegosTekojojaRoute: typeof AuthenticatedJuegosTekojojaRoute
   AuthenticatedJuegosTembiuRoute: typeof AuthenticatedJuegosTembiuRoute
   AuthenticatedJuegosTriviaDueloRoute: typeof AuthenticatedJuegosTriviaDueloRoute
+  AuthenticatedPracticaRegistroRoute: typeof AuthenticatedPracticaRegistroRoute
   AuthenticatedTriviaCategoryRoute: typeof AuthenticatedTriviaCategoryRoute
+  AuthenticatedDocenteIndexRoute: typeof AuthenticatedDocenteIndexRoute
   AuthenticatedJuegosIndexRoute: typeof AuthenticatedJuegosIndexRoute
+  AuthenticatedPracticaIndexRoute: typeof AuthenticatedPracticaIndexRoute
   AuthenticatedTriviaIndexRoute: typeof AuthenticatedTriviaIndexRoute
 }
 
@@ -1368,6 +1452,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminJaiRoute: AuthenticatedAdminJaiRoute,
   AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
   AuthenticatedCursoLangRoute: AuthenticatedCursoLangRouteWithChildren,
+  AuthenticatedDocenteConstanciaRoute: AuthenticatedDocenteConstanciaRoute,
   AuthenticatedJuegosAhorcadoRoute: AuthenticatedJuegosAhorcadoRoute,
   AuthenticatedJuegosDueloRoute: AuthenticatedJuegosDueloRoute,
   AuthenticatedJuegosKaraokeRoute: AuthenticatedJuegosKaraokeRoute,
@@ -1380,8 +1465,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedJuegosTekojojaRoute: AuthenticatedJuegosTekojojaRoute,
   AuthenticatedJuegosTembiuRoute: AuthenticatedJuegosTembiuRoute,
   AuthenticatedJuegosTriviaDueloRoute: AuthenticatedJuegosTriviaDueloRoute,
+  AuthenticatedPracticaRegistroRoute: AuthenticatedPracticaRegistroRoute,
   AuthenticatedTriviaCategoryRoute: AuthenticatedTriviaCategoryRoute,
+  AuthenticatedDocenteIndexRoute: AuthenticatedDocenteIndexRoute,
   AuthenticatedJuegosIndexRoute: AuthenticatedJuegosIndexRoute,
+  AuthenticatedPracticaIndexRoute: AuthenticatedPracticaIndexRoute,
   AuthenticatedTriviaIndexRoute: AuthenticatedTriviaIndexRoute,
 }
 
