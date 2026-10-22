@@ -23,6 +23,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { checkCorpusAdmin } from "@/lib/corpus.functions";
 import { getMyStaffStatus } from "@/lib/teacher.functions";
+import { withOfflineCache } from "@/lib/offline-data";
 import { StaffRequestCard } from "@/components/pilot/staff-request-card";
 import { OfflinePackCard } from "@/components/offline/offline-pack-card";
 import jaiImg from "@/assets/jai-tradicional.png";
@@ -77,14 +78,34 @@ function StaffShortcuts() {
  * Lugar en el piloto para quien todavía no es docente: acceso al Panel de práctica, estado del pedido
  * o un enlace discreto para pedir acceso (solo si ya está en un grupo del piloto).
  */
+const PANEL_REDIRECT_KEY = "jaikuaa:panel-abierto";
+
 function PilotCard() {
   const fn = useServerFn(getMyStaffStatus);
+  const navigate = useNavigate();
   const { data } = useQuery({
     queryKey: ["my-staff-status"],
-    queryFn: () => fn(),
+    queryFn: () => withOfflineCache("my-staff-status", () => fn()),
+    networkMode: "always",
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
+
+  // Al abrir Jaikuaa, el docente va directo a su Panel del docente y el estudiante en práctica a su
+  // Panel de práctica. Una sola vez por visita: si vuelve al inicio, se queda acá. El administrador no.
+  useEffect(() => {
+    if (!data) return;
+    const target = data.isTeacher && !data.isAdmin ? "/docente" : !data.isTeacher && data.isPractice ? "/practica" : null;
+    if (!target) return;
+    try {
+      if (sessionStorage.getItem(PANEL_REDIRECT_KEY)) return;
+      sessionStorage.setItem(PANEL_REDIRECT_KEY, "1");
+    } catch {
+      return;
+    }
+    void navigate({ to: target, replace: true });
+  }, [data, navigate]);
+
   if (!data || data.isTeacher) return null;
   if (data.isPractice) {
     return (

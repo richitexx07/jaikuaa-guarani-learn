@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -11,6 +11,18 @@ import { GuaraniCharBar } from "@/components/guarani-char-bar";
 import { StaffRequestCard } from "@/components/pilot/staff-request-card";
 import { getMyStaffStatus, getPracticeHome } from "@/lib/teacher.functions";
 import { getVerificationQueue, proposeContent, type VerificationWord } from "@/lib/validation-circuit.functions";
+import { isNetworkError, withOfflineCache } from "@/lib/offline-data";
+import {
+  clearProposalFailures,
+  proposalFailures,
+  queueProposal,
+  queuedProposalWords,
+  type ProposalFailure,
+} from "@/lib/staff-offline";
+import { PENDING_EVENT } from "@/lib/gamification";
+import { PanelTools } from "@/components/pilot/panel-tools";
+import { DictateButton } from "@/components/pilot/dictate-button";
+import { warmPages } from "@/lib/offline-pack";
 
 export const Route = createFileRoute("/_authenticated/practica/")({
   head: () => ({ meta: [{ title: "Jaikuaa — Panel de práctica" }, { name: "robots", content: "noindex" }] }),
@@ -27,7 +39,12 @@ const SKIP_KEY = "jaikuaa:practica-saltadas";
 
 function PracticePage() {
   const statusFn = useServerFn(getMyStaffStatus);
-  const status = useQuery({ queryKey: ["my-staff-status"], queryFn: () => statusFn(), retry: false });
+  const status = useQuery({
+    queryKey: ["my-staff-status"],
+    queryFn: () => withOfflineCache("my-staff-status", () => statusFn()),
+    retry: false,
+    networkMode: "always",
+  });
   if (status.isLoading) return <Spinner />;
   const s = status.data;
   if (!s) return <Shell><p className="mt-6 text-sm text-muted-foreground">No se pudo cargar. Revisá la conexión.</p></Shell>;
@@ -50,12 +67,22 @@ function PracticePage() {
 
 function PracticeHome() {
   const fn = useServerFn(getPracticeHome);
-  const q = useQuery({ queryKey: ["practice-home"], queryFn: () => fn() });
+  const q = useQuery({
+    queryKey: ["practice-home"],
+    queryFn: () => withOfflineCache("practice-home", () => fn()),
+    networkMode: "always",
+  });
+  const queued = useQueuedProposals();
+  useEffect(() => {
+    const t = setTimeout(() => void warmPages(["/practica", "/practica/registro"]), 2000);
+    return () => clearTimeout(t);
+  }, []);
   if (q.isLoading) return <Spinner />;
   if (q.isError || !q.data) return <Shell><p className="mt-6 text-sm text-muted-foreground">No se pudo cargar el panel.</p></Shell>;
   const d = q.data;
   const name = d.fullName.trim().split(/\s+/)[0] ?? "";
-  const left = Math.max(0, d.dailyLimit - d.today);
+  const today = d.today + queued.size;
+  const left = Math.max(0, d.dailyLimit - today);
 
   return (
     <Shell>
@@ -63,9 +90,17 @@ function PracticeHome() {
       <p className="mt-1 text-muted-foreground">
         {name ? `Hola, ${name}. ` : ""}Tu práctica supervisada en una sola pantalla.
       </p>
+      <PanelTools />
+      <Failures />
+      {queued.size > 0 && (
+        <p className="mt-4 rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm text-foreground">
+          📲 {queued.size} {queued.size === 1 ? "palabra guardada" : "palabras guardadas"} en tu celular. Se envían solas
+          cuando vuelva la señal.
+        </p>
+      )}
 
       <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Num n={d.today} label={`hoy (máximo ${d.dailyLimit})`} />
+        <Num n={today} label={`hoy (máximo ${d.dailyLimit})`} />
         <Num n={d.mine.waiting} label="esperando revisión" />
         <Num n={d.mine.published} label="publicadas" />
         <Num n={d.mine.reviews} label="revisiones hechas" />
@@ -104,7 +139,7 @@ function PracticeHome() {
           <p className="text-sm text-muted-foreground">Mañana podés seguir. Mientras, podés revisar propuestas de otros.</p>
         </div>
       ) : (
-        <VerifyCards left={left} />
+        <VerifyCards left={left} queued={queued} />
       )}
 
       <section className="mt-8 rounded-2xl border border-primary/30 bg-primary/5 p-5 text-sm">
@@ -119,11 +154,54 @@ function PracticeHome() {
   );
 }
 
-function VerifyCards({ left }: { left: number }) {
+/** Palabras que esperan en el teléfono para enviarse (se actualiza al guardar o al enviar). */
+function useQueuedProposals(): Set<string> {
+  const [set, setSet] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    const update = () => setSet(queuedProposalWords());
+    update();
+    window.addEventListener(PENDING_EVENT, update);
+    return () => window.removeEventListener(PENDING_EVENT, update);
+  }, []);
+  return set;
+}
+
+/** Palabras guardadas sin señal que después el servidor no aceptó. */
+function Failures() {
+  const [list, setList] = useState<ProposalFailure[]>([]);
+  useEffect(() => {
+    const update = () => setList(proposalFailures());
+    update();
+    window.addEventListener(PENDING_EVENT, update);
+    return () => window.removeEventListener(PENDING_EVENT, update);
+  }, []);
+  if (!list.length) return null;
+  return (
+    <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+      <p className="font-semibold">Algunas palabras guardadas sin señal no se pudieron enviar:</p>
+      <ul className="mt-1 list-disc pl-5">
+        {list.map((f, i) => (
+          <li key={i}>
+            <strong>{f.gn}</strong>: {f.error}
+          </li>
+        ))}
+      </ul>
+      <Button size="sm" variant="outline" className="mt-2" onClick={() => clearProposalFailures()}>
+        Entendido
+      </Button>
+    </div>
+  );
+}
+
+function VerifyCards({ left, queued }: { left: number; queued: Set<string> }) {
   const fn = useServerFn(getVerificationQueue);
   const proposeFn = useServerFn(proposeContent);
   const qc = useQueryClient();
-  const q = useQuery({ queryKey: ["verification-queue"], queryFn: () => fn() });
+  const q = useQuery({
+    queryKey: ["verification-queue"],
+    queryFn: () => withOfflineCache("verification-queue", () => fn(), { label: "La lista de palabras" }),
+    networkMode: "always",
+  });
   const [skipped, setSkipped] = useState<Set<string>>(() => {
     try {
       return new Set(JSON.parse(sessionStorage.getItem(SKIP_KEY) || "[]") as string[]);
@@ -139,8 +217,10 @@ function VerifyCards({ left }: { left: number }) {
 
   const list = useMemo(() => {
     if (!q.data) return [];
-    return q.data.palabras.filter((p) => (q.data.state[p.gn] ?? "pendiente") === "pendiente" && !sent.has(p.gn) && !skipped.has(p.gn));
-  }, [q.data, sent, skipped]);
+    return q.data.palabras.filter(
+      (p) => (q.data.state[p.gn] ?? "pendiente") === "pendiente" && !sent.has(p.gn) && !skipped.has(p.gn) && !queued.has(p.gn),
+    );
+  }, [q.data, sent, skipped, queued]);
   const word = list[0];
 
   const reset = () => {
@@ -151,20 +231,30 @@ function VerifyCards({ left }: { left: number }) {
   };
 
   const send = useMutation({
-    mutationFn: (w: VerificationWord) =>
-      proposeFn({
-        data: {
-          kind: "nueva",
-          targetWordId: null,
-          gn: (gnEdit ?? w.gn).trim(),
-          es: es.trim(),
-          notes: notes.trim(),
-          source: `${SOURCE[w.fuente].cite}; verificada en práctica supervisada`,
-        },
-      }),
+    // Sin señal la palabra se guarda en el celular: la acción no debe quedar en pausa esperando la red.
+    networkMode: "always",
+    mutationFn: async (w: VerificationWord) => {
+      const data = {
+        kind: "nueva" as const,
+        targetWordId: null,
+        gn: (gnEdit ?? w.gn).trim(),
+        es: es.trim(),
+        notes: notes.trim(),
+        source: `${SOURCE[w.fuente].cite}; verificada en práctica supervisada`,
+      };
+      try {
+        const r = await proposeFn({ data });
+        return { ...r, queued: false };
+      } catch (e) {
+        if (!isNetworkError(e)) throw e;
+        // Sin señal: queda guardada en el celular y se envía sola después.
+        queueProposal({ gn: data.gn, es: data.es, notes: data.notes, source: data.source });
+        return { ok: true as const, queued: true };
+      }
+    },
     onSuccess: (r, w) => {
       if (!r.ok) return toast.error(r.error);
-      toast.success("Enviada. Ahora la revisa otra persona.");
+      toast.success(r.queued ? "Guardada en tu celular. Se envía sola cuando vuelva la señal." : "Enviada. Ahora la revisa otra persona.");
       setSent((s) => new Set(s).add(w.gn));
       reset();
       void qc.invalidateQueries({ queryKey: ["practice-home"] });
@@ -220,6 +310,9 @@ function VerifyCards({ left }: { left: number }) {
               ¿Qué significa? (en castellano, con tus palabras)
             </label>
             <Input id="p-es" value={es} onChange={(e) => setEs(e.target.value)} maxLength={300} autoFocus />
+            <div className="mt-1.5">
+              <DictateButton label="Decirlo con la voz" onText={(t) => setEs((v) => (v ? `${v} ${t}` : t).slice(0, 300))} />
+            </div>
           </div>
           <details className="rounded-xl bg-muted/40 p-3 text-sm">
             <summary className="cursor-pointer text-muted-foreground">La escritura necesita un ajuste</summary>
@@ -263,9 +356,11 @@ function VerifyCards({ left }: { left: number }) {
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="mx-auto max-w-3xl px-4 pb-24 pt-5">
-      <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary">
-        ← Inicio
-      </Link>
+      <div className="flex items-center justify-between gap-2">
+        <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary">
+          ← Lecciones y juegos
+        </Link>
+      </div>
       {children}
     </div>
   );

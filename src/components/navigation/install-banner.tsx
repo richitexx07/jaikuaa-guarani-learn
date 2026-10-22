@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { Download, Share, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { canPromptInstall, isIos, isStandalone, onInstallChange, promptInstall } from "@/lib/install-prompt";
 
 const DISMISS_KEY = "jaikuaa:install-dismissed";
 const DISMISS_DAYS = 14;
-
-type PromptEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 
 function recentlyDismissed(): boolean {
   try {
@@ -20,33 +19,24 @@ function recentlyDismissed(): boolean {
 /** Aviso para instalar Jaikuaa en la pantalla de inicio del celular (solo en el panel). */
 export function InstallBanner() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [prompt, setPrompt] = useState<PromptEvent | null>(null);
+  const [prompt, setPrompt] = useState(false);
   const [ios, setIos] = useState(false);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const standalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      (navigator as unknown as { standalone?: boolean }).standalone === true;
-    if (standalone || window.self !== window.top || recentlyDismissed()) return;
-    const ua = navigator.userAgent;
-    const isIos = /iPhone|iPad|iPod/.test(ua) && !/CriOS|FxiOS/.test(ua);
-    if (isIos) {
+    if (isStandalone() || window.self !== window.top || recentlyDismissed()) return;
+    if (isIos()) {
       setIos(true);
       setVisible(true);
     }
-    const onPrompt = (e: Event) => {
-      e.preventDefault();
-      setPrompt(e as PromptEvent);
-      setVisible(true);
+    const update = () => {
+      if (isStandalone()) return setVisible(false);
+      const can = canPromptInstall();
+      setPrompt(can);
+      if (can) setVisible(true);
     };
-    const onInstalled = () => setVisible(false);
-    window.addEventListener("beforeinstallprompt", onPrompt);
-    window.addEventListener("appinstalled", onInstalled);
-    return () => {
-      window.removeEventListener("beforeinstallprompt", onPrompt);
-      window.removeEventListener("appinstalled", onInstalled);
-    };
+    update();
+    return onInstallChange(update);
   }, []);
 
   if (!visible || pathname !== "/dashboard") return null;
@@ -62,10 +52,9 @@ export function InstallBanner() {
 
   const install = async () => {
     if (!prompt) return;
-    await prompt.prompt();
-    const { outcome } = await prompt.userChoice;
-    setPrompt(null);
-    if (outcome === "accepted") setVisible(false);
+    const ok = await promptInstall();
+    setPrompt(false);
+    if (ok) setVisible(false);
     else dismiss();
   };
 

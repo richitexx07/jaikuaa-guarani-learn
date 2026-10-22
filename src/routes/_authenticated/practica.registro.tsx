@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getPracticeLog } from "@/lib/teacher.functions";
+import { withOfflineCache } from "@/lib/offline-data";
 
 export const Route = createFileRoute("/_authenticated/practica/registro")({
   head: () => ({ meta: [{ title: "Jaikuaa — Registro de práctica" }, { name: "robots", content: "noindex" }] }),
@@ -27,7 +28,12 @@ const when = (iso: string) =>
 function PracticeLogPage() {
   const { u } = Route.useSearch();
   const fn = useServerFn(getPracticeLog);
-  const q = useQuery({ queryKey: ["practice-log", u ?? "me"], queryFn: () => fn({ data: { userId: u ?? null } }), retry: false });
+  const q = useQuery({
+    queryKey: ["practice-log", u ?? "me"],
+    queryFn: () => withOfflineCache(`practice-log:${u ?? "me"}`, () => fn({ data: { userId: u ?? null } })),
+    retry: false,
+    networkMode: "always",
+  });
 
   if (q.isLoading) {
     return (

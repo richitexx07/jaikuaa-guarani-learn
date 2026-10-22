@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getMyConstancia } from "@/lib/teacher.functions";
+import { withOfflineCache } from "@/lib/offline-data";
 
 export const Route = createFileRoute("/_authenticated/docente/constancia")({
   head: () => ({ meta: [{ title: "Jaikuaa — Mi constancia" }, { name: "robots", content: "noindex" }] }),
@@ -19,7 +20,12 @@ const longDate = (iso: string | null) =>
  */
 function ConstanciaPage() {
   const fn = useServerFn(getMyConstancia);
-  const q = useQuery({ queryKey: ["my-constancia"], queryFn: () => fn(), retry: false });
+  const q = useQuery({
+    queryKey: ["my-constancia"],
+    queryFn: () => withOfflineCache("my-constancia", () => fn()),
+    retry: false,
+    networkMode: "always",
+  });
 
   if (q.isLoading) {
     return (

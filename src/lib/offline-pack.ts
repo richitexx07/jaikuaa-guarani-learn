@@ -94,6 +94,12 @@ async function cachePages(paths: string[], onStep: () => void): Promise<number> 
   return ok;
 }
 
+/** Guarda en silencio algunas pantallas para abrirlas después sin señal (por ejemplo, las del docente). */
+export async function warmPages(paths: string[]): Promise<number> {
+  if (typeof window === "undefined" || !navigator.onLine) return 0;
+  return cachePages(paths, () => {});
+}
+
 /** Baja los audios humanos y los deja en el mismo lugar donde el reproductor los busca sin señal. */
 async function cacheAudios(gns: string[], onStep: () => void): Promise<{ ok: number; missing: number }> {
   if (!("caches" in window)) return { ok: 0, missing: gns.length };

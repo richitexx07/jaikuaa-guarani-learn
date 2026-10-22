@@ -6,6 +6,7 @@ import { issueCertificate } from "./certificates.functions";
 import { PENDING_EVENT, pendingCount, syncStats } from "./gamification";
 import { isNetworkError, isOffline } from "./offline-data";
 import { flushAnswers } from "./answer-log";
+import { flushStaff, staffPendingCount } from "./staff-offline";
 
 const WOTD_KEY = "jaikuaa:pending-wotd";
 const WOTD_PLAYED = "jaikuaa:wotd-played";
@@ -96,7 +97,8 @@ export function totalPending(): number {
   return (
     pendingCount() +
     readJson<unknown[]>(WOTD_KEY, []).length +
-    (pendingCertificateName() ? 1 : 0)
+    (pendingCertificateName() ? 1 : 0) +
+    staffPendingCount()
   );
 }
 
@@ -111,6 +113,7 @@ export function syncAllPending(): Promise<void> {
     await flushWotd();
     await flushCertificate();
     await flushAnswers();
+    await flushStaff();
   })()
     .catch(() => {})
     .finally(() => {

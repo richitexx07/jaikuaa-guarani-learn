@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -15,6 +15,10 @@ import {
   listStaffRequests,
 } from "@/lib/teacher.functions";
 import { FOUR_QUESTIONS, weeklyReminderText } from "@/lib/validation-checklist";
+import { withOfflineCache } from "@/lib/offline-data";
+import { PanelTools } from "@/components/pilot/panel-tools";
+import { warmPages } from "@/lib/offline-pack";
+import { listValidationQueue } from "@/lib/teacher.functions";
 
 export const Route = createFileRoute("/_authenticated/docente/")({
   head: () => ({
@@ -32,7 +36,12 @@ function firstName(s: string) {
 
 function TeacherPanelPage() {
   const statusFn = useServerFn(getMyStaffStatus);
-  const status = useQuery({ queryKey: ["my-staff-status"], queryFn: () => statusFn(), retry: false });
+  const status = useQuery({
+    queryKey: ["my-staff-status"],
+    queryFn: () => withOfflineCache("my-staff-status", () => statusFn()),
+    retry: false,
+    networkMode: "always",
+  });
 
   if (status.isLoading) return <Spinner />;
   const s = status.data;
@@ -66,9 +75,35 @@ function TeacherPanelPage() {
   return <TeacherHome />;
 }
 
+/**
+ * Con señal, deja guardado en el celular lo necesario para validar después sin conexión:
+ * las pantallas del docente y la lista de palabras para validar.
+ */
+function useWarmOffline() {
+  const qc = useQueryClient();
+  const listFn = useServerFn(listValidationQueue);
+  useEffect(() => {
+    if (!navigator.onLine) return;
+    const t = setTimeout(() => {
+      void warmPages(["/docente", "/validar", "/docente/constancia", "/cuaderno"]);
+      void qc.prefetchQuery({
+        queryKey: ["quick-validate"],
+        queryFn: () => withOfflineCache("validation-queue", () => listFn()),
+      });
+    }, 2000);
+    return () => clearTimeout(t);
+  }, [qc, listFn]);
+}
+
 function TeacherHome() {
+  useWarmOffline();
   const fn = useServerFn(getTeacherHome);
-  const q = useQuery({ queryKey: ["teacher-home"], queryFn: () => fn(), refetchOnWindowFocus: true });
+  const q = useQuery({
+    queryKey: ["teacher-home"],
+    queryFn: () => withOfflineCache("teacher-home", () => fn()),
+    refetchOnWindowFocus: true,
+    networkMode: "always",
+  });
   if (q.isLoading) return <Spinner />;
   if (q.isError || !q.data) {
     return (
@@ -86,6 +121,7 @@ function TeacherHome() {
       <p className="mt-1 text-muted-foreground">
         {name ? `Hola, ${name}. ` : ""}Todo lo del piloto en una sola pantalla.
       </p>
+      <PanelTools />
 
       <h2 className="mt-8 text-xs font-semibold uppercase tracking-[0.15em] text-primary">Para hoy</h2>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -327,7 +363,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="mx-auto max-w-3xl px-4 pb-24 pt-5">
       <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary">
-        ← Inicio
+        ← Lecciones y juegos
       </Link>
       {children}
     </div>

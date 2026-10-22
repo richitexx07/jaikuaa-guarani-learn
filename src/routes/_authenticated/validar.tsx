@@ -11,6 +11,10 @@ import { WordAudioRecorder } from "@/components/corpus/word-audio-recorder";
 import { quickValidateWord } from "@/lib/corpus.functions";
 import { listValidationQueue } from "@/lib/teacher.functions";
 import { FOUR_QUESTIONS } from "@/lib/validation-checklist";
+import { OfflineMissingError, isNetworkError, withOfflineCache } from "@/lib/offline-data";
+import { queueReport, queueValidation, queuedValidationIds, unqueueValidation } from "@/lib/staff-offline";
+import { useConnection } from "@/components/offline/use-connection";
+import { DictateButton } from "@/components/pilot/dictate-button";
 import { reportContentError } from "@/lib/content-reports.functions";
 
 export const Route = createFileRoute("/_authenticated/validar")({
@@ -30,7 +34,7 @@ type Word = {
   validated_by: string | null;
   lesson: { n: number; title: string; published: boolean } | null;
 };
-type Done = { id: string; gn: string; prevStatus: "draft" | "published" };
+type Done = { id: string; gn: string; prevStatus: "draft" | "published"; queued?: boolean };
 type ReportKind = "escritura" | "significado" | "audio" | "otro";
 
 const SKIP_KEY = "jaikuaa:validar-saltadas";
@@ -62,7 +66,10 @@ function QuickValidatePage() {
 
   const q = useQuery({
     queryKey: ["quick-validate"],
-    queryFn: () => listFn(),
+    // Con copia en el teléfono: se puede validar sin señal y las aprobaciones se envían después.
+    queryFn: () => withOfflineCache("validation-queue", () => listFn(), { label: "La lista de palabras para validar" }),
+    // Sin señal igual se consulta: la copia guardada en el celular responde.
+    networkMode: "always",
     retry: false,
   });
 
@@ -73,7 +80,9 @@ function QuickValidatePage() {
       return new Set();
     }
   });
-  const [handled, setHandled] = useState<Set<string>>(new Set());
+  // Las aprobadas sin señal que todavía esperan en el teléfono no vuelven a aparecer.
+  const [handled, setHandled] = useState<Set<string>>(() => queuedValidationIds());
+  const { online } = useConnection();
   const [history, setHistory] = useState<Done[]>([]);
   const [count, setCount] = useState(0);
   const [sessionDelta, setSessionDelta] = useState(0);
@@ -127,9 +136,24 @@ function QuickValidatePage() {
       saveCount(n);
       if (!r.already) setSessionDelta((x) => x + 1);
       next(word.id);
-    } catch {
-      toast.error("No se pudo validar. Revisá la conexión y probá de nuevo.");
-      setDrag(0);
+    } catch (e) {
+      if (isNetworkError(e)) {
+        // Sin señal: queda guardada en el teléfono y se envía sola al volver la conexión.
+        queueValidation(word.id, word.gn);
+        setHistory((h) => [
+          ...h.slice(-19),
+          { id: word.id, gn: word.gn, prevStatus: word.status === "published" ? "published" : "draft", queued: true },
+        ]);
+        const n = count + 1;
+        setCount(n);
+        saveCount(n);
+        setSessionDelta((x) => x + 1);
+        next(word.id);
+        toast("Guardada en tu celular. Se envía sola cuando vuelva la señal.", { id: "validar-sin-senal" });
+      } else {
+        toast.error("No se pudo validar. Probá de nuevo.");
+        setDrag(0);
+      }
     } finally {
       setBusy(false);
     }
@@ -147,7 +171,10 @@ function QuickValidatePage() {
     if (!last || busy) return;
     setBusy(true);
     try {
-      await validateFn({ data: { id: last.id, action: "undo", prevStatus: last.prevStatus } });
+      // Si todavía no salió del teléfono, alcanza con sacarla de la fila de envío.
+      if (!(last.queued && unqueueValidation(last.id))) {
+        await validateFn({ data: { id: last.id, action: "undo", prevStatus: last.prevStatus } });
+      }
       setHistory((h) => h.slice(0, -1));
       setHandled((h) => {
         const c = new Set(h);
@@ -191,6 +218,21 @@ function QuickValidatePage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+  if (q.isError && q.error instanceof OfflineMissingError) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-20 text-center">
+        <div className="text-5xl" aria-hidden>📶</div>
+        <h1 className="mt-3 font-display text-2xl font-bold">Hace falta señal una vez</h1>
+        <p className="mt-2 text-muted-foreground">
+          Abrí esta pantalla una vez con internet: la lista de palabras queda guardada en tu celular y después podés
+          validar aunque no haya señal.
+        </p>
+        <Button asChild variant="outline" className="mt-6">
+          <Link to="/docente">Volver al panel</Link>
+        </Button>
       </div>
     );
   }
@@ -300,7 +342,12 @@ function QuickValidatePage() {
               </div>
             </div>
             {word.notes && <p className="mt-4 rounded-xl bg-muted/60 p-3 text-sm text-muted-foreground">{word.notes}</p>}
-            {!word.has_audio && (
+            {!word.has_audio && !online && (
+              <p className="mt-5 rounded-xl border border-dashed border-border p-3 text-sm text-muted-foreground">
+                Todavía no tiene audio. Para grabarlo hace falta señal.
+              </p>
+            )}
+            {!word.has_audio && online && (
               <div className="mt-5 rounded-xl border border-dashed border-border p-3">
                 <p className="mb-2 text-sm text-muted-foreground">Todavía no tiene audio. Podés grabarlo ahora:</p>
                 <WordAudioRecorder
@@ -350,13 +397,19 @@ function QuickValidatePage() {
           gn={word.gn}
           onCancel={() => setReporting(false)}
           onSend={async (tipo, mensaje) => {
+            const aviso = { gn: word.gn, es: word.es, lugar: "Validación rápida", tipo, mensaje };
             try {
-              await reportFn({ data: { gn: word.gn, es: word.es, lugar: "Validación rápida", tipo, mensaje } });
+              await reportFn({ data: aviso });
               toast.success("Gracias. El aviso queda para el equipo docente.");
               setReporting(false);
               next(word.id);
-            } catch {
-              toast.error("No se pudo enviar el aviso.");
+            } catch (e) {
+              if (isNetworkError(e)) {
+                queueReport(aviso);
+                toast("Aviso guardado en tu celular. Se envía solo cuando vuelva la señal.");
+                setReporting(false);
+                next(word.id);
+              } else toast.error("No se pudo enviar el aviso.");
             }
           }}
         />
@@ -460,6 +513,9 @@ function ReportSheet({
           placeholder="Contá qué está mal y, si querés, cómo debería ser."
           className="mt-3 w-full rounded-xl border border-input bg-background p-3 text-sm outline-none focus:ring-2 focus:ring-ring"
         />
+        <div className="mt-1">
+          <DictateButton label="Decirlo con la voz" onText={(t) => setMsg((m) => (m ? `${m} ${t}` : t).slice(0, 500))} />
+        </div>
         <div className="mt-3 grid grid-cols-2 gap-2">
           <Button variant="outline" className="h-12" onClick={onCancel} disabled={sending}>
             Cancelar
