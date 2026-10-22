@@ -163,7 +163,19 @@ function AuthPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+          <Button type="button" variant="outline" size="lg" className="mt-8 h-14 w-full border-2 text-base font-semibold" onClick={handleGoogle}>
+            <GoogleIcon /> Continuar con Google
+          </Button>
+          <p className="mt-2 text-center text-xs text-muted-foreground">Entrás en un toque, sin contraseña.</p>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-background px-2 text-muted-foreground">o {isLogin ? "ingresá" : "registrate"} con tu correo</span>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div className="space-y-2">
                 <Label htmlFor="name">Nombre</Label>
@@ -228,16 +240,6 @@ function AuthPage() {
             </Button>
           </form>
 
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">o</span>
-            </div>
-          </div>
-
-          <Button type="button" variant="outline" size="lg" className="w-full" onClick={handleGoogle}>
-            <GoogleIcon /> Continuar con Google
-          </Button>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             {isLogin ? "¿No tenés cuenta? " : "¿Ya tenés cuenta? "}
