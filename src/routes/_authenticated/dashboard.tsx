@@ -43,8 +43,8 @@ function StaffShortcuts() {
       <p className="text-xs font-semibold uppercase tracking-[0.15em] text-primary">
         Docentes y validadores
       </p>
-      <Button asChild variant="cta" className="mt-3 h-14 w-full justify-start text-base">
-        <Link to="/docente">🧑‍🏫 Panel del docente: todo en una pantalla</Link>
+      <Button asChild variant="cta" className="mt-3 h-auto min-h-14 w-full justify-start whitespace-normal py-3 text-left text-base">
+        <Link to="/docente">🧑‍🏫 Panel del docente</Link>
       </Button>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <Button asChild variant="outline" className="h-12 w-full justify-start">
@@ -111,8 +111,8 @@ function PilotCard() {
     return (
       <section className="mt-6 rounded-2xl border border-primary/30 bg-card p-5 shadow-elegant">
         <p className="text-xs font-semibold uppercase tracking-[0.15em] text-primary">Práctica supervisada</p>
-        <Button asChild variant="cta" className="mt-3 h-14 w-full justify-start text-base">
-          <Link to="/practica">🎓 Panel de práctica: todo en una pantalla</Link>
+        <Button asChild variant="cta" className="mt-3 h-auto min-h-14 w-full justify-start whitespace-normal py-3 text-left text-base">
+          <Link to="/practica">🎓 Panel de práctica</Link>
         </Button>
       </section>
     );
