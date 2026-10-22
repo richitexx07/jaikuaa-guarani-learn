@@ -320,24 +320,24 @@ function Dashboard() {
             <BigAction to="/juegos/palabra-del-dia" emoji="⭐" title="Palabra del día" desc="Una palabra nueva, en 1 minuto" tone="card" />
           </nav>
 
-          {/* INVITAR — tarjeta protagonista */}
+          {/* INVITAR — franja compacta con vida */}
           <Link
             to="/embajadores"
-            className="group relative mt-5 flex items-center gap-4 overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-accent p-5 text-primary-foreground shadow-elegant transition-transform hover:-translate-y-0.5 active:scale-[0.98] sm:p-6"
+            className="group relative mt-5 flex items-center gap-3 overflow-hidden rounded-2xl border border-primary/15 bg-gradient-to-r from-primary/10 via-card to-accent/10 px-4 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
           >
-            <span aria-hidden className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-primary-foreground/10 blur-2xl motion-safe:animate-pulse" />
-            <span aria-hidden className="pointer-events-none absolute -bottom-12 left-1/3 h-32 w-32 rounded-full bg-accent/40 blur-2xl" />
-            <img src={jaiAsset.url} alt="" className="relative h-20 w-20 shrink-0 object-contain drop-shadow-lg motion-safe:animate-bounce sm:h-24 sm:w-24" style={{ animationDuration: "2.4s" }} />
+            <span aria-hidden className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-12 bg-gradient-to-r from-transparent via-primary-foreground/40 to-transparent motion-safe:animate-[shine_3.5s_ease-in-out_infinite]" />
+            <span aria-hidden className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
+              <span className="absolute inset-0 rounded-full bg-accent/20 motion-safe:animate-ping" style={{ animationDuration: "2.6s" }} />
+              <svg viewBox="0 0 24 24" className="relative h-5 w-5" fill="currentColor"><path d="M12 21s-7-4.35-9.5-8.5C.9 9.6 2.6 6 6 6c2 0 3.2 1.1 4 2.3h4C14.8 7.1 16 6 18 6c3.4 0 5.1 3.6 3.5 6.5C19 16.65 12 21 12 21z"/></svg>
+            </span>
             <div className="relative min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary-foreground/80">Compartí Jaikuaa</p>
-              <h2 className="mt-0.5 font-display text-xl font-bold leading-tight sm:text-2xl">
-                ¿Querés invitar a un amigo o familiar?
-              </h2>
-              <p className="mt-1 text-sm text-primary-foreground/85">Aprender guaraní juntos es más lindo.</p>
-              <span className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary-foreground px-5 py-2.5 text-sm font-bold text-primary shadow-md transition-transform group-hover:scale-105">
-                Invitar a alguien →
-              </span>
+              <p className="font-display text-sm font-bold leading-tight text-foreground">¿Querés aprender con alguien?</p>
+              <p className="text-xs text-muted-foreground">Invitá a un amigo o familiar</p>
             </div>
+            <span className="relative inline-flex shrink-0 items-center gap-1 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm transition-transform group-hover:scale-105">
+              Compartir
+              <span className="transition-transform group-hover:translate-x-0.5">→</span>
+            </span>
           </Link>
 
           <div className="mt-6 space-y-3">

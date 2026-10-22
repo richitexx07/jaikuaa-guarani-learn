@@ -339,3 +339,8 @@ body { background-image: radial-gradient(circle at 0% 0%, color-mix(in oklab, va
 @keyframes jai-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 .jai-breathe { animation: jai-breathe 3s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .jai-halo, .jai-float, .jai-float-c, .jai-breathe { animation: none; } }
+
+@keyframes shine {
+  0%, 60% { transform: translateX(0) skewX(12deg); }
+  100% { transform: translateX(450%) skewX(12deg); }
+}
