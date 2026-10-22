@@ -55,7 +55,7 @@ function Header() {
           <BrandLogo />
         </a>
         <div className="flex items-center gap-3">
-          <nav aria-label="Studio">
+          <nav aria-label="Studio" className="flex items-center gap-3">
             <a href="/embajadores" className="text-sm font-semibold text-primary hover:underline">Invitar a alguien</a>
             <a href="/studio" className="text-sm text-muted-foreground hover:text-foreground">Studio</a>
           </nav>
