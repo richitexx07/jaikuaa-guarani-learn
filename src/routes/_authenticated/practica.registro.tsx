@@ -73,7 +73,7 @@ function PracticeLogPage() {
         </p>
         <p className="text-sm text-muted-foreground">
           Plan piloto que Jaikuaa desarrolla con el Ateneo de Lengua y Cultura Guaraní. Generado el{" "}
-          {when(new Date().toISOString())}.
+          {when(new Date().toISOString())}
         </p>
       </header>
 
@@ -87,7 +87,8 @@ function PracticeLogPage() {
       {d.rows.length === 0 ? (
         <p className="mt-8 text-center text-sm text-muted-foreground">Todavía no hay actividad registrada.</p>
       ) : (
-        <table className="mt-6 w-full border-collapse text-sm">
+        <div className="mt-6 overflow-x-auto print:overflow-visible">
+        <table className="w-full min-w-[520px] border-collapse text-sm print:min-w-0">
           <thead>
             <tr className="border-b-2 border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
               <th className="py-2 pr-2">Fecha y hora</th>
@@ -109,6 +110,7 @@ function PracticeLogPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <div className="mt-16 hidden grid-cols-2 gap-16 text-xs print:grid">
