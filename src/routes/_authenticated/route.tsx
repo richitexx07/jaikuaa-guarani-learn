@@ -6,10 +6,11 @@ import { OfflineStatusBar } from "@/components/offline/offline-status-bar";
 import { MobileBottomNav } from "@/components/navigation/mobile-bottom-nav";
 import { InstallBanner } from "@/components/navigation/install-banner";
 import { showsBottomNav } from "@/lib/bottom-nav";
+import { rememberAfterLogin } from "@/lib/after-login";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     // Sin señal no se puede confirmar la sesión con el servidor: se deja entrar con la última
     // sesión guardada en el teléfono (los datos del servidor igual piden una sesión válida).
     const offlineUser = () => {
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/_authenticated")({
         if (ok) return ok;
       }
     }
+    rememberAfterLogin(location.href);
     throw redirect({ to: "/auth", search: { mode: "login" } });
   },
   component: AuthenticatedLayout,
