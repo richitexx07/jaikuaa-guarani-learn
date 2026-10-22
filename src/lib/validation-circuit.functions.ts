@@ -64,6 +64,8 @@ async function getCircuitRolesFor(
     isAdmin,
     isEditor,
     isReviewer,
+    // Solo los habilitados del piloto (practicantes aprobados, docentes y admin) proponen contenido.
+    canPropose: isAdmin || isEditor || isReviewer,
     canReview: isAdmin || isEditor || isReviewer,
     canValidate: isAdmin || isEditor,
   };
@@ -110,6 +112,10 @@ export const proposeContent = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
+    const roles = await getCircuitRolesFor(context.supabase, context.userId);
+    if (!roles.canPropose) {
+      return { ok: false as const, error: "Solo las personas habilitadas del piloto pueden proponer palabras." };
+    }
     const db = await admin();
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { count } = await db

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -113,7 +113,25 @@ function ValidationCircuitPage() {
           {r?.isAdmin && <TabsTrigger value="revisores">Revisores</TabsTrigger>}
         </TabsList>
         <TabsContent value="proponer">
-          <ProposeForm />
+          {r?.canPropose ? (
+            <ProposeForm />
+          ) : (
+            <div className="mt-4 rounded-2xl border border-border/60 bg-card p-6 text-sm shadow-elegant">
+              <p className="font-semibold text-foreground">Proponer palabras es solo para personas habilitadas del piloto.</p>
+              <p className="mt-2 text-muted-foreground">
+                Si sos docente o estudiante en práctica, pedí tu acceso. Si encontraste un error en una palabra, usá
+                «Señalar un error» desde la lección: eso sí está abierto para todos.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button asChild variant="cta" size="sm">
+                  <Link to="/docente">Soy docente</Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/practica">Soy estudiante en práctica</Link>
+                </Button>
+              </div>
+            </div>
+          )}
         </TabsContent>
         <TabsContent value="mias">
           <MyProposals />

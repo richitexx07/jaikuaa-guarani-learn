@@ -3,7 +3,7 @@
 **Rama:** `circuito-validacion` (todavía no está en `main`).
 
 ## Cómo funciona
-1. **Propone:** cualquier persona con cuenta, sea estudiante, pasante o docente. Puede proponer una palabra nueva o la corrección de una palabra del corpus. Tiene un tope de 20 propuestas por día.
+1. **Propone:** solo personas habilitadas del piloto (estudiante en práctica aprobado, docente validador o admin). El servidor rechaza a cualquier otra cuenta. Puede proponer una palabra nueva o la corrección de una palabra del corpus. Tiene un tope de 20 propuestas por día. «Señalar un error» sigue abierto para todos porque solo avisa y no carga contenido.
 2. **Revisa:** un revisor avanzado (estudiante avanzado o pasante), un docente validador o un admin. Puede aprobar, devolver o no aceptar. Para devolver o no aceptar tiene que escribir el motivo.
 3. **Valida:** un docente validador (rol `editor`) o un admin. Solo en este paso el contenido entra al corpus, publicado y con `validated_by` y `validated_at` de quien validó.
 
