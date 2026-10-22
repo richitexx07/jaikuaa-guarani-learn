@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { WordAudioRecorder } from "@/components/corpus/word-audio-recorder";
 import { listCorpusWords, updateCorpusWord } from "@/lib/corpus.functions";
+import { GateNotice, useDeterministicGate } from "@/components/corpus/gate-notice";
 
 /** Bandeja del docente validador: palabras en borrador para aprobar en un toque. */
 export function ValidationPanel() {
@@ -30,7 +31,7 @@ export function ValidationPanel() {
       void qc.invalidateQueries({ queryKey: ["corpus-words"] });
       void qc.invalidateQueries({ queryKey: ["corpus-overview"] });
     },
-    onError: () => toast.error("No se pudo validar la palabra."),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo validar la palabra."),
   });
 
   const withoutAudio = words.filter((w) => !w.has_audio).length;
@@ -99,6 +100,19 @@ export function ValidationPanel() {
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+function GatedApprove({ gn, disabled, onApprove }: { gn: string; disabled: boolean; onApprove: () => void }) {
+  const gate = useDeterministicGate(gn);
+  return (
+    <div className="w-full sm:w-auto">
+      <Button variant="cta" className="h-11 w-full sm:w-auto" disabled={disabled || !gate.accepted} onClick={onApprove}>
+        <CheckCircle2 className="mr-2 h-4 w-4" />
+        Aprobar y publicar
+      </Button>
+      <GateNotice reason={gate.reason} />
     </div>
   );
 }
