@@ -19,7 +19,7 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Jaikuaa — Iniciar sesión o registrarte" },
-      { name: "description", content: "Accedé a Jaikuaa para aprender guaraní, inglés y portugués." },
+      { name: "description", content: "Accedé a Jaikuaa para aprender y jugar en guaraní." },
     ],
   }),
   component: AuthPage,

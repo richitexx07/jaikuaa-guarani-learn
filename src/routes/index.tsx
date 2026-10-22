@@ -13,14 +13,14 @@ import { DisplayToggles } from "@/components/display-toggles";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Jaikuaa — Aprendé guaraní. Cambiá tu vida." },
-      { name: "description", content: "Una plataforma paraguaya para aprender guaraní, con el guaraní en el corazón." },
-      { property: "og:title", content: "Jaikuaa — Aprendé guaraní. Cambiá tu vida." },
-      { property: "og:description", content: "Una plataforma paraguaya para aprender guaraní, con el guaraní en el corazón." },
-      { name: "twitter:title", content: "Jaikuaa — Aprendé guaraní. Cambiá tu vida." },
-      { name: "twitter:description", content: "Una plataforma paraguaya para aprender guaraní, con el guaraní en el corazón." },
+      { title: "Jaikuaa — Aprendé y jugá en guaraní" },
+      { name: "description", content: "Desafíos diarios, juegos y voces reales. Plataforma paraguaya para aprender guaraní." },
+      { property: "og:title", content: "Jaikuaa — Aprendé y jugá en guaraní" },
+      { property: "og:description", content: "Desafíos diarios, juegos y voces reales. Plataforma paraguaya para aprender guaraní." },
+      { name: "twitter:title", content: "Jaikuaa — Aprendé y jugá en guaraní" },
+      { name: "twitter:description", content: "Desafíos diarios, juegos y voces reales. Plataforma paraguaya para aprender guaraní." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "keywords", content: "aprender guaraní, guaraní, curso de guaraní, idioma guaraní, Paraguay, Jaikuaa" },
     ],
     links: [{ rel: "canonical", href: "https://www.jaikuaa.com/" }],
@@ -76,7 +76,7 @@ function Hero() {
           <span className="text-accent">Cambiá tu vida.</span>
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
-          Una plataforma paraguaya para aprender guaraní, con el guaraní en el corazón.
+          Desafíos diarios, juegos y voces reales. Plataforma paraguaya para aprender guaraní.
         </p>
         <p className="mx-auto mt-3 text-sm font-medium text-primary/80">
           +109 palabras con voz humana paraguaya 🇵🇾
