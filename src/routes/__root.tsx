@@ -99,12 +99,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Jaikuaa — Aprendé guaraní. Cambiá tu vida." },
       { property: "og:description", content: "Una plataforma paraguaya para aprender guaraní, con el guaraní en el corazón." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@jaikuaa" },
       { name: "twitter:title", content: "Jaikuaa — Aprendé guaraní. Cambiá tu vida." },
       { name: "twitter:description", content: "Una plataforma paraguaya para aprender guaraní, con el guaraní en el corazón." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/a9d89ab1-7850-4f9f-ac02-ea66c58b99a0" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/a9d89ab1-7850-4f9f-ac02-ea66c58b99a0" },
+      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" },
     ],
     links: [
       {
