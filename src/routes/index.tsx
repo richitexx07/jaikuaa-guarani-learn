@@ -56,7 +56,7 @@ function Header() {
         </a>
         <div className="flex items-center gap-3">
           <nav aria-label="Studio" className="flex items-center gap-3">
-            <a href="/embajadores" className="text-sm font-semibold text-primary hover:underline">Invitar a alguien</a>
+            <a href="/embajadores" className="rounded-full bg-accent px-4 py-1.5 text-sm font-semibold text-accent-foreground shadow-sm transition-transform hover:scale-105">Invitar a alguien</a>
             <a href="/studio" className="text-sm text-muted-foreground hover:text-foreground">Studio</a>
           </nav>
           <DisplayToggles />

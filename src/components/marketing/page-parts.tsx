@@ -24,7 +24,7 @@ export function MarketingHeader() {
               {l.label}
             </Link>
           ))}
-          <Link to="/embajadores" className="font-semibold text-primary hover:underline">Invitar a alguien</Link>
+          <Link to="/embajadores" className="rounded-full bg-accent px-4 py-1.5 font-semibold text-accent-foreground shadow-sm transition-transform hover:scale-105">Invitar a alguien</Link>
           <a href="/studio" className="text-muted-foreground hover:text-foreground">Studio</a>
         </nav>
         <button
