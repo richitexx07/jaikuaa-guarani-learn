@@ -181,7 +181,8 @@ function LessonPage() {
         </div>
       </header>
 
-      <main className="flex-1 px-4 py-8 sm:px-6">
+      {/* pb-28: deja lugar para «Volver» y Jai, que flotan abajo y tapaban las últimas tarjetas. */}
+      <main className="flex-1 px-4 pb-28 pt-8 sm:px-6">
         <div className="mx-auto max-w-2xl">
           <div className="mb-6">
             <div className="text-xs font-semibold uppercase tracking-wide text-accent">
@@ -515,22 +516,26 @@ function MatchStep({
             const isSelected = selectedGn === gn;
             const isWrong = wrong?.gn === gn;
             let cls =
-              "flex w-full items-center gap-2 rounded-xl border border-border/60 bg-card p-3 text-left text-sm font-display font-semibold shadow-sm transition";
+              "flex w-full items-center gap-2 rounded-xl border border-border/60 bg-card p-3 text-sm font-display font-semibold shadow-sm transition";
             if (isMatched) cls += " border-green-600 bg-green-50 text-green-800 opacity-70";
             else if (isWrong) cls += " border-accent bg-accent/10 text-accent";
             else if (isSelected) cls += " border-primary bg-primary/10 text-primary";
             else cls += " hover:border-accent/60";
+            // El parlante va al lado del botón de la palabra, no adentro: un botón dentro de otro
+            // hacía que escuchar la palabra también la seleccionara.
             return (
-              <button
-                key={gn}
-                type="button"
-                disabled={isMatched}
-                onClick={() => setSelectedGn(gn)}
-                className={cls}
-              >
+              <div key={gn} className={cls}>
                 <SpeakerButton gn={gn} />
-                <span className="flex-1">{gn}</span>
-              </button>
+                <button
+                  type="button"
+                  disabled={isMatched}
+                  aria-pressed={isSelected}
+                  onClick={() => setSelectedGn(gn)}
+                  className="flex-1 self-stretch text-left"
+                >
+                  {gn}
+                </button>
+              </div>
             );
           })}
         </div>
