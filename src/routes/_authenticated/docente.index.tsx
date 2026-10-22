@@ -19,6 +19,7 @@ import { withOfflineCache } from "@/lib/offline-data";
 import { PanelTools } from "@/components/pilot/panel-tools";
 import { warmPages } from "@/lib/offline-pack";
 import { listValidationQueue } from "@/lib/teacher.functions";
+import { staffStatusRefreshInterval } from "@/lib/staff-status-refresh";
 
 export const Route = createFileRoute("/_authenticated/docente/")({
   head: () => ({
@@ -39,6 +40,10 @@ function TeacherPanelPage() {
   const status = useQuery({
     queryKey: ["my-staff-status"],
     queryFn: () => withOfflineCache("my-staff-status", () => statusFn()),
+    refetchInterval: (query) => staffStatusRefreshInterval(query.state.data),
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
+    refetchOnReconnect: "always",
     retry: false,
     networkMode: "always",
   });
