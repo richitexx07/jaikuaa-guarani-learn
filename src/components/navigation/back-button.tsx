@@ -20,7 +20,7 @@ export function BackButton() {
       type="button"
       onClick={goBack}
       aria-label="Volver a la pantalla anterior"
-      className={`fixed left-3 z-40 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/95 px-4 py-2.5 text-sm font-semibold text-primary shadow-lg backdrop-blur-md transition active:scale-95 hover:bg-accent print:hidden ${
+      className={`fixed left-3 z-40 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/95 px-4 py-2.5 text-sm font-semibold text-primary shadow-lg transition active:scale-95 hover:bg-accent print:hidden ${
         aboveNav ? "bottom-20 md:bottom-4" : "bottom-4"
       }`}
     >

@@ -180,7 +180,9 @@
 }
 
 @utility page-in {
-  animation: aranduka-page-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* backwards (no both): al terminar no queda un transform puesto en toda la página; ese
+     transform dejaba una capa permanente que en Android dibujaba rayas sobre el texto. */
+  animation: aranduka-page-in 380ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 @utility pulse-soft {
