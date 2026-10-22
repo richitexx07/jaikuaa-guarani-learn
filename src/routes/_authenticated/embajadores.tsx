@@ -25,7 +25,7 @@ function EmbajadoresPage() {
   const fetchInfo = useServerFn(getAmbassadorInfo);
   const { data, isLoading, isError } = useQuery({ queryKey: ["ambassador"], queryFn: () => fetchInfo() });
   const link = data ? `https://www.jaikuaa.com/auth?ref=${data.code}` : "";
-  const shareText = `Te invito a aprender y jugar en guaraní en Jaikuaa, de libre acceso: desafíos diarios, juegos y voces reales. ${link}`;
+  const shareText = `¡Te invito a jugar y aprender en Jaikuaa! Entrá acá: ${link}`;
 
   const copy = async () => {
     await navigator.clipboard.writeText(link);

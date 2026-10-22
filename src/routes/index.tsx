@@ -14,11 +14,11 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Jaikuaa — Aprendé y jugá en guaraní" },
-      { name: "description", content: "Desafíos diarios, juegos y voces reales. Plataforma paraguaya para aprender guaraní." },
+      { name: "description", content: "Libre acceso." },
       { property: "og:title", content: "Jaikuaa — Aprendé y jugá en guaraní" },
-      { property: "og:description", content: "Desafíos diarios, juegos y voces reales. Plataforma paraguaya para aprender guaraní." },
+      { property: "og:description", content: "Libre acceso." },
       { name: "twitter:title", content: "Jaikuaa — Aprendé y jugá en guaraní" },
-      { name: "twitter:description", content: "Desafíos diarios, juegos y voces reales. Plataforma paraguaya para aprender guaraní." },
+      { name: "twitter:description", content: "Libre acceso." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "keywords", content: "aprender guaraní, guaraní, curso de guaraní, idioma guaraní, Paraguay, Jaikuaa" },
