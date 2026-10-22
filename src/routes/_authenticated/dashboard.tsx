@@ -27,6 +27,7 @@ import { claimReferral } from "@/lib/ambassador.functions";
 import { cleanRefCode, REF_STORAGE_KEY } from "@/lib/ambassador";
 import { withOfflineCache } from "@/lib/offline-data";
 import { StaffRequestCard } from "@/components/pilot/staff-request-card";
+import { staffStatusRefreshInterval } from "@/lib/staff-status-refresh";
 import { OfflinePackCard } from "@/components/offline/offline-pack-card";
 import jaiImg from "@/assets/jai-tradicional.png";
 const jaiAsset = { url: jaiImg };
@@ -94,6 +95,10 @@ function PilotCard() {
   const { data } = useQuery({
     queryKey: ["my-staff-status"],
     queryFn: () => withOfflineCache("my-staff-status", () => fn()),
+    refetchInterval: (query) => staffStatusRefreshInterval(query.state.data),
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
+    refetchOnReconnect: "always",
     networkMode: "always",
     staleTime: 5 * 60 * 1000,
     retry: false,
