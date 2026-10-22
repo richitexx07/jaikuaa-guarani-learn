@@ -38,6 +38,24 @@ export type Database = {
         }
         Relationships: []
       }
+      ambassador_codes: {
+        Row: {
+          code: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           key: string
@@ -807,6 +825,30 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          activated_at: string | null
+          created_at: string
+          referred_user_id: string
+          referrer_id: string
+          xp_awarded: number
+        }
+        Insert: {
+          activated_at?: string | null
+          created_at?: string
+          referred_user_id: string
+          referrer_id: string
+          xp_awarded?: number
+        }
+        Update: {
+          activated_at?: string | null
+          created_at?: string
+          referred_user_id?: string
+          referrer_id?: string
+          xp_awarded?: number
+        }
+        Relationships: []
+      }
       sponsor_impressions: {
         Row: {
           created_at: string
@@ -1141,6 +1183,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_referral: {
+        Args: { _code: string; _user_id: string }
+        Returns: string
+      }
       consume_ai_quota: {
         Args: { _feature: string; _limit: number; _user_id: string }
         Returns: boolean
@@ -1149,6 +1195,7 @@ export type Database = {
         Args: { _key: string; _limit: number; _window_seconds: number }
         Returns: boolean
       }
+      get_ambassador_code: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1166,6 +1213,14 @@ export type Database = {
           _xp: number
         }
         Returns: boolean
+      }
+      my_ambassador_summary: {
+        Args: { _user_id: string }
+        Returns: {
+          ambassador_xp: number
+          invited: number
+          started: number
+        }[]
       }
       record_activity: {
         Args: {
