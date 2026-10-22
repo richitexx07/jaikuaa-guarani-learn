@@ -996,8 +996,16 @@ export const quickValidateWord = createServerFn({ method: "POST" })
       if (!recent) throw new Error("Solo se puede deshacer tu propia aprobación de los últimos 15 minutos");
       patch = { status: data.prevStatus ?? "draft", validated_by: null, validated_at: null };
     }
-    const { error } = await supabaseAdmin.from("corpus_words").update(patch as never).eq("id", data.id);
+    // Condición en la misma escritura: si dos docentes aprueban la misma palabra a la vez,
+    // la firma queda para el primero y el segundo no la pisa.
+    const base = supabaseAdmin.from("corpus_words").update(patch as never).eq("id", data.id);
+    const guarded = data.action === "approve" ? base.is("validated_by", null) : base.eq("validated_by", context.userId);
+    const { data: changed, error } = await guarded.select("id");
     if (error) throw new Error(error.message);
+    if (!changed?.length) {
+      if (data.action === "approve") return { ok: true, prevStatus: before.status as "draft" | "published", already: true };
+      throw new Error("Solo se puede deshacer tu propia aprobación de los últimos 15 minutos");
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: logError } = await (supabaseAdmin as any).from("corpus_word_changes").insert({

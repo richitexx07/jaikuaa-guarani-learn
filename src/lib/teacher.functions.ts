@@ -37,6 +37,22 @@ async function rolesFor(
   return { isAdmin, isEditor, isReviewer, isTeacher: isAdmin || isEditor, isPractice: isReviewer };
 }
 
+/**
+ * La base devuelve como máximo 1000 filas por pedido. Para no contar de menos cuando el corpus crezca,
+ * se pide de a páginas hasta traer todo.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchAll<T>(build: (from: number, to: number) => any): Promise<T[]> {
+  const out: T[] = [];
+  for (let page = 0; page < 100; page++) {
+    const { data, error } = await build(page * 1000, page * 1000 + 999);
+    if (error) throw new Error(error.message);
+    out.push(...((data ?? []) as T[]));
+    if (!data || data.length < 1000) break;
+  }
+  return out;
+}
+
 function weekAgo() {
   return new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
 }
@@ -225,11 +241,11 @@ export const getTeacherHome = createServerFn({ method: "GET" })
 
     const [prof, lessonLinks, pendingWords] = await Promise.all([
       db.from("profiles").select("full_name, cohort").eq("id", me).maybeSingle(),
-      db.from("lesson_words").select("word_id"),
-      db.from("corpus_words").select("id").is("validated_by", null).limit(5000),
+      fetchAll<{ word_id: string }>((f, t) => db.from("lesson_words").select("word_id").order("word_id").range(f, t)),
+      fetchAll<{ id: string }>((f, t) => db.from("corpus_words").select("id").is("validated_by", null).order("id").range(f, t)),
     ]);
-    const inLessons = new Set<string>((lessonLinks.data ?? []).map((l: { word_id: string }) => l.word_id));
-    const pendingIds = (pendingWords.data ?? []).map((w: { id: string }) => w.id);
+    const inLessons = new Set<string>(lessonLinks.map((l) => l.word_id));
+    const pendingIds = pendingWords.map((w) => w.id);
     const cohort = (prof.data?.cohort as string | null) ?? null;
 
     const [
@@ -302,30 +318,6 @@ export const listValidationQueue = createServerFn({ method: "GET" })
     const roles = await rolesFor(context.supabase, context.userId);
     if (!roles.isTeacher) throw new Error("Forbidden");
     const db = await admin();
-    const [wordsRes, linksRes, lessonsRes, mineRes] = await Promise.all([
-      db
-        .from("corpus_words")
-        .select("id, gn, es, audio_slug, has_audio, status, notes, category, validated_by")
-        .is("validated_by", null)
-        .order("gn")
-        .limit(2000),
-      db.from("lesson_words").select("lesson_id, word_id, position"),
-      db.from("lessons").select("id, sort_order, title, status"),
-      db.from("corpus_words").select("id", { count: "exact", head: true }).eq("validated_by", context.userId),
-    ]);
-    if (wordsRes.error) throw new Error(wordsRes.error.message);
-    type L = { id: string; sort_order: number; title: string; status: string };
-    const lessons = new Map<string, L>(((lessonsRes.data ?? []) as L[]).map((l) => [l.id, l]));
-    // Para cada palabra, la primera lección (la de número más bajo) donde aparece.
-    const firstLesson = new Map<string, { n: number; title: string; published: boolean; pos: number }>();
-    for (const link of (linksRes.data ?? []) as { lesson_id: string; word_id: string; position: number }[]) {
-      const l = lessons.get(link.lesson_id);
-      if (!l) continue;
-      const cur = firstLesson.get(link.word_id);
-      if (!cur || l.sort_order < cur.n || (l.sort_order === cur.n && link.position < cur.pos)) {
-        firstLesson.set(link.word_id, { n: l.sort_order, title: l.title, published: l.status === "published", pos: link.position ?? 0 });
-      }
-    }
     type W = {
       id: string;
       gn: string;
@@ -337,7 +329,36 @@ export const listValidationQueue = createServerFn({ method: "GET" })
       category: string | null;
       validated_by: string | null;
     };
-    const words = ((wordsRes.data ?? []) as W[]).map((w) => {
+    type L = { id: string; sort_order: number; title: string; status: string };
+    // Se traen TODAS las pendientes (de a páginas): si se cortara en las primeras mil por orden
+    // alfabético, podrían quedar afuera palabras de las primeras lecciones.
+    const [pendingWords, links, lessonRows, mineRes] = await Promise.all([
+      fetchAll<W>((f, t) =>
+        db
+          .from("corpus_words")
+          .select("id, gn, es, audio_slug, has_audio, status, notes, category, validated_by")
+          .is("validated_by", null)
+          .order("id")
+          .range(f, t),
+      ),
+      fetchAll<{ lesson_id: string; word_id: string; position: number }>((f, t) =>
+        db.from("lesson_words").select("lesson_id, word_id, position").order("lesson_id").order("position").range(f, t),
+      ),
+      fetchAll<L>((f, t) => db.from("lessons").select("id, sort_order, title, status").order("id").range(f, t)),
+      db.from("corpus_words").select("id", { count: "exact", head: true }).eq("validated_by", context.userId),
+    ]);
+    const lessons = new Map<string, L>(lessonRows.map((l) => [l.id, l]));
+    // Para cada palabra, la primera lección (la de número más bajo) donde aparece.
+    const firstLesson = new Map<string, { n: number; title: string; published: boolean; pos: number }>();
+    for (const link of links) {
+      const l = lessons.get(link.lesson_id);
+      if (!l) continue;
+      const cur = firstLesson.get(link.word_id);
+      if (!cur || l.sort_order < cur.n || (l.sort_order === cur.n && link.position < cur.pos)) {
+        firstLesson.set(link.word_id, { n: l.sort_order, title: l.title, published: l.status === "published", pos: link.position ?? 0 });
+      }
+    }
+    const words = pendingWords.map((w) => {
       const l = firstLesson.get(w.id);
       return { ...w, lesson: l ? { n: l.n, title: l.title, published: l.published } : null, _pos: l?.pos ?? 0 };
     });
@@ -463,7 +484,10 @@ export const getPracticeLog = createServerFn({ method: "POST" })
         es: p.es,
         estado: p.status,
       })),
-    ].sort((a, b) => a.en.localeCompare(b.en));
+    ]
+      // Una fila sin fecha no se puede ordenar ni contar como día de práctica: se deja afuera.
+      .filter((r) => typeof r.en === "string" && r.en.length > 0)
+      .sort((a, b) => a.en.localeCompare(b.en));
     const days = new Set(rows.map((r) => new Date(r.en).toLocaleDateString("en-CA", { timeZone: "America/Asuncion" })));
     return {
       name: (prof.data?.full_name as string | null) || (prof.data?.email as string | null) || "",

@@ -42,7 +42,7 @@ type SenderoId = "achegety" | "nemongeta" | "arandupy" | "neenga";
 const SENDEROS: { id: SenderoId; emoji: string; gn: string; es: string; desc: string; tip: string; ready: boolean }[] = [
   { id: "achegety", emoji: "📜", gn: "Achegety ha Hai", es: "Ortografía", desc: "Elegí cómo se escribe la palabra, contra reloj.", tip: "Recordá: un sonido, una letra; y las vocales nasales llevan tilde nasal (~).", ready: true },
   { id: "nemongeta", emoji: "💬", gn: "Ñemongeta", es: "Vocabulario cotidiano", desc: "Escuchá o leé la palabra y elegí su significado.", tip: "Escuchá bien la nasalidad: cambia el significado de la palabra.", ready: true },
-  { id: "arandupy", emoji: "🌿", gn: "Arandupy", es: "Cultura y mitos", desc: "Mitos, comidas, historia y naturaleza del Paraguay.", tip: "La cultura paraguaya vive en su lengua: cada respuesta suma identidad.", ready: true },
+  { id: "arandupy", emoji: "🏺", gn: "Arandupy", es: "Cultura y mitos", desc: "Mitos, comidas, historia y naturaleza del Paraguay.", tip: "La cultura paraguaya vive en su lengua: cada respuesta suma identidad.", ready: true },
   { id: "neenga", emoji: "🪕", gn: "Ñe'ẽnga", es: "Dichos y poesía", desc: "En preparación con docentes y pasantes del Ateneo.", tip: "", ready: false },
 ];
 

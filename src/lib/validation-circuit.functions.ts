@@ -279,7 +279,8 @@ export const validateProposal = createServerFn({ method: "POST" })
     const { data: p } = await db.from("content_proposals").select("*").eq("id", data.id).maybeSingle();
     const prop = p as Proposal | null;
     if (!prop) return { ok: false as const, error: "No encontramos la propuesta." };
-    if (prop.status !== "revisada") return { ok: false as const, error: "La propuesta todavía no está revisada o ya se validó." };
+    if (prop.status === "validada") return { ok: false as const, error: "Otra persona ya la validó." };
+    if (prop.status !== "revisada") return { ok: false as const, error: "Esta propuesta ya no está esperando validación." };
     if (prop.proposed_by === context.userId || prop.reviewed_by === context.userId) {
       return { ok: false as const, error: "Valida una tercera persona: no podés validar lo que propusiste o revisaste." };
     }
@@ -288,7 +289,7 @@ export const validateProposal = createServerFn({ method: "POST" })
     if (data.decision !== "aprobar") {
       const status: ProposalStatus = data.decision === "devolver" ? "devuelta" : "rechazada";
       const paso = data.decision === "devolver" ? "devuelta_en_validacion" : "rechazada_en_validacion";
-      const { error } = await db
+      const { data: done, error } = await db
         .from("content_proposals")
         .update({
           status,
@@ -299,17 +300,52 @@ export const validateProposal = createServerFn({ method: "POST" })
           updated_at: now,
         })
         .eq("id", data.id)
-        .eq("status", "revisada");
+        .eq("status", "revisada")
+        .select("id");
       if (error) throw new Error(error.message);
+      if (!done?.length) return { ok: false as const, error: "Otra persona ya la validó." };
       return { ok: true as const };
     }
 
-    // Aprobada: se aplica al corpus.
+    // Aprobada. Primero se "toma" la propuesta (solo si sigue revisada): así, si dos docentes
+    // aprueban a la vez, la palabra entra al corpus una sola vez.
+    const { data: claimed, error: claimError } = await db
+      .from("content_proposals")
+      .update({
+        status: "validada",
+        validated_by: context.userId,
+        validated_at: now,
+        validation_note: data.note || null,
+        history: [...prop.history, step("validada", context.userId, data.note)],
+        updated_at: now,
+      })
+      .eq("id", data.id)
+      .eq("status", "revisada")
+      .select("id");
+    if (claimError) throw new Error(claimError.message);
+    if (!claimed?.length) return { ok: false as const, error: "Otra persona ya la validó." };
+    // Si algo falla al pasar al corpus, la propuesta vuelve a quedar revisada, como estaba.
+    const release = () =>
+      db
+        .from("content_proposals")
+        .update({
+          status: "revisada",
+          validated_by: null,
+          validated_at: null,
+          validation_note: null,
+          history: prop.history,
+          updated_at: now,
+        })
+        .eq("id", data.id);
+
     let wordId: string | null = null;
     let audioWarning = false;
     if (prop.kind === "nueva") {
       const { data: exists } = await db.from("corpus_words").select("id").eq("gn", prop.gn).maybeSingle();
-      if (exists) return { ok: false as const, error: "Esa palabra ya entró al corpus por otro lado. Devolvela como duplicada." };
+      if (exists) {
+        await release();
+        return { ok: false as const, error: "Esa palabra ya entró al corpus por otro lado. Devolvela como duplicada." };
+      }
       const { data: inserted, error } = await db
         .from("corpus_words")
         .insert({
@@ -324,11 +360,17 @@ export const validateProposal = createServerFn({ method: "POST" })
         })
         .select("id")
         .single();
-      if (error) throw new Error(error.message);
+      if (error) {
+        await release();
+        throw new Error(error.message);
+      }
       wordId = inserted.id;
     } else {
       const { data: target } = await db.from("corpus_words").select("id, gn").eq("id", prop.target_word_id).maybeSingle();
-      if (!target) return { ok: false as const, error: "La palabra a corregir ya no existe en el corpus." };
+      if (!target) {
+        await release();
+        return { ok: false as const, error: "La palabra a corregir ya no existe en el corpus." };
+      }
       const patch: Record<string, unknown> = {
         es: prop.es,
         notes: prop.notes,
@@ -344,23 +386,14 @@ export const validateProposal = createServerFn({ method: "POST" })
         audioWarning = true;
       }
       const { error } = await db.from("corpus_words").update(patch).eq("id", target.id);
-      if (error) throw new Error(error.message);
+      if (error) {
+        await release();
+        throw new Error(error.message);
+      }
       wordId = target.id;
     }
 
-    const { error } = await db
-      .from("content_proposals")
-      .update({
-        status: "validada",
-        validated_by: context.userId,
-        validated_at: now,
-        validation_note: data.note || null,
-        published_word_id: wordId,
-        history: [...prop.history, step("validada", context.userId, data.note)],
-        updated_at: now,
-      })
-      .eq("id", data.id)
-      .eq("status", "revisada");
+    const { error } = await db.from("content_proposals").update({ published_word_id: wordId }).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true as const, audioWarning };
   });

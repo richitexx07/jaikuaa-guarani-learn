@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { redeemPendingPilotCode } from "@/lib/pilot-code";
 import { SupportWhatsApp } from "@/components/support-whatsapp";
 import { BackButton } from "@/components/navigation/back-button";
+import { Toaster } from "@/components/ui/sonner";
 import { applyDisplayPrefs, readDisplayPrefs } from "@/lib/display-prefs";
 import { registerOfflineSupport } from "@/lib/pwa";
 import { syncAllPending, totalPending } from "@/lib/offline-sync";
@@ -196,6 +197,8 @@ function RootComponent() {
       <Outlet />
       <BackButton />
       <SupportWhatsApp />
+      {/* Los avisos breves ("Validación registrada", "Otra persona ya la validó"...). Arriba, para no tapar botones. */}
+      <Toaster position="top-center" richColors closeButton />
     </QueryClientProvider>
   );
 }

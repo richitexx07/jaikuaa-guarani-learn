@@ -254,7 +254,7 @@ export const TRIVIA: Record<TriviaCategoryId, TriviaCategory> = {
     id: "naturaleza",
     title: 'Naturaleza',
     subtitle: 'Fauna y flora del Paraguay',
-    emoji: "🌿",
+    emoji: "🌳",
     questions: [
       { q: '¿Cuál es el árbol nacional del Paraguay?', options: ['El lapacho', 'El ombú', 'El ceibo', 'El quebracho'], answer: 0, explanation: 'El lapacho florece en rosa, amarillo y blanco.' },
       { q: '¿Cuál es el ave nacional del Paraguay?', options: ['El pájaro campana', 'El cóndor', 'El hornero', 'El tucán'], answer: 0, explanation: 'El pájaro campana es famoso por su canto metálico.' },
