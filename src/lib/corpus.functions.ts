@@ -996,7 +996,7 @@ export const quickValidateWord = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: before } = await supabaseAdmin
       .from("corpus_words")
-      .select("status, validated_by, validated_at")
+      .select("gn, status, validated_by, validated_at")
       .eq("id", data.id)
       .maybeSingle();
     if (!before) throw new Error("No encontramos la palabra");
@@ -1004,6 +1004,8 @@ export const quickValidateWord = createServerFn({ method: "POST" })
     let patch: Record<string, unknown>;
     if (data.action === "approve") {
       if (before.validated_by) return { ok: true, prevStatus: before.status as "draft" | "published", already: true };
+      const { requireDeterministicAcceptance } = await import("@/lib/deterministic-gate.server");
+      await requireDeterministicAcceptance(before.gn);
       patch = { status: "published", validated_by: context.userId, validated_at: new Date().toISOString() };
     } else {
       const recent =
