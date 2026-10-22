@@ -137,7 +137,7 @@ function TeacherHome() {
         <Tile
           to="/validacion"
           search={{ tab: "errores" }}
-          emoji="🚩"
+          emoji="⚠️"
           title="Avisos de error"
           main={d.pending.reports}
           unit={d.pending.reports === 1 ? "aviso abierto" : "avisos abiertos"}

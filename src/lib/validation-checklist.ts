@@ -20,7 +20,7 @@ export function weeklyReminderText(pending: number, inLessons: number, reports: 
     "",
     "Con 10 minutos alcanza: entre a www.jaikuaa.com/docente y toque «Validar palabras».",
     "",
-    "¡Gracias por cuidar cada palabra! 🇵🇾🚩",
+    "¡Gracias por cuidar cada palabra! 🇵🇾",
   ];
   return parts.filter((l, i, a) => !(l === "" && a[i - 1] === "")).join("\n");
 }

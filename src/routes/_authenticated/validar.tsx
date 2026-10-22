@@ -430,7 +430,7 @@ const GUIDE_STEPS: { emoji: string; title: string; text: string }[] = [
     text: "¿Está bien escrita? ¿El significado es correcto? ¿El audio suena bien? ¿Sirve para enseñar? Si las cuatro son sí, tocá «Está bien».",
   },
   {
-    emoji: "🚩",
+    emoji: "⚠️",
     title: "Si algo no está bien, avisá",
     text: "Tocá «Error» y contá qué viste. Si dudás, «Saltar» la deja para después. Si te equivocaste, «Deshacer» la vuelve atrás.",
   },
