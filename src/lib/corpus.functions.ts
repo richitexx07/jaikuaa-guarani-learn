@@ -398,6 +398,9 @@ export const updateCorpusWord = createServerFn({ method: "POST" })
     const { id, ...rest } = data;
     const patch: Record<string, unknown> = { ...rest };
     if (rest.status === "published") {
+      const { data: w } = await supabaseAdmin.from("corpus_words").select("gn").eq("id", id).maybeSingle();
+      const { requireDeterministicAcceptance } = await import("@/lib/deterministic-gate.server");
+      await requireDeterministicAcceptance(w?.gn ?? "");
       patch.validated_by = context.userId;
       patch.validated_at = new Date().toISOString();
     } else if (rest.status === "draft") {
@@ -452,7 +455,21 @@ export const publishLevel = createServerFn({ method: "POST" })
       .select("word_id")
       .eq("level_id", data.levelId);
     const ids = (links ?? []).map((l) => l.word_id);
-    if (ids.length === 0) return { published: 0 };
+    if (ids.length === 0) return { published: 0, blocked: 0 };
+    const { data: candidates } = await supabaseAdmin
+      .from("corpus_words")
+      .select("id, gn")
+      .in("id", ids)
+      .eq("has_audio", true)
+      .eq("status", "draft");
+    // Barrera determinista palabra por palabra: solo pasan las aceptadas explícitamente.
+    const { checkDeterministicAcceptance } = await import("@/lib/deterministic-gate.server");
+    const accepted: string[] = [];
+    for (const c of candidates ?? []) {
+      if ((await checkDeterministicAcceptance(c.gn)).accepted) accepted.push(c.id);
+    }
+    const blocked = (candidates?.length ?? 0) - accepted.length;
+    if (accepted.length === 0) return { published: 0, blocked };
     const { data: updated, error } = await supabaseAdmin
       .from("corpus_words")
       .update({
@@ -460,12 +477,12 @@ export const publishLevel = createServerFn({ method: "POST" })
         validated_by: context.userId,
         validated_at: new Date().toISOString(),
       })
-      .in("id", ids)
+      .in("id", accepted)
       .eq("has_audio", true)
       .eq("status", "draft")
       .select("id");
     if (error) throw new Error(error.message);
-    return { published: updated?.length ?? 0 };
+    return { published: updated?.length ?? 0, blocked };
   });
 
 /** Re-escanea el bucket de audio y actualiza qué palabras ya tienen grabación. */
