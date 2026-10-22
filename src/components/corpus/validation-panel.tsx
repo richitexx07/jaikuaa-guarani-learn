@@ -93,15 +93,7 @@ export function ValidationPanel() {
                   hasAudio={w.has_audio}
                   onSaved={() => void qc.invalidateQueries({ queryKey: ["validation-queue"] })}
                 />
-                <Button
-                  variant="cta"
-                  className="h-11 w-full sm:w-auto"
-                  disabled={approve.isPending}
-                  onClick={() => approve.mutate(w.id)}
-                >
-                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                  Aprobar y publicar
-                </Button>
+                <GatedApprove gn={w.gn} disabled={approve.isPending} onApprove={() => approve.mutate(w.id)} />
               </div>
             </li>
           ))}
