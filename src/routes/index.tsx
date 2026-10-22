@@ -71,9 +71,9 @@ function Hero() {
     <section className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-24 lg:py-32">
       <div className="relative mx-auto max-w-3xl text-center">
         <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
-          Aprendé guaraní.
+          Aprendé y jugá
           <br />
-          <span className="text-accent">Cambiá tu vida.</span>
+          <span className="text-accent">en guaraní.</span>
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
           Desafíos diarios, juegos y voces reales. Plataforma paraguaya para aprender guaraní.
@@ -84,7 +84,7 @@ function Hero() {
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Button variant="cta" size="lg" asChild>
-            <Link to="/comenzar">Empezar gratis</Link>
+            <Link to="/comenzar">Empezar — Libre acceso</Link>
           </Button>
           <Button variant="ghost" size="lg" asChild>
             <Link to="/auth" search={{ mode: "login" }}>Iniciar sesión</Link>
