@@ -23,6 +23,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { checkCorpusAdmin } from "@/lib/corpus.functions";
 import { getMyStaffStatus } from "@/lib/teacher.functions";
+import { claimReferral } from "@/lib/ambassador.functions";
+import { cleanRefCode, REF_STORAGE_KEY } from "@/lib/ambassador";
 import { withOfflineCache } from "@/lib/offline-data";
 import { StaffRequestCard } from "@/components/pilot/staff-request-card";
 import { OfflinePackCard } from "@/components/offline/offline-pack-card";
@@ -221,6 +223,18 @@ function Dashboard() {
   const [openTeaser, setOpenTeaser] = useState<TeaserKey>(null);
   const greeting = useMemo(() => greetingFor(new Date().getHours()), []);
 
+  const claim = useServerFn(claimReferral);
+  useEffect(() => {
+    const code = cleanRefCode(localStorage.getItem(REF_STORAGE_KEY));
+    if (!code) return;
+    claim({ data: { code } })
+      .then(({ result }) => {
+        if (result !== "ok" && result !== "already" && result !== "invalid" && result !== "self" && result !== "too_old") return;
+        localStorage.removeItem(REF_STORAGE_KEY);
+      })
+      .catch(() => {});
+  }, [claim]);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -345,6 +359,7 @@ function Dashboard() {
                 <FreeCard to="/curso/guarani" emoji="📚" title="Curso de Guaraní" desc="10 lecciones con audio humano real. Empezá desde cero y sumá XP." accent="accent" />
                 <FreeCard to="/guarani-escolar" emoji="🎒" title="Guaraní Escolar" desc="Organizado según los grados escolares." accent="accent" inValidation />
                 <FreeCard to="/logros" emoji="🏅" title="Mis logros" desc="Tus insignias, racha y avance." accent="primary" />
+                <FreeCard to="/embajadores" emoji="🤝" title="Invitá a aprender" desc="Sé Embajador de Jaikuaa y sumá XP de embajador." accent="primary" />
                 <FreeCard to="/certificado" emoji="📜" title="Certificado" desc="Terminá el Curso de Guaraní y descargá tu certificado." accent="primary" />
               </div>
             </TabsContent>
