@@ -92,6 +92,13 @@
       "when": 1792674084419,
       "tag": "0012_protect_profile_cohort",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792684864781,
+      "tag": "0013_embajadores",
+      "breakpoints": true
     }
   ]
 }

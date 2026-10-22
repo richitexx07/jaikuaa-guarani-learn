@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { SiteFooter, TrustBadges } from "@/components/site-footer";
+import { cleanRefCode, REF_STORAGE_KEY } from "@/lib/ambassador";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -44,6 +45,11 @@ function AuthPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const ref = cleanRefCode(new URLSearchParams(window.location.search).get("ref"));
+    if (ref) localStorage.setItem(REF_STORAGE_KEY, ref);
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
