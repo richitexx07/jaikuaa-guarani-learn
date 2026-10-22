@@ -73,12 +73,3 @@ function EmbajadoresPage() {
   );
 }
 
-function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
-  return (
-    <div className="rounded-2xl border border-border bg-card p-3 text-center">
-      <div className="mx-auto flex w-fit text-primary">{icon}</div>
-      <p className="mt-1 font-display text-2xl font-bold text-foreground">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
-    </div>
-  );
-}
