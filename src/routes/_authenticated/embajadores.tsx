@@ -1,20 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Copy, Share2, Users, Award, Sparkles } from "lucide-react";
+import { Copy, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { getAmbassadorInfo } from "@/lib/ambassador.functions";
-import { levelFor, MAX_REWARDED_INVITES_PER_MONTH, XP_PER_ACTIVATED_INVITE } from "@/lib/ambassador";
 
 export const Route = createFileRoute("/_authenticated/embajadores")({
   head: () => ({
     meta: [
-      { title: "Jaikuaa — Embajadores" },
-      { name: "description", content: "Invitá a otras personas a aprender guaraní y sumá XP de embajador." },
-      { property: "og:title", content: "Embajadores de Jaikuaa" },
-      { property: "og:description", content: "Invitá a aprender guaraní con tu enlace personal." },
+      { title: "Jaikuaa — Invitar a alguien" },
+      { name: "description", content: "Invitá a un amigo o familiar a aprender guaraní en Jaikuaa." },
+      { property: "og:title", content: "Invitá a aprender guaraní" },
+      { property: "og:description", content: "Compartí tu enlace personal de Jaikuaa." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -26,7 +25,6 @@ function EmbajadoresPage() {
   const fetchInfo = useServerFn(getAmbassadorInfo);
   const { data, isLoading, isError } = useQuery({ queryKey: ["ambassador"], queryFn: () => fetchInfo() });
   const link = data ? `https://www.jaikuaa.com/auth?ref=${data.code}` : "";
-  const level = levelFor(data?.started ?? 0);
   const shareText = `Te invito a aprender guaraní gratis en Jaikuaa: ${link}`;
 
   const copy = async () => {
