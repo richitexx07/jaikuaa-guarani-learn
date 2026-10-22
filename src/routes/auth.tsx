@@ -11,6 +11,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { SiteFooter, TrustBadges } from "@/components/site-footer";
 import { cleanRefCode, REF_STORAGE_KEY } from "@/lib/ambassador";
+import { peekAfterLogin, takeAfterLogin } from "@/lib/after-login";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -51,13 +52,19 @@ function AuthPage() {
     if (ref) localStorage.setItem(REF_STORAGE_KEY, ref);
   }, []);
 
+  const [invitedToGame, setInvitedToGame] = useState(false);
+  useEffect(() => { setInvitedToGame(!!peekAfterLogin()?.includes("sala=")); }, []);
+  function goNext() {
+    window.location.replace(takeAfterLogin());
+  }
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+      if (data.session) goNext();
     });
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION")) {
-        navigate({ to: "/dashboard", replace: true });
+        goNext();
       }
     });
     return () => sub.subscription.unsubscribe();
@@ -101,7 +108,7 @@ function AuthPage() {
         } catch {
           // ignore storage errors
         }
-        navigate({ to: "/dashboard", replace: true });
+        goNext();
       } else {
         const parsed = signupSchema.safeParse({ name, email, password });
         if (!parsed.success) {
@@ -121,7 +128,7 @@ function AuthPage() {
           return;
         }
         toast.success("¡Cuenta creada! Revisá tu email si te lo pide.");
-        navigate({ to: "/dashboard", replace: true });
+        goNext();
       }
     } catch (err) {
       setErrorMsg("Ocurrió un error inesperado. Intentá de nuevo.");
@@ -140,7 +147,7 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/dashboard", replace: true });
+    goNext();
   }
 
   return (
@@ -162,6 +169,12 @@ function AuthPage() {
               {isLogin ? "Bienvenido de vuelta a Jaikuaa." : "Creá tu cuenta y empezá a aprender hoy."}
             </p>
           </div>
+          {invitedToGame && (
+            <div className="mt-6 rounded-2xl border-2 border-primary/30 bg-primary/10 p-4 text-center">
+              <p className="font-display text-lg font-bold text-primary">¡Te desafiaron a un juego!</p>
+              <p className="mt-1 text-sm text-muted-foreground">Entrá con Google y vas directo a la sala de tu amigo.</p>
+            </div>
+          )}
 
           <Button type="button" variant="outline" size="lg" className="mt-8 h-14 w-full border-2 text-base font-semibold" onClick={handleGoogle}>
             <GoogleIcon /> Continuar con Google

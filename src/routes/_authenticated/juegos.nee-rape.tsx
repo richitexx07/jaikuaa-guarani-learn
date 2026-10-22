@@ -240,22 +240,38 @@ function Remote({ code, isHost, sendero, pool, onExit }: { code: string; isHost:
   }, [rivalName, match, startMatch]);
 
   const link = typeof window !== "undefined" ? `${window.location.origin}/juegos/nee-rape?sala=${code}` : "";
-  const invite = `¡Te desafío a Ñe'ẽ Rape en Jaikuaa! 🛤️ A ver si me ganás. Entrá acá: ${link} (código ${code})`;
+  const invite = `¡Te desafío en Jaikuaa! A ver si me ganás.\nCódigo de sala: ${code}\nTocá acá para jugar:\n${link}`;
 
   if (!match) {
     return (
       <div className="space-y-5 text-center">
-        <div className="rounded-3xl border-2 border-primary/30 bg-primary/5 p-6">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Código de sala</p>
-          <p className="mt-1 font-display text-5xl font-bold tracking-[0.3em] text-primary">{code}</p>
-          <div className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            {rivalName ? <><Users className="h-4 w-4 text-primary" /> ¡{rivalName} entró! Preparando…</> : <><Loader2 className="h-4 w-4 animate-spin" /> Esperando a tu rival…</>}
+        <div className="relative overflow-hidden rounded-3xl bg-primary p-6 text-primary-foreground shadow-xl">
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-secondary/40 blur-2xl motion-safe:animate-pulse" />
+          <div className="relative flex items-center justify-center gap-4">
+            <div className="flex flex-col items-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-foreground font-display text-2xl font-bold text-primary ring-4 ring-primary-foreground/30">
+                {(me?.name ?? "V").charAt(0).toUpperCase()}
+              </div>
+              <p className="mt-1 text-sm font-semibold">{me?.name ?? "Vos"}</p>
+            </div>
+            <p className="font-display text-3xl font-black text-secondary motion-safe:animate-bounce">VS</p>
+            <div className="flex flex-col items-center">
+              <div className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-dashed font-display text-2xl font-bold ${rivalName ? "border-secondary bg-secondary text-secondary-foreground" : "border-primary-foreground/50 motion-safe:animate-pulse"}`}>
+                {rivalName ? rivalName.charAt(0).toUpperCase() : "?"}
+              </div>
+              <p className="mt-1 text-sm font-semibold">{rivalName ?? "Tu amigo"}</p>
+            </div>
           </div>
+          <div className="relative mt-5 flex items-center justify-center gap-2 text-sm">
+            {rivalName ? <><Users className="h-4 w-4" /> ¡{rivalName} entró! Arrancamos…</> : <><Loader2 className="h-4 w-4 animate-spin" /> Esperando que tu amigo abra el enlace</>}
+          </div>
+          <p className="relative mt-3 text-xs uppercase tracking-widest opacity-80">Sala <span className="font-display text-base font-bold tracking-[0.3em]">{code}</span></p>
         </div>
         {!rivalName && (
           <div className="grid gap-3">
-            <Button asChild size="lg" className="h-14 text-base">
-              <a href={`https://wa.me/?text=${encodeURIComponent(invite)}`} target="_blank" rel="noreferrer"><MessageCircle className="mr-2 h-5 w-5" /> Invitar por WhatsApp</a>
+            <p className="text-sm font-semibold text-foreground">1. Mandale el desafío · 2. Cuando abra, arranca solo</p>
+            <Button asChild size="lg" className="h-14 text-base shadow-lg">
+              <a href={`https://wa.me/?text=${encodeURIComponent(invite)}`} target="_blank" rel="noreferrer"><MessageCircle className="mr-2 h-5 w-5" /> Mandar por WhatsApp</a>
             </Button>
             <Button variant="outline" onClick={() => { void navigator.clipboard?.writeText(link); toast.success("Enlace copiado"); }}>
               <Copy className="mr-2 h-4 w-4" /> Copiar enlace
