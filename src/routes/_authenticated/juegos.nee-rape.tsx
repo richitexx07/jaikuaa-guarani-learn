@@ -270,7 +270,7 @@ function Remote({ code, isHost, sendero, pool, onExit }: { code: string; isHost:
         {!rivalName && (
           <div className="grid gap-3">
             <p className="text-sm font-semibold text-foreground">1. Mandale el desafío · 2. Cuando abra, arranca solo</p>
-            <Button asChild size="lg" className="h-14 bg-success text-base text-success-foreground hover:bg-success/90">
+            <Button asChild size="lg" className="h-14 text-base shadow-lg">
               <a href={`https://wa.me/?text=${encodeURIComponent(invite)}`} target="_blank" rel="noreferrer"><MessageCircle className="mr-2 h-5 w-5" /> Mandar por WhatsApp</a>
             </Button>
             <Button variant="outline" onClick={() => { void navigator.clipboard?.writeText(link); toast.success("Enlace copiado"); }}>
