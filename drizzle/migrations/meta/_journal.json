@@ -85,6 +85,13 @@
       "when": 1792631826349,
       "tag": "0011_staff_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792674084419,
+      "tag": "0012_protect_profile_cohort",
+      "breakpoints": true
     }
   ]
 }
