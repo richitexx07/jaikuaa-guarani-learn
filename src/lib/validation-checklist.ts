@@ -1,6 +1,6 @@
 /** Las cuatro preguntas que un docente se hace antes de aprobar una palabra. */
 export const FOUR_QUESTIONS: { id: string; q: string; hint: string }[] = [
-  { id: "escritura", q: "¿Está bien escrita?", hint: "Letras, tildes y nasales según la grafía oficial." },
+  { id: "escritura", q: "¿Está bien escrita?", hint: "Letras, tildes, nasales y puso según la grafía oficial." },
   { id: "significado", q: "¿El significado es correcto?", hint: "La traducción al castellano dice lo mismo." },
   { id: "audio", q: "¿El audio suena bien?", hint: "Se entiende y está bien pronunciada (si tiene audio)." },
   { id: "uso", q: "¿Sirve para enseñar?", hint: "Es de uso real y apropiada para los alumnos." },
