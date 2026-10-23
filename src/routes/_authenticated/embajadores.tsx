@@ -43,23 +43,6 @@ function EmbajadoresPage() {
   const shareFacebook = () => open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`);
   const shareX = () =>
     open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`);
-  const copyAndOpen = async (url: string, msg: string) => {
-    try { await navigator.clipboard.writeText(link); } catch { /* sin permiso */ }
-    // En celular: menú oficial del teléfono, que entrega el enlace directo a Instagram o TikTok.
-    if (typeof navigator.share === "function") {
-      try {
-        await navigator.share({ title: "Jaikuaa", text: shareText, url: link });
-        return;
-      } catch (e) {
-        if ((e as Error)?.name === "AbortError") return;
-      }
-    }
-    toast.success(msg, { duration: 7000 });
-    setTimeout(() => open(url), 1200);
-  };
-
-  const igMsg = "Paso 1: tu enlace ya está copiado. Paso 2: en Instagram, mantené apretado y tocá «Pegar» en tu historia o mensaje.";
-  const ttMsg = "Paso 1: tu enlace ya está copiado. Paso 2: en TikTok, mantené apretado y tocá «Pegar» en tu biografía o mensaje.";
 
   return (
     <div className="min-h-screen bg-background">
