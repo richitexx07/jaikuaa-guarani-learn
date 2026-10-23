@@ -20,7 +20,8 @@ import { JaiLauncher } from "@/components/jai-launcher";
 
 // En los juegos y en el panel de administración el botón molestaría, así que no se muestra.
 // En /validar los botones de decisión van abajo: Jai no debe taparlos.
-const HIDDEN_PREFIXES = ["/juegos", "/admin", "/piloto-ateneo", "/certificado", "/validar"];
+// /ficha-auspiciantes es una hoja comercial para imprimir: Jai no debe flotar sobre ella.
+const HIDDEN_PREFIXES = ["/juegos", "/admin", "/piloto-ateneo", "/certificado", "/validar", "/ficha-auspiciantes"];
 
 
 type Msg =
