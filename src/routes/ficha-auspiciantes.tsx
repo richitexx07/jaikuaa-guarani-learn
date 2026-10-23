@@ -120,6 +120,11 @@ function Ficha() {
 
       <footer className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-4 text-xs text-muted-foreground">
         <span>Guaraní Global Tech E.A.S. · RUC 80174299-4 · www.jaikuaa.com</span>
+        <span>
+          Contacto comercial: Richard Ávalos Arriola ·{" "}
+          <a href="https://wa.me/595982418732" className="font-semibold text-primary underline">0982 418 732</a> ·{" "}
+          <a href="mailto:richitexx07@gmail.com" className="font-semibold text-primary underline">richitexx07@gmail.com</a>
+        </span>
         <span>Precios y espacios: a convenir según el paquete.</span>
       </footer>
       </main>
