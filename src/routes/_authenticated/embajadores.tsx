@@ -77,6 +77,15 @@ function EmbajadoresPage() {
               <Stat icon={<Award className="h-5 w-5" />} label="XP de embajador" value={data.ambassadorXp} />
             </section>
 
+            <section className="mt-4 rounded-2xl border border-primary/20 bg-primary/5 p-5">
+              <p className="font-display font-bold text-primary">Tus puntos no vencen.</p>
+              <p className="mt-1 text-sm text-foreground">
+                Seguí aprendiendo y compartiendo. Mientras la comunidad crece, estamos preparando alianzas con marcas y
+                comercios paraguayos para que muy pronto puedas canjear tus XP por premios y descuentos reales.
+              </p>
+            </section>
+
+
             <section className="mt-4 rounded-2xl border border-border bg-card p-5">
               <p className="text-sm text-muted-foreground">Tu distinción</p>
               <p className="font-display text-2xl font-bold text-primary">{level.current.name}</p>
