@@ -1,4 +1,5 @@
 - [x] Google OAuth propio: bloqueo reproducido en www.jaikuaa.com; Google devuelve redirect_uri_mismatch, sin errores de JavaScript; portada e ingreso cargan con HTTP 200.
+- [ ] Invitaciones de juegos: impedir el doble regreso después del ingreso y verificar que se conserva la sala.
 - [ ] Google OAuth propio: autorizar exactamente https://www.jaikuaa.com/~oauth/callback en el cliente de Google Cloud y repetir ingreso completo; requiere acceso del propietario a Google Cloud.
 - [x] Piloto Ateneo: bandeja de Validación docente en el panel.
 - [x] Práctica: detectar aprobación en la pantalla abierta mediante actualización periódica de permisos pendientes, también en Docente y Panel.

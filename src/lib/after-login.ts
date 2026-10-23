@@ -20,3 +20,14 @@ export function takeAfterLogin(): string {
   try { localStorage.removeItem(KEY); } catch { /* nada */ }
   return v ?? "/dashboard";
 }
+
+// Session restoration, auth events and form completion may all report the
+// same login. Claim the redirect before consuming its single-use destination.
+export function createAfterLoginRedirect(navigate: (href: string) => unknown) {
+  let started = false;
+  return () => {
+    if (started) return;
+    started = true;
+    navigate(takeAfterLogin());
+  };
+}
