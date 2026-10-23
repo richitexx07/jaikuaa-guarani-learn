@@ -51,8 +51,20 @@ describe("Jai FAQ", () => {
   });
 
   it("sugiere preguntas según la pantalla", () => {
-    expect(faqsForPath("/curso/guarani/leccion/2")[0].id).toBe("audio");
-    expect(faqsForPath("/glosario")[0].id).toBe("error-palabra");
+    expect(faqsForPath("/curso/guarani/leccion/2")[0].id).toBe("premios");
+    expect(faqsForPath("/dashboard")[0].id).toBe("premios");
+  });
+
+  it("no abre con un problema técnico en el panel ni en la portada", () => {
+    for (const p of ["/", "/dashboard", "/curso/guarani/leccion/2"]) {
+      expect(faqsForPath(p)[0].category).not.toBe("Problemas");
+      expect(faqsForPath(p).map((f) => f.id)).not.toContain("audio");
+    }
+  });
+
+  it("entiende preguntas sobre premios y sorteos", () => {
+    expect(findFaq("para que sirven mis puntos")?.id).toBe("premios");
+    expect(findFaq("hay sorteos?")?.id).toBe("premios");
   });
 
   it("cada pregunta relacionada existe", () => {

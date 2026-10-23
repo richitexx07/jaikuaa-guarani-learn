@@ -28,6 +28,26 @@ export type JaiFaq = {
 
 export const JAI_FAQS: JaiFaq[] = [
   {
+    id: "premios",
+    category: "Empezar",
+    question: "¿Para qué me sirven mis XP?",
+    answer:
+      "¡Tus puntos no vencen! Cada lección, cada juego y cada amigo que traés suma XP a tu cuenta. Mientras la comunidad crece, estamos preparando alianzas con marcas y comercios paraguayos para que puedas canjear tus XP por premios, descuentos y participar en sorteos. Todavía no están habilitados: por ahora, acumulá todo lo que puedas.",
+    keywords: ["xp", "puntos", "premio", "premios", "sorteo", "sorteos", "descuento", "descuentos", "canjear", "canje", "regalo", "beneficio", "beneficios", "para que sirven"],
+    link: { label: "Ver mis logros", to: "/logros" },
+    related: ["invitar", "empezar"],
+  },
+  {
+    id: "invitar",
+    category: "Empezar",
+    question: "¿Cómo invito a mis amigos?",
+    answer:
+      "Desde Embajadores compartís tu enlace personal por WhatsApp. Cuando alguien nuevo se registra y empieza a estudiar, ganás XP de embajador.",
+    keywords: ["invitar", "invito", "amigo", "amigos", "compartir", "embajador", "embajadores", "referido", "enlace"],
+    link: { label: "Ir a Embajadores", to: "/embajadores" },
+    related: ["premios", "gratis"],
+  },
+  {
     id: "audio",
     category: "Problemas",
     question: "No escucho los audios",
@@ -322,16 +342,18 @@ export function suggestFaqs(text: string, max = 3): JaiFaq[] {
 /** Preguntas sugeridas según la pantalla donde está la persona. */
 export function faqsForPath(pathname: string): JaiFaq[] {
   const pick = (...ids: string[]) => ids.map(getFaq).filter((f): f is JaiFaq => !!f);
+  // Primero lo que motiva; los problemas técnicos quedan en «Todas las preguntas».
   if (pathname.startsWith("/curso") || pathname.startsWith("/guarani-escolar") || pathname.startsWith("/agro"))
-    return pick("audio", "error-palabra", "certificado", "offline");
-  if (pathname.startsWith("/glosario")) return pick("error-palabra", "audio", "traductor", "teclado");
-  if (pathname.startsWith("/validacion") || pathname.startsWith("/cuaderno")) return pick("docente", "error-palabra", "audio");
+    return pick("premios", "certificado", "offline", "error-palabra");
+  if (pathname.startsWith("/glosario")) return pick("premios", "traductor", "teclado", "error-palabra");
+  if (pathname.startsWith("/validacion") || pathname.startsWith("/cuaderno")) return pick("docente", "error-palabra");
   if (pathname.startsWith("/instituciones") || pathname.startsWith("/auspiciantes"))
     return pick("instituciones", "auspicio", "respaldo", "docente");
   if (pathname.startsWith("/auth") || pathname.startsWith("/recuperar") || pathname.startsWith("/reset"))
     return pick("contrasena", "empezar", "privacidad");
-  if (pathname.startsWith("/dashboard")) return pick("audio", "instalar", "glosario", "certificado");
-  return pick("gratis", "empezar", "audio", "que-es");
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/embajadores"))
+    return pick("premios", "invitar", "certificado", "instalar");
+  return pick("gratis", "empezar", "premios", "que-es");
 }
 
 /** Enlace de WhatsApp con el tema de la consulta (y la pantalla) ya cargados. */
