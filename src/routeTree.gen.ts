@@ -15,6 +15,7 @@ import { Route as AuspiciantesRouteImport } from './routes/auspiciantes'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CineRouteImport } from './routes/cine'
 import { Route as ComenzarRouteImport } from './routes/comenzar'
+import { Route as FichaAuspiciantesRouteImport } from './routes/ficha-auspiciantes'
 import { Route as InstitucionesRouteImport } from './routes/instituciones'
 import { Route as InversionRouteImport } from './routes/inversion'
 import { Route as PilotoAteneoRouteImport } from './routes/piloto-ateneo'
@@ -104,6 +105,11 @@ const CineRoute = CineRouteImport.update({
 const ComenzarRoute = ComenzarRouteImport.update({
   id: '/comenzar',
   path: '/comenzar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichaAuspiciantesRoute = FichaAuspiciantesRouteImport.update({
+  id: '/ficha-auspiciantes',
+  path: '/ficha-auspiciantes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InstitucionesRoute = InstitucionesRouteImport.update({
@@ -452,6 +458,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
   '/comenzar': typeof ComenzarRoute
+  '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
@@ -520,6 +527,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
   '/comenzar': typeof ComenzarRoute
+  '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
@@ -587,6 +595,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
   '/comenzar': typeof ComenzarRoute
+  '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
@@ -657,6 +666,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cine'
     | '/comenzar'
+    | '/ficha-auspiciantes'
     | '/instituciones'
     | '/inversion'
     | '/piloto-ateneo'
@@ -725,6 +735,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cine'
     | '/comenzar'
+    | '/ficha-auspiciantes'
     | '/instituciones'
     | '/inversion'
     | '/piloto-ateneo'
@@ -791,6 +802,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cine'
     | '/comenzar'
+    | '/ficha-auspiciantes'
     | '/instituciones'
     | '/inversion'
     | '/piloto-ateneo'
@@ -861,6 +873,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CineRoute: typeof CineRoute
   ComenzarRoute: typeof ComenzarRoute
+  FichaAuspiciantesRoute: typeof FichaAuspiciantesRoute
   InstitucionesRoute: typeof InstitucionesRoute
   InversionRoute: typeof InversionRoute
   PilotoAteneoRoute: typeof PilotoAteneoRoute
@@ -919,6 +932,13 @@ declare module '@tanstack/react-router' {
       path: '/comenzar'
       fullPath: '/comenzar'
       preLoaderRoute: typeof ComenzarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ficha-auspiciantes': {
+      id: '/ficha-auspiciantes'
+      path: '/ficha-auspiciantes'
+      fullPath: '/ficha-auspiciantes'
+      preLoaderRoute: typeof FichaAuspiciantesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/instituciones': {
@@ -1505,6 +1525,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CineRoute: CineRoute,
   ComenzarRoute: ComenzarRoute,
+  FichaAuspiciantesRoute: FichaAuspiciantesRoute,
   InstitucionesRoute: InstitucionesRoute,
   InversionRoute: InversionRoute,
   PilotoAteneoRoute: PilotoAteneoRoute,
