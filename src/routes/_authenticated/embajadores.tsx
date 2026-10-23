@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Copy, MessageCircle, Users, Award, Sparkles } from "lucide-react";
+import { Copy, Users, Award, Sparkles } from "lucide-react";
+import jaiImg from "@/assets/jai-anfitrion.webp";
+import { JaiPaw } from "@/components/py-icons";
+import { WhatsAppIcon, FacebookIcon, InstagramIcon, TikTokIcon, XIcon } from "@/components/social-icons";
 import { toast } from "sonner";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
@@ -46,6 +49,9 @@ function EmbajadoresPage() {
     open(url);
   };
 
+  const igMsg = "Enlace copiado. Pegalo en tu historia o en tu perfil de Instagram.";
+  const ttMsg = "Enlace copiado. Pegalo en tu biografía o en tu video de TikTok.";
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/50">
@@ -55,46 +61,69 @@ function EmbajadoresPage() {
         </div>
       </header>
       {/* pb-36: deja lugar para Jai, que flota abajo y tapaba las últimas reglas. */}
-      <main className="mx-auto max-w-3xl px-4 pt-8 pb-36">
-        <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
-          <Award className="h-4 w-4" /> Embajadores de Jaikuaa
-        </div>
-        <h1 className="mt-3 font-display text-3xl font-bold text-foreground">Invitá a aprender y jugar guaraní</h1>
-        <p className="mt-2 text-muted-foreground">
-          Compartí tu enlace. Cuando la persona que invitaste crea su cuenta y hace su primera actividad,
-          sumás {XP_PER_ACTIVATED_INVITE} XP de embajador. Este XP es aparte de tu avance de aprendizaje.
-        </p>
+      <main className="mx-auto max-w-3xl px-4 pt-6 pb-36">
+        <section className="amb-hero amb-rise shadow-xl">
+          <div className="amb-stripe relative" />
+          {[["12%", "20%", "0s"], ["70%", "15%", ".8s"], ["85%", "60%", "1.6s"], ["30%", "78%", "1.1s"], ["55%", "40%", "2s"]].map(([l, t, d], i) => (
+            <span key={i} className="amb-spark" style={{ left: l, top: t, animationDelay: d }} />
+          ))}
+          <div className="relative flex items-center gap-3 p-5 sm:p-7">
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 rounded-full bg-background/15 px-3 py-1 text-xs font-bold uppercase tracking-wider backdrop-blur">
+                <Award className="h-4 w-4" /> Embajadores de Jaikuaa
+              </div>
+              <h1 className="mt-3 font-display text-3xl font-bold leading-tight sm:text-4xl">
+                Llevá el guaraní a toda tu gente
+              </h1>
+              <p className="mt-2 text-sm opacity-90 sm:text-base">
+                Cada persona que invitás es una voz más para nuestra lengua. Compartí con orgullo: cuando empiece a
+                aprender, sumás {XP_PER_ACTIVATED_INVITE} XP de embajador.
+              </p>
+            </div>
+            <img src={jaiImg} alt="Jai, el jaguareté" className="amb-jai h-28 w-28 shrink-0 object-contain sm:h-36 sm:w-36" />
+          </div>
+        </section>
 
         {isLoading && <p className="mt-6 text-muted-foreground">Cargando tu enlace…</p>}
         {isError && <p className="mt-6 text-destructive">No pudimos cargar tu enlace. Probá de nuevo con señal.</p>}
 
         {data && (
           <>
-            <section className="mt-6 rounded-2xl border border-border bg-card p-5 shadow-sm">
-              <Button size="lg" className="h-14 w-full text-base" onClick={share}>
-                <MessageCircle className="mr-2 h-5 w-5" /> Compartir por WhatsApp
-              </Button>
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                <Button variant="outline" onClick={shareFacebook}>Facebook</Button>
-                <Button variant="outline" onClick={() => copyAndOpen("https://www.instagram.com/", "Enlace copiado. Pegalo en tu historia o en tu perfil de Instagram.")}>Instagram</Button>
-                <Button variant="outline" onClick={() => copyAndOpen("https://www.tiktok.com/", "Enlace copiado. Pegalo en tu biografía o en tu video de TikTok.")}>TikTok</Button>
-                <Button variant="outline" onClick={shareX}>X (Twitter)</Button>
+            <section className="amb-rise mt-5 rounded-3xl border border-border bg-card p-5 shadow-lg" style={{ animationDelay: ".15s" }}>
+              <p className="font-display text-lg font-bold text-foreground">Compartí en tus redes</p>
+              <p className="text-sm text-muted-foreground">Elegí dónde. Tu enlace ya va listo.</p>
+              <button type="button" onClick={share} className="social-btn social-wa amb-pulse mt-4 w-full !flex-row !gap-3 !py-4 text-base">
+                <WhatsAppIcon className="h-7 w-7" /> Compartir por WhatsApp
+              </button>
+              <div className="mt-3 grid grid-cols-4 gap-2">
+                <button type="button" onClick={shareFacebook} className="social-btn social-fb" style={{ animationDelay: ".25s" }}>
+                  <FacebookIcon className="h-7 w-7" /> Facebook
+                </button>
+                <button type="button" onClick={() => copyAndOpen("https://www.instagram.com/", igMsg)} className="social-btn social-ig" style={{ animationDelay: ".35s" }}>
+                  <InstagramIcon className="h-7 w-7" /> Instagram
+                </button>
+                <button type="button" onClick={() => copyAndOpen("https://www.tiktok.com/", ttMsg)} className="social-btn social-tt" style={{ animationDelay: ".45s" }}>
+                  <TikTokIcon className="h-7 w-7" /> TikTok
+                </button>
+                <button type="button" onClick={shareX} className="social-btn social-x" style={{ animationDelay: ".55s" }}>
+                  <XIcon className="h-6 w-6" /> X
+                </button>
               </div>
-              <p className="mt-4 text-sm font-semibold text-foreground">Tu enlace personal</p>
-              <p className="mt-2 break-all rounded-lg bg-muted px-3 py-2 font-mono text-sm text-foreground">{link}</p>
-              <Button variant="outline" className="mt-3 w-full" onClick={copy}>
-                <Copy className="mr-2 h-4 w-4" /> Copiar enlace
-              </Button>
+              <p className="mt-5 text-sm font-semibold text-foreground">Tu enlace personal</p>
+              <div className="mt-2 flex items-center gap-2 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-2">
+                <p className="flex-1 break-all px-1 font-mono text-xs text-foreground sm:text-sm">{link}</p>
+                <Button size="sm" onClick={copy}><Copy className="mr-1 h-4 w-4" /> Copiar</Button>
+              </div>
             </section>
 
             <section className="mt-4 grid grid-cols-3 gap-3">
-              <Stat icon={<Users className="h-5 w-5" />} label="Se registraron" value={data.invited} />
-              <Stat icon={<Sparkles className="h-5 w-5" />} label="Ya empezaron" value={data.started} />
-              <Stat icon={<Award className="h-5 w-5" />} label="XP de embajador" value={data.ambassadorXp} />
+              <Stat delay=".3s" icon={<Users className="h-5 w-5" />} label="Se registraron" value={data.invited} />
+              <Stat delay=".4s" icon={<Sparkles className="h-5 w-5" />} label="Ya empezaron" value={data.started} />
+              <Stat delay=".5s" icon={<Award className="h-5 w-5" />} label="XP de embajador" value={data.ambassadorXp} />
             </section>
 
-            <section className="mt-4 rounded-2xl border border-primary/20 bg-primary/5 p-5">
-              <p className="font-display font-bold text-primary">Tus puntos no vencen.</p>
+            <section className="amb-rise mt-4 overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 p-5" style={{ animationDelay: ".55s" }}>
+              <p className="flex items-center gap-2 font-display text-lg font-bold text-primary"><JaiPaw size={22} /> Tus puntos no vencen.</p>
               <p className="mt-1 text-sm text-foreground">
                 Seguí aprendiendo y compartiendo. Mientras la comunidad crece, estamos preparando alianzas con marcas y
                 comercios paraguayos para que muy pronto puedas canjear tus XP por premios y descuentos reales.
@@ -102,7 +131,9 @@ function EmbajadoresPage() {
             </section>
 
 
-            <section className="mt-4 rounded-2xl border border-border bg-card p-5">
+
+
+            <section className="amb-rise mt-4 rounded-3xl border border-border bg-card p-5" style={{ animationDelay: ".65s" }}>
               <p className="text-sm text-muted-foreground">Tu distinción</p>
               <p className="font-display text-2xl font-bold text-primary">{level.current.name}</p>
               {level.next && (() => {
@@ -110,8 +141,8 @@ function EmbajadoresPage() {
                 const pct = Math.min(100, Math.round((data.started / level.next.min) * 100));
                 return (
                   <>
-                    <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-muted" aria-hidden>
-                      <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                    <div className="mt-3 h-3.5 w-full overflow-hidden rounded-full bg-muted" aria-hidden>
+                      <div className="amb-bar h-full rounded-full" style={{ width: `${pct}%` }} />
                     </div>
                     <p className="mt-2 text-sm text-muted-foreground">
                       {data.started} de {level.next.min}. Te {faltan === 1 ? "falta 1 persona" : `faltan ${faltan} personas`} que empiecen para ser «{level.next.name}».
@@ -137,10 +168,10 @@ function EmbajadoresPage() {
   );
 }
 
-function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
+function Stat({ icon, label, value, delay }: { icon: React.ReactNode; label: string; value: number; delay: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-3 text-center">
-      <div className="mx-auto flex w-fit text-primary">{icon}</div>
+    <div className="amb-rise rounded-2xl border border-border bg-card p-3 text-center shadow-sm transition-transform hover:-translate-y-1" style={{ animationDelay: delay }}>
+      <div className="mx-auto flex w-fit rounded-full bg-primary/10 p-2 text-primary">{icon}</div>
       <p className="mt-1 font-display text-2xl font-bold text-foreground">{value}</p>
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
