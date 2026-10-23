@@ -19,7 +19,7 @@ async function admin(): Promise<any> {
 const Input = z.object({
   texto: z.string().trim().min(1).max(500),
   ruta: z.string().max(300).default("/"),
-  resultado: z.enum(["respondida", "opciones", "derivada", "no-util"]),
+  resultado: z.enum(["respondida", "opciones", "derivada", "no-util", "sugerencia"]),
   faqId: z.string().max(40).nullable().default(null),
 });
 
@@ -56,11 +56,12 @@ export const getJaiReport = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     const rows = (data ?? []) as JaiConsulta[];
     const counts: Record<string, number> = {};
-    for (const r of rows) if (r.faq_id && r.resultado !== "no-util") counts[r.faq_id] = (counts[r.faq_id] ?? 0) + 1;
+    for (const r of rows) if (r.faq_id && r.resultado !== "no-util" && r.resultado !== "sugerencia") counts[r.faq_id] = (counts[r.faq_id] ?? 0) + 1;
     const noUtil: Record<string, number> = {};
     for (const r of rows) if (r.faq_id && r.resultado === "no-util") noUtil[r.faq_id] = (noUtil[r.faq_id] ?? 0) + 1;
     return {
-      total: rows.length,
+      sugerencias: rows.filter((r) => r.resultado === "sugerencia").slice(0, 100),
+      total: rows.filter((r) => r.resultado !== "sugerencia").length,
       sinRespuesta: rows.filter((r) => r.resultado === "derivada" || r.resultado === "opciones").slice(0, 100),
       masUsadas: Object.entries(counts).sort((a, b) => b[1] - a[1]),
       noUtil: Object.entries(noUtil).sort((a, b) => b[1] - a[1]),

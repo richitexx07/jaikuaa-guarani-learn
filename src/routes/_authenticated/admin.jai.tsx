@@ -62,6 +62,22 @@ function AdminJaiPage() {
                 <Stat label="Sin respuesta" value={data.sinRespuesta.length} />
               </div>
 
+              <h2 className="mt-8 font-display text-lg font-semibold text-foreground">Buzón de sugerencias</h2>
+              {data.sugerencias.length === 0 ? (
+                <p className="mt-2 text-sm text-muted-foreground">Todavía no llegaron sugerencias.</p>
+              ) : (
+                <ul className="mt-3 divide-y divide-border rounded-2xl border border-border bg-card">
+                  {data.sugerencias.map((r, i) => (
+                    <li key={i} className="px-4 py-3 text-sm">
+                      <p className="font-medium text-foreground">«{r.texto}»</p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        en {r.ruta} · {new Date(r.created_at).toLocaleDateString("es-PY", { day: "numeric", month: "short" })}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
               <h2 className="mt-8 font-display text-lg font-semibold text-foreground">Lo que Jai no supo responder</h2>
               {data.sinRespuesta.length === 0 ? (
                 <p className="mt-2 text-sm text-muted-foreground">Nada todavía. 🎉</p>
