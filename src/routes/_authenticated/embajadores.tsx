@@ -43,23 +43,6 @@ function EmbajadoresPage() {
   const shareFacebook = () => open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`);
   const shareX = () =>
     open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`);
-  const copyAndOpen = async (url: string, msg: string) => {
-    try { await navigator.clipboard.writeText(link); } catch { /* sin permiso */ }
-    // En celular: menú oficial del teléfono, que entrega el enlace directo a Instagram o TikTok.
-    if (typeof navigator.share === "function") {
-      try {
-        await navigator.share({ title: "Jaikuaa", text: shareText, url: link });
-        return;
-      } catch (e) {
-        if ((e as Error)?.name === "AbortError") return;
-      }
-    }
-    toast.success(msg, { duration: 7000 });
-    setTimeout(() => open(url), 1200);
-  };
-
-  const igMsg = "Paso 1: tu enlace ya está copiado. Paso 2: en Instagram, mantené apretado y tocá «Pegar» en tu historia o mensaje.";
-  const ttMsg = "Paso 1: tu enlace ya está copiado. Paso 2: en TikTok, mantené apretado y tocá «Pegar» en tu biografía o mensaje.";
 
   return (
     <div className="min-h-screen bg-background">
@@ -104,17 +87,11 @@ function EmbajadoresPage() {
               <button type="button" onClick={share} className="social-btn social-wa amb-pulse mt-4 w-full !flex-row !gap-3 !py-4 text-base">
                 <WhatsAppIcon className="h-7 w-7" /> Compartir por WhatsApp
               </button>
-              <div className="mt-3 grid grid-cols-4 gap-2">
+              <div className="mt-3 grid grid-cols-2 gap-2">
                 <button type="button" onClick={shareFacebook} className="social-btn social-fb" style={{ animationDelay: ".25s" }}>
                   <FacebookIcon className="h-7 w-7" /> Facebook
                 </button>
-                <button type="button" onClick={() => copyAndOpen("https://www.instagram.com/", igMsg)} className="social-btn social-ig" style={{ animationDelay: ".35s" }}>
-                  <InstagramIcon className="h-7 w-7" /> Instagram
-                </button>
-                <button type="button" onClick={() => copyAndOpen("https://www.tiktok.com/", ttMsg)} className="social-btn social-tt" style={{ animationDelay: ".45s" }}>
-                  <TikTokIcon className="h-7 w-7" /> TikTok
-                </button>
-                <button type="button" onClick={shareX} className="social-btn social-x" style={{ animationDelay: ".55s" }}>
+                <button type="button" onClick={shareX} className="social-btn social-x" style={{ animationDelay: ".35s" }}>
                   <XIcon className="h-6 w-6" /> X
                 </button>
               </div>
@@ -122,6 +99,16 @@ function EmbajadoresPage() {
               <div className="mt-2 flex items-center gap-2 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-2">
                 <p className="flex-1 break-all px-1 font-mono text-xs text-foreground sm:text-sm">{link}</p>
                 <Button size="sm" onClick={copy}><Copy className="mr-1 h-4 w-4" /> Copiar</Button>
+              </div>
+              <div className="mt-3 rounded-xl border border-border bg-muted/50 p-3">
+                <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <span className="social-ig inline-flex h-7 w-7 items-center justify-center rounded-lg"><InstagramIcon className="h-4 w-4" /></span>
+                  <span className="social-tt inline-flex h-7 w-7 items-center justify-center rounded-lg"><TikTokIcon className="h-4 w-4" /></span>
+                  Para Instagram y TikTok
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Tocá «Copiar» y pegá tu enlace en tu biografía, o en una historia de Instagram con el sticker «Enlace».
+                </p>
               </div>
             </section>
 
