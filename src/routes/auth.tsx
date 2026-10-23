@@ -11,7 +11,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { SiteFooter, TrustBadges } from "@/components/site-footer";
 import { cleanRefCode, REF_STORAGE_KEY } from "@/lib/ambassador";
-import { peekAfterLogin, takeAfterLogin } from "@/lib/after-login";
+import { createAfterLoginRedirect, peekAfterLogin } from "@/lib/after-login";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -21,6 +21,10 @@ export const Route = createFileRoute("/auth")({
     meta: [
       { title: "Jaikuaa — Iniciar sesión o registrarte" },
       { name: "description", content: "Accedé a Jaikuaa para aprender y jugar en guaraní." },
+      { property: "og:title", content: "Jaikuaa — Iniciar sesión o registrarte" },
+      { property: "og:description", content: "Accedé a Jaikuaa para aprender y jugar en guaraní." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AuthPage,
@@ -54,9 +58,9 @@ function AuthPage() {
 
   const [invitedToGame, setInvitedToGame] = useState(false);
   useEffect(() => { setInvitedToGame(!!peekAfterLogin()?.includes("sala=")); }, []);
-  function goNext() {
-    window.location.replace(takeAfterLogin());
-  }
+  const [goNext] = useState(() => createAfterLoginRedirect(
+    (href) => navigate({ href, replace: true }),
+  ));
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -68,7 +72,7 @@ function AuthPage() {
       }
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate]);
+  }, [goNext]);
 
   // Reset error when switching between login/signup
   useEffect(() => {
