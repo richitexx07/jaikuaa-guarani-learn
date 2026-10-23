@@ -57,7 +57,13 @@ function Ficha() {
         >
           <ArrowLeft className="h-4 w-4" aria-hidden /> Volver al panel
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            to="/juegos/penales"
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-primary px-4 py-2 font-semibold text-primary"
+          >
+            <Trophy className="h-4 w-4" aria-hidden /> Abrir estadio de demostración
+          </Link>
           <p className="text-sm text-muted-foreground">Vista privada. Imprimila o guardala como PDF.</p>
           <button
             type="button"

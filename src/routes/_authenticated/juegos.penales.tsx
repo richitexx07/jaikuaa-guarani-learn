@@ -16,6 +16,8 @@ import { playGuarani } from '@/lib/audio';
 import { recordCompletion } from '@/lib/gamification';
 import { celebrate } from '@/lib/confetti';
 import type { GameWord } from '@/lib/games.functions';
+import { DemoBrandPanel } from '@/components/games/demo-brand-panel';
+import { demoLedText, useDemoBrand } from '@/lib/demo-brand';
 
 export const Route=createFileRoute('/_authenticated/juegos/penales')({
  head:()=>({meta:[{title:'Penales: Solo y Duelo | Jaikuaa'},{name:'description',content:'Palabras, estadio y una tanda de penales. Jugá solo o compartí un duelo en el mismo celular.'},{property:'og:title',content:'Penales: Solo y Duelo | Jaikuaa'},{property:'og:description',content:'Una tanda de penales con vocabulario publicado y audio de voces reales.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary'}]}),component:Penalties,
@@ -25,18 +27,20 @@ function PenaltiesContent(){
  const {muted}=useGameKit();
  const [lesson,setLesson]=useState<number|null>(null),q=useGameWords(lesson);
  const fn=useServerFn(getPenaltiesLed),led=useQuery({queryKey:['penales-led'],queryFn:()=>fn()});
+ const demo=useDemoBrand(),ledText=demo?demoLedText(demo):(led.data?.text??'JAIKUAA · TU MARCA AQUÍ');
  const [mode,setMode]=useState<'solo'|'duel'>('solo'),[names,setNames]=useState<[string,string]>(['','']),[started,setStarted]=useState(false),[round,setRound]=useState(0);
  const words=useMemo(()=>{const seen=new Set<string>();return (q.data?.words??[]).filter(w=>{const key=w.es.trim().toLowerCase();if(!key||seen.has(key))return false;seen.add(key);return true;});},[q.data]);
  return <div className="penalties-game mx-auto max-w-xl">
  <div className="flex flex-wrap items-center justify-center gap-2"><LessonFilter value={lesson} onChange={v=>{setLesson(v);setStarted(false);setRound(r=>r+1);}}/></div>
+ <DemoBrandPanel/>
  {q.isLoading?<div className="flex justify-center py-10"><Loader2 className="animate-spin"/></div>:q.isError?<p className="py-8 text-center">No se pudieron cargar las palabras. Volvé a intentar.</p>:words.length<5?<NotEnough min={5}/>:!started?<div className="space-y-5 py-6">
  <PenaltyMascot message="¡El estadio está listo! Hoy jugamos con palabras y puntería."/>
- <PenaltyPitch knew={false} ready={false} muted={muted} ledText={led.data?.text??'JAIKUAA · TU MARCA AQUÍ'} onShot={()=>{}}/>
+ <PenaltyPitch knew={false} ready={false} muted={muted} ledText={ledText} onShot={()=>{}}/>
  <div className="grid grid-cols-2 gap-3" role="group" aria-label="Modo de juego"><Button variant={mode==='solo'?'default':'outline'} className="h-12" aria-pressed={mode==='solo'} onClick={()=>setMode('solo')}><UserRound/>Solo</Button><Button variant={mode==='duel'?'default':'outline'} className="h-12" aria-pressed={mode==='duel'} onClick={()=>setMode('duel')}><UsersRound/>Duelo</Button></div>
  {mode==='duel'&&<div className="grid gap-3 sm:grid-cols-2">{[0,1].map(i=><label key={i} className="text-sm font-semibold">Jugador {i+1}<Input aria-label={`Nombre del Jugador ${i+1}`} placeholder={`Jugador ${i+1}`} maxLength={20} value={names[i]} onChange={e=>setNames(old=>i===0?[e.target.value,old[1]]:[old[0],e.target.value])} className="mt-2"/></label>)}</div>}
  <Button variant="cta" size="lg" className="w-full" onClick={()=>setStarted(true)}>Empezar tanda</Button>
  <Button asChild variant="outline" size="lg" className="mt-3 h-12 w-full"><Link to="/juegos/nee-rape" search={{ sala: undefined, sendero: "nemongeta" }}>📲 Jugar a distancia (cada uno en su celular)</Link></Button>
- </div>:<Match key={`${round}:${lesson}:${mode}`} words={words} duel={mode==='duel'} names={[names[0].trim()||'Jugador 1',names[1].trim()||'Jugador 2']} ledText={led.data?.text??'JAIKUAA · TU MARCA AQUÍ'} muted={muted} onAgain={()=>setRound(r=>r+1)} onModes={()=>setStarted(false)}/>}
+ </div>:<Match key={`${round}:${lesson}:${mode}`} words={words} duel={mode==='duel'} names={[names[0].trim()||'Jugador 1',names[1].trim()||'Jugador 2']} ledText={ledText} muted={muted} onAgain={()=>setRound(r=>r+1)} onModes={()=>setStarted(false)}/>}
  </div>;
 }
 type Played={word:GameWord;outcome:Outcome;player:number};
