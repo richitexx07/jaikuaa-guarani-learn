@@ -36,6 +36,15 @@ function EmbajadoresPage() {
   const share = () => {
     window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank", "noopener");
   };
+  const open = (url: string) => window.open(url, "_blank", "noopener");
+  const shareFacebook = () => open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`);
+  const shareX = () =>
+    open(`https://x.com/intent/post?text=${encodeURIComponent("¡Te invito a jugar y aprender en Jaikuaa!")}&url=${encodeURIComponent(link)}`);
+  const copyAndOpen = async (url: string, msg: string) => {
+    try { await navigator.clipboard.writeText(link); } catch { /* sin permiso: igual abrimos */ }
+    toast.success(msg);
+    open(url);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -65,6 +74,12 @@ function EmbajadoresPage() {
               <Button size="lg" className="h-14 w-full text-base" onClick={share}>
                 <MessageCircle className="mr-2 h-5 w-5" /> Compartir por WhatsApp
               </Button>
+              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <Button variant="outline" onClick={shareFacebook}>Facebook</Button>
+                <Button variant="outline" onClick={() => copyAndOpen("https://www.instagram.com/", "Enlace copiado. Pegalo en tu historia o en tu perfil de Instagram.")}>Instagram</Button>
+                <Button variant="outline" onClick={() => copyAndOpen("https://www.tiktok.com/", "Enlace copiado. Pegalo en tu biografía o en tu video de TikTok.")}>TikTok</Button>
+                <Button variant="outline" onClick={shareX}>X (Twitter)</Button>
+              </div>
               <p className="mt-4 text-sm font-semibold text-foreground">Tu enlace personal</p>
               <p className="mt-2 break-all rounded-lg bg-muted px-3 py-2 font-mono text-sm text-foreground">{link}</p>
               <Button variant="outline" className="mt-3 w-full" onClick={copy}>
