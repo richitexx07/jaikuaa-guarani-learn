@@ -349,6 +349,10 @@ function Dashboard() {
 
           <div className="mt-6 space-y-3">
             <StatsBar />
+            <p className="px-1 text-xs text-muted-foreground">
+              <span className="font-semibold text-foreground">Tus puntos no vencen.</span> Muy pronto vas a poder canjear
+              tus XP por premios y descuentos con marcas y comercios paraguayos.
+            </p>
             <StreakBanner />
             <OfflinePackCard />
           </div>
