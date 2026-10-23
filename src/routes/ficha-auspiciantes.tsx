@@ -116,6 +116,7 @@ function Ficha() {
         <span>Guaraní Global Tech E.A.S. · RUC 80174299-4 · www.jaikuaa.com</span>
         <span>Precios y espacios: a convenir según el paquete.</span>
       </footer>
-    </main>
+      </main>
+    </div>
   );
 }
