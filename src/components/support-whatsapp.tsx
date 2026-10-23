@@ -16,6 +16,7 @@ import {
 import { logJaiQuestion } from "@/lib/jai.functions";
 import { JAI_OPEN_EVENT } from "@/lib/jai-events";
 import jaiImg from "@/assets/jai-anfitrion.webp";
+import { JaiLauncher } from "@/components/jai-launcher";
 
 // En los juegos y en el panel de administración el botón molestaría, así que no se muestra.
 // En /validar los botones de decisión van abajo: Jai no debe taparlos.
@@ -421,22 +422,7 @@ export function SupportWhatsApp() {
         </div>
       )}
 
-      {!open && (
-        <button
-          ref={launcherRef}
-          type="button"
-          onClick={() => {
-            setOpen(true);
-            setTeaser(false);
-          }}
-          aria-label="Abrir a Jai, tu compañero de Jaikuaa"
-          className="jai-enter group relative ml-auto block h-20 w-20 rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-24 sm:w-24"
-        >
-          <span className="jai-halo absolute inset-x-2 bottom-1 top-6 rounded-full" aria-hidden />
-          <span className="absolute inset-x-1 bottom-0 h-14 rounded-full bg-primary shadow-lift ring-4 ring-background transition group-hover:scale-105 sm:h-16" aria-hidden />
-          <img src={jaiImg} alt="" width={96} height={96} decoding="async" className="jai-idle absolute inset-x-0 bottom-1 mx-auto h-20 w-20 object-contain drop-shadow-xl group-hover:[animation:jai-hop_.6s_cubic-bezier(.3,1.6,.5,1)] sm:h-24 sm:w-24" />
-        </button>
-      )}
+      {!open && <JaiLauncher launcherRef={launcherRef} onOpen={() => { setOpen(true); setTeaser(false); }} />}
     </div>
   );
 }
