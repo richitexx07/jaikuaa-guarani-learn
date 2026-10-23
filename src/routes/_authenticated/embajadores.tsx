@@ -58,8 +58,8 @@ function EmbajadoresPage() {
     setTimeout(() => open(url), 1200);
   };
 
-  const igMsg = "Enlace copiado. Pegalo en tu historia o en tu perfil de Instagram.";
-  const ttMsg = "Enlace copiado. Pegalo en tu biografía o en tu video de TikTok.";
+  const igMsg = "Paso 1: tu enlace ya está copiado. Paso 2: en Instagram, mantené apretado y tocá «Pegar» en tu historia o mensaje.";
+  const ttMsg = "Paso 1: tu enlace ya está copiado. Paso 2: en TikTok, mantené apretado y tocá «Pegar» en tu biografía o mensaje.";
 
   return (
     <div className="min-h-screen bg-background">
