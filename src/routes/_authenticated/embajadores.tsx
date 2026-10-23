@@ -1,3 +1,4 @@
+import { EarlyAccessBadge } from "@/components/early-access-badge";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -54,6 +55,7 @@ function EmbajadoresPage() {
       </header>
       {/* pb-36: deja lugar para Jai, que flota abajo y tapaba las últimas reglas. */}
       <main className="mx-auto max-w-3xl px-4 pt-6 pb-36">
+        <EarlyAccessBadge className="mb-4" />
         <section className="amb-hero amb-rise shadow-xl">
           <div className="amb-stripe relative" />
           {[["12%", "20%", "0s"], ["70%", "15%", ".8s"], ["85%", "60%", "1.6s"], ["30%", "78%", "1.1s"], ["55%", "40%", "2s"]].map(([l, t, d], i) => (

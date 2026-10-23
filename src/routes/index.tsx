@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getFoundingSponsors } from "@/lib/sponsors.functions";
 import { DisplayToggles } from "@/components/display-toggles";
+import { EarlyAccessBadge } from "@/components/early-access-badge";
 
 
 
@@ -66,6 +67,7 @@ function Hero() {
   return (
     <section className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-24 lg:py-32">
       <div className="relative mx-auto max-w-3xl text-center">
+        <EarlyAccessBadge className="mb-8" />
         <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
           Aprendé y jugá
           <br />
