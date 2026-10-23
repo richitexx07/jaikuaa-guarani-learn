@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ChevronDown, ChevronUp, MessageCircle, Send, ThumbsDown, ThumbsUp, X } from "lucide-react";
+import { ChevronDown, ChevronUp, MessageCircle, Send, ThumbsDown, ThumbsUp, X, Lightbulb } from "lucide-react";
 import { showsBottomNav } from "@/lib/bottom-nav";
 import {
   JAI_CATEGORIES,
@@ -74,6 +74,7 @@ export function SupportWhatsApp() {
   const [typing, setTyping] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [teaser, setTeaser] = useState(false);
+  const [suggesting, setSuggesting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastQuestionRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -116,7 +117,7 @@ export function SupportWhatsApp() {
   useEffect(() => () => clearTimeout(timer.current), []);
 
   const log = useCallback(
-    (texto: string, resultado: "respondida" | "opciones" | "derivada" | "no-util", faqId: string | null) => {
+    (texto: string, resultado: "respondida" | "opciones" | "derivada" | "no-util" | "sugerencia", faqId: string | null) => {
       void logFn({ data: { texto, ruta: pathname, resultado, faqId } }).catch(() => {});
     },
     [logFn, pathname],
@@ -212,6 +213,13 @@ export function SupportWhatsApp() {
     const text = input.trim();
     if (!text) return;
     setInput("");
+    if (suggesting) {
+      setSuggesting(false);
+      setMsgs((m) => [...m, { id: nextId++, from: "user", text }]);
+      log(text, "sugerencia", null);
+      setMsgs((m) => [...m, { id: nextId++, from: "jai", lead: "¡Anotadísimo!", text: "Muchísimas gracias por ayudarnos a hacer crecer Jaikuaa. Tu sugerencia ya le llegó al equipo." }]);
+      return;
+    }
     reply(text, findFaq(text));
   };
 
@@ -385,6 +393,17 @@ export function SupportWhatsApp() {
                     ))}
                   </div>
                 )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSuggesting(true);
+                    setMsgs((m) => [...m, { id: nextId++, from: "jai", lead: "¡Me encanta que quieras ayudar!", text: "Este es el buzón de sugerencias. Contame qué te gustaría que mejoremos o agreguemos a Jaikuaa. No hace falta poner tu nombre." }]);
+                    inputRef.current?.focus();
+                  }}
+                  className="mb-1 flex w-full items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/10"
+                >
+                  <Lightbulb className="h-3.5 w-3.5" /> Buzón de sugerencias
+                </button>
                 <a
                   href={whatsappLink(undefined, pathname)}
                   target="_blank"
@@ -403,7 +422,7 @@ export function SupportWhatsApp() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               maxLength={300}
-              placeholder="Escribime tu consulta…"
+              placeholder={suggesting ? "Escribí tu sugerencia…" : "Escribime tu consulta…"}
               aria-label="Tu consulta"
               className="flex-1 rounded-full border border-input bg-background px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
             />
