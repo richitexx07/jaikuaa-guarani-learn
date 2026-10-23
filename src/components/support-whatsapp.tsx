@@ -16,6 +16,7 @@ import {
 import { logJaiQuestion } from "@/lib/jai.functions";
 import { JAI_OPEN_EVENT } from "@/lib/jai-events";
 import jaiImg from "@/assets/jai-anfitrion.webp";
+import { JaiLauncher } from "@/components/jai-launcher";
 
 // En los juegos y en el panel de administración el botón molestaría, así que no se muestra.
 // En /validar los botones de decisión van abajo: Jai no debe taparlos.
