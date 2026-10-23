@@ -404,22 +404,14 @@ function Dashboard() {
                 <FreeCard to="/juegos" emoji="⚽" title="Juegos de vocabulario" desc="Penales, Palabra del día, Ahorcado, Sopa de letras y Memoria." accent="accent" />
                 <FreeCard to="/ranking" emoji="🏆" title="Ranking semanal" desc="Mirá quiénes estudiaron más esta semana en tu grupo." accent="primary" />
               </div>
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                <Link
-                  to="/juegos/karaoke"
-                  className="rounded-2xl border border-border bg-card p-4 text-left transition-colors hover:bg-muted"
-                >
-                  <span className="text-[10px] font-semibold uppercase tracking-wide text-accent">Nuevo</span>
-                  <div className="mt-1 font-display font-bold text-foreground">🎤 Purahéi Karaoke</div>
+              <div className="mt-6 rounded-2xl border border-dashed border-border bg-muted/40 p-4">
+                <p className="font-display font-bold text-foreground">Vienen más juegos</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  A medida que la comunidad vaya creciendo, iremos sumando más juegos en guaraní.
+                </p>
+                <Link to="/juegos" className="mt-2 inline-block text-sm font-semibold text-primary">
+                  Ver todos los juegos →
                 </Link>
-                <button
-                  type="button"
-                  onClick={() => setOpenTeaser("vivo")}
-                  className="rounded-2xl border border-dashed border-border bg-muted/40 p-4 text-left transition-colors hover:bg-muted"
-                >
-                  <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Próximamente</span>
-                  <div className="mt-1 font-display font-bold text-foreground">🔴 Guaraní en Vivo</div>
-                </button>
               </div>
             </TabsContent>
 

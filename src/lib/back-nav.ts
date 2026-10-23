@@ -1,5 +1,6 @@
 // Botón «Volver» global: dónde se oculta y a dónde lleva si no hay historial.
-const HIDDEN = new Set(["/", "/dashboard", "/auth"]);
+// /embajadores ya tiene «Volver al panel» arriba; el flotante tapaba las reglas.
+const HIDDEN = new Set(["/", "/dashboard", "/auth", "/embajadores"]);
 
 export function showsBackButton(pathname: string): boolean {
   const p = pathname.replace(/\/+$/, "") || "/";

@@ -45,7 +45,8 @@ function EmbajadoresPage() {
           <Button asChild variant="outline" size="sm"><Link to="/dashboard">← Volver al panel</Link></Button>
         </div>
       </header>
-      <main className="mx-auto max-w-3xl px-4 py-8">
+      {/* pb-36: deja lugar para Jai, que flota abajo y tapaba las últimas reglas. */}
+      <main className="mx-auto max-w-3xl px-4 pt-8 pb-36">
         <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
           <Award className="h-4 w-4" /> Embajadores de Jaikuaa
         </div>
@@ -89,11 +90,20 @@ function EmbajadoresPage() {
             <section className="mt-4 rounded-2xl border border-border bg-card p-5">
               <p className="text-sm text-muted-foreground">Tu distinción</p>
               <p className="font-display text-2xl font-bold text-primary">{level.current.name}</p>
-              {level.next && (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Te faltan {level.next.min - data.started} persona(s) que empiecen para ser «{level.next.name}».
-                </p>
-              )}
+              {level.next && (() => {
+                const faltan = Math.max(0, level.next.min - data.started);
+                const pct = Math.min(100, Math.round((data.started / level.next.min) * 100));
+                return (
+                  <>
+                    <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-muted" aria-hidden>
+                      <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                    </div>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {data.started} de {level.next.min}. Te {faltan === 1 ? "falta 1 persona" : `faltan ${faltan} personas`} que empiecen para ser «{level.next.name}».
+                    </p>
+                  </>
+                );
+              })()}
             </section>
 
             <section className="mt-4 text-sm text-muted-foreground">
