@@ -42,15 +42,24 @@ function EmbajadoresPage() {
   const open = (url: string) => window.open(url, "_blank", "noopener");
   const shareFacebook = () => open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`);
   const shareX = () =>
-    open(`https://x.com/intent/post?text=${encodeURIComponent("¡Te invito a jugar y aprender en Jaikuaa!")}&url=${encodeURIComponent(link)}`);
+    open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`);
   const copyAndOpen = async (url: string, msg: string) => {
-    try { await navigator.clipboard.writeText(link); } catch { /* sin permiso: igual abrimos */ }
-    toast.success(msg);
-    open(url);
+    try { await navigator.clipboard.writeText(link); } catch { /* sin permiso */ }
+    // En celular: menú oficial del teléfono, que entrega el enlace directo a Instagram o TikTok.
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title: "Jaikuaa", text: shareText, url: link });
+        return;
+      } catch (e) {
+        if ((e as Error)?.name === "AbortError") return;
+      }
+    }
+    toast.success(msg, { duration: 7000 });
+    setTimeout(() => open(url), 1200);
   };
 
-  const igMsg = "Enlace copiado. Pegalo en tu historia o en tu perfil de Instagram.";
-  const ttMsg = "Enlace copiado. Pegalo en tu biografía o en tu video de TikTok.";
+  const igMsg = "Paso 1: tu enlace ya está copiado. Paso 2: en Instagram, mantené apretado y tocá «Pegar» en tu historia o mensaje.";
+  const ttMsg = "Paso 1: tu enlace ya está copiado. Paso 2: en TikTok, mantené apretado y tocá «Pegar» en tu biografía o mensaje.";
 
   return (
     <div className="min-h-screen bg-background">
