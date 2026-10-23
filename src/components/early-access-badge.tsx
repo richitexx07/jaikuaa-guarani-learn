@@ -1,4 +1,7 @@
-/** Sello de pre-lanzamiento: invita a sumarse como pionero, sin cifras ni promesas concretas. */
+/**
+ * Sello de pre-lanzamiento, en la portada y en Embajadores.
+ * Invita a sumarse como pionero, sin cifras ni promesas concretas.
+ */
 export function EarlyAccessBadge({ className = "" }: { className?: string }) {
   return (
     <div className={`mx-auto w-fit max-w-full overflow-hidden rounded-2xl border border-primary/20 bg-card text-center shadow-sm ${className}`}>
