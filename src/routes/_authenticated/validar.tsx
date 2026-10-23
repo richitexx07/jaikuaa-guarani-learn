@@ -129,10 +129,6 @@ function QuickValidatePage() {
 
   const approve = useCallback(async () => {
     if (!word || busy) return;
-    if (!gate.accepted) {
-      toast.error(gate.reason ?? "El motor determinista no aceptó esta palabra.");
-      return;
-    }
     setBusy(true);
     try {
       const r = await validateFn({ data: { id: word.id, action: "approve" } });
@@ -163,7 +159,7 @@ function QuickValidatePage() {
     } finally {
       setBusy(false);
     }
-  }, [word, busy, validateFn, count, next, gate.accepted, gate.reason]);
+  }, [word, busy, validateFn, count, next]);
 
   const skip = useCallback(() => {
     if (!word) return;
@@ -386,11 +382,11 @@ function QuickValidatePage() {
             <Button variant="outline" className="h-14" onClick={skip} disabled={busy}>
               <SkipForward aria-hidden /> Saltar
             </Button>
-            <Button variant="cta" className="h-14" onClick={() => void approve()} disabled={busy || !gate.accepted}>
+            <Button variant="cta" className="h-14" onClick={() => void approve()} disabled={busy}>
               {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Check aria-hidden />} Está bien
             </Button>
           </div>
-          <GateNotice reason={gate.reason} />
+          <GateNotice accepted={gate.accepted} reason={gate.reason} loading={gate.loading} />
           <p className="mt-2 hidden text-center text-xs text-muted-foreground md:block">
             Teclado: → aprobar · ← error · S saltar · Z deshacer
           </p>

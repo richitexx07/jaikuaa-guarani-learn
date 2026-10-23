@@ -108,11 +108,11 @@ function GatedApprove({ gn, disabled, onApprove }: { gn: string; disabled: boole
   const gate = useDeterministicGate(gn);
   return (
     <div className="w-full sm:w-auto">
-      <Button variant="cta" className="h-11 w-full sm:w-auto" disabled={disabled || !gate.accepted} onClick={onApprove}>
+      <Button variant="cta" className="h-11 w-full sm:w-auto" disabled={disabled} onClick={onApprove}>
         <CheckCircle2 className="mr-2 h-4 w-4" />
         Aprobar y publicar
       </Button>
-      <GateNotice reason={gate.reason} />
+      <GateNotice accepted={gate.accepted} reason={gate.reason} loading={gate.loading} />
     </div>
   );
 }

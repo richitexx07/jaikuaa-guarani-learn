@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ShieldAlert } from "lucide-react";
 import { checkGate } from "@/lib/deterministic-gate.functions";
 
-/** Consulta la barrera determinista para una palabra. Solo `accepted === true` habilita aprobar. */
+/** Opinión del motor sobre una palabra. Es solo informativa: la decisión es siempre del docente. */
 export function useDeterministicGate(gn: string | undefined) {
   const fn = useServerFn(checkGate);
   const q = useQuery({
@@ -23,12 +23,21 @@ export function useDeterministicGate(gn: string | undefined) {
   return { accepted, reason, loading: q.isLoading };
 }
 
-export function GateNotice({ reason }: { reason: string | null }) {
-  if (!reason) return null;
+/**
+ * El motor de Alan está en desarrollo: opina, pero nunca bloquea. «La plataforma enseña,
+ * el motor estudia la lengua y los docentes deciden.»
+ */
+export function GateNotice({ accepted, reason, loading }: { accepted: boolean; reason: string | null; loading?: boolean }) {
+  if (loading) return null;
+  const text = accepted
+    ? "El motor (en desarrollo) reconoce esta palabra."
+    : `Opinión del motor (en desarrollo): ${reason ?? "sin respuesta"}`;
   return (
-    <p className="mt-2 flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
-      <ShieldAlert className="h-4 w-4 shrink-0" aria-hidden />
-      {reason}
+    <p className="mt-2 flex items-start gap-2 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
+      <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+      <span>
+        {text} La decisión es del docente.
+      </span>
     </p>
   );
 }

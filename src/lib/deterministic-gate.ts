@@ -20,7 +20,7 @@ export function sanitizeGateText(text: string): string {
 
 export function evaluateGate(text: string, outcome: MotorOutcome): GateResult {
   if (!sanitizeGateText(text)) return { accepted: false, reason: "La palabra está vacía." };
-  if (outcome.status === "apagado") return { accepted: false, reason: "El motor determinista no está conectado: no se puede aprobar todavía." };
+  if (outcome.status === "apagado") return { accepted: false, reason: "todavía no está conectado." };
   if (outcome.status === "error") return { accepted: false, reason: `El motor determinista falló: ${outcome.message}` };
   const tokens = outcome.response.tokens;
   if (!tokens.length) return { accepted: false, reason: "El motor no devolvió análisis (tokens vacíos)." };

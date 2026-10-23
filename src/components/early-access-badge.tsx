@@ -15,7 +15,7 @@ export function EarlyAccessBadge({ className = "" }: { className?: string }) {
           Acceso anticipado · Comunidad pionera
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Probá Jaikuaa antes del lanzamiento oficial, aprendé gratis y acumulá tus XP para los primeros premios.
+          Probá Jaikuaa antes del lanzamiento oficial, aprendé gratis y acumulá tus XP desde ahora.
         </p>
       </div>
     </div>
