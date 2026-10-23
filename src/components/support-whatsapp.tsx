@@ -15,7 +15,7 @@ import {
 } from "@/lib/jai-faq";
 import { logJaiQuestion } from "@/lib/jai.functions";
 import { JAI_OPEN_EVENT } from "@/lib/jai-events";
-import jaiImg from "@/assets/jai-atencion-3d.webp";
+import jaiImg from "@/assets/jai-anfitrion.webp";
 
 // En los juegos y en el panel de administración el botón molestaría, así que no se muestra.
 // En /validar los botones de decisión van abajo: Jai no debe taparlos.
@@ -45,7 +45,7 @@ let nextId = 1;
 const greeting = (): Msg => ({
   id: nextId++,
   from: "jai",
-  text: "Soy Jai, el jaguareté de Jaikuaa 🐆. Estoy acá para darte una mano. Elegí una pregunta o escribime con tus palabras.",
+  text: "Soy Jai, el jaguareté de Jaikuaa. Te acompaño a aprender, jugar y sumar XP. Tus puntos no vencen: muy pronto vas a poder canjearlos por premios, descuentos y sorteos.",
   lead: "¡Hola! ¡Qué lindo que estés por acá!",
 });
 
@@ -250,11 +250,10 @@ export function SupportWhatsApp() {
           <header className="jai-header relative flex items-center gap-3 overflow-hidden px-4 py-3 text-primary-foreground">
             <div className="relative">
               <img src={jaiImg} alt="" width={56} height={56} className="jai-breathe h-14 w-14 rounded-full bg-gradient-to-b from-accent/40 to-background object-cover object-top ring-2 ring-primary-foreground/40" />
-              <span className="jai-whatsapp absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ring-2 ring-primary" aria-hidden />
             </div>
             <div className="flex-1">
-              <p className="font-display text-base font-bold leading-tight">Jai · Atención</p>
-              <p className="text-xs opacity-85">En línea · te respondo al instante</p>
+              <p className="font-display text-base font-bold leading-tight">Jai · Tu compañero</p>
+              <p className="text-xs opacity-85">Aprendé, jugá y sumá XP</p>
             </div>
             <button
               type="button"
@@ -281,7 +280,7 @@ export function SupportWhatsApp() {
                 </div>
               ) : i === 0 ? (
                 <div key={m.id} className="jai-msg-in jai-welcome flex flex-col items-center rounded-3xl px-3 pb-4 pt-2 text-center">
-                  <img src={jaiImg} alt="Jai, el jaguareté de Jaikuaa" width={128} height={137} className="jai-float h-40 w-40 object-contain drop-shadow-2xl" />
+                  <img src={jaiImg} alt="Jai, el jaguareté de Jaikuaa" width={128} height={128} className="jai-hello h-40 w-40 object-contain drop-shadow-2xl" />
                   <p className="mt-1 font-display text-lg font-bold text-primary">{m.lead}</p>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{m.text}</p>
                 </div>
@@ -388,9 +387,9 @@ export function SupportWhatsApp() {
                   href={whatsappLink(undefined, pathname)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="jai-whatsapp-outline mt-2 inline-block rounded-full border bg-card px-3 py-1.5 text-xs font-semibold"
+                  className="mt-2 inline-block text-xs text-muted-foreground underline-offset-2 hover:text-primary hover:underline"
                 >
-                  💬 Hablar con una persona
+                  ¿Algo no funciona? Escribinos por WhatsApp
                 </a>
               </div>
             )}
@@ -418,7 +417,7 @@ export function SupportWhatsApp() {
           <button type="button" onClick={() => setTeaser(false)} aria-label="Cerrar saludo" className="float-right -mr-1 -mt-1 ml-2 rounded-full p-0.5 text-muted-foreground hover:text-foreground">
             <X className="h-3.5 w-3.5" />
           </button>
-          <p>¡Hola! Soy Jai 👋 ¿Tenés alguna duda? Te respondo al instante.</p>
+          <p>¡Hola! Soy Jai. Cada lección suma XP, y muy pronto vas a poder canjearlos por premios y sorteos.</p>
         </div>
       )}
 
@@ -430,13 +429,12 @@ export function SupportWhatsApp() {
             setOpen(true);
             setTeaser(false);
           }}
-          aria-label="Abrir atención al cliente con Jai"
-          className="group relative ml-auto block h-20 w-20 rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-24 sm:w-24"
+          aria-label="Abrir a Jai, tu compañero de Jaikuaa"
+          className="jai-enter group relative ml-auto block h-20 w-20 rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-24 sm:w-24"
         >
           <span className="jai-halo absolute inset-x-2 bottom-1 top-6 rounded-full" aria-hidden />
           <span className="absolute inset-x-1 bottom-0 h-14 rounded-full bg-primary shadow-lift ring-4 ring-background transition group-hover:scale-105 sm:h-16" aria-hidden />
-          <img src={jaiImg} alt="" width={96} height={98} decoding="async" className="jai-float-c absolute inset-x-0 bottom-1 mx-auto h-20 w-20 object-contain drop-shadow-xl transition group-hover:scale-110 sm:h-24 sm:w-24" />
-          <span className="jai-whatsapp absolute bottom-2 right-2 h-4 w-4 rounded-full ring-2 ring-background" aria-hidden />
+          <img src={jaiImg} alt="" width={96} height={96} decoding="async" className="jai-idle absolute inset-x-0 bottom-1 mx-auto h-20 w-20 object-contain drop-shadow-xl group-hover:[animation:jai-hop_.6s_cubic-bezier(.3,1.6,.5,1)] sm:h-24 sm:w-24" />
         </button>
       )}
     </div>
