@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Copy, MessageCircle, Users, Award, Sparkles } from "lucide-react";
+import { Copy, Users, Award, Sparkles } from "lucide-react";
+import jaiImg from "@/assets/jai-anfitrion.webp";
+import { JaiPaw } from "@/components/py-icons";
+import { WhatsAppIcon, FacebookIcon, InstagramIcon, TikTokIcon, XIcon } from "@/components/social-icons";
 import { toast } from "sonner";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
@@ -130,7 +133,7 @@ function EmbajadoresPage() {
 
 
 
-            <section className="mt-4 rounded-2xl border border-border bg-card p-5">
+            <section className="amb-rise mt-4 rounded-3xl border border-border bg-card p-5" style={{ animationDelay: ".65s" }}>
               <p className="text-sm text-muted-foreground">Tu distinción</p>
               <p className="font-display text-2xl font-bold text-primary">{level.current.name}</p>
               {level.next && (() => {
@@ -138,8 +141,8 @@ function EmbajadoresPage() {
                 const pct = Math.min(100, Math.round((data.started / level.next.min) * 100));
                 return (
                   <>
-                    <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-muted" aria-hidden>
-                      <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                    <div className="mt-3 h-3.5 w-full overflow-hidden rounded-full bg-muted" aria-hidden>
+                      <div className="amb-bar h-full rounded-full" style={{ width: `${pct}%` }} />
                     </div>
                     <p className="mt-2 text-sm text-muted-foreground">
                       {data.started} de {level.next.min}. Te {faltan === 1 ? "falta 1 persona" : `faltan ${faltan} personas`} que empiecen para ser «{level.next.name}».
@@ -165,10 +168,10 @@ function EmbajadoresPage() {
   );
 }
 
-function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
+function Stat({ icon, label, value, delay }: { icon: React.ReactNode; label: string; value: number; delay: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-3 text-center">
-      <div className="mx-auto flex w-fit text-primary">{icon}</div>
+    <div className="amb-rise rounded-2xl border border-border bg-card p-3 text-center shadow-sm transition-transform hover:-translate-y-1" style={{ animationDelay: delay }}>
+      <div className="mx-auto flex w-fit rounded-full bg-primary/10 p-2 text-primary">{icon}</div>
       <p className="mt-1 font-display text-2xl font-bold text-foreground">{value}</p>
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
