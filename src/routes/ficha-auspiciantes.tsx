@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Printer, Trophy, Gift, Megaphone, ShieldCheck, BarChart3 } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Printer, Trophy, Gift, Megaphone, ShieldCheck, BarChart3, ArrowLeft } from "lucide-react";
 import { PrivateGate } from "@/components/private-gate";
 import { BrandLogo } from "@/components/brand-logo";
 
@@ -48,16 +48,25 @@ const GARANTIAS = [
 
 function Ficha() {
   return (
-    <main className="mx-auto max-w-3xl bg-background px-6 py-8 pb-36 text-foreground print:max-w-none print:p-8 print:pb-8">
-      <div className="mb-6 flex items-center justify-between print:hidden">
-        <p className="text-sm text-muted-foreground">Vista privada. Imprimila o guardala como PDF.</p>
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-semibold text-primary-foreground"
+    <div className="min-h-dvh bg-muted/60 px-3 py-5 print:bg-transparent print:p-0 sm:px-6 sm:py-8">
+      <main className="mx-auto max-w-3xl rounded-2xl border border-border bg-card px-5 py-7 pb-20 text-foreground shadow-sm print:max-w-none print:rounded-none print:border-0 print:bg-white print:p-8 print:shadow-none">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 print:hidden">
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
         >
-          <Printer className="h-4 w-4" aria-hidden /> Imprimir / PDF
-        </button>
+          <ArrowLeft className="h-4 w-4" aria-hidden /> Volver al panel
+        </Link>
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-muted-foreground">Vista privada. Imprimila o guardala como PDF.</p>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-primary px-4 py-2 font-semibold text-primary-foreground"
+          >
+            <Printer className="h-4 w-4" aria-hidden /> Imprimir / PDF
+          </button>
+        </div>
       </div>
 
       <header className="flex items-center justify-between border-b-4 border-secondary pb-4">
@@ -107,6 +116,7 @@ function Ficha() {
         <span>Guaraní Global Tech E.A.S. · RUC 80174299-4 · www.jaikuaa.com</span>
         <span>Precios y espacios: a convenir según el paquete.</span>
       </footer>
-    </main>
+      </main>
+    </div>
   );
 }
