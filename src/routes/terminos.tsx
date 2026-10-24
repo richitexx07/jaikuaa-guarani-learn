@@ -7,7 +7,13 @@ export const Route = createFileRoute("/terminos")({
     meta: [
       { title: "Términos y Condiciones — Jaikuaa" },
       { name: "description", content: "Términos de uso de la plataforma Jaikuaa." },
+      { property: "og:title", content: "Términos y Condiciones — Jaikuaa" },
+      { property: "og:description", content: "Condiciones de uso, cuentas y contenido educativo de Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://www.jaikuaa.com/terminos" },
+      { name: "twitter:card", content: "summary" },
     ],
+    links: [{ rel: "canonical", href: "https://www.jaikuaa.com/terminos" }],
   }),
   component: TerminosPage,
 });

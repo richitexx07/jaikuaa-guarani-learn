@@ -7,7 +7,13 @@ export const Route = createFileRoute("/privacidad")({
     meta: [
       { title: "Política de Privacidad — Jaikuaa" },
       { name: "description", content: "Cómo Jaikuaa cuida y protege tus datos personales." },
+      { property: "og:title", content: "Política de Privacidad — Jaikuaa" },
+      { property: "og:description", content: "Cómo Jaikuaa recoge, utiliza y protege tu información personal." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://www.jaikuaa.com/privacidad" },
+      { name: "twitter:card", content: "summary" },
     ],
+    links: [{ rel: "canonical", href: "https://www.jaikuaa.com/privacidad" }],
   }),
   component: PrivacidadPage,
 });
