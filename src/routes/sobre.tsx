@@ -12,7 +12,7 @@ export const Route = createFileRoute("/sobre")({
       { property: "og:title", content: "Sobre Jaikuaa" },
       { property: "og:description", content: "Conozcamos juntos. Una plataforma paraguaya para aprender guaraní, con voz humana real." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" }, { property: "og:image:width", content: "1200" }, { property: "og:image:height", content: "630" }, { name: "twitter:card", content: "summary_large_image" }, { name: "twitter:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" },
     ],
   }),
   component: SobrePage,

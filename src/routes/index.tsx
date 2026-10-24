@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:title", content: "Jaikuaa — Aprendé y jugá en guaraní" },
       { name: "twitter:description", content: "Aprendé guaraní con voces humanas, juegos y actividades en Jaikuaa, una plataforma paraguaya en acceso anticipado." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" }, { property: "og:image:width", content: "1200" }, { property: "og:image:height", content: "630" }, { name: "twitter:card", content: "summary_large_image" }, { name: "twitter:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" },
       { name: "keywords", content: "aprender guaraní, guaraní, curso de guaraní, idioma guaraní, Paraguay, Jaikuaa" },
     ],
     links: [{ rel: "canonical", href: "https://www.jaikuaa.com/" }],

@@ -5,9 +5,7 @@ export type Language = {
   featured?: boolean;
 };
 
-// Solo se habilitan los cursos que ya tienen contenido. Los demás idiomas
-// (inglés, portugués, francés, español) se agregarán cuando tengan contenido
-// validado; mientras tanto sus direcciones muestran "curso no encontrado".
+// Jaikuaa es solo guaraní.
 export const LANGUAGES: Language[] = [
   { slug: "guarani", name: "Guaraní", flag: "🇵🇾", featured: true },
 ];

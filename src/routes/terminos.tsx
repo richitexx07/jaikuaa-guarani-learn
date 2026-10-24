@@ -11,7 +11,7 @@ export const Route = createFileRoute("/terminos")({
       { property: "og:description", content: "Condiciones de uso, cuentas y contenido educativo de Jaikuaa." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://www.jaikuaa.com/terminos" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" }, { property: "og:image:width", content: "1200" }, { property: "og:image:height", content: "630" }, { name: "twitter:card", content: "summary_large_image" }, { name: "twitter:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" },
     ],
     links: [{ rel: "canonical", href: "https://www.jaikuaa.com/terminos" }],
   }),
@@ -40,7 +40,7 @@ function TerminosPage() {
 
           <Section title="1. Qué es Jaikuaa">
             <p>
-              Jaikuaa es una plataforma educativa paraguaya para aprender idiomas, con el guaraní en el corazón. Ofrecemos lecciones, ejercicios, herramientas de práctica y contenido cultural.
+              Jaikuaa es una plataforma educativa paraguaya para aprender guaraní. Ofrecemos lecciones, ejercicios, herramientas de práctica y contenido cultural.
             </p>
           </Section>
 
