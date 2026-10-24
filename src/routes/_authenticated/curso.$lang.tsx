@@ -5,7 +5,13 @@ import { getLanguage } from "@/lib/languages";
 export const Route = createFileRoute("/_authenticated/curso/$lang")({
   head: ({ params }) => {
     const lang = getLanguage(params.lang);
-    return { meta: [{ title: `Jaikuaa — Curso de ${lang?.name ?? "idioma"}` }] };
+    return { meta: [{ title: `Jaikuaa — Curso de ${lang?.name ?? "idioma"}` },
+      { name: "description", content: "Accedé a las lecciones de tu curso de idiomas en Jaikuaa." },
+      { property: "og:title", content: `Jaikuaa — Curso de ${lang?.name ?? "idioma" },
+      { property: "og:description", content: "Accedé a las lecciones de tu curso de idiomas en Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] };
   },
   loader: ({ params }) => {
     const lang = getLanguage(params.lang);

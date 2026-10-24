@@ -8,7 +8,13 @@ import { getJaiReport } from "@/lib/jai.functions";
 import { getFaq } from "@/lib/jai-faq";
 
 export const Route = createFileRoute("/_authenticated/admin/jai")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Qué le preguntan a Jai" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Qué le preguntan a Jai" },
+      { name: "description", content: "Revisá las consultas a Jai y las sugerencias recibidas de la comunidad de Jaikuaa." },
+      { property: "og:title", content: "Jaikuaa — Qué le preguntan a Jai" },
+      { property: "og:description", content: "Revisá las consultas a Jai y las sugerencias recibidas de la comunidad de Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: AdminJaiPage,
 });
 

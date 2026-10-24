@@ -8,7 +8,13 @@ import { monthYear } from "@/components/nhande-marandu";
 import { listNewsAdmin, setNewsStatus, type NewsRow, type NewsStatus } from "@/lib/news.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/noticias")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Noticias para aprobar" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Noticias para aprobar" },
+      { name: "description", content: "Revisá y aprobá las noticias de Jaikuaa desde el espacio de administración." },
+      { property: "og:title", content: "Jaikuaa — Noticias para aprobar" },
+      { property: "og:description", content: "Revisá y aprobá las noticias de Jaikuaa desde el espacio de administración." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: AdminNoticiasPage,
 });
 

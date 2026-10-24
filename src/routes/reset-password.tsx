@@ -14,6 +14,10 @@ export const Route = createFileRoute("/reset-password")({
     meta: [
       { title: "Jaikuaa — Nueva contraseña" },
       { name: "description", content: "Definí una nueva contraseña para tu cuenta de Jaikuaa." },
+      { property: "og:title", content: "Jaikuaa — Nueva contraseña" },
+      { property: "og:description", content: "Definí una nueva contraseña para tu cuenta de Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ResetPasswordPage,

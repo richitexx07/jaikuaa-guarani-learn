@@ -7,7 +7,13 @@ import { getPracticeLog } from "@/lib/teacher.functions";
 import { withOfflineCache } from "@/lib/offline-data";
 
 export const Route = createFileRoute("/_authenticated/practica/registro")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Registro de práctica" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Registro de práctica" }, { name: "robots", content: "noindex" },
+      { name: "description", content: "Consultá e imprimí el registro de tu práctica supervisada en Jaikuaa." },
+      { property: "og:title", content: "Jaikuaa — Registro de práctica" },
+      { property: "og:description", content: "Consultá e imprimí el registro de tu práctica supervisada en Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   validateSearch: (s: Record<string, unknown>): { u?: string } =>
     typeof s.u === "string" && /^[0-9a-f-]{36}$/i.test(s.u) ? { u: s.u } : {},
   component: PracticeLogPage,

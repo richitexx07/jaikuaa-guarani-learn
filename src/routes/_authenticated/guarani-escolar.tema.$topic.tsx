@@ -15,7 +15,13 @@ const isAgro = (slug: string) => AGRO_SLUGS.has(slug);
 
 export const Route = createFileRoute("/_authenticated/guarani-escolar/tema/$topic")({
   head: ({ params }) => ({
-    meta: [{ title: `Jaikuaa — ${params.topic}` }],
+    meta: [{ title: `Jaikuaa — ${params.topic}` },
+      { name: "description", content: "Explorá este tema de Guaraní Escolar en Jaikuaa y sus materiales en validación." },
+      { property: "og:title", content: `Jaikuaa — ${params.topic },
+      { property: "og:description", content: "Explorá este tema de Guaraní Escolar en Jaikuaa y sus materiales en validación." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
   }),
   loader: ({ params }) => {
     const tema = getTema(params.topic);

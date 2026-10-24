@@ -6,7 +6,13 @@ import { ESCOLAR_GRADES, temasFor, saveEscolarGrade, type EscolarGrade } from "@
 import { recordCompletion, useRecordVisit } from "@/lib/gamification";
 
 export const Route = createFileRoute("/_authenticated/guarani-escolar/semanal")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Plan Semanal" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Plan Semanal" },
+      { name: "description", content: "Consultá el espacio Plan Semanal de Guaraní Escolar en Jaikuaa; materiales en validación." },
+      { property: "og:title", content: "Jaikuaa — Plan Semanal" },
+      { property: "og:description", content: "Consultá el espacio Plan Semanal de Guaraní Escolar en Jaikuaa; materiales en validación." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: PlanSemanal,
 });
 

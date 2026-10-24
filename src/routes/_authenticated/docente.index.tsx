@@ -26,6 +26,11 @@ export const Route = createFileRoute("/_authenticated/docente/")({
     meta: [
       { title: "Jaikuaa — Panel del docente" },
       { name: "robots", content: "noindex" },
+      { name: "description", content: "Accedé a las tareas docentes, la revisión de contenido y el seguimiento de tu grupo en Jaikuaa." },
+      { property: "og:title", content: "Jaikuaa — Panel del docente" },
+      { property: "og:description", content: "Accedé a las tareas docentes, la revisión de contenido y el seguimiento de tu grupo en Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: TeacherPanelPage,

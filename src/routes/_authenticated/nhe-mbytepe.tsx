@@ -12,6 +12,10 @@ export const Route = createFileRoute("/_authenticated/nhe-mbytepe")({
         content:
           "El guaraní que se habla en la calle: jopara con su forma pura, explicado con respeto.",
       },
+      { property: "og:title", content: "Jaikuaa — Ñe'ẽ Mbytépe" },
+      { property: "og:description", content: "Explorá el espacio de Jaikuaa dedicado al guaraní de uso cotidiano, con materiales en validación." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: NheMbytepe,

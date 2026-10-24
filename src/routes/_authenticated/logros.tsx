@@ -6,7 +6,13 @@ import { BADGES, useStats } from "@/lib/gamification";
 import { StatsBar } from "@/components/gamification/stats-bar";
 
 export const Route = createFileRoute("/_authenticated/logros")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Logros" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Logros" },
+      { name: "description", content: "Consultá tus insignias y el progreso de aprendizaje que alcanzaste en Jaikuaa." },
+      { property: "og:title", content: "Jaikuaa — Logros" },
+      { property: "og:description", content: "Consultá tus insignias y el progreso de aprendizaje que alcanzaste en Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: LogrosPage,
 });
 

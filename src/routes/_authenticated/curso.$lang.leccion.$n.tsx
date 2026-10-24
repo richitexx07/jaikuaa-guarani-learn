@@ -23,7 +23,13 @@ import {
 
 export const Route = createFileRoute("/_authenticated/curso/$lang/leccion/$n")({
   head: ({ params }) => ({
-    meta: [{ title: `Jaikuaa — Lección ${params.n}` }],
+    meta: [{ title: `Jaikuaa — Lección ${params.n}` },
+      { name: "description", content: "Practicá el contenido de esta lección de Jaikuaa y seguí tu progreso de aprendizaje." },
+      { property: "og:title", content: `Jaikuaa — Lección ${params.n },
+      { property: "og:description", content: "Practicá el contenido de esta lección de Jaikuaa y seguí tu progreso de aprendizaje." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
   }),
   loader: async ({ params }) => {
     const lang = getLanguage(params.lang);

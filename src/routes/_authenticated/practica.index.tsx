@@ -26,7 +26,13 @@ import { warmPages } from "@/lib/offline-pack";
 import { staffStatusRefreshInterval } from "@/lib/staff-status-refresh";
 
 export const Route = createFileRoute("/_authenticated/practica/")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Panel de práctica" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Panel de práctica" }, { name: "robots", content: "noindex" },
+      { name: "description", content: "Accedé a tu espacio de práctica supervisada y revisión de contenido en Jaikuaa." },
+      { property: "og:title", content: "Jaikuaa — Panel de práctica" },
+      { property: "og:description", content: "Accedé a tu espacio de práctica supervisada y revisión de contenido en Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: PracticePage,
 });
 

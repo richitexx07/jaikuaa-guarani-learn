@@ -11,6 +11,8 @@ export const Route = createFileRoute("/sobre")({
       { name: "description", content: "Jaikuaa es una plataforma paraguaya para aprender guaraní, con voz humana real y hecha íntegramente en Paraguay." },
       { property: "og:title", content: "Sobre Jaikuaa" },
       { property: "og:description", content: "Conozcamos juntos. Una plataforma paraguaya para aprender guaraní, con voz humana real." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SobrePage,

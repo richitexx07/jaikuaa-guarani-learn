@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { getWeeklyRanking, type RankingRow } from "@/lib/community.functions";
 
 export const Route = createFileRoute("/_authenticated/ranking")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Ranking semanal" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Ranking semanal" },
+      { name: "description", content: "Consultá el ranking semanal de aprendizaje de tu grupo en Jaikuaa." },
+      { property: "og:title", content: "Jaikuaa — Ranking semanal" },
+      { property: "og:description", content: "Consultá el ranking semanal de aprendizaje de tu grupo en Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: RankingPage,
 });
 

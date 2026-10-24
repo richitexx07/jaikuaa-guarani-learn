@@ -36,6 +36,10 @@ export const Route = createFileRoute("/_authenticated/validacion")({
       { title: "Jaikuaa — Circuito de validación" },
       { name: "description", content: "Proponer, revisar y validar contenido del corpus en tres pasos." },
       { name: "robots", content: "noindex" },
+      { property: "og:title", content: "Jaikuaa — Circuito de validación" },
+      { property: "og:description", content: "Accedé al circuito de propuestas, revisión y validación de contenido de Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   validateSearch: (s: Record<string, unknown>): { tab?: CircuitTab } =>

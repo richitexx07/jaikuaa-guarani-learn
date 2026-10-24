@@ -19,7 +19,13 @@ import { DictateButton } from "@/components/pilot/dictate-button";
 import { reportContentError } from "@/lib/content-reports.functions";
 
 export const Route = createFileRoute("/_authenticated/validar")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Validación rápida" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Validación rápida" },
+      { name: "description", content: "Revisá las palabras pendientes de Jaikuaa desde el espacio de validación para especialistas." },
+      { property: "og:title", content: "Jaikuaa — Validación rápida" },
+      { property: "og:description", content: "Revisá las palabras pendientes de Jaikuaa desde el espacio de validación para especialistas." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: QuickValidatePage,
 });
 

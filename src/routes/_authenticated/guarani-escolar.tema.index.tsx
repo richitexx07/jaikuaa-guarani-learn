@@ -3,7 +3,13 @@ import { useEffect, useState } from "react";
 import { loadEscolarGrade, temasFor, type EscolarGrade } from "@/lib/guarani-tema";
 
 export const Route = createFileRoute("/_authenticated/guarani-escolar/tema/")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Práctica por Tema" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Práctica por Tema" },
+      { name: "description", content: "Elegí un tema para explorar los materiales de Guaraní Escolar de Jaikuaa, en validación." },
+      { property: "og:title", content: "Jaikuaa — Práctica por Tema" },
+      { property: "og:description", content: "Elegí un tema para explorar los materiales de Guaraní Escolar de Jaikuaa, en validación." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: TemaIndex,
 });
 

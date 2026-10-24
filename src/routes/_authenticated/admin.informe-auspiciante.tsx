@@ -19,7 +19,13 @@ export const Route = createFileRoute("/_authenticated/admin/informe-auspiciante"
     const r = searchSchema.safeParse({ ...s, days: s.days === undefined ? undefined : Number(s.days) });
     return r.success ? r.data : {};
   },
-  head: () => ({ meta: [{ title: "Jaikuaa — Informe para auspiciante" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Informe para auspiciante" },
+      { name: "description", content: "Consultá el informe de presencia de auspiciantes en Jaikuaa y prepará su versión imprimible." },
+      { property: "og:title", content: "Jaikuaa — Informe para auspiciante" },
+      { property: "og:description", content: "Consultá el informe de presencia de auspiciantes en Jaikuaa y prepará su versión imprimible." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: InformeAuspiciantePage,
 });
 
