@@ -1,3 +1,4 @@
+- [ ] SEO: revisar los tres hallazgos antiguos, corregir los pendientes reales y verificar títulos y descripciones sin publicar.
 - [x] Google OAuth propio: bloqueo reproducido en www.jaikuaa.com; Google devuelve redirect_uri_mismatch, sin errores de JavaScript; portada e ingreso cargan con HTTP 200.
 - [x] Invitaciones de juegos: regreso único; 7 pruebas y verificación con sesión real conservan la sala K7M2QP en lugar de abrir el Panel.
 - [ ] Google OAuth propio: autorizar exactamente https://www.jaikuaa.com/~oauth/callback en el cliente de Google Cloud y repetir ingreso completo; requiere acceso del propietario a Google Cloud.
