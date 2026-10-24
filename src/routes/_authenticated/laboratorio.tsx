@@ -44,6 +44,11 @@ export const Route = createFileRoute("/_authenticated/laboratorio")({
     meta: [
       { title: "Jaikuaa — Laboratorio Morfológico Guaraní" },
       { name: "robots", content: "noindex, nofollow" },
+      { name: "description", content: "Espacio de trabajo lingüístico de Jaikuaa para analizar resultados y realizar revisión especializada." },
+      { property: "og:title", content: "Jaikuaa — Laboratorio Morfológico Guaraní" },
+      { property: "og:description", content: "Espacio de trabajo lingüístico de Jaikuaa para analizar resultados y realizar revisión especializada." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: () => (

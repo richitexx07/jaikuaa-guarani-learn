@@ -13,7 +13,16 @@ export const Route = createFileRoute("/_authenticated/traductor")({
   beforeLoad: () => {
     if (!AI_GUARANI_TOOLS_ENABLED) throw redirect({ to: "/dashboard" });
   },
-  head: () => ({ meta: [{ title: "Jaikuaa — Traductor" }] }),
+  head: () => ({
+    meta: [
+      { title: "Jaikuaa — Traductor no disponible" },
+      { name: "description", content: "La herramienta de traducción automática está deshabilitada. Jaikuaa prioriza el contenido revisado por especialistas." },
+      { property: "og:title", content: "Jaikuaa — Traductor no disponible" },
+      { property: "og:description", content: "Herramienta deshabilitada; el aprendizaje de Jaikuaa prioriza contenido revisado por especialistas." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: TraductorPage,
 });
 

@@ -10,6 +10,10 @@ export const Route = createFileRoute("/_authenticated/trivia/")({
     meta: [
       { title: "Jaikuaápa — Trivia | Jaikuaa" },
       { name: "description", content: "Preguntados paraguayo: gastronomía, mitos, deportes, música, historia y naturaleza." },
+      { property: "og:title", content: "Jaikuaápa — Trivia | Jaikuaa" },
+      { property: "og:description", content: "Elegí una categoría de trivia paraguaya para practicar en Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: TriviaLanding,

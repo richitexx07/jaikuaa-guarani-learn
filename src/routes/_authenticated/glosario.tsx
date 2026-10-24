@@ -17,6 +17,10 @@ export const Route = createFileRoute("/_authenticated/glosario")({
     meta: [
       { title: "Jaikuaa — Glosario" },
       { name: "description", content: "Las palabras publicadas de Jaikuaa, con su significado y su audio." },
+      { property: "og:title", content: "Jaikuaa — Glosario" },
+      { property: "og:description", content: "Consultá las palabras publicadas en Jaikuaa, con su significado y grabaciones humanas." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: GlossaryPage,

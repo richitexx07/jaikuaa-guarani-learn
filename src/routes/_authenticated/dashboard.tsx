@@ -172,7 +172,18 @@ function BigAction({ to, emoji, title, desc, tone }: { to: "/curso/$lang" | "/ju
 }
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Tu panel" }] }),
+  head: () => ({
+    meta: [
+      { title: "Jaikuaa — Tu panel" },
+      { name: "description", content: "Retomá tu curso de guaraní, consultá tu progreso y encontrá juegos y actividades de Jaikuaa." },
+      { property: "og:title", content: "Jaikuaa — Tu panel" },
+      { property: "og:description", content: "Tu espacio de aprendizaje: curso, juegos, progreso y actividades de guaraní." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { property: "og:url", content: "https://www.jaikuaa.com/dashboard" },
+    ],
+    links: [{ rel: "canonical", href: "https://www.jaikuaa.com/dashboard" }],
+  }),
   component: Dashboard,
 });
 

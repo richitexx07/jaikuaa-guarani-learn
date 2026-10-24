@@ -8,7 +8,13 @@ import { SpeakerButton } from "@/components/audio/speaker-button";
 
 
 export const Route = createFileRoute("/_authenticated/guarani-escolar/rescate")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Modo Rescate" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Modo Rescate" },
+      { name: "description", content: "Accedé al espacio Modo Rescate de Guaraní Escolar en Jaikuaa; materiales en validación." },
+      { property: "og:title", content: "Jaikuaa — Modo Rescate" },
+      { property: "og:description", content: "Accedé al espacio Modo Rescate de Guaraní Escolar en Jaikuaa; materiales en validación." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: ModoRescate,
 });
 

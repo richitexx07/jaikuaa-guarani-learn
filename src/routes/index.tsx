@@ -15,11 +15,12 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Jaikuaa — Aprendé y jugá en guaraní" },
-      { name: "description", content: "Libre acceso." },
+      { name: "description", content: "Jaikuaa es una plataforma paraguaya para aprender guaraní con voces humanas, juegos y actividades. Acceso anticipado para conocer la comunidad." },
       { property: "og:title", content: "Jaikuaa — Aprendé y jugá en guaraní" },
-      { property: "og:description", content: "Libre acceso." },
+      { property: "og:description", content: "Aprendé guaraní con voces humanas, juegos y actividades en Jaikuaa, una plataforma paraguaya en acceso anticipado." },
+      { property: "og:url", content: "https://www.jaikuaa.com/" },
       { name: "twitter:title", content: "Jaikuaa — Aprendé y jugá en guaraní" },
-      { name: "twitter:description", content: "Libre acceso." },
+      { name: "twitter:description", content: "Aprendé guaraní con voces humanas, juegos y actividades en Jaikuaa, una plataforma paraguaya en acceso anticipado." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "keywords", content: "aprender guaraní, guaraní, curso de guaraní, idioma guaraní, Paraguay, Jaikuaa" },

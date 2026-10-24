@@ -16,7 +16,13 @@ import { celebrate } from "@/lib/confetti";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/trivia/$category")({
-  head: () => ({ meta: [{ title: "Jaikuaápa — Trivia | Jaikuaa" }] }),
+  head: ({ params }) => ({ meta: [{ title: `Jaikuaa — Trivia: ${params.category}` },
+      { name: "description", content: "Practicá con las preguntas de esta categoría de trivia de Jaikuaa." },
+      { property: "og:title", content: `Jaikuaa — Trivia: ${params.category}` },
+      { property: "og:description", content: "Practicá con las preguntas de esta categoría de trivia de Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   loader: ({ params }) => {
     if (!TRIVIA_ORDER.includes(params.category as TriviaCategoryId)) throw notFound();
     return { category: params.category as TriviaCategoryId };

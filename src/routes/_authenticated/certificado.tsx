@@ -38,7 +38,13 @@ async function loadStatus(fn: () => Promise<CertStatus>): Promise<CertStatus & {
 }
 
 export const Route = createFileRoute("/_authenticated/certificado")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Certificado" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Certificado" },
+      { name: "description", content: "Consultá tu certificado del curso de Jaikuaa y los requisitos para obtenerlo." },
+      { property: "og:title", content: "Jaikuaa — Certificado" },
+      { property: "og:description", content: "Consultá tu certificado del curso de Jaikuaa y los requisitos para obtenerlo." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: CertificadoPage,
 });
 

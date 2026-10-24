@@ -12,6 +12,10 @@ export const Route = createFileRoute("/recuperar")({
     meta: [
       { title: "Jaikuaa — Recuperar contraseña" },
       { name: "description", content: "Recuperá el acceso a tu cuenta de Jaikuaa." },
+      { property: "og:title", content: "Jaikuaa — Recuperar contraseña" },
+      { property: "og:description", content: "Recuperá el acceso a tu cuenta de Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: RecuperarPage,

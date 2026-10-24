@@ -13,7 +13,13 @@ export const Route = createFileRoute("/_authenticated/tutor")({
   beforeLoad: () => {
     if (!AI_GUARANI_TOOLS_ENABLED) throw redirect({ to: "/dashboard" });
   },
-  head: () => ({ meta: [{ title: "Jaikuaa — Tutor IA" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Tutor IA" },
+      { name: "description", content: "El tutor de inteligencia artificial está deshabilitado; Jaikuaa prioriza contenido revisado por especialistas." },
+      { property: "og:title", content: "Jaikuaa — Tutor IA" },
+      { property: "og:description", content: "El tutor de inteligencia artificial está deshabilitado; Jaikuaa prioriza contenido revisado por especialistas." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: TutorPage,
 });
 

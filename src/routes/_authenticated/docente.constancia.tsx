@@ -7,7 +7,13 @@ import { getMyConstancia } from "@/lib/teacher.functions";
 import { withOfflineCache } from "@/lib/offline-data";
 
 export const Route = createFileRoute("/_authenticated/docente/constancia")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Mi constancia" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Jaikuaa — Mi constancia" }, { name: "robots", content: "noindex" },
+      { name: "description", content: "Consultá la constancia de tu participación docente en el piloto de Jaikuaa." },
+      { property: "og:title", content: "Jaikuaa — Mi constancia" },
+      { property: "og:description", content: "Consultá la constancia de tu participación docente en el piloto de Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] }),
   component: ConstanciaPage,
 });
 

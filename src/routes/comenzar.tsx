@@ -14,7 +14,13 @@ export const Route = createFileRoute("/comenzar")({
     meta: [
       { title: "Jaikuaa — Conocé a Jai" },
       { name: "description", content: "Empezá tu camino en guaraní con Jai, el jaguaréte de Jaikuaa." },
+      { property: "og:title", content: "Jaikuaa — Conocé a Jai" },
+      { property: "og:description", content: "Conocé a Jai y elegí cómo empezar tu aprendizaje de guaraní." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://www.jaikuaa.com/comenzar" },
+      { name: "twitter:card", content: "summary" },
     ],
+    links: [{ rel: "canonical", href: "https://www.jaikuaa.com/comenzar" }],
   }),
   component: Onboarding,
 });
@@ -123,11 +129,11 @@ function Onboarding() {
         {step === 1 && (
           <section className="flex flex-col items-center gap-6 text-center">
             <JaiCharacter />
-            <p className="font-display text-2xl font-semibold leading-snug text-primary sm:text-3xl">
+            <h1 className="font-display text-2xl font-semibold leading-snug text-primary sm:text-3xl">
               ¡Che! 🐆 Soy Jai, el jaguaréte de Jaikuaa.
               <br />
               <span className="text-foreground">¿Para qué querés aprender guaraní?</span>
-            </p>
+            </h1>
             <div className="flex w-full flex-col gap-3">
               {OPTIONS.map((o) => (
                 <button

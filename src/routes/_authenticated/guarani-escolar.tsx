@@ -4,7 +4,16 @@ import { Button } from "@/components/ui/button";
 import { ValidationNotice } from "@/components/validation-notice";
 
 export const Route = createFileRoute("/_authenticated/guarani-escolar")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Guaraní Escolar" }] }),
+  head: () => ({
+    meta: [
+      { title: "Jaikuaa — Guaraní Escolar" },
+      { name: "description", content: "Explorá el espacio de guaraní escolar de Jaikuaa, organizado por grados y con materiales en validación." },
+      { property: "og:title", content: "Jaikuaa — Guaraní Escolar" },
+      { property: "og:description", content: "Guaraní para la escuela: actividades por grado y materiales en validación." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: GuaraniEscolarLayout,
 });
 
