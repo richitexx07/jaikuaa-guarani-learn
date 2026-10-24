@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/guarani-escolar/tema/$topi
   head: ({ params }) => ({
     meta: [{ title: `Jaikuaa — ${params.topic}` },
       { name: "description", content: "Explorá este tema de Guaraní Escolar en Jaikuaa y sus materiales en validación." },
-      { property: "og:title", content: `Jaikuaa — ${params.topic },
+      { property: "og:title", content: `Jaikuaa — ${params.topic}` },
       { property: "og:description", content: "Explorá este tema de Guaraní Escolar en Jaikuaa y sus materiales en validación." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
