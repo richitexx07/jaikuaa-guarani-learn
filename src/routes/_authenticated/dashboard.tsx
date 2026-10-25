@@ -334,7 +334,7 @@ function Dashboard() {
           {/* 2. TRES BOTONES GIGANTES */}
           <nav aria-label="Elegí qué hacer" className="mt-5 grid gap-3 sm:grid-cols-3">
             <BigAction to="/curso/$lang" emoji="📚" title="Aprender" desc="Seguí tu curso con voces reales" tone="primary" />
-            <BigAction to="/juegos" emoji="🎮" title="Jugar" desc="11 juegos con palabras validadas" tone="accent" />
+            <BigAction to="/juegos" emoji="🎮" title="Jugar" desc="11 juegos para aprender jugando" tone="accent" />
             <BigAction to="/juegos/palabra-del-dia" emoji="⭐" title="Palabra del día" desc="Una palabra nueva, en 1 minuto" tone="card" />
           </nav>
 
