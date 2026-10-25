@@ -123,7 +123,7 @@ function Ficha() {
         <span>
           Contacto comercial: Richard Ávalos Arriola ·{" "}
           <a href="https://wa.me/595982418732" className="font-semibold text-primary underline">0982 418 732</a> ·{" "}
-          <a href="mailto:richitexx07@gmail.com" className="font-semibold text-primary underline">richitexx07@gmail.com</a>
+          <a href="mailto:contacto@jaikuaa.com" className="font-semibold text-primary underline">contacto@jaikuaa.com</a>
         </span>
         <span>Precios y espacios: a convenir según el paquete.</span>
       </footer>
