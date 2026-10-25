@@ -22,6 +22,7 @@ import { Route as PilotoAteneoRouteImport } from './routes/piloto-ateneo'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as RecuperarRouteImport } from './routes/recuperar'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RespaldosRouteImport } from './routes/respaldos'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as TecladoRouteImport } from './routes/teclado'
 import { Route as TerminosRouteImport } from './routes/terminos'
@@ -140,6 +141,11 @@ const RecuperarRoute = RecuperarRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RespaldosRoute = RespaldosRouteImport.update({
+  id: '/respaldos',
+  path: '/respaldos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SobreRoute = SobreRouteImport.update({
@@ -465,6 +471,7 @@ export interface FileRoutesByFullPath {
   '/privacidad': typeof PrivacidadRoute
   '/recuperar': typeof RecuperarRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/respaldos': typeof RespaldosRoute
   '/sobre': typeof SobreRoute
   '/teclado': typeof TecladoRoute
   '/terminos': typeof TerminosRoute
@@ -534,6 +541,7 @@ export interface FileRoutesByTo {
   '/privacidad': typeof PrivacidadRoute
   '/recuperar': typeof RecuperarRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/respaldos': typeof RespaldosRoute
   '/sobre': typeof SobreRoute
   '/teclado': typeof TecladoRoute
   '/terminos': typeof TerminosRoute
@@ -602,6 +610,7 @@ export interface FileRoutesById {
   '/privacidad': typeof PrivacidadRoute
   '/recuperar': typeof RecuperarRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/respaldos': typeof RespaldosRoute
   '/sobre': typeof SobreRoute
   '/teclado': typeof TecladoRoute
   '/terminos': typeof TerminosRoute
@@ -673,6 +682,7 @@ export interface FileRouteTypes {
     | '/privacidad'
     | '/recuperar'
     | '/reset-password'
+    | '/respaldos'
     | '/sobre'
     | '/teclado'
     | '/terminos'
@@ -742,6 +752,7 @@ export interface FileRouteTypes {
     | '/privacidad'
     | '/recuperar'
     | '/reset-password'
+    | '/respaldos'
     | '/sobre'
     | '/teclado'
     | '/terminos'
@@ -809,6 +820,7 @@ export interface FileRouteTypes {
     | '/privacidad'
     | '/recuperar'
     | '/reset-password'
+    | '/respaldos'
     | '/sobre'
     | '/teclado'
     | '/terminos'
@@ -880,6 +892,7 @@ export interface RootRouteChildren {
   PrivacidadRoute: typeof PrivacidadRoute
   RecuperarRoute: typeof RecuperarRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RespaldosRoute: typeof RespaldosRoute
   SobreRoute: typeof SobreRoute
   TecladoRoute: typeof TecladoRoute
   TerminosRoute: typeof TerminosRoute
@@ -981,6 +994,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/respaldos': {
+      id: '/respaldos'
+      path: '/respaldos'
+      fullPath: '/respaldos'
+      preLoaderRoute: typeof RespaldosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sobre': {
@@ -1532,6 +1552,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacidadRoute: PrivacidadRoute,
   RecuperarRoute: RecuperarRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RespaldosRoute: RespaldosRoute,
   SobreRoute: SobreRoute,
   TecladoRoute: TecladoRoute,
   TerminosRoute: TerminosRoute,

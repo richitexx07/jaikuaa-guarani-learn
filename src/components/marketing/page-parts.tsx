@@ -105,11 +105,12 @@ export function InfoCard({ emoji, title, children, tag }: { emoji: string; title
 export function BackingList() {
   const items = [
     ["Honorable Cámara de Senadores", "Declaración N.° 547/2026, de Interés Nacional y Educativo."],
+    ["Honorable Cámara de Diputados", "Declaración N.° 2001, de Interés Nacional y Educativo."],
     ["Secretaría de Políticas Lingüísticas", "Resolución N.° 116/2026, de interés lingüístico."],
     ["Ateneo de Lengua y Cultura Guaraní", "Convenio Marco de Cooperación Institucional, firmado el 25 de septiembre de 2026."],
   ];
   return (
-    <ul className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-3">
+    <ul className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-2">
       {items.map(([who, what]) => (
         <li key={who} className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
           <div className="font-display font-bold text-foreground">{who}</div>

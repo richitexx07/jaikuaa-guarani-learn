@@ -89,6 +89,12 @@ function Hero() {
             <Link to="/auth" search={{ mode: "login" }}>Iniciar sesión</Link>
           </Button>
         </div>
+        <p className="mx-auto mt-6 max-w-md text-xs text-muted-foreground">
+          No vendemos tus datos ni los compartimos con terceros para publicidad.{" "}
+          <Link to="/respaldos" className="font-medium text-accent hover:underline">
+            Ver respaldos institucionales
+          </Link>
+        </p>
       </div>
     </section>
   );

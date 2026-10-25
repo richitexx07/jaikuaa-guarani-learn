@@ -32,6 +32,9 @@ export function SiteFooter() {
             <Link to="/sobre" className="text-muted-foreground transition-colors hover:text-foreground">
               Sobre Jaikuaa
             </Link>
+            <Link to="/respaldos" className="text-muted-foreground transition-colors hover:text-foreground">
+              Respaldos
+            </Link>
             <Link to="/instituciones" className="text-muted-foreground transition-colors hover:text-foreground">
               Instituciones
             </Link>

@@ -191,6 +191,9 @@ function AuthPage() {
           <p className="mt-1 text-center text-xs text-muted-foreground">
             Solo usamos tu nombre y tu correo. Nunca publicamos nada en tu nombre.
           </p>
+          <p className="mt-1 text-center text-xs text-muted-foreground">
+            No vendemos tus datos ni los compartimos con terceros para publicidad.
+          </p>
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
@@ -277,7 +280,10 @@ function AuthPage() {
           <p className="mt-4 text-center text-[11px] leading-relaxed text-muted-foreground">
             Declarada de interés nacional y educativo por la Cámara de Senadores (Declaración N.° 547/2026) y por la
             Cámara de Diputados (Declaración N.° 2001), y de interés lingüístico por la Secretaría de Políticas
-            Lingüísticas (Resolución N.° 116/2026).
+            Lingüísticas (Resolución N.° 116/2026).{" "}
+            <Link to="/respaldos" className="font-medium text-accent hover:underline">
+              Ver respaldos
+            </Link>
           </p>
         </div>
       </main>
