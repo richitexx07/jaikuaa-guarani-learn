@@ -139,7 +139,7 @@ function AuspiciantesPage() {
               las autorizaciones que correspondan.
             </SlotCard>
             <SlotCard title="Capacitación de tu personal" mock={<div className="rounded-lg bg-background p-4 text-center text-3xl">🤝</div>}>
-              Guaraní para tu equipo de atención al cliente, con vocabulario de tu rubro validado por especialistas.
+              Guaraní para tu equipo de atención al cliente, con vocabulario de tu rubro revisado por docentes especialistas.
             </SlotCard>
           </div>
         </Section>

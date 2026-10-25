@@ -81,7 +81,7 @@ function TurismoPage() {
               Saludos, cómo preguntar direcciones, pedir comida y agradecer en guaraní, con audio de voces paraguayas.
             </InfoCard>
             <InfoCard emoji="🍲" title="Gastronomía con nombre propio">
-              Chipa, sopa paraguaya, mbeju, tereré: qué es cada plato y cómo se pide, validado por especialistas.
+              Chipa, sopa paraguaya, mbeju, tereré: qué es cada plato y cómo se pide, revisado por docentes especialistas.
             </InfoCard>
             <InfoCard emoji="📖" title="Historia viva" tag="En validación">
               El vocabulario cultural e histórico de cada destino se publica solo tras la revisión de docentes de la

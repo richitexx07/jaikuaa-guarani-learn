@@ -38,6 +38,12 @@ export function SiteFooter() {
             <Link to="/instituciones" className="text-muted-foreground transition-colors hover:text-foreground">
               Instituciones
             </Link>
+            <Link to="/teclado" className="text-muted-foreground transition-colors hover:text-foreground">
+              Teclado
+            </Link>
+            <Link to="/turismo" className="text-muted-foreground transition-colors hover:text-foreground">
+              Turismo
+            </Link>
             <Link to="/auspiciantes" className="text-muted-foreground transition-colors hover:text-foreground">
               Auspiciantes
             </Link>

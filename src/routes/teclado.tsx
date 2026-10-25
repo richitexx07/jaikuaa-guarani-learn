@@ -168,11 +168,11 @@ function TecladoPage() {
         {fixes && (
           <p className="text-sm text-muted-foreground">
             {fixes.length === 0
-              ? "No encontré nada para corregir con las palabras validadas del corpus."
+              ? "No encontré nada para corregir con las palabras del corpus de Jaikuaa."
               : `Corregí ${fixes.length}: ` + fixes.map((f) => `${f.from} → ${f.to}`).join(", ")}
           </p>
         )}
-        <p className="text-xs text-muted-foreground">Solo usa palabras ya validadas por docentes. Si una palabra no está en el corpus, la deja igual.</p>
+        <p className="text-xs text-muted-foreground">Solo usa palabras del corpus de Jaikuaa, que está en revisión por docentes especialistas. Si una palabra no está en el corpus, la deja igual.</p>
 
         {prev && (
           <div>

@@ -75,7 +75,7 @@ function InstitucionesPage() {
               Todos los participantes entran con el código de su institución, desde el celular o la computadora.
             </InfoCard>
             <InfoCard emoji="🎙️" title="Lecciones con voz humana">
-              Contenido validado por especialistas en la lengua y audios grabados por hablantes paraguayos.
+              Contenido en revisión por docentes especialistas y audios grabados por hablantes paraguayos.
             </InfoCard>
             <InfoCard emoji="📚" title="Vocabulario de tu área">
               La institución aporta sus términos técnicos y los especialistas elaboran y validan su versión en guaraní

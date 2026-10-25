@@ -6,6 +6,7 @@ import { SUPPORT_WHATSAPP } from "@/lib/contact";
 
 const NAV_LINKS = [
   { to: "/teclado", label: "Teclado" },
+  { to: "/turismo", label: "Turismo" },
   { to: "/instituciones", label: "Instituciones" },
   { to: "/auspiciantes", label: "Auspiciantes" },
 ] as const;
