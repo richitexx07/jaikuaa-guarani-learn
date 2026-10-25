@@ -37,7 +37,7 @@ const REACTIONS: Record<Motivation, string> = {
   trabajo: "¡Buenísimo! El guaraní abre puertas en Paraguay. Empezamos con 3 frases para la oficina.",
   colegio: "¡Vamos a aprobar ese examen! Te enseño exactamente lo que te piden.",
   familia: "Tu abuela va a sonreír cuando le digas 'Mba'éichapa'. Empezamos con 3 palabras de saludo.",
-  gusta: "Che, ya sos paraguayo completo. Solo falta despertar el ñe'ẽ que llevás dentro.",
+  gusta: "Ya sos paraguayo completo. Solo falta despertar el ñe'ẽ que llevás dentro.",
   probar: "Perfecto. 3 palabras, 2 minutos. Sin presión, sin examen, sin vergüenza.",
 };
 
@@ -130,7 +130,7 @@ function Onboarding() {
           <section className="flex flex-col items-center gap-6 text-center">
             <JaiCharacter />
             <h1 className="font-display text-2xl font-semibold leading-snug text-primary sm:text-3xl">
-              ¡Che! 🐆 Soy Jai, el jaguaréte de Jaikuaa.
+              ¡Mba'éichapa! 🐆 Soy Jai, el jaguaréte de Jaikuaa.
               <br />
               <span className="text-foreground">¿Para qué querés aprender guaraní?</span>
             </h1>

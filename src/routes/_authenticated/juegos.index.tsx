@@ -49,7 +49,7 @@ function GamesHome() {
         <div className="flex items-center gap-3">
           <img src={jaiAsset.url} alt="Jai, el jaguarete" className="penalties-mascot h-16 w-16 shrink-0 object-contain" />
           <div className="min-w-0">
-            <p className="font-display text-base font-bold text-foreground">¡Che, mba'éichapa! Soy Jai.</p>
+            <p className="font-display text-base font-bold text-foreground">¡Mba'éichapa! Soy Jai.</p>
             <p className="text-xs text-muted-foreground">Elegí un juego y aprendamos jugando. Todas las palabras están validadas.</p>
           </div>
         </div>

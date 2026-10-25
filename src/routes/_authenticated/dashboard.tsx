@@ -325,7 +325,7 @@ function Dashboard() {
             <img src={jaiAsset.url} alt="Jai, el jaguarete" className="h-20 w-20 shrink-0 object-contain" />
             <div className="min-w-0">
               <h1 className="font-display text-2xl font-bold leading-tight text-foreground sm:text-4xl">
-                ¡Che, {name ? <span className="text-accent">{name}</span> : "amigo"}! {greeting.emoji}
+                ¡Mba'éichapa, {name ? <span className="text-accent">{name}</span> : "amigo"}! {greeting.emoji}
               </h1>
               <p className="mt-1 text-base text-muted-foreground">¿Qué querés hacer hoy? Tocá un botón.</p>
             </div>

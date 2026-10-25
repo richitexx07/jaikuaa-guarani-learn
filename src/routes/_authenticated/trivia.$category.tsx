@@ -35,11 +35,11 @@ type Phase = "playing" | "done";
 // ── Rotating error messages (never repeat the same one twice in a row) ────────
 function buildErrorMessage(correctAnswer: string, index: number): string {
   const templates = [
-    `¡Casi, che! La respuesta era **${correctAnswer}**.\n\nNo te preocupés, el guaraní ya está en vos. Solo hay que despertarlo. 🐆`,
+    `¡Casi! La respuesta era **${correctAnswer}**.\n\nNo te preocupés, el guaraní ya está en vos. Solo hay que despertarlo. 🐆`,
     `¡Uy, esa era difícil! Era **${correctAnswer}**.\n\nNadie nace sabiendo. Cada guaraní que aprendés es una raíz que recuperás. 💙`,
     `¡Casi la tenés! Era **${correctAnswer}**.\n\nEl jaguaréte también tropieza, pero siempre se levanta. Seguí. 🐆`,
     `El guaraní es como el mate: se aprende tomando. 🧉\n\nLa correcta era **${correctAnswer}**. ¡Otra más!`,
-    `¡No pasa nada, che! Era **${correctAnswer}**.\n\nEn Paraguay nadie te juzga por equivocarte. Acá se aprende junto. 💙`,
+    `¡No pasa nada! Era **${correctAnswer}**.\n\nEn Paraguay nadie te juzga por equivocarte. Acá se aprende junto. 💙`,
     `Era **${correctAnswer}**.\n\nCada error es una palabra que ya no se te olvida. Tu ñe'ẽ crece. 🌱`,
     `¡Casi! Era **${correctAnswer}**.\n\nVos no estás aprendiendo un idioma. Estás recuperando lo que siempre fue tuyo. 🐆`,
     `Era **${correctAnswer}**.\n\nEl que nunca se equivoca, nunca aprende. Vos ya estás un paso adelante. 💪`,
@@ -65,7 +65,7 @@ function buildSuccessMessage(
 }
 
 function streakLabel(n: number): string | null {
-  if (n === 2) return "¡Vas bien, che! 🔥";
+  if (n === 2) return "¡Vas bien! 🔥";
   if (n === 3) return "¡Racha x3! El jaguaréte está orgulloso. 🐆";
   if (n === 4) return "¡Imparable! ¿Vos ya sabías guaraní en otra vida? ✨";
   if (n >= 5) return "¡PERFECTO! El jaguaréte te nombra guerrero del Ñe'ẽ. 🐆⚔️";
@@ -403,7 +403,7 @@ function ResultsScreen({
       {isPerfect && (
         <div className="mt-5 rounded-xl border border-accent/30 bg-accent/5 p-4 text-left text-sm leading-relaxed text-foreground">
           <p className="font-display text-lg font-bold text-accent">
-            ¡PERFECTO, CHE! 🐆🐆🐆
+            ¡PERFECTO! 🐆🐆🐆
           </p>
           <p className="mt-2">
             El jaguaréte te nombra <strong>Guerrero del Ñe'ẽ</strong>.
