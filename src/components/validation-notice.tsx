@@ -5,16 +5,28 @@ import { ShieldCheck } from "lucide-react";
  * Regla: solo los especialistas validan el guaraní. Por el protocolo con el Ateneo,
  * aquí no se nombra al Ateneo ni se usan palabras como "homologación" o "aval".
  */
+/**
+ * El aviso general ahora lo muestra PreLaunchBanner en todas las pantallas con sesión,
+ * así que este queda vacío para no repetir el mismo mensaje dos veces en la misma pantalla.
+ */
 export function ValidationNotice() {
+  return null;
+}
+
+/**
+ * Aviso de pre-lanzamiento, arriba de todas las pantallas con sesión (lo monta el layout).
+ * Deja claro que la plataforma no se lanzó y que el guaraní está en revisión por especialistas.
+ */
+export function PreLaunchBanner() {
   return (
     <div
       role="note"
-      className="flex items-center justify-center gap-2 border-b border-primary/20 bg-primary/5 px-4 py-2.5 text-center text-xs font-medium text-primary sm:text-sm"
+      className="flex items-center justify-center gap-2 border-b border-primary/20 bg-primary/5 px-4 py-2 text-center text-xs font-medium text-primary sm:text-sm"
     >
       <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden />
       <span>
-        <strong>Contenido en validación:</strong> especialistas en la lengua lo están revisando antes
-        de usarlo en clase.
+        <strong>Acceso anticipado:</strong> Jaikuaa todavía no se lanzó oficialmente. Las palabras están en
+        revisión por docentes especialistas; si ves un error, avisanos.
       </span>
     </div>
   );

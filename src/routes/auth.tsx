@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { SiteFooter, TrustBadges } from "@/components/site-footer";
 import { cleanRefCode, REF_STORAGE_KEY } from "@/lib/ambassador";
 import { createAfterLoginRedirect, peekAfterLogin } from "@/lib/after-login";
+import { EarlyAccessBadge } from "@/components/early-access-badge";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -169,6 +170,7 @@ function AuthPage() {
       </header>
       <main className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
         <div className="w-full max-w-md">
+          <EarlyAccessBadge className="mb-6" />
           <div className="text-center">
             <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               {isLogin ? "Iniciar sesión" : "Registrarse"}

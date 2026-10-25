@@ -7,6 +7,7 @@ import { MobileBottomNav } from "@/components/navigation/mobile-bottom-nav";
 import { InstallBanner } from "@/components/navigation/install-banner";
 import { showsBottomNav } from "@/lib/bottom-nav";
 import { rememberAfterLogin } from "@/lib/after-login";
+import { PreLaunchBanner } from "@/components/validation-notice";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -48,6 +49,7 @@ function AuthenticatedLayout() {
   return (
     <>
       <OfflineStatusBar />
+      <PreLaunchBanner />
       <div key={key} className={`page-in ${withNav ? "pb-20 md:pb-0" : ""}`}>
         <Outlet />
       </div>

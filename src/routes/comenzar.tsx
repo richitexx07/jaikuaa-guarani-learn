@@ -7,6 +7,7 @@ import { saveMotivation, markOnboardingDone, type Motivation } from "@/lib/onboa
 import jaiImg from "@/assets/jai-tradicional.png";
 const jaiAsset = { url: jaiImg };
 import { celebrate } from "@/lib/confetti";
+import { EarlyAccessBadge } from "@/components/early-access-badge";
 
 export const Route = createFileRoute("/comenzar")({
   ssr: false,
@@ -128,6 +129,7 @@ function Onboarding() {
 
         {step === 1 && (
           <section className="flex flex-col items-center gap-6 text-center">
+            <EarlyAccessBadge />
             <JaiCharacter />
             <h1 className="font-display text-2xl font-semibold leading-snug text-primary sm:text-3xl">
               ¡Mba'éichapa! 🐆 Soy Jai, el jaguaréte de Jaikuaa.
