@@ -188,11 +188,14 @@ function AuthPage() {
             <GoogleIcon /> Continuar con Google
           </Button>
           <p className="mt-2 text-center text-xs text-muted-foreground">Entrás en un toque, sin contraseña.</p>
+          <p className="mt-1 text-center text-xs text-muted-foreground">
+            Solo usamos tu nombre y tu correo. Nunca publicamos nada en tu nombre.
+          </p>
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-background px-2 text-muted-foreground">o {isLogin ? "ingresá" : "registrate"} con tu correo</span>
+              <span className="bg-background px-2 text-muted-foreground">¿Preferís no usar Google? {isLogin ? "Ingresá" : "Registrate"} con tu correo</span>
             </div>
           </div>
 
@@ -270,6 +273,11 @@ function AuthPage() {
           </p>
 
           <TrustBadges className="mt-8" />
+          {/* Solo respaldos vigentes. El Ateneo y el ISL se suman cuando estén firmados y validados. */}
+          <p className="mt-4 text-center text-[11px] leading-relaxed text-muted-foreground">
+            Declarada de interés nacional y educativo por la Cámara de Senadores (Declaración N.° 547/2026) y de
+            interés lingüístico por la Secretaría de Políticas Lingüísticas (Resolución N.° 116/2026).
+          </p>
         </div>
       </main>
       <SiteFooter />
