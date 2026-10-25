@@ -273,10 +273,11 @@ function AuthPage() {
           </p>
 
           <TrustBadges className="mt-8" />
-          {/* Solo respaldos vigentes. El Ateneo y el ISL se suman cuando estén firmados y validados. */}
+          {/* Solo respaldos vigentes (Senado, Diputados, SPL). El Ateneo y el ISL se suman cuando estén firmados y validados. */}
           <p className="mt-4 text-center text-[11px] leading-relaxed text-muted-foreground">
-            Declarada de interés nacional y educativo por la Cámara de Senadores (Declaración N.° 547/2026) y de
-            interés lingüístico por la Secretaría de Políticas Lingüísticas (Resolución N.° 116/2026).
+            Declarada de interés nacional y educativo por la Cámara de Senadores (Declaración N.° 547/2026) y por la
+            Cámara de Diputados (Declaración N.° 2001), y de interés lingüístico por la Secretaría de Políticas
+            Lingüísticas (Resolución N.° 116/2026).
           </p>
         </div>
       </main>
