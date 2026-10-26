@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, RotateCcw, Volume2, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { GameShell, LessonFilter, NotEnough, XpNote, pickDistinct, shuffle, useGameWords } from "@/components/games/game-shell";
+import { LessonFilter, NotEnough, pickDistinct, shuffle, useGameWords } from "@/components/games/game-shell";
+import { GameStage } from "@/components/games/game-stage";
 import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { playGuarani } from "@/lib/audio";
@@ -45,18 +45,48 @@ function Duel() {
   }, [q.data]);
 
   return (
-    <GameShell title="Duelo Cara a Cara" emoji="🤜" sponsorSlot="duelo">
-      <LessonFilter value={lesson} onChange={setLesson} />
+    <GameStage
+      title="Duelo Cara a Cara"
+      sponsorSlot="duelo"
+      css={CSS}
+      background={`linear-gradient(160deg, ${V.rojo} 0%, ${V.rojo} 48%, #FFFFFF 48%, #FFFFFF 52%, ${V.azul} 52%, ${V.azul} 100%)`}
+    >
+      <div className="dv-filter flex justify-center">
+        <LessonFilter value={lesson} onChange={setLesson} />
+      </div>
       <div className="mt-6">
         {q.isLoading ? (
-          <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>
+          <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
         ) : pool.length < MIN_WORDS ? (
           <NotEnough min={MIN_WORDS} />
         ) : (
           <Board key={`${lesson}-${match}`} pool={pool} onRematch={() => setMatch((m) => m + 1)} />
         )}
       </div>
-    </GameShell>
+    </GameStage>
+  );
+}
+
+/* Rojo contra azul, como la bandera: cada jugador tiene su color. */
+const V = { rojo: "#D52B1E", azul: "#0038A8", tinta: "#101426", oro: "#F6C445" };
+const COLOR = [V.azul, V.rojo] as const;
+
+const CSS = `
+.dv-filter label { color: #fff; } .dv-filter select { background: rgba(0,0,0,.25); color: #fff; border-color: rgba(255,255,255,.4); } .dv-filter select option { color: #000; }
+.dv-rayo { animation: dv-rayo 1.8s ease-in-out infinite; transform-origin: center; }
+@keyframes dv-rayo { 0%, 100% { transform: scale(1) rotate(0) } 10% { transform: scale(1.15) rotate(-6deg) } 20% { transform: scale(1) } }
+.dv-punto { animation: dv-punto .5s cubic-bezier(.2,1.5,.4,1) 1; }
+@keyframes dv-punto { from { transform: scale(1.8) } }
+.dv-shake { animation: dv-shake .3s ease-in-out 2; }
+@keyframes dv-shake { 25% { transform: translateX(-5px) } 75% { transform: translateX(5px) } }
+@media (prefers-reduced-motion: reduce) { .dv-rayo, .dv-punto, .dv-shake { animation: none !important } }
+`;
+
+function Rayo({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 40 60" className={`dv-rayo ${className}`} aria-hidden>
+      <path d="M26 0 L4 34 H18 L12 60 L36 22 H22 Z" fill={V.oro} stroke={V.tinta} strokeWidth="2.5" strokeLinejoin="round" />
+    </svg>
   );
 }
 
@@ -122,44 +152,63 @@ function Board({ pool, onRematch }: { pool: GameWord[]; onRematch: () => void })
 
   if (!started) {
     return (
-      <div className="mx-auto max-w-md space-y-4 rounded-2xl border border-border bg-card p-6 text-center shadow-elegant">
-        <p className="font-display text-xl font-bold text-foreground">Apoyen el celular sobre la mesa</p>
-        <p className="text-sm text-muted-foreground">
-          Cada uno se sienta de un lado. Suena una palabra en guaraní: el primero que toca su traducción gana el punto.
-          Si te equivocás, quedás bloqueado un segundo. Gana quien llega a {TARGET}.
-        </p>
-        <Button size="lg" className="h-14 w-full text-lg" onClick={() => setStarted(true)}>¡Empezar duelo!</Button>
-        <Button asChild variant="outline" size="lg" className="mt-3 h-12 w-full"><Link to="/juegos/nee-rape" search={{ sala: undefined, sendero: "nemongeta" }}>📲 Jugar a distancia (cada uno en su celular)</Link></Button>
+      <div className="mx-auto max-w-md space-y-5 text-center">
+        <div className="flex items-center justify-center gap-3">
+          <span className="font-display text-5xl font-bold sm:text-6xl">J1</span>
+          <Rayo className="h-20 w-14" />
+          <span className="font-display text-5xl font-bold sm:text-6xl">J2</span>
+        </div>
+        <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">Duelo Cara a Cara</h1>
+        <div className="rounded-3xl bg-white p-5 text-left shadow-2xl" style={{ color: V.tinta }}>
+          <p className="font-display text-lg font-bold">Apoyen el celular sobre la mesa</p>
+          <p className="mt-2 text-sm leading-relaxed opacity-80">
+            Cada uno se sienta de un lado. Suena una palabra en guaraní: el primero que toca su traducción gana el punto.
+            Si te equivocás, quedás bloqueado un segundo. Gana quien llega a {TARGET}.
+          </p>
+          <button type="button" className="mt-4 h-14 w-full rounded-2xl font-display text-xl font-bold text-white" style={{ background: V.tinta }} onClick={() => setStarted(true)}>
+            ¡Empezar duelo!
+          </button>
+          <Link to="/juegos/nee-rape" search={{ sala: undefined, sendero: "nemongeta" }} className="mt-2 flex h-12 w-full items-center justify-center rounded-2xl text-sm font-semibold ring-1 ring-[#101426]/20">
+            📲 Jugar a distancia (cada uno en su celular)
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (finished) {
-    const champ = score[0] > score[1] ? "Jugador 1" : "Jugador 2";
+    const w = score[0] > score[1] ? 0 : 1;
+    const champ = w === 0 ? "Jugador 1" : "Jugador 2";
     return (
-      <div className="mx-auto max-w-md space-y-4 rounded-2xl border border-primary/30 bg-card p-6 text-center shadow-elegant">
-        <div className="text-5xl" aria-hidden>🏆</div>
-        <p className="font-display text-2xl font-bold text-foreground">¡{champ} ganó el duelo!</p>
-        <p className="font-display text-4xl font-bold text-primary tabular-nums">{score[0]} — {score[1]}</p>
-        {xp > 0 && <XpNote xp={xp} />}
-        <p className="text-xs text-muted-foreground">El XP se suma a la cuenta con sesión iniciada (Jugador 1).</p>
+      <div className="mx-auto max-w-md space-y-4 rounded-3xl p-6 text-center text-white shadow-2xl ring-4 ring-white" style={{ background: COLOR[w] }}>
+        <svg viewBox="0 0 64 64" className="mx-auto h-20 w-20" aria-hidden>
+          <path d="M18 8 H46 V22 Q46 38 32 40 Q18 38 18 22 Z" fill={V.oro} />
+          <path d="M18 12 H8 Q8 26 20 28 M46 12 H56 Q56 26 44 28" fill="none" stroke={V.oro} strokeWidth="4" />
+          <rect x="28" y="40" width="8" height="10" fill={V.oro} />
+          <rect x="20" y="50" width="24" height="6" rx="2" fill={V.oro} />
+        </svg>
+        <p className="font-display text-3xl font-bold">¡{champ} ganó el duelo!</p>
+        <p className="font-display text-6xl font-bold tabular-nums">{score[0]} — {score[1]}</p>
+        {xp > 0 && <p className="font-bold" style={{ color: V.oro }}>+{xp} XP</p>}
+        <p className="text-xs opacity-80">El XP se suma a la cuenta con sesión iniciada (Jugador 1).</p>
         <div className="flex flex-wrap justify-center gap-2">
-          <Button size="lg" onClick={onRematch}><RotateCcw /> Revancha ya</Button>
-          <ShareResult text={`¡Jugamos un Duelo Cara a Cara en guaraní en Jaikuaa y terminó ${score[0]} a ${score[1]}! ¿Te animás a desafiarme?`} />
+          <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl bg-white px-6 font-bold" style={{ color: COLOR[w] }}><RotateCcw className="h-5 w-5" /> Revancha ya</button>
+          <ShareResult text={`¡Jugamos un Duelo Cara a Cara en guaraní en Jaikuaa y terminó ${score[0]} a ${score[1]}! ¿Te animás a desafiarme? 🇵🇾`} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col overflow-hidden bg-card">
+    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col overflow-hidden" style={{ background: V.tinta }}>
       <PlayerHalf p={1} round={round} winner={winner} locked={locked[1]} wrong={wrongPick[1]} onPick={pick} rotated />
-      <div className="flex shrink-0 items-center justify-between gap-2 border-y border-border bg-primary px-2 py-1.5 text-primary-foreground">
-        <Button size="icon" variant="ghost" className="h-9 w-9 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" onClick={onRematch} aria-label="Salir del duelo"><X /></Button>
-        <span className="font-display text-xs font-semibold">J1</span>
-        <span className="font-display text-2xl font-bold tabular-nums" aria-live="polite">{score[0]} — {score[1]}</span>
-        <span className="font-display text-xs font-semibold">J2</span>
-        <Button size="icon" variant="ghost" className="h-9 w-9 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" onClick={() => say(round.word)} disabled={!round.word.hasAudio} aria-label="Escuchar otra vez"><Volume2 /></Button>
+      <div className="relative flex shrink-0 items-center justify-between gap-2 bg-white px-2 py-2" style={{ color: V.tinta }}>
+        <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-black/5" onClick={onRematch} aria-label="Salir del duelo"><X /></button>
+        <span key={`a${score[0]}`} className="dv-punto font-display text-4xl font-bold tabular-nums" style={{ color: V.azul }}>{score[0]}</span>
+        <Rayo className="h-10 w-7" />
+        <span key={`b${score[1]}`} className="dv-punto rotate-180 font-display text-4xl font-bold tabular-nums" style={{ color: V.rojo }}>{score[1]}</span>
+        <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-black/5 disabled:opacity-30" onClick={() => say(round.word)} disabled={!round.word.hasAudio} aria-label="Escuchar otra vez"><Volume2 /></button>
+        <span className="sr-only" aria-live="polite">{score[0]} a {score[1]}</span>
       </div>
       <PlayerHalf p={0} round={round} winner={winner} locked={locked[0]} wrong={wrongPick[0]} onPick={pick} />
     </div>
@@ -175,30 +224,34 @@ function PlayerHalf({ p, round, winner, locked, wrong, onPick, rotated }: {
   return (
     <section
       aria-label={`Jugador ${p + 1}`}
-      className={`flex min-h-0 flex-1 flex-col justify-center gap-2 px-4 py-2 transition-colors ${rotated ? "rotate-180" : ""} ${won ? "bg-primary/10" : locked ? "bg-accent/10" : ""}`}
+      className={`flex min-h-0 flex-1 flex-col justify-center gap-3 px-5 py-3 text-white transition-[filter] ${rotated ? "rotate-180" : ""} ${locked ? "dv-shake" : ""}`}
+      style={{ background: COLOR[p], filter: lost ? "saturate(.4) brightness(.8)" : "none" }}
     >
-      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <div className="flex items-center justify-between text-sm font-semibold">
         <span>Jugador {p + 1}</span>
-        <span>{won ? "¡Punto!" : lost ? "Punto rival" : locked ? "Bloqueado…" : "¿Qué significa?"}</span>
+        <span className="rounded-full bg-black/20 px-3 py-0.5">{won ? "¡Punto!" : lost ? "Punto rival" : locked ? "Bloqueado…" : "¿Qué significa?"}</span>
       </div>
-      <div className="text-center font-display text-2xl font-bold text-foreground">{round.word.gn}</div>
+      <div className="text-center font-display text-4xl font-bold">{round.word.gn}</div>
       <div className="grid gap-2">
         {round.options.map((o) => {
           const correct = winner !== null && o === round.word.es;
           const isWrong = wrong === o;
           return (
-            <Button
+            <button
               key={o}
               type="button"
-              variant="outline"
               disabled={locked || winner !== null}
               onPointerDown={(e) => { e.preventDefault(); onPick(p, o); }}
-              className={`h-11 whitespace-normal break-words text-base font-semibold ${
-                correct ? "border-primary bg-primary/15 text-primary disabled:opacity-100" : isWrong ? "border-accent bg-accent/15 text-accent disabled:opacity-100" : ""
-              }`}
+              className="min-h-12 whitespace-normal break-words rounded-2xl px-3 text-lg font-bold transition active:scale-[.98]"
+              style={{
+                background: correct ? "#fff" : isWrong ? "rgba(0,0,0,.35)" : "rgba(255,255,255,.16)",
+                color: correct ? "#2F7A4A" : "#fff",
+                boxShadow: correct ? `0 0 0 3px ${V.oro}` : "inset 0 0 0 2px rgba(255,255,255,.35)",
+                opacity: (locked || winner !== null) && !correct && !isWrong ? 0.55 : 1,
+              }}
             >
               {o}
-            </Button>
+            </button>
           );
         })}
       </div>

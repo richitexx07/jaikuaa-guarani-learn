@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { RotateCcw, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { GameShell, XpNote, shuffle } from "@/components/games/game-shell";
+import { shuffle } from "@/components/games/game-shell";
+import { GameStage } from "@/components/games/game-stage";
 import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
@@ -36,10 +36,54 @@ function TriviaDuel() {
   return (
     <>
       <ValidationNotice />
-      <GameShell title="Duelo de Trivia" emoji="🧠" sponsorSlot="trivia-duelo">
+      <GameStage
+        title="Duelo de Trivia"
+        sponsorSlot="trivia-duelo"
+        css={CSS}
+        background={`radial-gradient(70% 45% at 50% 0%, #1F4A8F 0%, transparent 70%), ${TV.estudio}`}
+      >
         <Board key={match} onRematch={() => setMatch((m) => m + 1)} />
-      </GameShell>
+      </GameStage>
     </>
+  );
+}
+
+/* Estudio de concurso: azul noche, luces doradas y una ruleta de colores. */
+const TV = { estudio: "#0B1F45", oro: "#F6C445", j1: "#0E7C86", j2: "#7A3FB0", tinta: "#0B1F45" };
+const JC = [TV.j1, TV.j2] as const;
+const GAJOS = ["#D52B1E", "#F6C445", "#1F8A5B", "#FFFFFF", "#0038A8", "#E9A23B", "#7FD3A8", "#E0457B"];
+
+const CSS = `
+.tv-spin { animation: tv-spin 24s linear infinite; transform-box: view-box; transform-origin: 0px 0px; }
+@keyframes tv-spin { to { transform: rotate(360deg) } }
+.tv-bulbs span { animation: tv-bulb 1.2s steps(2) infinite; }
+.tv-bulbs span:nth-child(2n) { animation-delay: .6s; }
+@keyframes tv-bulb { 50% { opacity: .3 } }
+.tv-punto { animation: tv-punto .5s cubic-bezier(.2,1.5,.4,1) 1; }
+@keyframes tv-punto { from { transform: scale(1.8) } }
+@media (prefers-reduced-motion: reduce) { .tv-spin, .tv-bulbs span, .tv-punto { animation: none !important } }
+`;
+
+function Ruleta({ className = "", gira = true }: { className?: string; gira?: boolean }) {
+  return (
+    <svg viewBox="-60 -66 120 126" className={className} aria-hidden>
+      <g className={gira ? "tv-spin" : ""}>
+        {GAJOS.map((c, i) => (
+          <path key={i} d={`M0 0 L${54 * Math.cos((i * Math.PI) / 4)} ${54 * Math.sin((i * Math.PI) / 4)} A54 54 0 0 1 ${54 * Math.cos(((i + 1) * Math.PI) / 4)} ${54 * Math.sin(((i + 1) * Math.PI) / 4)} Z`} fill={c} />
+        ))}
+      </g>
+      <circle r="56" fill="none" stroke="#F3E3B5" strokeWidth="4" />
+      <circle r="12" fill={TV.estudio} stroke="#F3E3B5" strokeWidth="3" />
+      <path d="M-9 -66 H9 L0 -50Z" fill="#F3E3B5" />
+    </svg>
+  );
+}
+
+function Focos() {
+  return (
+    <div className="tv-bulbs flex justify-center gap-3" aria-hidden>
+      {Array.from({ length: 11 }, (_, i) => <span key={i} className="h-2.5 w-2.5 rounded-full" style={{ background: TV.oro, boxShadow: `0 0 8px ${TV.oro}` }} />)}
+    </div>
   );
 }
 
@@ -91,47 +135,65 @@ function Board({ onRematch }: { onRematch: () => void }) {
 
   if (!started) {
     return (
-      <div className="mx-auto max-w-md space-y-4 rounded-2xl border border-border bg-card p-6 text-center shadow-elegant">
-        <p className="font-display text-xl font-bold text-foreground">Apoyen el celular sobre la mesa</p>
-        <p className="text-sm text-muted-foreground">
-          Gastronomía, mitos, deportes, música, historia y naturaleza del Paraguay. Cada uno tiene una sola chance por pregunta:
-          el primero que acierta gana el punto. Si fallás, tu rival puede responder tranquilo. Gana quien llega a {TARGET}.
-        </p>
-        <Button size="lg" className="h-14 w-full text-lg" onClick={() => setStarted(true)}>¡Empezar duelo!</Button>
-        <Button asChild variant="outline" size="lg" className="mt-3 h-12 w-full"><Link to="/juegos/nee-rape" search={{ sala: undefined, sendero: "arandupy" }}>📲 Jugar a distancia (cada uno en su celular)</Link></Button>
+      <div className="mx-auto max-w-md space-y-5 text-center">
+        <Focos />
+        <Ruleta className="mx-auto h-44 w-44 drop-shadow-2xl" />
+        <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">Duelo de Trivia</h1>
+        <p className="text-white/75">¿Quién sabe más del Paraguay?</p>
+        <div className="rounded-3xl bg-white p-5 text-left shadow-2xl" style={{ color: TV.tinta }}>
+          <p className="font-display text-lg font-bold">Apoyen el celular sobre la mesa</p>
+          <p className="mt-2 text-sm leading-relaxed opacity-80">
+            Gastronomía, mitos, deportes, música, historia y naturaleza del Paraguay. Cada uno tiene una sola chance por pregunta:
+            el primero que acierta gana el punto. Si fallás, tu rival puede responder tranquilo. Gana quien llega a {TARGET}.
+          </p>
+          <button type="button" className="mt-4 h-14 w-full rounded-2xl font-display text-xl font-bold" style={{ background: TV.oro, color: TV.tinta }} onClick={() => setStarted(true)}>
+            ¡Empezar duelo!
+          </button>
+          <Link to="/juegos/nee-rape" search={{ sala: undefined, sendero: "arandupy" }} className="mt-2 flex h-12 w-full items-center justify-center rounded-2xl text-sm font-semibold ring-1 ring-[#0B1F45]/20">
+            📲 Jugar a distancia (cada uno en su celular)
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (finished) {
-    const champ = score[0] > score[1] ? "Jugador 1" : "Jugador 2";
+    const w = score[0] > score[1] ? 0 : 1;
+    const champ = w === 0 ? "Jugador 1" : "Jugador 2";
     return (
-      <div className="mx-auto max-w-md space-y-4 rounded-2xl border border-primary/30 bg-card p-6 text-center shadow-elegant">
-        <div className="text-5xl" aria-hidden>🏆</div>
-        <p className="font-display text-2xl font-bold text-foreground">¡{champ} ganó la trivia!</p>
-        <p className="font-display text-4xl font-bold text-primary tabular-nums">{score[0]} — {score[1]}</p>
-        {xp > 0 && <XpNote xp={xp} />}
-        <p className="text-xs text-muted-foreground">El XP se suma a la cuenta con sesión iniciada (Jugador 1).</p>
+      <div className="mx-auto max-w-md space-y-4 text-center">
+        <Focos />
+        <div className="space-y-3 rounded-3xl p-6 text-white shadow-2xl ring-4" style={{ background: JC[w], ["--tw-ring-color" as string]: TV.oro }}>
+          <p className="text-5xl" aria-hidden>🏆</p>
+          <p className="font-display text-3xl font-bold">¡{champ} ganó la trivia!</p>
+          <p className="font-display text-6xl font-bold tabular-nums">{score[0]} — {score[1]}</p>
+          {xp > 0 && <p className="font-bold" style={{ color: TV.oro }}>+{xp} XP</p>}
+          <p className="text-xs opacity-80">El XP se suma a la cuenta con sesión iniciada (Jugador 1).</p>
+        </div>
         <div className="flex flex-wrap justify-center gap-2">
-          <Button size="lg" onClick={onRematch}><RotateCcw /> Revancha ya</Button>
-          <ShareResult text={`¡Jugamos un Duelo de Trivia Paraguaya en Jaikuaa y terminó ${score[0]} a ${score[1]}! ¿Cuánto sabés del Paraguay?`} />
+          <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl px-6 font-bold" style={{ background: TV.oro, color: TV.tinta }}><RotateCcw className="h-5 w-5" /> Revancha ya</button>
+          <ShareResult text={`¡Jugamos un Duelo de Trivia Paraguaya en Jaikuaa y terminó ${score[0]} a ${score[1]}! ¿Cuánto sabés del Paraguay? 🇵🇾`} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col overflow-hidden bg-card">
+    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col overflow-hidden" style={{ background: TV.estudio }}>
       <Half p={1} q={q} pick={picks[1]} winner={winner} onPick={pick} rotated />
-      <div className="shrink-0 border-y border-border bg-primary px-2 py-1.5 text-primary-foreground">
+      <div className="relative shrink-0 px-2 py-2 text-white" style={{ background: TV.estudio }}>
         <div className="flex items-center justify-between gap-2">
-          <Button size="icon" variant="ghost" className="h-9 w-9 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" onClick={onRematch} aria-label="Salir del duelo"><X /></Button>
-          <span className="font-display text-xs font-semibold">J1</span>
-          <span className="font-display text-2xl font-bold tabular-nums" aria-live="polite">{score[0]} — {score[1]}</span>
-          <span className="font-display text-xs font-semibold">J2</span>
-          <span className="h-9 w-9" aria-hidden />
+          <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" onClick={onRematch} aria-label="Salir del duelo"><X /></button>
+          <span key={`a${score[0]}`} className="tv-punto font-display text-4xl font-bold tabular-nums" style={{ color: "#5FE0E8" }}>{score[0]}</span>
+          <div className="flex items-center gap-2">
+            <Ruleta className="h-10 w-10" gira={winner === null} />
+            <span className="max-w-[9rem] truncate text-xs font-semibold" style={{ color: TV.oro }}>{q.emoji} {q.cat}</span>
+          </div>
+          <span key={`b${score[1]}`} className="tv-punto rotate-180 font-display text-4xl font-bold tabular-nums" style={{ color: "#D3A6FF" }}>{score[1]}</span>
+          <span className="h-10 w-10" aria-hidden />
+          <span className="sr-only" aria-live="polite">{score[0]} a {score[1]}</span>
         </div>
-        {winner !== null && <p className="px-2 pb-1 text-center text-xs text-primary-foreground/90">{q.explanation}</p>}
+        {winner !== null && <p className="px-2 pb-1 pt-1 text-center text-xs text-white/90">{q.explanation}</p>}
       </div>
       <Half p={0} q={q} pick={picks[0]} winner={winner} onPick={pick} />
     </div>
@@ -143,29 +205,38 @@ function Half({ p, q, pick, winner, onPick, rotated }: {
   onPick: (p: 0 | 1, o: number) => void; rotated?: boolean;
 }) {
   const won = winner === p;
-  const status = won ? "¡Punto!" : winner === "none" ? "Nadie acertó" : winner !== null ? "Punto rival" : pick !== null ? "Fallaste, espera…" : "¡Rápido!";
+  const status = won ? "¡Punto!" : winner === "none" ? "Nadie acertó" : winner !== null ? "Punto rival" : pick !== null ? "Fallaste, esperá…" : "¡Rápido!";
   return (
-    <section aria-label={`Jugador ${p + 1}`} className={`flex min-h-0 flex-1 flex-col justify-center gap-2 px-3 py-2 transition-colors ${rotated ? "rotate-180" : ""} ${won ? "bg-primary/10" : pick !== null && winner === null ? "bg-accent/10" : ""}`}>
-      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        <span>{q.emoji} {q.cat}</span>
-        <span>{status}</span>
+    <section
+      aria-label={`Jugador ${p + 1}`}
+      className={`flex min-h-0 flex-1 flex-col justify-center gap-2.5 px-4 py-2 text-white ${rotated ? "rotate-180" : ""}`}
+      style={{ background: JC[p], filter: winner !== null && !won ? "saturate(.5) brightness(.85)" : "none" }}
+    >
+      <div className="flex items-center justify-between text-sm font-semibold">
+        <span>Jugador {p + 1}</span>
+        <span className="rounded-full bg-black/20 px-3 py-0.5">{status}</span>
       </div>
-      <div className="text-center font-display text-base font-bold leading-snug text-foreground">{q.q}</div>
+      <div className="text-center font-display text-lg font-bold leading-snug sm:text-xl">{q.q}</div>
       <div className="grid grid-cols-2 gap-2">
         {q.options.map((o, i) => {
           const reveal = winner !== null && i === q.answer;
           const wrong = pick === i && i !== q.answer;
           return (
-            <Button
+            <button
               key={o}
               type="button"
-              variant="outline"
               disabled={pick !== null || winner !== null}
               onPointerDown={(e) => { e.preventDefault(); onPick(p, i); }}
-              className={`h-auto min-h-11 whitespace-normal break-words py-1.5 text-sm font-semibold ${reveal ? "border-primary bg-primary/15 text-primary disabled:opacity-100" : wrong ? "border-accent bg-accent/15 text-accent disabled:opacity-100" : ""}`}
+              className="min-h-12 whitespace-normal break-words rounded-2xl px-2 py-1.5 text-sm font-bold transition active:scale-[.98] sm:text-base"
+              style={{
+                background: reveal ? "#fff" : wrong ? "rgba(0,0,0,.35)" : "rgba(255,255,255,.15)",
+                color: reveal ? "#2F7A4A" : "#fff",
+                boxShadow: reveal ? `0 0 0 3px ${TV.oro}` : "inset 0 0 0 2px rgba(255,255,255,.3)",
+                opacity: (pick !== null || winner !== null) && !reveal && !wrong ? 0.6 : 1,
+              }}
             >
               {o}
-            </Button>
+            </button>
           );
         })}
       </div>

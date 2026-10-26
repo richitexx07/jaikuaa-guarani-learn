@@ -4,7 +4,8 @@ import { Copy, Loader2, MessageCircle, RotateCcw, Users, Volume2, Wifi } from "l
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { GameShell, XpNote, shuffle, useGameWords } from "@/components/games/game-shell";
+import { XpNote, shuffle, useGameWords } from "@/components/games/game-shell";
+import { GameStage } from "@/components/games/game-stage";
 import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,7 +44,7 @@ const SENDEROS: { id: SenderoId; emoji: string; gn: string; es: string; desc: st
   { id: "achegety", emoji: "📜", gn: "Achegety ha Hai", es: "Ortografía", desc: "Elegí cómo se escribe la palabra, contra reloj.", tip: "Recordá: un sonido, una letra; y las vocales nasales llevan tilde nasal (~).", ready: true },
   { id: "nemongeta", emoji: "💬", gn: "Ñemongeta", es: "Vocabulario cotidiano", desc: "Escuchá o leé la palabra y elegí su significado.", tip: "Escuchá bien la nasalidad: cambia el significado de la palabra.", ready: true },
   { id: "arandupy", emoji: "🏺", gn: "Arandupy", es: "Cultura y mitos", desc: "Mitos, comidas, historia y naturaleza del Paraguay.", tip: "La cultura paraguaya vive en su lengua: cada respuesta suma identidad.", ready: true },
-  { id: "neenga", emoji: "🪕", gn: "Ñe'ẽnga", es: "Dichos y poesía", desc: "En preparación con docentes y pasantes del Ateneo.", tip: "", ready: false },
+  { id: "neenga", emoji: "🪕", gn: "Ñe'ẽnga", es: "Dichos y poesía", desc: "En preparación con docentes especialistas.", tip: "", ready: false },
 ];
 
 type Round = { prompt: string; options: string[]; answer: number; audio?: string; tip?: string };
@@ -101,12 +102,17 @@ function NeeRape() {
   const enough = sendero === "arandupy" || new Set(pool.map((w) => w.gn)).size >= 8;
 
   return (
-    <GameShell title="Ñe'ẽ Rape" emoji="🛤️" sponsorSlot="nee-rape">
+    <GameStage
+      title="Ñe'ẽ Rape"
+      sponsorSlot="nee-rape"
+      css={CSS}
+      ink="#F7F1DE"
+      background="radial-gradient(80% 40% at 50% 0%, #2A7A55 0%, transparent 70%), linear-gradient(180deg, #1F5E43 0%, #123B2A 100%)"
+    >
+      <div className="nr">
       {mode === "menu" && (
         <div className="space-y-6">
-          <p className="text-center text-sm text-muted-foreground">
-            El camino de la palabra. Desafiá a un compañero: cada uno juega desde su celular.
-          </p>
+          <Sendero />
           <div className="grid gap-3 sm:grid-cols-2">
             {SENDEROS.map((s) => (
               <button
@@ -150,14 +156,58 @@ function NeeRape() {
               <Button disabled={joinCode.length !== 4} onClick={() => { setCode(joinCode); setIsHost(false); setMode("remote"); }}>Unirme</Button>
             </div>
           </div>
-          <p className="text-center text-[11px] text-muted-foreground">Contenido basado en el vocabulario validado por docentes y en las normas de la Academia de la Lengua Guaraní.</p>
+          <p className="text-center text-[11px] text-muted-foreground">Contenido basado en el vocabulario de Jaikuaa, en revisión por docentes especialistas.</p>
         </div>
       )}
       {mode === "solo" && <Solo sendero={sendero} pool={pool} onExit={() => setMode("menu")} />}
       {mode === "remote" && code && (
         <Remote code={code} isHost={isHost} sendero={sendero} pool={pool} onExit={() => { setMode("menu"); setCode(null); }} />
       )}
-    </GameShell>
+      </div>
+    </GameStage>
+  );
+}
+
+/*
+ * Paleta del sendero: monte verde, camino de tierra clara y paso dorado.
+ * Se redefinen los colores de la app dentro de .nr para que todo el juego tome el tono del monte.
+ */
+const CSS = `
+.nr {
+  --background: #123B2A; --foreground: #F7F1DE; --card: #1B4D37; --card-foreground: #F7F1DE;
+  --muted: #174632; --muted-foreground: #BFD3C4; --border: #2F6B50; --input: #3A7A5C;
+  --primary: #F2C14E; --primary-foreground: #1A2E22; --secondary: #FF8A5B; --secondary-foreground: #1A2E22;
+  --accent: #2F6B50; --accent-foreground: #F7F1DE; --destructive: #FF6B5E; --ring: #F2C14E;
+  color: var(--foreground);
+}
+.nr-paso { animation: nr-paso 2.4s ease-in-out infinite; }
+.nr-paso:nth-child(2n) { animation-delay: .3s; }
+@keyframes nr-paso { 50% { opacity: .35 } }
+.nr-viaje { offset-path: path("M46 100 C90 40 170 150 240 70 S330 40 352 30"); animation: nr-viaje 5s ease-in-out infinite; }
+@keyframes nr-viaje { from { offset-distance: 0% } to { offset-distance: 100% } }
+@media (prefers-reduced-motion: reduce) { .nr-paso, .nr-viaje { animation: none !important } }
+`;
+
+/** El camino de la palabra: dos celulares unidos por un sendero de puntos y una palabra que viaja. */
+function Sendero() {
+  return (
+    <div className="relative overflow-hidden rounded-3xl ring-1 ring-white/10" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.3))" }}>
+      <svg viewBox="0 0 400 150" className="mx-auto block max-h-44 w-full" aria-hidden>
+        <path d="M0 125 Q100 100 200 120 T400 110 V150 H0Z" fill="#174A34" />
+        <path d="M46 100 C90 40 170 150 240 70 S330 40 352 30" fill="none" stroke="#F3E3B5" strokeWidth="5" strokeDasharray="2 12" strokeLinecap="round" className="nr-paso" />
+        {[[14, 74], [352, 6]].map(([x, y], i) => (
+          <g key={i} transform={`translate(${x} ${y})`}>
+            <rect width="32" height="54" rx="7" fill="#0E2A1F" stroke="#F3E3B5" strokeWidth="3" />
+            <rect x="6" y="8" width="20" height="32" rx="2" fill={i ? "#F2C14E" : "#7FD3A8"} />
+          </g>
+        ))}
+        <circle r="9" fill="#F2C14E" className="nr-viaje" />
+      </svg>
+      <div className="px-5 pb-5">
+        <h1 className="font-display text-4xl font-bold leading-none tracking-tight">Ñe'ẽ Rape</h1>
+        <p className="mt-2 text-sm opacity-80">El camino de la palabra. Desafiá a un compañero: cada uno juega desde su celular.</p>
+      </div>
+    </div>
   );
 }
 

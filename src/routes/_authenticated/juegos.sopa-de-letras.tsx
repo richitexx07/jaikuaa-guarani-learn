@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { Check, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { SpeakerButton } from "@/components/audio/speaker-button";
-import { GameShell, LessonFilter, NotEnough, XpNote, shuffle, useGameWords, useIsWide } from "@/components/games/game-shell";
+import { LessonFilter, NotEnough, shuffle, useGameWords, useIsWide } from "@/components/games/game-shell";
+import { GameStage } from "@/components/games/game-stage";
 import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ACHEGETY, displayLetter, splitAchegety } from "@/lib/achegety";
@@ -83,20 +83,41 @@ function WordSearch() {
   }, [q.data, size, round]);
 
   return (
-    <GameShell title="Sopa de letras" emoji="🔤" sponsorSlot="sopa-de-letras">
-      <LessonFilter value={lesson} onChange={setLesson} />
-      <div className="mt-6">
+    <GameStage
+      title="Sopa de letras"
+      sponsorSlot="sopa-de-letras"
+      css={CSS}
+      ink={S.tinta}
+      background={`linear-gradient(90deg, transparent 0 46px, rgba(213,43,30,.35) 46px 48px, transparent 48px), repeating-linear-gradient(0deg, transparent 0 27px, #C9DCF0 27px 28px), ${S.hoja}`}
+    >
+      <div className="sp-filter flex justify-center">
+        <LessonFilter value={lesson} onChange={setLesson} />
+      </div>
+      <div className="mt-4">
         {q.isLoading ? (
-          <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>
+          <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
         ) : !puzzle ? (
           <NotEnough min={COUNT} />
         ) : (
           <Board key={`${round}-${size}`} puzzle={puzzle} onNext={() => setRound((r) => r + 1)} />
         )}
       </div>
-    </GameShell>
+    </GameStage>
   );
 }
+
+/* Hoja de cuaderno escolar con resaltadores de colores. */
+const S = { hoja: "#F5F9FE", tinta: "#13294B", margen: "#D52B1E" };
+const MARCADORES = ["#FFE066", "#8CE6B0", "#FFB3C7", "#A8D8FF", "#FFC48A", "#D4B8FF"];
+
+const CSS = `
+.sp-filter label { color: ${S.tinta}; } .sp-filter select { background: #fff; }
+.sp-mark { animation: sp-mark .35s cubic-bezier(.2,.8,.2,1) 1 both; transform-origin: left center; }
+@keyframes sp-mark { from { transform: scaleX(0) } }
+.sp-cell { transition: transform .1s; }
+.sp-cell[data-trail="true"] { transform: scale(1.12); }
+@media (prefers-reduced-motion: reduce) { .sp-mark { animation: none } .sp-cell { transition: none } }
+`;
 
 function Board({ puzzle, onNext }: { puzzle: Puzzle; onNext: () => void }) {
   const feedback = useGameFeedback();
@@ -169,55 +190,67 @@ function Board({ puzzle, onNext }: { puzzle: Puzzle; onNext: () => void }) {
 
   const trail = new Set(drag ? lineOf(drag.from, drag.to) : []);
 
+  /** Rectángulo de resaltador sobre las celdas de una palabra (en % de la grilla). */
+  function marca(cells: number[]) {
+    const r1 = Math.floor(cells[0]! / size), c1 = cells[0]! % size;
+    const r2 = Math.floor(cells[cells.length - 1]! / size), c2 = cells[cells.length - 1]! % size;
+    const u = 100 / size;
+    return { left: `${Math.min(c1, c2) * u + u * 0.08}%`, top: `${Math.min(r1, r2) * u + u * 0.12}%`, width: `${(Math.abs(c2 - c1) + 1) * u - u * 0.16}%`, height: `${(Math.abs(r2 - r1) + 1) * u - u * 0.24}%` };
+  }
+
   return (
-    <div className="space-y-3 sm:space-y-6">
-      <p className="text-center text-sm text-muted-foreground">
-        Deslizá el dedo sobre cada palabra, o tocá su primera y última letra (horizontal o vertical).
-      </p>
-      <div
-        className="sopa-grid mx-auto grid w-full max-w-[min(28rem,58vh)] touch-none select-none gap-1 lg:max-w-xl"
-        onPointerMove={move}
-        onPointerUp={up}
-        onPointerCancel={() => setDrag(null)}
-        onPointerLeave={up}
-        style={{ gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))` }}
-      >
-        {grid.map((t, i) => (
-          <Button variant="ghost"
-            key={i}
-            type="button"
-            data-cell={i}
-            onPointerDown={(e) => { (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId); down(e, i); }}
-            className={`flex h-auto aspect-square p-0 items-center justify-center rounded-md border text-sm font-bold transition-colors sm:text-base ${
-              trail.has(i)
-                ? "sopa-trail"
-                : foundCells.has(i)
-                ? "sopa-found border-primary text-primary-foreground"
-                : start === i
-                  ? "border-accent bg-accent text-accent-foreground"
-                  : miss.includes(i)
-                    ? "border-accent bg-accent/20 text-foreground"
-                    : "border-border bg-card text-foreground hover:border-primary"
-            }`}
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm opacity-75">Deslizá el dedo sobre cada palabra (horizontal o vertical).</p>
+        <p className="shrink-0 font-display text-lg font-bold">{found.size}/{placed.length}</p>
+      </div>
+      <div className="mx-auto w-full max-w-[min(30rem,60vh)] rounded-2xl bg-white p-2 shadow-[0_10px_30px_-12px_rgba(19,41,75,.35)] ring-1 ring-[#C9DCF0] lg:max-w-xl">
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-0" aria-hidden>
+            {placed.map((p, i) =>
+              found.has(i) ? <span key={i} className="sp-mark absolute rounded-full" style={{ ...marca(p.cells), background: MARCADORES[i % MARCADORES.length], transformOrigin: Math.floor(p.cells[0]! / size) === Math.floor(p.cells[p.cells.length - 1]! / size) ? "left center" : "center top" }} /> : null,
+            )}
+            {drag && trail.size > 0 && <span className="absolute rounded-full" style={{ ...marca([...trail].sort((x, y) => x - y)), background: "rgba(255,224,102,.75)" }} />}
+          </div>
+          <div
+            className="sopa-grid relative grid w-full touch-none select-none"
+            onPointerMove={move}
+            onPointerUp={up}
+            onPointerCancel={() => setDrag(null)}
+            onPointerLeave={up}
+            style={{ gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))` }}
           >
-            {displayLetter(t)}
-          </Button>
-        ))}
+            {grid.map((t, i) => (
+              <button
+                key={i}
+                type="button"
+                data-cell={i}
+                data-trail={trail.has(i)}
+                onPointerDown={(e) => { (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId); down(e, i); }}
+                className="sp-cell flex aspect-square items-center justify-center rounded-full font-display text-base font-bold sm:text-xl"
+                style={{
+                  color: foundCells.has(i) ? S.tinta : miss.includes(i) ? S.margen : "#2A3E62",
+                  background: start === i ? "#FFE066" : "transparent",
+                  boxShadow: start === i ? `0 0 0 2px ${S.tinta}` : "none",
+                }}
+              >
+                {displayLetter(t)}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <ul className="grid grid-cols-2 gap-1.5 sm:gap-2">
+      <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5">
         {placed.map((p, i) => (
-          <li
-            key={i}
-            className={`flex min-w-0 flex-wrap items-center gap-1 rounded-lg border px-2 py-1.5 text-xs sm:gap-2 sm:p-3 sm:text-sm ${
-              found.has(i) ? "border-primary/40 bg-primary/5" : "border-border bg-card"
-            }`}
-          >
-            {found.has(i) ? <Check className="h-4 w-4 text-primary" /> : <span className="h-4 w-4" />}
-            <span className="text-muted-foreground">{p.word.es}</span>
+          <li key={i} className="flex min-w-0 flex-wrap items-center gap-1.5 py-1 text-sm sm:text-base">
+            <span className="grid h-5 w-5 shrink-0 place-items-center rounded border-2" style={{ borderColor: S.tinta, background: found.has(i) ? MARCADORES[i % MARCADORES.length] : "#fff" }}>
+              {found.has(i) && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+            </span>
+            <span className={found.has(i) ? "line-through opacity-50" : ""}>{p.word.es}</span>
             {found.has(i) && (
               <>
-                <span className="ml-auto font-semibold text-primary">{p.word.gn}</span>
+                <span className="rounded px-1 font-display font-bold" style={{ background: MARCADORES[i % MARCADORES.length] }}>{p.word.gn}</span>
                 {p.word.hasAudio && <SpeakerButton gn={p.word.gn} />}
               </>
             )}
@@ -226,12 +259,13 @@ function Board({ puzzle, onNext }: { puzzle: Puzzle; onNext: () => void }) {
       </ul>
 
       {done && (
-        <div className="space-y-2 text-center">
-          <p className="font-display text-xl font-bold text-foreground">¡Encontraste todas!</p>
-          <XpNote xp={XP} />
+        <div className="space-y-3 rounded-3xl bg-white p-6 text-center shadow-lg ring-1 ring-[#C9DCF0]">
+          <p className="font-display text-3xl font-bold">¡Encontraste todas!</p>
+          <p className="text-3xl tracking-widest text-[#F2B544]" aria-label="3 de 3 estrellas">★★★</p>
+          <p className="font-bold text-[#2F7A4A]">+{XP} XP</p>
           <div className="flex flex-wrap justify-center gap-2">
-            <Button onClick={onNext}>Otra sopa</Button>
-            <ShareResult text="¡Encontré todas las palabras en guaraní de la Sopa de letras de Jaikuaa! ¿Te animás?" />
+            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: S.tinta }}>Otra sopa</button>
+            <ShareResult text="¡Encontré todas las palabras en guaraní de la Sopa de letras de Jaikuaa! ¿Te animás? 🇵🇾" />
           </div>
         </div>
       )}

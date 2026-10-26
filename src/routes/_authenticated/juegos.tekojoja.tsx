@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { GameShell, XpNote, shuffle } from "@/components/games/game-shell";
+import { shuffle } from "@/components/games/game-shell";
+import { GameStage } from "@/components/games/game-stage";
 import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
@@ -36,14 +36,46 @@ const CASES: Case[] = [
 ];
 const ROUNDS = 5;
 
+/* Sala del juzgado: bordó y madera, carpeta de expediente y sellos dorados. */
+const J = { bordo: "#4A1F2B", madera: "#3A1621", oro: "#E8C26A", carpeta: "#F1E2BE", papel: "#FFFCF4", tinta: "#2B1A12", verde: "#2F7A4A", rojo: "#B3261E" };
+
+const CSS = `
+.tj-mazo { transform-origin: 80% 80%; transform: rotate(-28deg); }
+.tj-golpe .tj-mazo { animation: tj-golpe .45s cubic-bezier(.6,0,.4,1) 1 both; }
+@keyframes tj-golpe { 0% { transform: rotate(-28deg) } 60% { transform: rotate(8deg) } 100% { transform: rotate(0deg) } }
+.tj-sello { animation: tj-sello .4s cubic-bezier(.2,1.6,.4,1) .25s 1 both; }
+@keyframes tj-sello { from { transform: scale(2.4) rotate(-20deg); opacity: 0 } }
+.tj-in { animation: tj-in .45s cubic-bezier(.2,.8,.2,1) 1 both; }
+@keyframes tj-in { from { transform: translateX(30px) rotate(2deg); opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { .tj-golpe .tj-mazo, .tj-sello, .tj-in { animation: none !important } }
+`;
+
+function Mazo({ golpe }: { golpe: boolean }) {
+  return (
+    <svg viewBox="0 0 120 80" className={`h-16 w-24 ${golpe ? "tj-golpe" : ""}`} aria-hidden>
+      <rect x="62" y="64" width="50" height="10" rx="3" fill="#6E3F18" />
+      <rect x="70" y="58" width="34" height="8" rx="2" fill="#8A5221" />
+      <g className="tj-mazo" style={{ transformBox: "view-box" }}>
+        <rect x="10" y="44" width="62" height="7" rx="3" fill="#8A5221" transform="rotate(-20 40 48)" />
+        <rect x="64" y="22" width="22" height="34" rx="5" fill="#6E3F18" transform="rotate(-20 75 39)" />
+        <rect x="62" y="30" width="26" height="5" fill={J.oro} transform="rotate(-20 75 39)" />
+      </g>
+    </svg>
+  );
+}
+
 function Tekojoja() {
   const [game, setGame] = useState(0);
   return (
-    <GameShell title="Tekojoja · Juzgado de Paz" emoji="⚖️" sponsorSlot="tekojoja">
+    <GameStage
+      title="Tekojoja · Juzgado de Paz"
+      sponsorSlot="tekojoja"
+      css={CSS}
+      background={`repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 90px), linear-gradient(180deg, ${J.bordo} 0%, ${J.madera} 100%)`}
+    >
       <ValidationNotice />
-      <p className="mt-4 text-center text-sm text-muted-foreground">Sos juez o jueza de paz. Leé el caso y elegí de qué se trata. 5 casos por partida.</p>
-      <div className="mt-6"><Court key={game} onAgain={() => setGame((g) => g + 1)} /></div>
-    </GameShell>
+      <Court key={game} onAgain={() => setGame((g) => g + 1)} />
+    </GameStage>
   );
 }
 
@@ -67,16 +99,28 @@ function Court({ onAgain }: { onAgain: () => void }) {
   }, [done, xp]);
 
   if (done) {
+    const stars = score >= 5 ? 3 : score >= 3 ? 2 : score >= 1 ? 1 : 0;
     return (
-      <div className="space-y-3 text-center">
-        <div className="text-5xl">⚖️</div>
-        <p className="font-display text-xl font-bold text-foreground">Resolviste bien {score} de {ROUNDS} casos</p>
-        <XpNote xp={xp} />
-        <div className="flex flex-wrap justify-center gap-2">
-          <Button onClick={onAgain}>Nuevos casos</Button>
-          <ShareResult text={`¡Resolví ${score} de ${ROUNDS} casos en el Juzgado de Paz de Jaikuaa! ¿Te animás?`} />
+      <section className="space-y-5 pt-2 text-center">
+        <div className="tj-in relative mx-auto max-w-md rounded-sm p-7 text-left shadow-2xl" style={{ background: J.papel, color: J.tinta }}>
+          <p className="text-center text-xs font-semibold uppercase tracking-wide opacity-60">Juzgado de Paz · Jaikuaa</p>
+          <h2 className="mt-2 text-center font-display text-3xl font-bold">Resolución</h2>
+          <p className="mt-4 leading-relaxed">Visto el desempeño de la jornada, se resuelve que la persona a cargo del juzgado resolvió bien <b>{score} de {ROUNDS} casos</b>.</p>
+          <p className="mt-3 text-center text-3xl tracking-widest" style={{ color: J.oro }} aria-label={`${stars} de 3 estrellas`}>
+            {"★".repeat(stars)}<span className="opacity-25">{"★".repeat(3 - stars)}</span>
+          </p>
+          <div className="mt-6 flex items-end justify-between">
+            <div className="w-36 border-t pt-1 text-center text-xs opacity-70" style={{ borderColor: J.tinta }}>Juez/a de paz</div>
+            <span className="tj-sello rotate-[-12deg] rounded-full border-4 px-3 py-2 text-xs font-bold uppercase" style={{ borderColor: J.verde, color: J.verde }}>+{xp} XP</span>
+          </div>
         </div>
-      </div>
+        <div className="flex flex-wrap justify-center gap-2">
+          <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: J.oro, color: J.tinta }}>Nuevos casos</button>
+          <div className="[&_a]:h-12 [&_a]:rounded-2xl [&_a]:border-white/30 [&_a]:bg-transparent [&_a]:text-white">
+            <ShareResult text={`¡Resolví ${score} de ${ROUNDS} casos en el Juzgado de Paz de Jaikuaa! ¿Te animás? 🇵🇾`} />
+          </div>
+        </div>
+      </section>
     );
   }
 
@@ -85,31 +129,63 @@ function Court({ onAgain }: { onAgain: () => void }) {
     setPick(o);
     if (o === c.answer) { setScore((s) => s + 1); feedback("success"); } else feedback("error");
   }
+  const ok = pick === c.answer;
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between text-sm text-muted-foreground"><span>Caso {i + 1}/{ROUNDS}</span><span>Aciertos: <b className="text-foreground">{score}</b></span></div>
-      <div className="rounded-xl border border-border bg-card p-5 shadow-elegant">
-        <div className="text-center text-5xl" aria-hidden>{c.emoji}</div>
-        <p className="mt-3 text-center text-lg text-foreground">{c.story}</p>
+    <section className="space-y-4 pt-1">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="font-display text-xl font-bold">Sos juez o jueza de paz</p>
+          <p className="text-sm text-white/70">Leé el caso y elegí de qué se trata.</p>
+        </div>
+        <Mazo golpe={!!pick} />
       </div>
+
+      <div key={i} className="tj-in relative">
+        <div className="ml-4 h-5 w-32 rounded-t-lg" style={{ background: "#E3CF9F" }} />
+        <div className="relative rounded-lg rounded-tl-none p-5 shadow-2xl" style={{ background: J.carpeta, color: J.tinta }}>
+          <div className="flex items-center justify-between text-xs font-semibold opacity-70">
+            <span>Expediente N.º {String(i + 1).padStart(3, "0")}/2026</span>
+            <span>Caso {i + 1} de {ROUNDS} · {score} bien</span>
+          </div>
+          <div className="mt-3 rounded p-4" style={{ background: J.papel }}>
+            <div className="flex gap-3">
+              <span className="text-4xl" aria-hidden>{c.emoji}</span>
+              <p className="text-lg leading-relaxed">{c.story}</p>
+            </div>
+          </div>
+          {pick && (
+            <span className="tj-sello absolute -top-3 right-3 rotate-[-8deg] rounded-md border-4 bg-[#FFFCF4]/85 px-3 py-1 font-display text-lg font-bold uppercase" style={{ borderColor: ok ? J.verde : J.rojo, color: ok ? J.verde : J.rojo }}>
+              {ok ? "Bien resuelto" : "A revisar"}
+            </span>
+          )}
+        </div>
+      </div>
+
       <div className="grid gap-2">
         {options.map((o) => {
-          const state = pick ? (o === c.answer ? "border-primary bg-primary/10 text-primary" : o === pick ? "border-destructive bg-destructive/10 text-destructive" : "border-border opacity-60") : "border-border";
+          const right = o === c.answer;
+          const estilo = pick
+            ? right ? { background: J.verde, color: "#fff" } : o === pick ? { background: J.rojo, color: "#fff" } : { background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.45)" }
+            : { background: "rgba(255,255,255,.08)", color: "#fff", boxShadow: `inset 0 0 0 2px rgba(232,194,106,.45)` };
           return (
-            <button key={o} type="button" onClick={() => choose(o)} className={`min-h-14 rounded-lg border-2 bg-card px-4 py-3 text-left text-base font-semibold transition active:scale-95 ${state}`}>{o}</button>
+            <button key={o} type="button" onClick={() => choose(o)} disabled={!!pick} className="min-h-14 rounded-2xl px-4 py-3 text-left font-display text-lg font-bold transition active:scale-[.98]" style={estilo}>
+              {o}
+            </button>
           );
         })}
       </div>
       {pick && (
         <div className="space-y-3">
-          <div className="rounded-lg bg-muted p-4 text-sm">
-            <p className="text-foreground">{c.why}</p>
-            <p className="mt-2 text-xs text-muted-foreground">Término en guaraní: pendiente de carga y validación por especialistas en derecho.</p>
+          <div className="rounded-2xl p-4 text-sm" style={{ background: "rgba(0,0,0,.25)" }}>
+            <p>{c.why}</p>
+            <p className="mt-2 text-xs text-white/60">Término en guaraní: pendiente de carga y validación por especialistas en derecho.</p>
           </div>
-          <Button size="lg" className="h-12 w-full" onClick={() => { setI((n) => n + 1); setPick(null); }}>{i + 1 === ROUNDS ? "Ver resultado" : "Siguiente caso →"}</Button>
+          <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold" style={{ background: J.oro, color: J.tinta }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
+            {i + 1 === ROUNDS ? "Ver la resolución" : "Siguiente caso"}
+          </button>
         </div>
       )}
-    </div>
+    </section>
   );
 }
