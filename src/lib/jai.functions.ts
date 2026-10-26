@@ -40,7 +40,7 @@ export const logJaiQuestion = createServerFn({ method: "POST" })
     return { ok: !error };
   });
 
-export type JaiConsulta = { texto: string; ruta: string; resultado: string; faq_id: string | null; created_at: string };
+export type JaiConsulta = { texto: string; ruta: string; resultado: string; faq_id: string | null; contacto: string | null; created_at: string };
 
 /** Para el administrador: lo que Jai no supo responder y qué respuestas se usan más (últimos 30 días). */
 export const getJaiReport = createServerFn({ method: "GET" })
@@ -52,7 +52,7 @@ export const getJaiReport = createServerFn({ method: "GET" })
     const since = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
     const { data, error } = await db
       .from("jai_consultas")
-      .select("texto, ruta, resultado, faq_id, created_at")
+      .select("texto, ruta, resultado, faq_id, contacto, created_at")
       .gte("created_at", since)
       .order("created_at", { ascending: false })
       .limit(1000);
