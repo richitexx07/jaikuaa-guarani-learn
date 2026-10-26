@@ -4,6 +4,8 @@ import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
 import { TRIVIA, TRIVIA_ORDER } from "@/lib/trivia";
 import { TriviaRoulette } from "@/components/games/trivia-roulette";
+import { TRIVIA_ART } from "@/lib/trivia-art";
+import bannerTrivia from "@/assets/covers/cover-trivia-duelo.webp";
 
 export const Route = createFileRoute("/_authenticated/trivia/")({
   head: () => ({
@@ -37,19 +39,24 @@ function TriviaLanding() {
         </div>
       </header>
 
-      <main className="flex-1 px-4 py-10 sm:px-6 sm:py-14">
+      <main className="flex-1 px-4 pb-28 pt-6 sm:px-6 sm:pt-10">
         <div className="mx-auto max-w-4xl">
-          <div className="text-center">
-            <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent">
-              🧠 Trivia
+          <section className="relative overflow-hidden rounded-3xl shadow-elegant">
+            <img
+              src={bannerTrivia}
+              alt="Jai, presentador de un programa de preguntas, junto a una ruleta de colores"
+              className="aspect-[16/10] w-full object-cover sm:aspect-[16/8]"
+              width={800}
+              height={600}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B1638]/90 via-[#0B1638]/30 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-5 text-white sm:p-7">
+              <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl">Jaikuaápa</h1>
+              <p className="mt-1 max-w-xl text-base text-white/85 sm:text-lg">
+                Girá la ruleta y demostrá cuánto sabés del Paraguay.
+              </p>
             </div>
-            <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              Jaikuaápa
-            </h1>
-            <p className="mx-auto mt-3 max-w-xl text-base text-muted-foreground sm:text-lg">
-              Girá la ruleta y demostrá cuánto sabés del Paraguay.
-            </p>
-          </div>
+          </section>
 
           <section className="mt-8">
             <TriviaRoulette />
@@ -71,10 +78,8 @@ function TriviaLanding() {
                   <span className="absolute right-4 top-4 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
                     Gratis
                   </span>
-                  <div className="text-4xl" aria-hidden>
-                    {cat.emoji}
-                  </div>
-                  <div className="mt-4 font-display text-lg font-bold text-foreground">
+                  <img src={TRIVIA_ART[id]} alt="" className="mx-auto h-24 w-24 object-contain drop-shadow-md transition-transform group-hover:scale-105 sm:h-28 sm:w-28" loading="lazy" />
+                  <div className="mt-3 font-display text-lg font-bold text-foreground">
                     {cat.title}
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground">{cat.subtitle}</p>

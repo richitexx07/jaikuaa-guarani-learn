@@ -8,6 +8,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { getFoundingSponsors } from "@/lib/sponsors.functions";
 import { DisplayToggles } from "@/components/display-toggles";
 import { EarlyAccessBadge } from "@/components/early-access-badge";
+import { NandutiDisc } from "@/components/nanduti-disc";
+import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
+import bannerCurso from "@/assets/banners/banner-curso.webp";
+import bannerEscolar from "@/assets/banners/banner-escolar.webp";
+import coverKaraoke from "@/assets/covers/cover-karaoke.webp";
 
 
 
@@ -37,6 +42,7 @@ function Index() {
       <Header />
       <main className="flex-1">
         <Hero />
+        <Adentro />
         <LiveAudioPreview />
         <FoundingSponsors />
       </main>
@@ -64,37 +70,91 @@ function Header() {
   );
 }
 
+const HERO_CSS = `
+.hero-jai { animation: hero-rise .9s cubic-bezier(.2,.8,.2,1) both .1s; }
+.hero-disc { animation: hero-fade 1.2s ease-out both; }
+@keyframes hero-rise { from { opacity: 0; transform: translateY(28px) scale(.96); } }
+@keyframes hero-fade { from { opacity: 0; transform: scale(.85); } }
+@media (prefers-reduced-motion: reduce) { .hero-jai, .hero-disc { animation: none; } }
+`;
+
 function Hero() {
   return (
-    <section className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-24 lg:py-32">
-      <div className="relative mx-auto max-w-3xl text-center">
-        <EarlyAccessBadge className="mb-8" />
-        <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
-          Aprendé y jugá
-          <br />
-          <span className="text-accent">en guaraní.</span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
-          Desafíos diarios, juegos y voces reales. Plataforma paraguaya para aprender guaraní.
-        </p>
-        <p className="mx-auto mt-3 text-sm font-medium text-primary/80">
-          +109 palabras con voz humana paraguaya 🇵🇾
-        </p>
+    <section className="relative overflow-hidden px-4 pb-14 pt-6 sm:px-6 sm:pt-10 lg:py-20">
+      <style>{HERO_CSS}</style>
+      <div className="mx-auto grid max-w-6xl items-center gap-6 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
+        <div className="relative order-2 text-center lg:order-1 lg:text-left">
+          <EarlyAccessBadge className="mb-7 lg:mx-0" />
+          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
+            Aprendé y jugá
+            <br />
+            <span className="text-accent">en guaraní.</span>
+          </h1>
+          <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl lg:mx-0">
+            Desafíos diarios, juegos y voces reales. Plataforma paraguaya para aprender guaraní.
+          </p>
+          <p className="mt-3 text-sm font-medium text-primary/80">
+            +109 palabras con voz humana paraguaya 🇵🇾
+          </p>
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-          <Button variant="cta" size="lg" asChild>
-            <Link to="/comenzar">Empezar — Libre acceso</Link>
-          </Button>
-          <Button variant="ghost" size="lg" asChild>
-            <Link to="/auth" search={{ mode: "login" }}>Iniciar sesión</Link>
-          </Button>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+            <Button variant="cta" size="lg" asChild>
+              <Link to="/comenzar">Empezar — Libre acceso</Link>
+            </Button>
+            <Button variant="ghost" size="lg" asChild>
+              <Link to="/auth" search={{ mode: "login" }}>Iniciar sesión</Link>
+            </Button>
+          </div>
+          <p className="mx-auto mt-6 max-w-md text-xs text-muted-foreground lg:mx-0">
+            No vendemos tus datos ni los compartimos con terceros para publicidad.{" "}
+            <Link to="/respaldos" className="font-medium text-accent hover:underline">
+              Ver respaldos institucionales
+            </Link>
+          </p>
         </div>
-        <p className="mx-auto mt-6 max-w-md text-xs text-muted-foreground">
-          No vendemos tus datos ni los compartimos con terceros para publicidad.{" "}
-          <Link to="/respaldos" className="font-medium text-accent hover:underline">
-            Ver respaldos institucionales
-          </Link>
-        </p>
+
+        <div className="relative order-1 mx-auto aspect-square w-full max-w-[19rem] sm:max-w-sm lg:order-2 lg:max-w-lg">
+          <div className="hero-disc absolute inset-0">
+            <NandutiDisc className="h-full w-full text-primary" />
+          </div>
+          <img
+            src={jaiBienvenida}
+            alt="Jai, el jaguarete de Jaikuaa, saluda con auriculares y el celular en la mano"
+            className="hero-jai absolute inset-[6%] h-[88%] w-[88%] object-contain drop-shadow-2xl"
+            width={640}
+            height={640}
+            fetchPriority="high"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const ADENTRO = [
+  { img: bannerCurso, title: "Un curso paso a paso", desc: "Lecciones cortas con voces humanas paraguayas, a tu ritmo." },
+  { img: coverKaraoke, title: "13 juegos", desc: "Karaoke, cocina, penales, duelos y más para practicar jugando." },
+  { img: bannerEscolar, title: "Guaraní Escolar", desc: "Organizado por grado, para entender y aprobar en la escuela." },
+];
+
+function Adentro() {
+  return (
+    <section className="px-4 pb-16 sm:px-6">
+      <div className="mx-auto max-w-6xl">
+        <h2 className="text-center font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          Lo que vas a encontrar
+        </h2>
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+          {ADENTRO.map((a) => (
+            <figure key={a.title} className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-elegant">
+              <img src={a.img} alt="" className="aspect-[16/10] w-full object-cover" width={800} height={500} loading="lazy" decoding="async" />
+              <figcaption className="p-5">
+                <p className="font-display text-lg font-bold text-foreground">{a.title}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{a.desc}</p>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
       </div>
     </section>
   );

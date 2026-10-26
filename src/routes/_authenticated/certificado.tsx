@@ -13,6 +13,7 @@ import { isOffline, readOfflineCopy, withOfflineCache } from "@/lib/offline-data
 import { K } from "@/lib/offline-pack";
 import { pendingLessonRefs } from "@/lib/gamification";
 import { pendingCertificateName, queueCertificate } from "@/lib/offline-sync";
+import jaiGraduado from "@/assets/jai/jai-graduado.webp";
 
 type CertStatus = {
   eligible: boolean;
@@ -81,7 +82,7 @@ function CertificadoPage() {
           </Button>
         </div>
       </header>
-      <main className="flex-1 px-4 py-10 sm:px-6 print:p-0">
+      <main className="flex-1 px-4 pb-28 pt-8 sm:px-6 print:p-0">
         <div className="mx-auto max-w-4xl">
           {q.error ? (
             <p className="mx-auto max-w-lg rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
@@ -93,9 +94,7 @@ function CertificadoPage() {
             </div>
           ) : !d.eligible ? (
             <div className="mx-auto max-w-lg rounded-2xl border border-border/60 bg-card p-8 text-center shadow-elegant">
-              <div className="text-5xl" aria-hidden>
-                📜
-              </div>
+              <img src={jaiGraduado} alt="Jai con birrete y su diploma" className="mx-auto h-40 w-auto object-contain drop-shadow-xl" />
               <h1 className="mt-4 font-display text-2xl font-bold text-foreground">Tu certificado te espera</h1>
               <p className="mt-2 text-muted-foreground">
                 Completaste <span className="font-semibold text-foreground">{d.completed}</span> de{" "}
@@ -116,6 +115,10 @@ function CertificadoPage() {
             </div>
           ) : (
             <>
+              <div className="mb-6 flex flex-col items-center gap-2 text-center print:hidden">
+                <img src={jaiGraduado} alt="Jai con birrete y su diploma" className="h-36 w-auto object-contain drop-shadow-xl" />
+                <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl">¡Terminaste el curso!</h1>
+              </div>
               {!d.name && (
                 <div className="mx-auto mb-6 max-w-md print:hidden">
                   <label className="text-sm font-semibold">

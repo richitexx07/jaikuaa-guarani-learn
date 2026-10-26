@@ -30,7 +30,8 @@ import { StaffRequestCard } from "@/components/pilot/staff-request-card";
 import { staffStatusRefreshInterval } from "@/lib/staff-status-refresh";
 import { OfflinePackCard } from "@/components/offline/offline-pack-card";
 import { AulaPendientes } from "@/components/aula/aula-pendientes";
-import jaiImg from "@/assets/jai-tradicional.png";
+import jaiImg from "@/assets/jai/jai-saluda.webp";
+import { NandutiDisc } from "@/components/nanduti-disc";
 import bannerAprender from "@/assets/banners/banner-aprender.webp";
 const jaiAsset = { url: jaiImg };
 
@@ -329,8 +330,11 @@ function Dashboard() {
       <main className="flex-1 px-4 py-6 sm:px-6 sm:py-12">
         <div className="mx-auto max-w-5xl">
           {/* 1. SALUDO DE JAI */}
-          <div className="nanduti-bg flex items-center gap-3 rounded-3xl border border-border bg-card p-4 shadow-elegant">
-            <img src={jaiAsset.url} alt="Jai, el jaguarete" className="h-20 w-20 shrink-0 object-contain" />
+          <div className="nanduti-bg relative flex items-center gap-3 overflow-hidden rounded-3xl border border-border bg-card p-4 shadow-elegant sm:gap-5 sm:p-5">
+            <div className="relative h-24 w-24 shrink-0 sm:h-32 sm:w-32">
+              <NandutiDisc className="absolute inset-0 h-full w-full text-primary" />
+              <img src={jaiAsset.url} alt="Jai, el jaguarete, te saluda" className="relative h-full w-full object-contain drop-shadow-lg" />
+            </div>
             <div className="min-w-0">
               <h1 className="font-display text-2xl font-bold leading-tight text-foreground sm:text-4xl">
                 ¡Mba'éichapa, {name ? <span className="text-accent">{name}</span> : "amigo"}! {greeting.emoji}

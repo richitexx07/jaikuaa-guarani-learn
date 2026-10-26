@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Copy, Users, Award, Sparkles } from "lucide-react";
-import jaiImg from "@/assets/jai-anfitrion.webp";
+import jaiImg from "@/assets/jai/jai-embajador.webp";
 import { JaiPaw } from "@/components/py-icons";
 import { WhatsAppIcon, FacebookIcon, InstagramIcon, TikTokIcon, XIcon } from "@/components/social-icons";
 import { toast } from "sonner";
@@ -74,7 +74,7 @@ function EmbajadoresPage() {
                 aprender, sumás {XP_PER_ACTIVATED_INVITE} XP de embajador.
               </p>
             </div>
-            <img src={jaiImg} alt="Jai, el jaguareté" className="amb-jai h-28 w-28 shrink-0 object-contain sm:h-36 sm:w-36" />
+            <img src={jaiImg} alt="Jai invita con un megáfono" className="amb-jai h-32 w-32 shrink-0 object-contain sm:h-44 sm:w-44" />
           </div>
         </section>
 

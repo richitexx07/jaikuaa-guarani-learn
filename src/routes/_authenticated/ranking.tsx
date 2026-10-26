@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { getWeeklyRanking, type RankingRow } from "@/lib/community.functions";
+import jaiTrofeo from "@/assets/jai/jai-trofeo.webp";
 
 export const Route = createFileRoute("/_authenticated/ranking")({
   head: () => ({ meta: [{ title: "Jaikuaa — Ranking semanal" },
@@ -40,6 +41,30 @@ function Row({ r }: { r: RankingRow }) {
   );
 }
 
+/** Los tres primeros en un podio: el 1.º al medio y más alto. */
+function Podium({ rows }: { rows: RankingRow[] }) {
+  const order = [rows[1], rows[0], rows[2]];
+  const alto = ["h-20", "h-28", "h-14"];
+  const tono = ["bg-[#C9D1DC] text-[#1E2A3A]", "bg-[#F6C445] text-[#3A1A05]", "bg-[#D9925B] text-[#3A1A05]"];
+  return (
+    <ol className="mt-8 grid grid-cols-3 items-end gap-2 sm:gap-3" aria-label="Podio de la semana">
+      {order.map((r, i) => (
+        <li key={r.rank} className="flex flex-col items-center text-center">
+          <span className="text-2xl" aria-hidden>{MEDALS[r.rank - 1]}</span>
+          <span className={`mt-1 w-full truncate px-1 text-sm font-semibold ${r.isMe ? "text-accent" : "text-foreground"}`}>
+            {r.name}
+            {r.isMe && " (vos)"}
+          </span>
+          <span className="text-xs font-bold text-primary">{r.xp} XP</span>
+          <div className={`mt-2 flex w-full items-start justify-center rounded-t-2xl pt-2 font-display text-2xl font-bold shadow-inner ${alto[i]} ${tono[i]}`}>
+            {r.rank}
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function RankingPage() {
   const fn = useServerFn(getWeeklyRanking);
   const q = useQuery({ queryKey: ["weekly-ranking"], queryFn: () => fn(), staleTime: 60_000 });
@@ -56,13 +81,15 @@ function RankingPage() {
           </Button>
         </div>
       </header>
-      <main className="flex-1 px-4 py-10 sm:px-6">
+      <main className="flex-1 px-4 pb-28 pt-8 sm:px-6">
         <div className="mx-auto max-w-xl">
           <div className="text-center">
-            <div className="text-4xl" aria-hidden>
-              🏆
-            </div>
-            <h1 className="mt-3 font-display text-3xl font-bold text-foreground">Ranking semanal</h1>
+            <img
+              src={jaiTrofeo}
+              alt="Jai levanta un trofeo dorado sobre el podio"
+              className="mx-auto h-40 w-auto object-contain drop-shadow-xl sm:h-48"
+            />
+            <h1 className="mt-3 font-display text-3xl font-bold text-foreground sm:text-4xl">Ranking semanal</h1>
             {d && (
               <p className="mt-2 text-sm text-muted-foreground">
                 {d.group} · desde el lunes {new Date(d.weekStart).toLocaleDateString("es-PY", { timeZone: "America/Asuncion" })}
@@ -79,8 +106,9 @@ function RankingPage() {
             </p>
           ) : (
             <>
-              <ol className="mt-8 space-y-2">
-                {d.top.map((r) => (
+              {d.top.length >= 3 && <Podium rows={d.top.slice(0, 3)} />}
+              <ol className="mt-6 space-y-2">
+                {(d.top.length >= 3 ? d.top.slice(3) : d.top).map((r) => (
                   <Row key={r.rank} r={r} />
                 ))}
               </ol>

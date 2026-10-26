@@ -14,6 +14,7 @@ import {
 import { recordCompletion, useRecordVisit } from "@/lib/gamification";
 import { celebrate } from "@/lib/confetti";
 import { cn } from "@/lib/utils";
+import { TRIVIA_ART } from "@/lib/trivia-art";
 
 export const Route = createFileRoute("/_authenticated/trivia/$category")({
   head: ({ params }) => ({ meta: [{ title: `Jaikuaa — Trivia: ${params.category}` },
@@ -232,7 +233,7 @@ function TriviaQuiz() {
               {/* Header */}
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-lg" aria-hidden>{cat.emoji}</span>
+                  <img src={TRIVIA_ART[category]} alt="" className="h-9 w-9 object-contain" />
                   <span className="font-semibold text-foreground">{cat.title}</span>
                 </div>
                 <span className="text-sm font-medium text-muted-foreground">

@@ -3,6 +3,8 @@ import { BrandLogo } from "@/components/brand-logo";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, X } from "lucide-react";
 import { celebrate } from "@/lib/confetti";
+import jaiProfe from "@/assets/jai-profe.webp";
+import jaiFesteja from "@/assets/jai/jai-festeja.webp";
 
 import { Button } from "@/components/ui/button";
 import { getLanguage } from "@/lib/languages";
@@ -249,7 +251,9 @@ function IntroStep({
   onStart: () => void;
 }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
+    <div className="flex flex-col items-center gap-4 rounded-3xl border border-border/60 bg-card p-6 text-center shadow-elegant sm:flex-row sm:text-left">
+      <img src={jaiProfe} alt="Jai, el profe, te acompaña en la lección" className="h-32 w-auto shrink-0 object-contain drop-shadow-lg sm:h-40" />
+      <div className="w-full">
       <p className="text-base text-foreground">
         Vas a aprender <strong>{lesson.vocab.length}</strong> palabras en guaraní.
         Primero las practicamos, después hacemos ejercicios.
@@ -257,6 +261,7 @@ function IntroStep({
       <Button variant="cta" size="lg" className="mt-6 w-full" onClick={onStart}>
         Empezar lección
       </Button>
+      </div>
     </div>
   );
 }
@@ -595,9 +600,7 @@ function DoneStep({
   useEffect(() => { celebrate("big"); }, []);
   return (
     <div className="rounded-2xl border border-border/60 bg-card p-8 text-center shadow-lift animate-scale-in">
-      <div className="text-6xl" aria-hidden>
-        🎉
-      </div>
+      <img src={jaiFesteja} alt="Jai festeja con los brazos arriba" className="mx-auto h-44 w-auto object-contain drop-shadow-xl sm:h-52" />
       <h2 className="mt-4 font-display text-3xl font-bold text-foreground">
         ¡Lección completada!
       </h2>
