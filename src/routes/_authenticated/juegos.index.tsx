@@ -96,7 +96,7 @@ function GamesHome() {
         style={{ background: COVER_TONE[destacado.id].bg }}
       >
         <div className="overflow-hidden">
-          <GameCover id={destacado.id} className="vit-art block aspect-[16/9] h-full w-full sm:aspect-[4/3]" />
+          <GameCover id={destacado.id} fit className="vit-art block aspect-[16/9] h-full w-full sm:aspect-[4/3]" />
         </div>
         <div className="flex flex-col justify-center gap-2 p-5 sm:gap-3 sm:p-8">
           <span className="w-fit rounded-full bg-[#F6C445] px-3 py-1 text-xs font-bold text-[#3A1A05]">Nuevo</span>

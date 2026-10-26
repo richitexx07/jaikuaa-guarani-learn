@@ -36,9 +36,9 @@ export const COVER_TONE: Record<CoverId, { bg: string; ink: string }> = {
   "palabra-del-dia": { bg: "#F28C28", ink: "#3A1A05" },
 };
 
-export function GameCover({ id, className = "" }: { id: CoverId; className?: string }) {
+export function GameCover({ id, className = "", fit = false }: { id: CoverId; className?: string; fit?: boolean }) {
   return (
-    <svg viewBox="0 0 200 150" className={className} role="presentation" aria-hidden preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 200 150" className={className} role="presentation" aria-hidden preserveAspectRatio={fit ? "xMidYMid meet" : "xMidYMid slice"}>
       {ART[id]}
     </svg>
   );
