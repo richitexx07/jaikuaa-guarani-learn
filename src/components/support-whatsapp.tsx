@@ -217,7 +217,7 @@ export function SupportWhatsApp() {
     if (suggesting) {
       setSuggesting(false);
       setMsgs((m) => [...m, { id: nextId++, from: "user", text }]);
-      const contacto = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ? email.trim() : null;
+      const contacto = email.trim().slice(0, 200) || null;
       void logFn({ data: { texto: text, ruta: pathname, resultado: "sugerencia", faqId: null, contacto } }).catch(() => {});
       setEmail("");
       setMsgs((m) => [...m, { id: nextId++, from: "jai", lead: "¡Anotadísimo!", text: "Muchísimas gracias por ayudarnos a hacer crecer Jaikuaa. Tu sugerencia ya le llegó al equipo." + (contacto ? " Si hace falta, te respondemos a tu correo." : "") }]);

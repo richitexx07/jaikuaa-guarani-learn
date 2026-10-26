@@ -21,8 +21,9 @@ const Input = z.object({
   ruta: z.string().max(300).default("/"),
   resultado: z.enum(["respondida", "opciones", "derivada", "no-util", "sugerencia"]),
   faqId: z.string().max(40).nullable().default(null),
-  // Correo opcional, solo para sugerencias/quejas, para poder responder.
-  contacto: z.string().trim().max(200).email().nullable().optional(),
+  // Correo opcional, solo para sugerencias/quejas. Se acepta como texto libre
+  // (aunque tenga un error de tipeo) para que la sugerencia nunca se pierda.
+  contacto: z.string().trim().max(200).nullable().optional().catch(null),
 });
 
 export const logJaiQuestion = createServerFn({ method: "POST" })
