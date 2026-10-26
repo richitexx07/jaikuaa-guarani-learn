@@ -10,6 +10,7 @@ import { withOfflineCache } from "@/lib/offline-data";
 import { getMostradorAudio, listMostrador } from "@/lib/mostrador.functions";
 import { agruparPorSituacion, isRubro, RUBROS, type Frase, type RubroId } from "@/lib/mostrador";
 import { countOffline, playFrase, saveOffline, stopFrase } from "@/lib/mostrador-audio";
+import jaiAtencion from "@/assets/jai-atencion-pro.webp";
 
 export const Route = createFileRoute("/_authenticated/mostrador/")({
   head: () => ({
@@ -96,8 +97,13 @@ function MostradorPage() {
 
       <main className="flex-1 px-4 pb-28 pt-6 sm:px-6 sm:py-10">
         <div className="mx-auto max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-accent">Modo mostrador</p>
-          <h1 className="mt-1 font-display text-2xl font-bold text-foreground sm:text-3xl">Atendé en guaraní</h1>
+          <div className="flex items-center gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-accent">Modo mostrador</p>
+              <h1 className="mt-1 font-display text-2xl font-bold text-foreground sm:text-3xl">Atendé en guaraní</h1>
+            </div>
+            <img src={jaiAtencion} alt="Jai, listo para atender" className="h-24 w-auto shrink-0 drop-shadow-lg sm:h-32" />
+          </div>
           <p className="mt-2 text-sm text-muted-foreground">
             Elegí la frase y hacésela escuchar a la persona que atendés: la grabó un hablante paraguayo y la validaron
             docentes especialistas. Tocá <Maximize2 className="inline h-3.5 w-3.5" aria-hidden /> para mostrarla en
