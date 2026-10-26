@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GameStage } from "@/components/games/game-stage";
-import { COVER_TONE, GameCover, type CoverId } from "@/components/games/game-covers";
+import { COVER_TONE, type CoverId } from "@/components/games/game-covers";
+import { COVER_IMAGE } from "@/components/games/game-cover-images";
 import { useRecordVisit } from "@/lib/gamification";
 import jaiImg from "@/assets/jai-gamer.webp";
-import jaiDoctor from "@/assets/jai-doctor.webp";
 
 export const Route = createFileRoute("/_authenticated/juegos/")({
   head: () => ({
@@ -96,9 +96,14 @@ function GamesHome() {
         className="vit-card mt-6 grid overflow-hidden rounded-3xl ring-1 ring-white/10 sm:grid-cols-[1.2fr_1fr]"
         style={{ background: COVER_TONE[destacado.id].bg }}
       >
-        <div className="relative overflow-hidden">
-          <GameCover id={destacado.id} fit className="vit-art block aspect-[16/9] h-full w-full sm:aspect-[4/3]" />
-          <img src={jaiDoctor} alt="Jai, el doctor del consultorio" className="absolute bottom-0 right-2 h-[92%] w-auto drop-shadow-2xl sm:right-6" />
+        <div className="overflow-hidden">
+          <img
+            src={COVER_IMAGE[destacado.id]}
+            alt="Jai, vestido de doctor, atiende a una paciente en el consultorio"
+            className="vit-art block aspect-[4/3] h-full w-full object-cover"
+            width={800}
+            height={600}
+          />
         </div>
         <div className="flex flex-col justify-center gap-2 p-5 sm:gap-3 sm:p-8">
           <span className="w-fit rounded-full bg-[#F6C445] px-3 py-1 text-xs font-bold text-[#3A1A05]">Nuevo</span>
@@ -134,7 +139,15 @@ function Cover({ g }: { g: Game }) {
       style={{ background: tone.bg, color: tone.ink }}
     >
       <div className="overflow-hidden">
-        <GameCover id={g.id} className="vit-art block aspect-[4/3] w-full" />
+        <img
+          src={COVER_IMAGE[g.id]}
+          alt=""
+          className="vit-art block aspect-[4/3] w-full object-cover"
+          width={800}
+          height={600}
+          loading="lazy"
+          decoding="async"
+        />
       </div>
       {g.nuevo && g.id !== "consultorio" && (
         <span className="absolute left-3 top-3 rounded-full bg-[#F6C445] px-2.5 py-0.5 text-[11px] font-bold text-[#3A1A05]">Nuevo</span>

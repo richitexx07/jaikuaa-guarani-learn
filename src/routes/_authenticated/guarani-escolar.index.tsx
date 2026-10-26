@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ESCOLAR_GRADES, loadEscolarGrade, saveEscolarGrade, type EscolarGrade } from "@/lib/guarani-tema";
 import { Button } from "@/components/ui/button";
+import bannerEscolar from "@/assets/banners/banner-escolar.webp";
 
 export const Route = createFileRoute("/_authenticated/guarani-escolar/")({
   head: () => ({ meta: [{ title: "Guaraní Escolar | Jaikuaa" }, { name: "description", content: "Prepará tus pruebas de Guaraní: Modo Rescate, Plan Semanal y práctica por tema." }, { property: "og:title", content: "Guaraní Escolar | Jaikuaa" }, { property: "og:description", content: "Prepará tus pruebas de Guaraní paso a paso." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -42,6 +43,13 @@ function GuaraniEscolarEntry() {
 
   return (
     <div className="mx-auto max-w-4xl">
+      <img
+        src={bannerEscolar}
+        alt="Jai levanta la mano en un aula paraguaya, con un libro abierto sobre el pupitre"
+        className="mb-6 aspect-[16/9] w-full rounded-3xl object-cover shadow-elegant sm:aspect-[21/9]"
+        width={1280}
+        height={720}
+      />
       <div className="text-center">
         <div className="inline-flex items-center justify-center rounded-full bg-accent/10 px-3 py-1 text-sm font-semibold text-accent">
           Guaraní Escolar <span aria-hidden className="ml-2">🎒</span>

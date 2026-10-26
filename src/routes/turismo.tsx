@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteFooter } from "@/components/site-footer";
 import { InfoCard, MarketingHeader, Section, WhatsAppCta } from "@/components/marketing/page-parts";
+import bannerTurismo from "@/assets/banners/banner-turismo.webp";
+import jaiTurismo from "@/assets/jai/jai-turismo.webp";
 
 const MSG = "Hola, quisiera información sobre la Ruta Turística de Jai en Jaikuaa.";
 
@@ -41,7 +43,14 @@ function TurismoPage() {
     <div className="flex min-h-screen flex-col bg-background">
       <MarketingHeader />
       <main className="flex-1">
-        <section className="px-4 pt-16 pb-10 sm:px-6 sm:pt-24">
+        <section className="px-4 pt-6 pb-10 sm:px-6 sm:pt-10">
+          <img
+            src={bannerTurismo}
+            alt="Jai saluda con un mate en la mano, al atardecer, junto a un lago y una iglesia colonial"
+            className="mx-auto mb-10 aspect-[16/9] w-full max-w-5xl rounded-3xl object-cover shadow-elegant sm:aspect-[21/9]"
+            width={1280}
+            height={720}
+          />
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
               Jai Turístico
@@ -89,6 +98,12 @@ function TurismoPage() {
 
         <Section title="Para el sector turismo">
           <div className="mx-auto max-w-3xl rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
+            <img
+              src={jaiTurismo}
+              alt="Jai, guía turístico, saluda con un mate"
+              className="mx-auto -mt-2 mb-4 h-36 w-auto object-contain drop-shadow-lg sm:h-44"
+              loading="lazy"
+            />
             <h3 className="font-display text-xl font-bold text-foreground">Hoteles, posadas, operadores y gastronomía</h3>
             <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
               Sumá tu negocio a la Ruta de Jai: aparecés en el destino correspondiente, recibís consultas directas de

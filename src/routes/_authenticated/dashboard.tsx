@@ -31,6 +31,7 @@ import { staffStatusRefreshInterval } from "@/lib/staff-status-refresh";
 import { OfflinePackCard } from "@/components/offline/offline-pack-card";
 import { AulaPendientes } from "@/components/aula/aula-pendientes";
 import jaiImg from "@/assets/jai-tradicional.png";
+import bannerAprender from "@/assets/banners/banner-aprender.webp";
 const jaiAsset = { url: jaiImg };
 
 function StaffShortcuts() {
@@ -402,6 +403,14 @@ function Dashboard() {
             </TabsList>
 
             <TabsContent value="aprender" className="mt-6">
+              <img
+                src={bannerAprender}
+                alt="Jai escucha audio en el celular, recostado junto a un libro abierto, al atardecer"
+                className="mb-4 aspect-[16/9] w-full rounded-2xl object-cover sm:aspect-[21/9]"
+                width={1280}
+                height={720}
+                loading="lazy"
+              />
               <p className="mb-4 text-sm text-muted-foreground">
                 Contenido pedagógico ordenado, con audio humano.
               </p>

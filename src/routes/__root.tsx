@@ -22,11 +22,13 @@ import { applyDisplayPrefs, readDisplayPrefs } from "@/lib/display-prefs";
 import { registerOfflineSupport } from "@/lib/pwa";
 import { syncAllPending, totalPending } from "@/lib/offline-sync";
 import { pendingAnswersCount } from "@/lib/answer-log";
+import jaiSorpresa from "@/assets/jai/jai-sorpresa.webp";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
+        <img src={jaiSorpresa} alt="Jai, sorprendido, con las manos en la cara" className="mx-auto mb-4 h-40 w-auto object-contain" />
         <h1 className="font-display text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 font-display text-xl font-semibold text-foreground">Página no encontrada</h2>
         <p className="mt-2 text-sm text-muted-foreground">

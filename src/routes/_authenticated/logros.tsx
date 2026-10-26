@@ -4,6 +4,18 @@ import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BADGES, useStats } from "@/lib/gamification";
 import { StatsBar } from "@/components/gamification/stats-bar";
+import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import medallaPrimerPaso from "@/assets/medallas/medalla-primer-paso.webp";
+import medallaGuaranihablante from "@/assets/medallas/medalla-guaranihablante.webp";
+import medallaEstrella from "@/assets/medallas/medalla-estudiante-estrella.webp";
+import medallaRacha from "@/assets/medallas/medalla-racha-fuego.webp";
+
+const MEDALLA: Record<string, string> = {
+  "primer-paso": medallaPrimerPaso,
+  guaranihablante: medallaGuaranihablante,
+  "estudiante-estrella": medallaEstrella,
+  "racha-fuego": medallaRacha,
+};
 
 export const Route = createFileRoute("/_authenticated/logros")({
   head: () => ({ meta: [{ title: "Jaikuaa — Logros" },
@@ -37,6 +49,11 @@ function LogrosPage() {
       <main className="flex-1 px-4 py-10 sm:px-6 sm:py-14">
         <div className="mx-auto max-w-3xl">
           <div className="text-center">
+            <img
+              src={jaiFesteja}
+              alt="Jai festeja con los brazos arriba"
+              className="mx-auto mb-2 h-32 w-auto object-contain drop-shadow-lg sm:h-40"
+            />
             <div className="inline-flex items-center justify-center rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
               Tus logros <span aria-hidden className="ml-2">🏆</span>
             </div>
@@ -62,6 +79,7 @@ function LogrosPage() {
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             {BADGES.map((b) => {
               const earned = stats.badges.includes(b.id);
+              const medalla = MEDALLA[b.id];
               return (
                 <div
                   key={b.id}
@@ -71,14 +89,32 @@ function LogrosPage() {
                       : "border-border/60 bg-card opacity-80"
                   }`}
                 >
-                  <div
-                    className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-3xl ${
-                      earned ? "bg-accent/15" : "bg-muted"
-                    }`}
-                    aria-hidden
-                  >
-                    {earned ? b.emoji : <Lock className="h-6 w-6 text-muted-foreground" />}
-                  </div>
+                  {medalla ? (
+                    <div className="relative h-20 w-20 shrink-0" aria-hidden>
+                      <img
+                        src={medalla}
+                        alt=""
+                        className={`h-full w-full object-contain ${
+                          earned ? "drop-shadow-md" : "opacity-40 grayscale"
+                        }`}
+                        loading="lazy"
+                      />
+                      {!earned && (
+                        <span className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full border border-border bg-card shadow-sm">
+                          <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <div
+                      className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-3xl ${
+                        earned ? "bg-accent/15" : "bg-muted"
+                      }`}
+                      aria-hidden
+                    >
+                      {earned ? b.emoji : <Lock className="h-6 w-6 text-muted-foreground" />}
+                    </div>
+                  )}
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-display text-lg font-semibold text-foreground">

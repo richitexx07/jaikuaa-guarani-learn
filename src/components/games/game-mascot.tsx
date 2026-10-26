@@ -1,15 +1,16 @@
-import jaiTradicional from "@/assets/jai-tradicional.png";
-import jaiGamer from "@/assets/jai-gamer.webp";
-import jaiProfe from "@/assets/jai-profe.webp";
+import jaiPiensa from "@/assets/jai/jai-piensa.webp";
+import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
+import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiAnimo from "@/assets/jai/jai-animo.webp";
 
 export type MascotMood = "idle" | "success" | "error" | "victory";
 
-/** Jai cambia según la jugada: tranquilo al empezar, festeja cuando acertás y explica cuando te equivocás. */
+/** Jai cambia según la jugada: piensa con vos, aplaude cuando acertás, te da ánimo si errás y festeja al ganar. */
 const JAI_POR_ANIMO: Record<MascotMood, string> = {
-  idle: jaiTradicional,
-  success: jaiGamer,
-  victory: jaiGamer,
-  error: jaiProfe,
+  idle: jaiPiensa,
+  success: jaiAplaude,
+  victory: jaiFesteja,
+  error: jaiAnimo,
 };
 
 export function GameMascot({ message, mood = "idle" }: { message: string; mood?: MascotMood }) {

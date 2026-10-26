@@ -83,7 +83,7 @@ function Match({words,duel,names,ledText,muted,onAgain,onModes}:{words:GameWord[
   </div>)}
   </div>
  </div>
- <PenaltyMascot message={message}/>
+ <PenaltyMascot message={message} mood={finished?(duel||goals[0]>=3?'victory':'success'):last?(isGoal(last)?'success':'error'):choice!==null?(knew?'success':'error'):'idle'}/>
  {finished?<div className="space-y-5 text-center"><div className="text-5xl tracking-widest" style={{color:P.led}} aria-label={`${stars} de 3 estrellas`}>{'★'.repeat(stars)}<span className="opacity-25">{'★'.repeat(3-stars)}</span></div>
  <h2 className="font-display text-3xl font-bold">{duel?(goals[0]===goals[1]?'Empate':`Ganó ${goals[0]>goals[1]?names[0]:names[1]}`):`${goals[0]} de 5 goles`}</h2><p className="font-bold" style={{color:P.led}}>+{xp} XP{duel?' · Jugador 1':''}</p>
  <ul className="divide-y divide-white/10 rounded-2xl bg-white/[.06] px-3 text-left">{played.map((p,i)=><li key={i} className="flex items-center gap-2 py-3 text-sm"><span className="h-3 w-3 shrink-0 rounded-full" style={{background:isGoal(p.outcome)?P.gol:P.mal}} aria-label={isGoal(p.outcome)?'Gol':'Errado'}/><div className="min-w-0 flex-1">{duel&&<span className="block text-xs text-white/60">{names[p.player]}</span>}<span className="font-semibold">{p.word.gn}</span><span className="text-white/60"> — {p.word.es}</span></div>{p.word.hasAudio&&<SpeakerButton gn={p.word.gn}/>}</li>)}</ul>
