@@ -14,7 +14,7 @@ const XP_CAP: Record<string, number> = {
 };
 
 /** Juegos que se registran con recordActivity (la Palabra del día tiene su propio flujo). */
-const GAME_REFS = new Set(["ahorcado", "sopa-de-letras", "memoria", "penales", "duelo", "trivia-duelo", "nee-rape", "tembiu", "karaoke", "tekojoja", "taanga"]);
+const GAME_REFS = new Set(["ahorcado", "sopa-de-letras", "memoria", "penales", "duelo", "trivia-duelo", "nee-rape", "tembiu", "karaoke", "tekojoja", "taanga", "consultorio"]);
 
 const BADGE_IDS = ["primer-paso", "guaranihablante", "estudiante-estrella", "racha-fuego"] as const;
 

@@ -5,6 +5,7 @@
 
 /** Juegos que se pueden asignar como tarea (mismo nombre que registra el juego al terminar). */
 export const JUEGOS_ASIGNABLES = [
+  { ref: "consultorio", titulo: "Consultorio de Jai (guaraní médico)" },
   { ref: "ahorcado", titulo: "Ahorcado con chipas" },
   { ref: "sopa-de-letras", titulo: "Sopa de letras" },
   { ref: "memoria", titulo: "Memoria" },

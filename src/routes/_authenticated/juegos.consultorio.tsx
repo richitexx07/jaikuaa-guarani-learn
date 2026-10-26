@@ -1,0 +1,779 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Loader2, RotateCcw, Stethoscope, Volume2 } from "lucide-react";
+import { GameKit, GameSoundButton, useGameKit } from "@/components/games/game-kit";
+import { useGameWords } from "@/components/games/game-shell";
+import { recordCompletion } from "@/lib/gamification";
+import { playGuarani } from "@/lib/audio";
+import { getMostradorAudio, listMostrador } from "@/lib/mostrador.functions";
+import { playFrase } from "@/lib/mostrador-audio";
+import {
+  armarTurno,
+  enIdioma,
+  estrellas,
+  paciente as nuevoPaciente,
+  PACIENTES_POR_TURNO,
+  puntosPorAcierto,
+  regionDe,
+  REGIONES,
+  SEGUNDOS_POR_PACIENTE,
+  t,
+  VIDAS,
+  xpDelTurno,
+  type FraseSalud,
+  type Idioma,
+  type PalabraCuerpo,
+  type Paciente,
+  type RegionId,
+  type Ronda,
+} from "@/lib/consultorio";
+import jaiImg from "@/assets/jai-atencion.png";
+
+export const Route = createFileRoute("/_authenticated/juegos/consultorio")({
+  head: () => ({
+    meta: [
+      { title: "Consultorio de Jai | Jaikuaa" },
+      {
+        name: "description",
+        content: "Juego de guaraní médico: atendé pacientes que hablan guaraní, con voces de hablantes paraguayos.",
+      },
+    ],
+  }),
+  component: () => (
+    <GameKit>
+      <Consultorio />
+    </GameKit>
+  ),
+});
+
+/* Paleta propia del consultorio: ambo de guardia, papel de ficha y fósforo de monitor. */
+const C = {
+  ambo: "#0F4C55",
+  amboOscuro: "#0A3439",
+  ficha: "#F3FAF7",
+  tinta: "#12323A",
+  fosforo: "#3DE0B0",
+  ambar: "#F2B544",
+  rojo: "#D52B1E",
+};
+
+const CSS = `
+.cj-ecg { animation: cj-scroll var(--cj-speed, 2.4s) linear infinite; }
+@keyframes cj-scroll { from { transform: translateX(0) } to { transform: translateX(-200px) } }
+.cj-pulse { animation: cj-pulse 0.9s ease-out 1; transform-box: fill-box; transform-origin: center; }
+@keyframes cj-pulse { 0% { transform: scale(1) } 40% { transform: scale(1.35) } 100% { transform: scale(1) } }
+.cj-flat { animation: cj-flat 0.5s steps(2) 2; }
+@keyframes cj-flat { 50% { opacity: 0.2 } }
+.cj-enter { animation: cj-enter 0.45s cubic-bezier(.2,.8,.2,1) 1; }
+@keyframes cj-enter { from { transform: translateY(18px) rotate(-1.5deg); opacity: 0 } to { transform: none; opacity: 1 } }
+.cj-region { cursor: pointer; outline: none; }
+.cj-region .cj-ring { opacity: 0; transition: opacity .15s; }
+.cj-region:hover .cj-ring, .cj-region:focus-visible .cj-ring { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .cj-ecg, .cj-pulse, .cj-flat, .cj-enter { animation: none !important; } }
+`;
+
+type Fase = "intro" | "jugando" | "fin";
+type Resultado = null | { ok: boolean; porTiempo?: boolean; elegida?: string };
+
+function Consultorio() {
+  const { react } = useGameKit();
+  const [idioma, setIdioma] = useState<Idioma>("es");
+  useEffect(() => {
+    try {
+      const v = localStorage.getItem("jaikuaa:consultorio-idioma");
+      if (v === "pt" || v === "es") setIdioma(v);
+    } catch {}
+  }, []);
+  const cambiarIdioma = (v: Idioma) => {
+    setIdioma(v);
+    try {
+      localStorage.setItem("jaikuaa:consultorio-idioma", v);
+    } catch {}
+  };
+
+  // Contenido: palabras del cuerpo (lección 4) y frases de salud publicadas con voz.
+  const cuerpoQ = useGameWords(4);
+  const listFn = useServerFn(listMostrador);
+  const audioFn = useServerFn(getMostradorAudio);
+  const frasesQ = useQuery({
+    queryKey: ["mostrador", "salud"],
+    queryFn: () => listFn({ data: { rubro: "salud", todas: false } }),
+    retry: false,
+  });
+  const cuerpo: PalabraCuerpo[] = useMemo(
+    () =>
+      (cuerpoQ.data?.words ?? [])
+        .filter((w) => w.hasAudio)
+        .map((w) => ({ gn: w.gn, es: w.es, region: regionDe(w.es) }))
+        .filter((w): w is PalabraCuerpo => w.region !== null),
+    [cuerpoQ.data],
+  );
+  const frases: FraseSalud[] = useMemo(
+    () =>
+      (frasesQ.data?.frases ?? [])
+        .filter((f) => f.gn && f.hasAudio)
+        .map((f) => ({ id: f.id, tipo: f.tipo, es: f.es, gn: f.gn as string })),
+    [frasesQ.data],
+  );
+  const ids = useMemo(() => frases.map((f) => f.id), [frases]);
+  const audioQ = useQuery({
+    queryKey: ["mostrador-audio", "salud", ids.join(",")],
+    enabled: ids.length > 0,
+    staleTime: 30 * 60 * 1000,
+    queryFn: () => audioFn({ data: { ids: ids.slice(0, 80) } }),
+  });
+  const urls = audioQ.data?.urls ?? {};
+  const cargando = cuerpoQ.isLoading || frasesQ.isLoading;
+  const pocos = frases.length < 8;
+
+  const [fase, setFase] = useState<Fase>("intro");
+  const [rondas, setRondas] = useState<Ronda[]>([]);
+  const [pacientes, setPacientes] = useState<Paciente[]>([]);
+  const [i, setI] = useState(0);
+  const [vidas, setVidas] = useState(VIDAS);
+  const [puntos, setPuntos] = useState(0);
+  const [racha, setRacha] = useState(0);
+  const [mejorRacha, setMejorRacha] = useState(0);
+  const [aciertos, setAciertos] = useState(0);
+  const [atendidos, setAtendidos] = useState(0);
+  const [resultado, setResultado] = useState<Resultado>(null);
+  const [restante, setRestante] = useState(SEGUNDOS_POR_PACIENTE);
+  const [ganado, setGanado] = useState<number | null>(null);
+  const guardado = useRef(false);
+
+  const ronda = rondas[i];
+  const pac = pacientes[i];
+
+  const sonar = useCallback(
+    (r: Ronda | undefined) => {
+      if (!r) return;
+      if (r.tipo === "cuerpo") void playGuarani(r.palabra.gn);
+      else if (r.tipo === "sintoma") void playFrase(r.frase.id, urls[r.frase.id]);
+    },
+    [urls],
+  );
+
+  function empezar() {
+    const rs = armarTurno(cuerpo, frases);
+    if (rs.length === 0) return;
+    setRondas(rs);
+    setPacientes(rs.map((_, k) => nuevoPaciente(k)));
+    setI(0);
+    setVidas(VIDAS);
+    setPuntos(0);
+    setRacha(0);
+    setMejorRacha(0);
+    setAciertos(0);
+    setAtendidos(0);
+    setResultado(null);
+    setRestante(SEGUNDOS_POR_PACIENTE);
+    setGanado(null);
+    guardado.current = false;
+    setFase("jugando");
+  }
+
+  // Al llegar cada paciente: dice lo que le pasa y arranca el reloj.
+  useEffect(() => {
+    if (fase !== "jugando" || !ronda) return;
+    setRestante(SEGUNDOS_POR_PACIENTE);
+    const id = window.setTimeout(() => sonar(ronda), 450);
+    return () => window.clearTimeout(id);
+  }, [fase, i, ronda, sonar]);
+
+  useEffect(() => {
+    if (fase !== "jugando" || resultado) return;
+    const id = window.setInterval(() => setRestante((s) => Math.max(0, +(s - 0.1).toFixed(1))), 100);
+    return () => window.clearInterval(id);
+  }, [fase, resultado, i]);
+
+  const responder = useCallback(
+    (ok: boolean, elegida?: string, porTiempo = false) => {
+      if (resultado || !ronda) return;
+      setResultado({ ok, elegida, porTiempo });
+      setAtendidos((n) => n + 1);
+      if (ok) {
+        const nr = racha + 1;
+        setRacha(nr);
+        setMejorRacha((m) => Math.max(m, nr));
+        setAciertos((n) => n + 1);
+        setPuntos((p) => p + puntosPorAcierto(Math.floor(restante), nr));
+        react("success");
+        if (ronda.tipo === "indicacion") void playFrase(ronda.frase.id, urls[ronda.frase.id]);
+      } else {
+        setRacha(0);
+        setVidas((v) => v - 1);
+        react("error");
+      }
+    },
+    [resultado, ronda, racha, restante, react, urls],
+  );
+
+  useEffect(() => {
+    if (fase === "jugando" && !resultado && restante <= 0) responder(false, undefined, true);
+  }, [restante, fase, resultado, responder]);
+
+  function siguiente() {
+    if (vidas <= 0 || i + 1 >= rondas.length) {
+      setFase("fin");
+      return;
+    }
+    setResultado(null);
+    setI((n) => n + 1);
+  }
+
+  useEffect(() => {
+    if (fase !== "fin" || guardado.current) return;
+    guardado.current = true;
+    const xp = xpDelTurno(aciertos);
+    setGanado(xp);
+    if (xp > 0) recordCompletion({ source: "game", sourceRef: "consultorio", xp });
+    if (estrellas(aciertos, PACIENTES_POR_TURNO) >= 2) react("victory");
+  }, [fase, aciertos, react]);
+
+  return (
+    <div className="min-h-screen pb-28" style={{ background: `linear-gradient(180deg, ${C.ambo} 0%, ${C.amboOscuro} 100%)` }}>
+      <style>{CSS}</style>
+      <header className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-3 text-white">
+        <Link to="/juegos" className="rounded-md px-2 py-1 text-sm font-medium text-white/80 hover:text-white">
+          ← Juegos
+        </Link>
+        <div className="flex items-center gap-2">
+          <div className="flex overflow-hidden rounded-full border border-white/30 text-xs font-semibold" role="group" aria-label="Idioma">
+            {(["es", "pt"] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => cambiarIdioma(v)}
+                aria-pressed={idioma === v}
+                className={`px-3 py-1.5 ${idioma === v ? "bg-white text-[#0F4C55]" : "text-white/80"}`}
+              >
+                {v === "es" ? "Español" : "Português"}
+              </button>
+            ))}
+          </div>
+          <div className="[&_button]:border-white/30 [&_button]:bg-transparent [&_button]:text-white">
+            <GameSoundButton />
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-3xl px-4">
+        {fase === "intro" && (
+          <Intro
+            idioma={idioma}
+            cargando={cargando}
+            puede={cuerpo.length >= 3 || frases.length >= 4}
+            pocos={pocos}
+            onEmpezar={empezar}
+          />
+        )}
+
+        {fase === "jugando" && ronda && pac && (
+          <div className="space-y-4">
+            <Monitor
+              restante={restante}
+              vidas={vidas}
+              puntos={puntos}
+              racha={racha}
+              n={i + 1}
+              total={rondas.length}
+              resultado={resultado}
+              idioma={idioma}
+            />
+            <Ficha key={i} p={pac} ronda={ronda} idioma={idioma} onEscuchar={() => sonar(ronda)} resultado={resultado}>
+              {ronda.tipo === "cuerpo" && (
+                <CuerpoMapa
+                  correcta={ronda.palabra.region}
+                  elegida={(resultado?.elegida as RegionId | undefined) ?? null}
+                  bloqueado={!!resultado}
+                  idioma={idioma}
+                  onElegir={(r) => responder(r === ronda.palabra.region, r)}
+                />
+              )}
+              {ronda.tipo !== "cuerpo" && (
+                <Opciones ronda={ronda} idioma={idioma} resultado={resultado} onElegir={(id, ok) => responder(ok, id)} />
+              )}
+            </Ficha>
+            {resultado && (
+              <Veredicto ronda={ronda} resultado={resultado} idioma={idioma} onSeguir={siguiente} ultimo={vidas <= 0 || i + 1 >= rondas.length} />
+            )}
+          </div>
+        )}
+
+        {fase === "fin" && (
+          <Fin
+            idioma={idioma}
+            aciertos={aciertos}
+            atendidos={atendidos}
+            total={rondas.length}
+            racha={mejorRacha}
+            puntos={puntos}
+            xp={ganado ?? 0}
+            onOtro={empezar}
+          />
+        )}
+      </main>
+    </div>
+  );
+}
+
+/* ------------------------------ Pantallas ------------------------------ */
+
+function Intro({
+  idioma,
+  cargando,
+  puede,
+  pocos,
+  onEmpezar,
+}: {
+  idioma: Idioma;
+  cargando: boolean;
+  puede: boolean;
+  pocos: boolean;
+  onEmpezar: () => void;
+}) {
+  return (
+    <section className="cj-enter pt-4 text-white">
+      <div className="overflow-hidden rounded-3xl border border-white/15 bg-[#062A2E] shadow-2xl">
+        <Ecg velocidad={2.4} alto={90} />
+        <div className="grid items-end gap-4 px-6 pb-6 sm:grid-cols-[1fr_auto]">
+          <div>
+            <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">{t("titulo", idioma)}</h1>
+            <p className="mt-3 max-w-md text-base leading-relaxed text-white/80">{t("bajada", idioma)}</p>
+          </div>
+          <img src={jaiImg} alt="" className="mx-auto h-36 w-auto drop-shadow-xl sm:h-44" />
+        </div>
+      </div>
+      <ul className="mt-5 grid gap-2 text-sm text-white/85 sm:grid-cols-3">
+        <li className="rounded-2xl bg-white/10 p-3">
+          <span className="block font-semibold text-white">{PACIENTES_POR_TURNO} pacientes</span>
+          {idioma === "es" ? "por turno, con voces reales" : "por plantão, com vozes reais"}
+        </li>
+        <li className="rounded-2xl bg-white/10 p-3">
+          <span className="block font-semibold text-white">{SEGUNDOS_POR_PACIENTE} segundos</span>
+          {idioma === "es" ? "para atender a cada uno" : "para atender cada um"}
+        </li>
+        <li className="rounded-2xl bg-white/10 p-3">
+          <span className="block font-semibold text-white">{VIDAS} vidas</span>
+          {idioma === "es" ? "un error cuesta una" : "cada erro custa uma"}
+        </li>
+      </ul>
+      {pocos && !cargando && <p className="mt-4 rounded-2xl border border-[#F2B544]/50 bg-[#F2B544]/10 p-3 text-sm text-[#FBE3A6]">{t("pocos", idioma)}</p>}
+      <button
+        type="button"
+        onClick={onEmpezar}
+        disabled={cargando || !puede}
+        className="mt-6 flex h-16 w-full items-center justify-center gap-3 rounded-2xl text-lg font-bold text-[#062A2E] shadow-lg transition active:scale-[0.98] disabled:opacity-50"
+        style={{ background: C.fosforo }}
+      >
+        {cargando ? <Loader2 className="h-6 w-6 animate-spin" /> : <Stethoscope className="h-6 w-6" />}
+        {t("empezar", idioma)}
+      </button>
+    </section>
+  );
+}
+
+function Ecg({ velocidad, alto, color = C.fosforo, plano = false }: { velocidad: number; alto: number; color?: string; plano?: boolean }) {
+  // Un latido cada 200 px; se repite y se desplaza para que parezca un monitor.
+  const latido = "M0 50 L60 50 L70 44 L78 50 L90 50 L96 20 L104 82 L112 50 L128 50 L140 40 L156 50 L200 50";
+  const d = Array.from({ length: 6 }, (_, k) => latido.replace(/(\d+(?:\.\d+)?) (\d+)/g, (_, x, y) => `${Number(x) + k * 200} ${y}`)).join(" ");
+  return (
+    <svg viewBox={`0 0 600 100`} preserveAspectRatio="none" className="block w-full" style={{ height: alto }} aria-hidden>
+      <defs>
+        <pattern id="cj-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M20 0 L0 0 0 20" fill="none" stroke="#0E3D42" strokeWidth="1" />
+        </pattern>
+      </defs>
+      <rect width="600" height="100" fill="url(#cj-grid)" />
+      <g className={plano ? "" : "cj-ecg"} style={{ ["--cj-speed" as string]: `${velocidad}s` }}>
+        <path d={plano ? "M0 50 L1200 50" : d} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 4px ${color})` }} />
+      </g>
+    </svg>
+  );
+}
+
+function Corazon({ lleno }: { lleno: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
+      <path
+        d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"
+        fill={lleno ? C.rojo : "transparent"}
+        stroke={lleno ? C.rojo : "#ffffff55"}
+        strokeWidth="1.6"
+      />
+    </svg>
+  );
+}
+
+/** El monitor de signos vitales: reloj, vidas, puntos y racha. Late más rápido cuando queda poco tiempo. */
+function Monitor({
+  restante,
+  vidas,
+  puntos,
+  racha,
+  n,
+  total,
+  resultado,
+  idioma,
+}: {
+  restante: number;
+  vidas: number;
+  puntos: number;
+  racha: number;
+  n: number;
+  total: number;
+  resultado: Resultado;
+  idioma: Idioma;
+}) {
+  const urgente = restante <= 6 && !resultado;
+  const vel = resultado ? 2.4 : Math.max(0.7, (restante / SEGUNDOS_POR_PACIENTE) * 2.4);
+  const color = resultado ? (resultado.ok ? C.fosforo : C.rojo) : urgente ? C.ambar : C.fosforo;
+  return (
+    <div className="overflow-hidden rounded-3xl border border-white/15 bg-[#062A2E] text-white shadow-xl">
+      <div className="flex items-center justify-between px-4 pt-3 text-xs text-white/70">
+        <span>
+          {t("paciente", idioma)} {n} {t("de", idioma)} {total}
+        </span>
+        <span className="flex gap-1" aria-label={`${vidas} vidas`}>
+          {Array.from({ length: VIDAS }, (_, k) => (
+            <Corazon key={k} lleno={k < vidas} />
+          ))}
+        </span>
+      </div>
+      <div className="grid grid-cols-[1fr_auto] items-center">
+        <div className={resultado && !resultado.ok ? "cj-flat" : ""}>
+          <Ecg velocidad={vel} alto={64} color={color} plano={!!resultado && !resultado.ok} />
+        </div>
+        <div className="px-4 text-right">
+          <div className="font-display text-4xl font-bold tabular-nums leading-none" style={{ color }} aria-live="off">
+            {Math.ceil(restante)}
+            <span className="ml-0.5 text-base font-medium text-white/60">s</span>
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center justify-between border-t border-white/10 px-4 py-2 text-sm">
+        <span className="tabular-nums">
+          <span className="font-bold text-white">{puntos}</span> <span className="text-white/60">{t("puntos", idioma)}</span>
+        </span>
+        {racha >= 2 && (
+          <span key={racha} className="cj-pulse rounded-full px-2 py-0.5 text-xs font-bold text-[#062A2E]" style={{ background: C.ambar }}>
+            ×{Math.min(2, 1 + 0.25 * (racha - 1)).toFixed(2).replace(/\.?0+$/, "")} · {racha} seguidos
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const PIEL = ["#F2C9A0", "#D9A57B", "#B57B52", "#8A5A3B"];
+const PELO = ["#2B1D14", "#5A3A22", "#9A9A9A", "#C9A15B"];
+
+function Avatar({ p, estado }: { p: Paciente; estado: "espera" | "bien" | "mal" }) {
+  const piel = PIEL[p.piel]!;
+  const pelo = p.edad > 62 ? PELO[2]! : PELO[p.pelo]!;
+  const boca = estado === "bien" ? "M38 62 Q50 72 62 62" : estado === "mal" ? "M38 68 Q50 60 62 68" : "M40 65 Q50 66 60 65";
+  const ceja = estado === "espera" ? "M34 40 L44 43 M56 43 L66 40" : "M34 42 L44 41 M56 41 L66 42";
+  return (
+    <svg viewBox="0 0 100 100" className="h-20 w-20 shrink-0 sm:h-24 sm:w-24" aria-hidden>
+      <circle cx="50" cy="50" r="48" fill="#DCEFEA" />
+      {p.femenino && <path d="M18 56 Q14 18 50 14 Q86 18 82 56 L76 80 L24 80 Z" fill={pelo} />}
+      <ellipse cx="50" cy="54" rx="26" ry="30" fill={piel} />
+      <path d={p.femenino ? "M24 46 Q30 20 50 20 Q70 20 76 46 Q64 30 50 32 Q36 30 24 46" : "M25 44 Q28 20 50 20 Q72 20 75 44 Q70 32 50 32 Q30 32 25 44"} fill={pelo} />
+      <path d={ceja} stroke="#3a2a20" strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="40" cy="50" r="3" fill="#1b1b1b" />
+      <circle cx="60" cy="50" r="3" fill="#1b1b1b" />
+      <path d={boca} stroke="#6b2b2b" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path d="M22 100 Q22 82 50 82 Q78 82 78 100 Z" fill="#7FB8C9" />
+    </svg>
+  );
+}
+
+function Ficha({
+  p,
+  ronda,
+  idioma,
+  onEscuchar,
+  resultado,
+  children,
+}: {
+  p: Paciente;
+  ronda: Ronda;
+  idioma: Idioma;
+  onEscuchar: () => void;
+  resultado: Resultado;
+  children: ReactNode;
+}) {
+  const motivo = ronda.tipo === "cuerpo" ? t("motivoCuerpo", idioma) : ronda.tipo === "sintoma" ? t("motivoSintoma", idioma) : t("motivoIndicacion", idioma);
+  const pregunta = ronda.tipo === "cuerpo" ? t("dondeDuele", idioma) : ronda.tipo === "sintoma" ? t("quePasa", idioma) : t("queDecis", idioma);
+  return (
+    <article className="cj-enter relative rounded-3xl p-5 pt-7 shadow-2xl" style={{ background: C.ficha, color: C.tinta }}>
+      {/* El clip de la tablilla */}
+      <div className="absolute -top-3 left-1/2 h-6 w-24 -translate-x-1/2 rounded-md bg-[#9FB4B2] shadow-inner" aria-hidden />
+      <div className="flex items-center gap-4">
+        <Avatar p={p} estado={resultado ? (resultado.ok ? "bien" : "mal") : "espera"} />
+        <div className="min-w-0 flex-1">
+          <p className="font-display text-2xl font-bold leading-tight">{p.nombre}</p>
+          <p className="text-sm opacity-70">
+            {p.edad} {idioma === "es" ? "años" : "anos"}
+          </p>
+          <span className="mt-1 inline-block rounded-md px-2 py-0.5 text-xs font-semibold" style={{ background: "#FCE7B0", color: "#6A4A00" }}>
+            {motivo}
+          </span>
+        </div>
+      </div>
+
+      {ronda.tipo !== "indicacion" ? (
+        <button
+          type="button"
+          onClick={onEscuchar}
+          className="mt-5 flex h-14 w-full items-center justify-center gap-3 rounded-2xl text-base font-bold text-white shadow-md transition active:scale-[0.98]"
+          style={{ background: C.ambo }}
+        >
+          <Volume2 className="h-6 w-6" /> {t("escuchar", idioma)}
+        </button>
+      ) : (
+        <div className="mt-5 rounded-2xl border-2 border-dashed p-4" style={{ borderColor: "#9FB4B2" }}>
+          <p className="text-sm opacity-70">{t("pedile", idioma)}</p>
+          <p className="mt-1 font-display text-xl font-bold">{enIdioma(ronda.frase.es, idioma)}</p>
+        </div>
+      )}
+
+      <p className="mt-5 text-sm font-semibold">{pregunta}</p>
+      <div className="mt-3">{children}</div>
+    </article>
+  );
+}
+
+/** Dibujo del cuerpo con las partes que se pueden tocar. Cabeza grande para que la cara se toque fácil. */
+function CuerpoMapa({
+  correcta,
+  elegida,
+  bloqueado,
+  idioma,
+  onElegir,
+}: {
+  correcta: RegionId;
+  elegida: RegionId | null;
+  bloqueado: boolean;
+  idioma: Idioma;
+  onElegir: (r: RegionId) => void;
+}) {
+  const piel = "#E8B990";
+  const zonas: { id: RegionId; shape: ReactNode; ring: ReactNode }[] = [
+    { id: "cabeza", shape: <ellipse cx="120" cy="40" rx="58" ry="24" />, ring: <ellipse cx="120" cy="40" rx="58" ry="24" /> },
+    { id: "ojo", shape: <><circle cx="96" cy="86" r="15" /><circle cx="144" cy="86" r="15" /></>, ring: <><circle cx="96" cy="86" r="15" /><circle cx="144" cy="86" r="15" /></> },
+    { id: "oreja", shape: <><ellipse cx="50" cy="96" rx="15" ry="20" /><ellipse cx="190" cy="96" rx="15" ry="20" /></>, ring: <><ellipse cx="50" cy="96" rx="15" ry="20" /><ellipse cx="190" cy="96" rx="15" ry="20" /></> },
+    { id: "nariz", shape: <circle cx="120" cy="108" r="12" />, ring: <circle cx="120" cy="108" r="12" /> },
+    { id: "boca", shape: <ellipse cx="120" cy="134" rx="22" ry="11" />, ring: <ellipse cx="120" cy="134" rx="22" ry="11" /> },
+    { id: "corazon", shape: <circle cx="140" cy="198" r="18" />, ring: <circle cx="140" cy="198" r="18" /> },
+    { id: "panza", shape: <circle cx="120" cy="245" r="22" />, ring: <circle cx="120" cy="245" r="22" /> },
+    { id: "mano", shape: <><circle cx="46" cy="268" r="17" /><circle cx="194" cy="268" r="17" /></>, ring: <><circle cx="46" cy="268" r="17" /><circle cx="194" cy="268" r="17" /></> },
+    { id: "pie", shape: <><ellipse cx="98" cy="350" rx="20" ry="11" /><ellipse cx="142" cy="350" rx="20" ry="11" /></>, ring: <><ellipse cx="98" cy="350" rx="20" ry="11" /><ellipse cx="142" cy="350" rx="20" ry="11" /></> },
+  ];
+  const etiqueta = (id: RegionId) => {
+    const r = REGIONES.find((x) => x.id === id)!;
+    return idioma === "pt" ? r.pt : r.es[0]!.charAt(0).toUpperCase() + r.es[0]!.slice(1);
+  };
+  return (
+    <div className="mx-auto max-w-[300px]">
+      <svg viewBox="0 0 240 370" className="w-full" role="group" aria-label={idioma === "es" ? "Cuerpo del paciente" : "Corpo do paciente"}>
+        {/* Cuerpo */}
+        <rect x="104" y="150" width="32" height="22" fill={piel} />
+        <path d="M70 175 Q120 158 170 175 L176 290 Q120 302 64 290 Z" fill="#7FB8C9" />
+        <path d="M70 180 Q52 200 48 258" stroke="#7FB8C9" strokeWidth="22" strokeLinecap="round" fill="none" />
+        <path d="M170 180 Q188 200 192 258" stroke="#7FB8C9" strokeWidth="22" strokeLinecap="round" fill="none" />
+        <circle cx="46" cy="268" r="13" fill={piel} />
+        <circle cx="194" cy="268" r="13" fill={piel} />
+        <path d="M100 290 L98 342 M140 290 L142 342" stroke="#2F6F7C" strokeWidth="24" strokeLinecap="round" />
+        <ellipse cx="98" cy="350" rx="18" ry="9" fill="#33383A" />
+        <ellipse cx="142" cy="350" rx="18" ry="9" fill="#33383A" />
+        {/* Cabeza */}
+        <ellipse cx="50" cy="96" rx="11" ry="16" fill={piel} />
+        <ellipse cx="190" cy="96" rx="11" ry="16" fill={piel} />
+        <circle cx="120" cy="92" r="70" fill={piel} />
+        <path d="M52 76 Q58 22 120 20 Q182 22 188 76 Q170 44 120 44 Q70 44 52 76" fill="#3B2A1E" />
+        <circle cx="96" cy="86" r="6" fill="#1b1b1b" />
+        <circle cx="144" cy="86" r="6" fill="#1b1b1b" />
+        <path d="M120 98 Q114 112 122 114" stroke="#B07A55" strokeWidth="3" fill="none" strokeLinecap="round" />
+        <path d="M104 132 Q120 142 136 132" stroke="#8A3B3B" strokeWidth="4" fill="none" strokeLinecap="round" />
+        <path d="M140 190 c-4-6-12-3-10 4 c1 5 10 10 10 10 s9-5 10-10 c2-7-6-10-10-4z" fill="#D52B1E33" />
+
+        {zonas.map((z) => {
+          const esCorrecta = bloqueado && z.id === correcta;
+          const esMal = bloqueado && elegida === z.id && z.id !== correcta;
+          const fill = esCorrecta ? "#3DE0B088" : esMal ? "#D52B1E77" : "transparent";
+          return (
+            <g
+              key={z.id}
+              className={`cj-region ${esCorrecta ? "cj-pulse" : ""}`}
+              role="button"
+              tabIndex={bloqueado ? -1 : 0}
+              aria-label={etiqueta(z.id)}
+              aria-disabled={bloqueado}
+              onClick={() => !bloqueado && onElegir(z.id)}
+              onKeyDown={(e) => {
+                if (!bloqueado && (e.key === "Enter" || e.key === " ")) {
+                  e.preventDefault();
+                  onElegir(z.id);
+                }
+              }}
+            >
+              <g fill={fill} stroke={esCorrecta ? C.fosforo : esMal ? C.rojo : "none"} strokeWidth="3">
+                {z.shape}
+              </g>
+              <g className="cj-ring" fill="none" stroke={C.ambo} strokeWidth="2.5" strokeDasharray="5 4">
+                {z.ring}
+              </g>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+function Opciones({
+  ronda,
+  idioma,
+  resultado,
+  onElegir,
+}: {
+  ronda: Extract<Ronda, { tipo: "sintoma" | "indicacion" }>;
+  idioma: Idioma;
+  resultado: Resultado;
+  onElegir: (id: string, ok: boolean) => void;
+}) {
+  return (
+    <div className="grid gap-2">
+      {ronda.opciones.map((o) => {
+        const ok = o.id === ronda.frase.id;
+        const marcada = resultado && (ok || resultado.elegida === o.id);
+        return (
+          <button
+            key={o.id}
+            type="button"
+            disabled={!!resultado}
+            onClick={() => onElegir(o.id, ok)}
+            className={`min-h-14 rounded-2xl border-2 px-4 py-3 text-left text-base font-semibold transition active:scale-[0.99] ${
+              marcada ? (ok ? "border-[#1E9E78] bg-[#D8F6EC]" : "border-[#D52B1E] bg-[#FBE2DF]") : "border-[#C9DCD8] bg-white hover:border-[#0F4C55]"
+            }`}
+            lang={ronda.tipo === "indicacion" ? "gn" : undefined}
+          >
+            {ronda.tipo === "sintoma" ? enIdioma(o.es, idioma) : o.gn}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function Veredicto({
+  ronda,
+  resultado,
+  idioma,
+  onSeguir,
+  ultimo,
+}: {
+  ronda: Ronda;
+  resultado: NonNullable<Resultado>;
+  idioma: Idioma;
+  onSeguir: () => void;
+  ultimo: boolean;
+}) {
+  const gn = ronda.tipo === "cuerpo" ? ronda.palabra.gn : ronda.frase.gn;
+  const es = ronda.tipo === "cuerpo" ? ronda.palabra.es : ronda.frase.es;
+  const titulo = resultado.ok ? t("correcto", idioma) : resultado.porTiempo ? t("seAcabo", idioma) : t("incorrecto", idioma);
+  return (
+    <div
+      className="cj-enter rounded-3xl p-4 text-white shadow-xl"
+      style={{ background: resultado.ok ? "#14614F" : "#7A1F17" }}
+      role="status"
+    >
+      <p className="font-display text-xl font-bold">{titulo}</p>
+      <p className="mt-1 text-base">
+        <span className="font-bold" lang="gn">
+          {gn}
+        </span>{" "}
+        <span className="opacity-80">= {enIdioma(es, idioma)}</span>
+      </p>
+      <button
+        type="button"
+        onClick={onSeguir}
+        autoFocus
+        className="mt-3 h-12 w-full rounded-xl bg-white text-base font-bold transition active:scale-[0.98]"
+        style={{ color: resultado.ok ? "#14614F" : "#7A1F17" }}
+      >
+        {ultimo ? t("resumen", idioma) : t("siguiente", idioma)}
+      </button>
+    </div>
+  );
+}
+
+function Fin({
+  idioma,
+  aciertos,
+  atendidos,
+  total,
+  racha,
+  puntos,
+  xp,
+  onOtro,
+}: {
+  idioma: Idioma;
+  aciertos: number;
+  atendidos: number;
+  total: number;
+  racha: number;
+  puntos: number;
+  xp: number;
+  onOtro: () => void;
+}) {
+  const e = estrellas(aciertos, total);
+  return (
+    <section className="cj-enter pt-4 text-white">
+      <div className="overflow-hidden rounded-3xl border border-white/15 bg-[#062A2E] shadow-2xl">
+        <Ecg velocidad={2.4} alto={70} />
+        <div className="px-6 pb-6 text-center">
+          <h2 className="font-display text-3xl font-bold">{t("resumen", idioma)}</h2>
+          <div className="mt-3 flex justify-center gap-2" aria-label={`${e} de 3`}>
+            {[1, 2, 3].map((k) => (
+              <svg key={k} viewBox="0 0 24 24" className="h-10 w-10" aria-hidden>
+                <path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z" fill={k <= e ? C.ambar : "#ffffff22"} />
+              </svg>
+            ))}
+          </div>
+          <dl className="mt-5 grid grid-cols-3 gap-2 text-left">
+            <div className="rounded-2xl bg-white/10 p-3">
+              <dt className="text-xs text-white/70">{t("atendidos", idioma)}</dt>
+              <dd className="font-display text-2xl font-bold tabular-nums">
+                {aciertos}/{atendidos}
+              </dd>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-3">
+              <dt className="text-xs text-white/70">{t("racha", idioma)}</dt>
+              <dd className="font-display text-2xl font-bold tabular-nums">{racha}</dd>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-3">
+              <dt className="text-xs text-white/70">{t("puntos", idioma)}</dt>
+              <dd className="font-display text-2xl font-bold tabular-nums">{puntos}</dd>
+            </div>
+          </dl>
+          {xp > 0 && <p className="mt-4 text-sm text-white/80">+{xp} XP</p>}
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={onOtro}
+        className="mt-6 flex h-16 w-full items-center justify-center gap-3 rounded-2xl text-lg font-bold text-[#062A2E] shadow-lg transition active:scale-[0.98]"
+        style={{ background: C.fosforo }}
+      >
+        <RotateCcw className="h-5 w-5" /> {t("otroTurno", idioma)}
+      </button>
+      <Link to="/juegos" className="mt-3 block text-center text-sm text-white/70 hover:text-white">
+        {idioma === "es" ? "Volver a los juegos" : "Voltar aos jogos"}
+      </Link>
+    </section>
+  );
+}
