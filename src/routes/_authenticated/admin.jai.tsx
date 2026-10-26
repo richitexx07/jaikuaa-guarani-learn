@@ -79,6 +79,13 @@ function AdminJaiPage() {
                       <p className="mt-0.5 text-xs text-muted-foreground">
                         en {r.ruta} · {new Date(r.created_at).toLocaleDateString("es-PY", { day: "numeric", month: "short" })}
                       </p>
+                      {r.contacto ? (
+                        <a href={`mailto:${r.contacto}?subject=${encodeURIComponent("Respuesta a tu sugerencia en Jaikuaa")}`} className="mt-1 inline-block text-xs font-semibold text-primary underline">
+                          Responder a {r.contacto}
+                        </a>
+                      ) : (
+                        <p className="mt-1 text-xs text-muted-foreground">Sin correo (anónima)</p>
+                      )}
                     </li>
                   ))}
                 </ul>

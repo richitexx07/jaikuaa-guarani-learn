@@ -21,6 +21,8 @@ const Input = z.object({
   ruta: z.string().max(300).default("/"),
   resultado: z.enum(["respondida", "opciones", "derivada", "no-util", "sugerencia"]),
   faqId: z.string().max(40).nullable().default(null),
+  // Correo opcional, solo para sugerencias/quejas, para poder responder.
+  contacto: z.string().trim().max(200).email().nullable().optional(),
 });
 
 export const logJaiQuestion = createServerFn({ method: "POST" })
@@ -32,8 +34,9 @@ export const logJaiQuestion = createServerFn({ method: "POST" })
     const texto = scrubJaiText(data.texto);
     if (!texto) return { ok: false };
     const ruta = data.ruta.split("?")[0].replace(/[0-9a-f]{8}-[0-9a-f-]{27,}/gi, ":id").slice(0, 120) || "/";
+    const contacto = data.resultado === "sugerencia" && data.contacto ? data.contacto.toLowerCase() : null;
     const db = await admin();
-    const { error } = await db.from("jai_consultas").insert({ texto, ruta, resultado: data.resultado, faq_id: data.faqId });
+    const { error } = await db.from("jai_consultas").insert({ texto, ruta, resultado: data.resultado, faq_id: data.faqId, contacto });
     return { ok: !error };
   });
 
