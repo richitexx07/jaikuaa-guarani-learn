@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PrivateGate } from "@/components/private-gate";
 import { SiteFooter } from "@/components/site-footer";
 import { InfoCard, MarketingHeader, Section, WhatsAppCta } from "@/components/marketing/page-parts";
 
@@ -17,7 +16,6 @@ const DESTINOS = [
 export const Route = createFileRoute("/turismo")({
   head: () => ({
     meta: [
-      { name: "robots", content: "noindex, nofollow" },
       { title: "Jai Turístico — Recorré Paraguay con Jaikuaa" },
       {
         name: "description",
@@ -35,8 +33,7 @@ export const Route = createFileRoute("/turismo")({
     ],
     links: [{ rel: "canonical", href: "https://www.jaikuaa.com/turismo" }],
   }),
-  ssr: false,
-  component: () => <PrivateGate><TurismoPage /></PrivateGate>,
+  component: TurismoPage,
 });
 
 function TurismoPage() {
