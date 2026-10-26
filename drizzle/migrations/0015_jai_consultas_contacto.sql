@@ -1,0 +1,1 @@
+ALTER TABLE public.jai_consultas ADD COLUMN IF NOT EXISTS contacto text;

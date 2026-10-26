@@ -513,6 +513,7 @@ export type Database = {
       }
       jai_consultas: {
         Row: {
+          contacto: string | null
           created_at: string
           faq_id: string | null
           id: string
@@ -521,6 +522,7 @@ export type Database = {
           texto: string
         }
         Insert: {
+          contacto?: string | null
           created_at?: string
           faq_id?: string | null
           id?: string
@@ -529,6 +531,7 @@ export type Database = {
           texto: string
         }
         Update: {
+          contacto?: string | null
           created_at?: string
           faq_id?: string | null
           id?: string
