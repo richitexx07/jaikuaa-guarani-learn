@@ -29,7 +29,7 @@ import {
   type RegionId,
   type Ronda,
 } from "@/lib/consultorio";
-import jaiImg from "@/assets/jai-atencion.png";
+import jaiImg from "@/assets/jai-doctor.webp";
 
 export const Route = createFileRoute("/_authenticated/juegos/consultorio")({
   head: () => ({
@@ -343,7 +343,7 @@ function Intro({
             <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">{t("titulo", idioma)}</h1>
             <p className="mt-3 max-w-md text-base leading-relaxed text-white/80">{t("bajada", idioma)}</p>
           </div>
-          <img src={jaiImg} alt="" className="mx-auto h-36 w-auto drop-shadow-xl sm:h-44" />
+          <img src={jaiImg} alt="Jai, el doctor del consultorio" className="mx-auto h-48 w-auto drop-shadow-xl sm:h-60" />
         </div>
       </div>
       <ul className="mt-5 grid gap-2 text-sm text-white/85 sm:grid-cols-3">
