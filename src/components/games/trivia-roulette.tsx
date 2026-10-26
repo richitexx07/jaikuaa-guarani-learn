@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { TRIVIA_ART } from "@/lib/trivia-art";
 import { ROULETTE, TRIVIA } from "@/lib/trivia";
 
 const SLICE = 360 / ROULETTE.length;
@@ -57,12 +58,11 @@ export function TriviaRoulette() {
               className="absolute left-1/2 top-1/2 origin-[0_0]"
               style={{ transform: `rotate(${i * SLICE + SLICE / 2 - 90}deg)` }}
             >
-              <span
-                className="block translate-x-[70px] -translate-y-1/2 rotate-90 text-3xl sm:translate-x-[85px]"
-                aria-hidden
-              >
-                {TRIVIA[id].emoji}
-              </span>
+              <img
+                src={TRIVIA_ART[id]}
+                alt=""
+                className="block h-11 w-11 translate-x-[62px] -translate-y-1/2 rotate-90 object-contain drop-shadow sm:h-14 sm:w-14 sm:translate-x-[74px]"
+              />
             </div>
           ))}
           <div className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-primary bg-card" />
@@ -72,8 +72,8 @@ export function TriviaRoulette() {
       <div className="mt-6 min-h-24 text-center" aria-live="polite">
         {cat ? (
           <>
-            <div className="font-display text-2xl font-bold text-foreground">
-              {cat.emoji} {cat.title}
+            <div className="flex items-center justify-center gap-2 font-display text-2xl font-bold text-foreground">
+              <img src={TRIVIA_ART[cat.id]} alt="" className="h-12 w-12 object-contain" /> {cat.title}
             </div>
             <Button
               size="lg"

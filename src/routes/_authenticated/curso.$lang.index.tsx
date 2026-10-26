@@ -74,16 +74,17 @@ function CourseIndex() {
         <style>{PATH_CSS}</style>
         <div className="mx-auto max-w-3xl">
           {/* Cabecera ilustrada: el camino del curso, con el título y el progreso encima */}
-          <section className="relative overflow-hidden rounded-3xl shadow-elegant">
+          {/* En el celular el texto va en una franja debajo del dibujo; en pantallas anchas, a la derecha, sin tapar a Jai */}
+          <section className="relative overflow-hidden rounded-3xl bg-[#0D1B33] shadow-elegant">
             <img
               src={bannerCurso}
               alt="Jai camina con su mochila por un sendero de piedras entre lomas y lapachos"
-              className="aspect-[16/10] w-full object-cover sm:aspect-[16/8]"
+              className="aspect-[16/9] w-full object-cover sm:aspect-[16/8]"
               width={1280}
               height={720}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0D1B33]/90 via-[#0D1B33]/35 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-5 text-white sm:p-7">
+            <div className="absolute inset-0 hidden bg-gradient-to-l from-[#0D1B33]/90 via-[#0D1B33]/40 to-transparent sm:block" />
+            <div className="p-5 text-white sm:absolute sm:inset-y-0 sm:right-0 sm:flex sm:w-[55%] sm:flex-col sm:justify-end sm:p-7">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">Curso de {lang.name}</h1>
                 {lang.featured && (

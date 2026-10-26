@@ -113,7 +113,7 @@ function Hero() {
           </p>
         </div>
 
-        <div className="relative order-1 mx-auto aspect-square w-full max-w-[19rem] sm:max-w-sm lg:order-2 lg:max-w-lg">
+        <div className="relative order-1 mx-auto aspect-square w-full max-w-[15rem] sm:max-w-sm lg:order-2 lg:max-w-lg">
           <div className="hero-disc absolute inset-0">
             <NandutiDisc className="h-full w-full text-primary" />
           </div>
