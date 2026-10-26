@@ -50,6 +50,9 @@ import { Route as AuthenticatedAdminCorpusRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminInformeAuspicianteRouteImport } from './routes/_authenticated/admin.informe-auspiciante'
 import { Route as AuthenticatedAdminJaiRouteImport } from './routes/_authenticated/admin.jai'
 import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
+import { Route as AuthenticatedAulaIndexRouteImport } from './routes/_authenticated/aula.index'
+import { Route as AuthenticatedAulaIdRouteImport } from './routes/_authenticated/aula.$id'
+import { Route as AuthenticatedAulaDocenteRouteImport } from './routes/_authenticated/aula.docente'
 import { Route as AuthenticatedCursoLangRouteImport } from './routes/_authenticated/curso.$lang'
 import { Route as AuthenticatedDocenteIndexRouteImport } from './routes/_authenticated/docente.index'
 import { Route as AuthenticatedDocenteConstanciaRouteImport } from './routes/_authenticated/docente.constancia'
@@ -79,6 +82,7 @@ import { Route as AuthenticatedTriviaCategoryRouteImport } from './routes/_authe
 import { Route as AuthenticatedCursoLangIndexRouteImport } from './routes/_authenticated/curso.$lang.index'
 import { Route as AuthenticatedGuaraniEscolarTemaIndexRouteImport } from './routes/_authenticated/guarani-escolar.tema.index'
 import { Route as AuthenticatedGuaraniEscolarTemaTopicRouteImport } from './routes/_authenticated/guarani-escolar.tema.$topic'
+import { Route as AuthenticatedAulaConstanciaAulaIdAlumnoIdRouteImport } from './routes/_authenticated/aula.constancia.$aulaId.$alumnoId'
 import { Route as AuthenticatedCursoLangLeccionNRouteImport } from './routes/_authenticated/curso.$lang.leccion.$n'
 
 const IndexRoute = IndexRouteImport.update({
@@ -292,6 +296,22 @@ const AuthenticatedAdminNoticiasRoute =
     path: '/admin/noticias',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAulaIndexRoute = AuthenticatedAulaIndexRouteImport.update({
+  id: '/aula/',
+  path: '/aula/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAulaIdRoute = AuthenticatedAulaIdRouteImport.update({
+  id: '/aula/$id',
+  path: '/aula/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAulaDocenteRoute =
+  AuthenticatedAulaDocenteRouteImport.update({
+    id: '/aula/docente',
+    path: '/aula/docente',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCursoLangRoute = AuthenticatedCursoLangRouteImport.update({
   id: '/curso/$lang',
   path: '/curso/$lang',
@@ -465,6 +485,12 @@ const AuthenticatedGuaraniEscolarTemaTopicRoute =
     path: '/$topic',
     getParentRoute: () => AuthenticatedGuaraniEscolarTemaRoute,
   } as any)
+const AuthenticatedAulaConstanciaAulaIdAlumnoIdRoute =
+  AuthenticatedAulaConstanciaAulaIdAlumnoIdRouteImport.update({
+    id: '/aula/constancia/$aulaId/$alumnoId',
+    path: '/aula/constancia/$aulaId/$alumnoId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCursoLangLeccionNRoute =
   AuthenticatedCursoLangLeccionNRouteImport.update({
     id: '/leccion/$n',
@@ -513,6 +539,8 @@ export interface FileRoutesByFullPath {
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/aula/$id': typeof AuthenticatedAulaIdRoute
+  '/aula/docente': typeof AuthenticatedAulaDocenteRoute
   '/curso/$lang': typeof AuthenticatedCursoLangRouteWithChildren
   '/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
   '/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
@@ -533,6 +561,7 @@ export interface FileRoutesByFullPath {
   '/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
+  '/aula/': typeof AuthenticatedAulaIndexRoute
   '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/guarani-escolar/': typeof AuthenticatedGuaraniEscolarIndexRoute
   '/juegos/': typeof AuthenticatedJuegosIndexRoute
@@ -542,6 +571,7 @@ export interface FileRoutesByFullPath {
   '/guarani-escolar/tema/$topic': typeof AuthenticatedGuaraniEscolarTemaTopicRoute
   '/curso/$lang/': typeof AuthenticatedCursoLangIndexRoute
   '/guarani-escolar/tema/': typeof AuthenticatedGuaraniEscolarTemaIndexRoute
+  '/aula/constancia/$aulaId/$alumnoId': typeof AuthenticatedAulaConstanciaAulaIdAlumnoIdRoute
   '/curso/$lang/leccion/$n': typeof AuthenticatedCursoLangLeccionNRoute
 }
 export interface FileRoutesByTo {
@@ -584,6 +614,8 @@ export interface FileRoutesByTo {
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/aula/$id': typeof AuthenticatedAulaIdRoute
+  '/aula/docente': typeof AuthenticatedAulaDocenteRoute
   '/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
   '/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
   '/guarani-escolar/semanal': typeof AuthenticatedGuaraniEscolarSemanalRoute
@@ -602,6 +634,7 @@ export interface FileRoutesByTo {
   '/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
+  '/aula': typeof AuthenticatedAulaIndexRoute
   '/docente': typeof AuthenticatedDocenteIndexRoute
   '/guarani-escolar': typeof AuthenticatedGuaraniEscolarIndexRoute
   '/juegos': typeof AuthenticatedJuegosIndexRoute
@@ -611,6 +644,7 @@ export interface FileRoutesByTo {
   '/guarani-escolar/tema/$topic': typeof AuthenticatedGuaraniEscolarTemaTopicRoute
   '/curso/$lang': typeof AuthenticatedCursoLangIndexRoute
   '/guarani-escolar/tema': typeof AuthenticatedGuaraniEscolarTemaIndexRoute
+  '/aula/constancia/$aulaId/$alumnoId': typeof AuthenticatedAulaConstanciaAulaIdAlumnoIdRoute
   '/curso/$lang/leccion/$n': typeof AuthenticatedCursoLangLeccionNRoute
 }
 export interface FileRoutesById {
@@ -656,6 +690,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/_authenticated/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/_authenticated/aula/$id': typeof AuthenticatedAulaIdRoute
+  '/_authenticated/aula/docente': typeof AuthenticatedAulaDocenteRoute
   '/_authenticated/curso/$lang': typeof AuthenticatedCursoLangRouteWithChildren
   '/_authenticated/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
   '/_authenticated/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
@@ -676,6 +712,7 @@ export interface FileRoutesById {
   '/_authenticated/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
   '/_authenticated/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/_authenticated/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
+  '/_authenticated/aula/': typeof AuthenticatedAulaIndexRoute
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/guarani-escolar/': typeof AuthenticatedGuaraniEscolarIndexRoute
   '/_authenticated/juegos/': typeof AuthenticatedJuegosIndexRoute
@@ -685,6 +722,7 @@ export interface FileRoutesById {
   '/_authenticated/guarani-escolar/tema/$topic': typeof AuthenticatedGuaraniEscolarTemaTopicRoute
   '/_authenticated/curso/$lang/': typeof AuthenticatedCursoLangIndexRoute
   '/_authenticated/guarani-escolar/tema/': typeof AuthenticatedGuaraniEscolarTemaIndexRoute
+  '/_authenticated/aula/constancia/$aulaId/$alumnoId': typeof AuthenticatedAulaConstanciaAulaIdAlumnoIdRoute
   '/_authenticated/curso/$lang/leccion/$n': typeof AuthenticatedCursoLangLeccionNRoute
 }
 export interface FileRouteTypes {
@@ -730,6 +768,8 @@ export interface FileRouteTypes {
     | '/admin/informe-auspiciante'
     | '/admin/jai'
     | '/admin/noticias'
+    | '/aula/$id'
+    | '/aula/docente'
     | '/curso/$lang'
     | '/docente/constancia'
     | '/guarani-escolar/rescate'
@@ -750,6 +790,7 @@ export interface FileRouteTypes {
     | '/mostrador/editar'
     | '/practica/registro'
     | '/trivia/$category'
+    | '/aula/'
     | '/docente/'
     | '/guarani-escolar/'
     | '/juegos/'
@@ -759,6 +800,7 @@ export interface FileRouteTypes {
     | '/guarani-escolar/tema/$topic'
     | '/curso/$lang/'
     | '/guarani-escolar/tema/'
+    | '/aula/constancia/$aulaId/$alumnoId'
     | '/curso/$lang/leccion/$n'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -801,6 +843,8 @@ export interface FileRouteTypes {
     | '/admin/informe-auspiciante'
     | '/admin/jai'
     | '/admin/noticias'
+    | '/aula/$id'
+    | '/aula/docente'
     | '/docente/constancia'
     | '/guarani-escolar/rescate'
     | '/guarani-escolar/semanal'
@@ -819,6 +863,7 @@ export interface FileRouteTypes {
     | '/mostrador/editar'
     | '/practica/registro'
     | '/trivia/$category'
+    | '/aula'
     | '/docente'
     | '/guarani-escolar'
     | '/juegos'
@@ -828,6 +873,7 @@ export interface FileRouteTypes {
     | '/guarani-escolar/tema/$topic'
     | '/curso/$lang'
     | '/guarani-escolar/tema'
+    | '/aula/constancia/$aulaId/$alumnoId'
     | '/curso/$lang/leccion/$n'
   id:
     | '__root__'
@@ -872,6 +918,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/informe-auspiciante'
     | '/_authenticated/admin/jai'
     | '/_authenticated/admin/noticias'
+    | '/_authenticated/aula/$id'
+    | '/_authenticated/aula/docente'
     | '/_authenticated/curso/$lang'
     | '/_authenticated/docente/constancia'
     | '/_authenticated/guarani-escolar/rescate'
@@ -892,6 +940,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mostrador/editar'
     | '/_authenticated/practica/registro'
     | '/_authenticated/trivia/$category'
+    | '/_authenticated/aula/'
     | '/_authenticated/docente/'
     | '/_authenticated/guarani-escolar/'
     | '/_authenticated/juegos/'
@@ -901,6 +950,7 @@ export interface FileRouteTypes {
     | '/_authenticated/guarani-escolar/tema/$topic'
     | '/_authenticated/curso/$lang/'
     | '/_authenticated/guarani-escolar/tema/'
+    | '/_authenticated/aula/constancia/$aulaId/$alumnoId'
     | '/_authenticated/curso/$lang/leccion/$n'
   fileRoutesById: FileRoutesById
 }
@@ -1218,6 +1268,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminNoticiasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/aula/': {
+      id: '/_authenticated/aula/'
+      path: '/aula'
+      fullPath: '/aula/'
+      preLoaderRoute: typeof AuthenticatedAulaIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/aula/$id': {
+      id: '/_authenticated/aula/$id'
+      path: '/aula/$id'
+      fullPath: '/aula/$id'
+      preLoaderRoute: typeof AuthenticatedAulaIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/aula/docente': {
+      id: '/_authenticated/aula/docente'
+      path: '/aula/docente'
+      fullPath: '/aula/docente'
+      preLoaderRoute: typeof AuthenticatedAulaDocenteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/curso/$lang': {
       id: '/_authenticated/curso/$lang'
       path: '/curso/$lang'
@@ -1421,6 +1492,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGuaraniEscolarTemaTopicRouteImport
       parentRoute: typeof AuthenticatedGuaraniEscolarTemaRoute
     }
+    '/_authenticated/aula/constancia/$aulaId/$alumnoId': {
+      id: '/_authenticated/aula/constancia/$aulaId/$alumnoId'
+      path: '/aula/constancia/$aulaId/$alumnoId'
+      fullPath: '/aula/constancia/$aulaId/$alumnoId'
+      preLoaderRoute: typeof AuthenticatedAulaConstanciaAulaIdAlumnoIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/curso/$lang/leccion/$n': {
       id: '/_authenticated/curso/$lang/leccion/$n'
       path: '/leccion/$n'
@@ -1509,6 +1587,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminInformeAuspicianteRoute: typeof AuthenticatedAdminInformeAuspicianteRoute
   AuthenticatedAdminJaiRoute: typeof AuthenticatedAdminJaiRoute
   AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
+  AuthenticatedAulaIdRoute: typeof AuthenticatedAulaIdRoute
+  AuthenticatedAulaDocenteRoute: typeof AuthenticatedAulaDocenteRoute
   AuthenticatedCursoLangRoute: typeof AuthenticatedCursoLangRouteWithChildren
   AuthenticatedDocenteConstanciaRoute: typeof AuthenticatedDocenteConstanciaRoute
   AuthenticatedJuegosAhorcadoRoute: typeof AuthenticatedJuegosAhorcadoRoute
@@ -1526,11 +1606,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMostradorEditarRoute: typeof AuthenticatedMostradorEditarRoute
   AuthenticatedPracticaRegistroRoute: typeof AuthenticatedPracticaRegistroRoute
   AuthenticatedTriviaCategoryRoute: typeof AuthenticatedTriviaCategoryRoute
+  AuthenticatedAulaIndexRoute: typeof AuthenticatedAulaIndexRoute
   AuthenticatedDocenteIndexRoute: typeof AuthenticatedDocenteIndexRoute
   AuthenticatedJuegosIndexRoute: typeof AuthenticatedJuegosIndexRoute
   AuthenticatedMostradorIndexRoute: typeof AuthenticatedMostradorIndexRoute
   AuthenticatedPracticaIndexRoute: typeof AuthenticatedPracticaIndexRoute
   AuthenticatedTriviaIndexRoute: typeof AuthenticatedTriviaIndexRoute
+  AuthenticatedAulaConstanciaAulaIdAlumnoIdRoute: typeof AuthenticatedAulaConstanciaAulaIdAlumnoIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1555,6 +1637,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAdminInformeAuspicianteRoute,
   AuthenticatedAdminJaiRoute: AuthenticatedAdminJaiRoute,
   AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
+  AuthenticatedAulaIdRoute: AuthenticatedAulaIdRoute,
+  AuthenticatedAulaDocenteRoute: AuthenticatedAulaDocenteRoute,
   AuthenticatedCursoLangRoute: AuthenticatedCursoLangRouteWithChildren,
   AuthenticatedDocenteConstanciaRoute: AuthenticatedDocenteConstanciaRoute,
   AuthenticatedJuegosAhorcadoRoute: AuthenticatedJuegosAhorcadoRoute,
@@ -1572,11 +1656,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMostradorEditarRoute: AuthenticatedMostradorEditarRoute,
   AuthenticatedPracticaRegistroRoute: AuthenticatedPracticaRegistroRoute,
   AuthenticatedTriviaCategoryRoute: AuthenticatedTriviaCategoryRoute,
+  AuthenticatedAulaIndexRoute: AuthenticatedAulaIndexRoute,
   AuthenticatedDocenteIndexRoute: AuthenticatedDocenteIndexRoute,
   AuthenticatedJuegosIndexRoute: AuthenticatedJuegosIndexRoute,
   AuthenticatedMostradorIndexRoute: AuthenticatedMostradorIndexRoute,
   AuthenticatedPracticaIndexRoute: AuthenticatedPracticaIndexRoute,
   AuthenticatedTriviaIndexRoute: AuthenticatedTriviaIndexRoute,
+  AuthenticatedAulaConstanciaAulaIdAlumnoIdRoute:
+    AuthenticatedAulaConstanciaAulaIdAlumnoIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

@@ -29,6 +29,7 @@ import { withOfflineCache } from "@/lib/offline-data";
 import { StaffRequestCard } from "@/components/pilot/staff-request-card";
 import { staffStatusRefreshInterval } from "@/lib/staff-status-refresh";
 import { OfflinePackCard } from "@/components/offline/offline-pack-card";
+import { AulaPendientes } from "@/components/aula/aula-pendientes";
 import jaiImg from "@/assets/jai-tradicional.png";
 const jaiAsset = { url: jaiImg };
 
@@ -58,6 +59,9 @@ function StaffShortcuts() {
         </Button>
         <Button asChild variant="outline" className="h-12 w-full justify-start">
           <Link to="/mostrador/editar">🩺 Frases del mostrador</Link>
+        </Button>
+        <Button asChild variant="outline" className="h-12 w-full justify-start">
+          <Link to="/aula/docente">🏫 Mis aulas</Link>
         </Button>
         <Button asChild variant="outline" className="h-12 w-full justify-start">
           <Link to="/admin/corpus">✅ Bandeja de validación</Link>
@@ -376,6 +380,7 @@ function Dashboard() {
           </h2>
 
           {/* 3. ACCESO DOCENTE */}
+          <AulaPendientes />
           <StaffShortcuts />
           <PilotCard />
 
@@ -434,6 +439,7 @@ function Dashboard() {
                 Apoyo y consulta.
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
+                <FreeCard to="/aula" emoji="🏫" title="Mi aula" desc="Entrá con el código de tu docente y mirá tus tareas." accent="primary" />
                 <FreeCard to="/mostrador" emoji="🩺" title="Atendé en guaraní" desc="Modo mostrador: hacé escuchar frases grabadas por hablantes al atender." accent="primary" inValidation />
                 <FreeCard to="/teclado" emoji="⌨️" title="Teclado Guaraní" desc="Escribí con ã, g̃ y puso, y mandalo por WhatsApp." accent="primary" />
                 <FreeCard to="/glosario" emoji="📖" title="Glosario" desc="Las palabras publicadas, con su significado y su audio." accent="primary" />
