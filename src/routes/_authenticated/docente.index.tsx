@@ -20,6 +20,7 @@ import { PanelTools } from "@/components/pilot/panel-tools";
 import { warmPages } from "@/lib/offline-pack";
 import { listValidationQueue } from "@/lib/teacher.functions";
 import { staffStatusRefreshInterval } from "@/lib/staff-status-refresh";
+import jaiProfe from "@/assets/jai-profe.webp";
 
 export const Route = createFileRoute("/_authenticated/docente/")({
   head: () => ({
@@ -127,10 +128,15 @@ function TeacherHome() {
 
   return (
     <Shell>
-      <h1 className="mt-2 font-display text-3xl font-bold text-foreground">Panel del docente</h1>
-      <p className="mt-1 text-muted-foreground">
-        {name ? `Hola, ${name}. ` : ""}Todo lo del piloto en una sola pantalla.
-      </p>
+      <div className="mt-2 flex items-center gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="font-display text-3xl font-bold text-foreground">Panel del docente</h1>
+          <p className="mt-1 text-muted-foreground">
+            {name ? `Hola, ${name}. ` : ""}Todo lo del piloto en una sola pantalla.
+          </p>
+        </div>
+        <img src={jaiProfe} alt="Jai, el profe" className="h-28 w-auto shrink-0 drop-shadow-lg sm:h-36" />
+      </div>
       <PanelTools />
 
       <h2 className="mt-8 text-xs font-semibold uppercase tracking-[0.15em] text-primary">Para hoy</h2>

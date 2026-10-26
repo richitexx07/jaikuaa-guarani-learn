@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { crearAula, decidirDocente, getPanelDocente, pedirAccesoDocente } from "@/lib/aula.functions";
+import jaiProfe from "@/assets/jai-profe.webp";
 
 export const Route = createFileRoute("/_authenticated/aula/docente")({
   head: () => ({ meta: [{ title: "Jaikuaa — Mis aulas" }, { name: "robots", content: "noindex" }] }),
@@ -54,8 +55,13 @@ function PanelDocente() {
 
       <main className="flex-1 px-4 pb-28 pt-6 sm:px-6 sm:py-10">
         <div className="mx-auto max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-accent">Aula · Docentes</p>
-          <h1 className="mt-1 font-display text-2xl font-bold text-foreground sm:text-3xl">Mis aulas</h1>
+          <div className="flex items-center gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-accent">Aula · Docentes</p>
+              <h1 className="mt-1 font-display text-2xl font-bold text-foreground sm:text-3xl">Mis aulas</h1>
+            </div>
+            <img src={jaiProfe} alt="Jai, el profe" className="h-24 w-auto shrink-0 drop-shadow-lg sm:h-32" />
+          </div>
 
           {isLoading && <Loader2 className="mx-auto mt-10 h-6 w-6 animate-spin text-muted-foreground" />}
           {error && <p className="mt-6 text-sm text-destructive">{(error as Error).message}</p>}

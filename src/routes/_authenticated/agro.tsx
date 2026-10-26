@@ -3,6 +3,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { ValidationNotice } from "@/components/validation-notice";
 import { TEMAS_AGRO } from "@/lib/guarani-tema-agro";
+import jaiAgro from "@/assets/jai-agro.webp";
 
 export const Route = createFileRoute("/_authenticated/agro")({
   head: () => ({
@@ -30,6 +31,7 @@ function AgroPage() {
       </header>
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6">
         <div className="text-center">
+          <img src={jaiAgro} alt="Jai, productor del campo" className="mx-auto mb-4 h-44 w-auto drop-shadow-xl sm:h-56" />
           <div className="inline-flex rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">Jaikuaa Agro-Rural 🌾</div>
           <h1 className="mt-4 font-display text-3xl font-bold text-foreground sm:text-4xl">Ñemitỹ ha Ka'aguy</h1>
           <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
