@@ -440,6 +440,7 @@ function Dashboard() {
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <FreeCard to="/aula" emoji="🏫" title="Mi aula" desc="Entrá con el código de tu docente y mirá tus tareas." accent="primary" />
+                <FreeCard to="/pronunciar" emoji="🎙️" title="Grabate y compará" desc="Escuchá a un hablante, grabate y compará las dos voces." accent="primary" />
                 <FreeCard to="/mostrador" emoji="🩺" title="Atendé en guaraní" desc="Modo mostrador: hacé escuchar frases grabadas por hablantes al atender." accent="primary" inValidation />
                 <FreeCard to="/teclado" emoji="⌨️" title="Teclado Guaraní" desc="Escribí con ã, g̃ y puso, y mandalo por WhatsApp." accent="primary" />
                 <FreeCard to="/glosario" emoji="📖" title="Glosario" desc="Las palabras publicadas, con su significado y su audio." accent="primary" />
