@@ -57,6 +57,9 @@ function StaffShortcuts() {
           <Link to="/cuaderno">📒 Cuaderno digital del aula</Link>
         </Button>
         <Button asChild variant="outline" className="h-12 w-full justify-start">
+          <Link to="/mostrador/editar">🩺 Frases del mostrador</Link>
+        </Button>
+        <Button asChild variant="outline" className="h-12 w-full justify-start">
           <Link to="/admin/corpus">✅ Bandeja de validación</Link>
         </Button>
         <Button asChild variant="outline" className="h-12 w-full justify-start">
@@ -431,6 +434,7 @@ function Dashboard() {
                 Apoyo y consulta.
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
+                <FreeCard to="/mostrador" emoji="🩺" title="Atendé en guaraní" desc="Modo mostrador: hacé escuchar frases grabadas por hablantes al atender." accent="primary" inValidation />
                 <FreeCard to="/teclado" emoji="⌨️" title="Teclado Guaraní" desc="Escribí con ã, g̃ y puso, y mandalo por WhatsApp." accent="primary" />
                 <FreeCard to="/glosario" emoji="📖" title="Glosario" desc="Las palabras publicadas, con su significado y su audio." accent="primary" />
                 <FreeCard to="/agro" emoji="🌾" title="Jaikuaa Agro-Rural" desc="Guaraní técnico del campo: suelo, cultivos y ganado." accent="primary" />

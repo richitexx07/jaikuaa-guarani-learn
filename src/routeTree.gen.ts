@@ -70,6 +70,8 @@ import { Route as AuthenticatedJuegosTaangaRouteImport } from './routes/_authent
 import { Route as AuthenticatedJuegosTekojojaRouteImport } from './routes/_authenticated/juegos.tekojoja'
 import { Route as AuthenticatedJuegosTembiuRouteImport } from './routes/_authenticated/juegos.tembiu'
 import { Route as AuthenticatedJuegosTriviaDueloRouteImport } from './routes/_authenticated/juegos.trivia-duelo'
+import { Route as AuthenticatedMostradorIndexRouteImport } from './routes/_authenticated/mostrador.index'
+import { Route as AuthenticatedMostradorEditarRouteImport } from './routes/_authenticated/mostrador.editar'
 import { Route as AuthenticatedPracticaIndexRouteImport } from './routes/_authenticated/practica.index'
 import { Route as AuthenticatedPracticaRegistroRouteImport } from './routes/_authenticated/practica.registro'
 import { Route as AuthenticatedTriviaIndexRouteImport } from './routes/_authenticated/trivia.index'
@@ -409,6 +411,18 @@ const AuthenticatedJuegosTriviaDueloRoute =
     path: '/juegos/trivia-duelo',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMostradorIndexRoute =
+  AuthenticatedMostradorIndexRouteImport.update({
+    id: '/mostrador/',
+    path: '/mostrador/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMostradorEditarRoute =
+  AuthenticatedMostradorEditarRouteImport.update({
+    id: '/mostrador/editar',
+    path: '/mostrador/editar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPracticaIndexRoute =
   AuthenticatedPracticaIndexRouteImport.update({
     id: '/practica/',
@@ -516,11 +530,13 @@ export interface FileRoutesByFullPath {
   '/juegos/tekojoja': typeof AuthenticatedJuegosTekojojaRoute
   '/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
+  '/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
   '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/guarani-escolar/': typeof AuthenticatedGuaraniEscolarIndexRoute
   '/juegos/': typeof AuthenticatedJuegosIndexRoute
+  '/mostrador/': typeof AuthenticatedMostradorIndexRoute
   '/practica/': typeof AuthenticatedPracticaIndexRoute
   '/trivia/': typeof AuthenticatedTriviaIndexRoute
   '/guarani-escolar/tema/$topic': typeof AuthenticatedGuaraniEscolarTemaTopicRoute
@@ -583,11 +599,13 @@ export interface FileRoutesByTo {
   '/juegos/tekojoja': typeof AuthenticatedJuegosTekojojaRoute
   '/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
+  '/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
   '/docente': typeof AuthenticatedDocenteIndexRoute
   '/guarani-escolar': typeof AuthenticatedGuaraniEscolarIndexRoute
   '/juegos': typeof AuthenticatedJuegosIndexRoute
+  '/mostrador': typeof AuthenticatedMostradorIndexRoute
   '/practica': typeof AuthenticatedPracticaIndexRoute
   '/trivia': typeof AuthenticatedTriviaIndexRoute
   '/guarani-escolar/tema/$topic': typeof AuthenticatedGuaraniEscolarTemaTopicRoute
@@ -655,11 +673,13 @@ export interface FileRoutesById {
   '/_authenticated/juegos/tekojoja': typeof AuthenticatedJuegosTekojojaRoute
   '/_authenticated/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/_authenticated/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
+  '/_authenticated/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
   '/_authenticated/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/_authenticated/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/guarani-escolar/': typeof AuthenticatedGuaraniEscolarIndexRoute
   '/_authenticated/juegos/': typeof AuthenticatedJuegosIndexRoute
+  '/_authenticated/mostrador/': typeof AuthenticatedMostradorIndexRoute
   '/_authenticated/practica/': typeof AuthenticatedPracticaIndexRoute
   '/_authenticated/trivia/': typeof AuthenticatedTriviaIndexRoute
   '/_authenticated/guarani-escolar/tema/$topic': typeof AuthenticatedGuaraniEscolarTemaTopicRoute
@@ -727,11 +747,13 @@ export interface FileRouteTypes {
     | '/juegos/tekojoja'
     | '/juegos/tembiu'
     | '/juegos/trivia-duelo'
+    | '/mostrador/editar'
     | '/practica/registro'
     | '/trivia/$category'
     | '/docente/'
     | '/guarani-escolar/'
     | '/juegos/'
+    | '/mostrador/'
     | '/practica/'
     | '/trivia/'
     | '/guarani-escolar/tema/$topic'
@@ -794,11 +816,13 @@ export interface FileRouteTypes {
     | '/juegos/tekojoja'
     | '/juegos/tembiu'
     | '/juegos/trivia-duelo'
+    | '/mostrador/editar'
     | '/practica/registro'
     | '/trivia/$category'
     | '/docente'
     | '/guarani-escolar'
     | '/juegos'
+    | '/mostrador'
     | '/practica'
     | '/trivia'
     | '/guarani-escolar/tema/$topic'
@@ -865,11 +889,13 @@ export interface FileRouteTypes {
     | '/_authenticated/juegos/tekojoja'
     | '/_authenticated/juegos/tembiu'
     | '/_authenticated/juegos/trivia-duelo'
+    | '/_authenticated/mostrador/editar'
     | '/_authenticated/practica/registro'
     | '/_authenticated/trivia/$category'
     | '/_authenticated/docente/'
     | '/_authenticated/guarani-escolar/'
     | '/_authenticated/juegos/'
+    | '/_authenticated/mostrador/'
     | '/_authenticated/practica/'
     | '/_authenticated/trivia/'
     | '/_authenticated/guarani-escolar/tema/$topic'
@@ -1332,6 +1358,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJuegosTriviaDueloRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mostrador/': {
+      id: '/_authenticated/mostrador/'
+      path: '/mostrador'
+      fullPath: '/mostrador/'
+      preLoaderRoute: typeof AuthenticatedMostradorIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mostrador/editar': {
+      id: '/_authenticated/mostrador/editar'
+      path: '/mostrador/editar'
+      fullPath: '/mostrador/editar'
+      preLoaderRoute: typeof AuthenticatedMostradorEditarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/practica/': {
       id: '/_authenticated/practica/'
       path: '/practica'
@@ -1483,10 +1523,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedJuegosTekojojaRoute: typeof AuthenticatedJuegosTekojojaRoute
   AuthenticatedJuegosTembiuRoute: typeof AuthenticatedJuegosTembiuRoute
   AuthenticatedJuegosTriviaDueloRoute: typeof AuthenticatedJuegosTriviaDueloRoute
+  AuthenticatedMostradorEditarRoute: typeof AuthenticatedMostradorEditarRoute
   AuthenticatedPracticaRegistroRoute: typeof AuthenticatedPracticaRegistroRoute
   AuthenticatedTriviaCategoryRoute: typeof AuthenticatedTriviaCategoryRoute
   AuthenticatedDocenteIndexRoute: typeof AuthenticatedDocenteIndexRoute
   AuthenticatedJuegosIndexRoute: typeof AuthenticatedJuegosIndexRoute
+  AuthenticatedMostradorIndexRoute: typeof AuthenticatedMostradorIndexRoute
   AuthenticatedPracticaIndexRoute: typeof AuthenticatedPracticaIndexRoute
   AuthenticatedTriviaIndexRoute: typeof AuthenticatedTriviaIndexRoute
 }
@@ -1527,10 +1569,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedJuegosTekojojaRoute: AuthenticatedJuegosTekojojaRoute,
   AuthenticatedJuegosTembiuRoute: AuthenticatedJuegosTembiuRoute,
   AuthenticatedJuegosTriviaDueloRoute: AuthenticatedJuegosTriviaDueloRoute,
+  AuthenticatedMostradorEditarRoute: AuthenticatedMostradorEditarRoute,
   AuthenticatedPracticaRegistroRoute: AuthenticatedPracticaRegistroRoute,
   AuthenticatedTriviaCategoryRoute: AuthenticatedTriviaCategoryRoute,
   AuthenticatedDocenteIndexRoute: AuthenticatedDocenteIndexRoute,
   AuthenticatedJuegosIndexRoute: AuthenticatedJuegosIndexRoute,
+  AuthenticatedMostradorIndexRoute: AuthenticatedMostradorIndexRoute,
   AuthenticatedPracticaIndexRoute: AuthenticatedPracticaIndexRoute,
   AuthenticatedTriviaIndexRoute: AuthenticatedTriviaIndexRoute,
 }
