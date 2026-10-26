@@ -106,6 +106,13 @@
       "when": 1792761734457,
       "tag": "0014_jai_sugerencias",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1793007616755,
+      "tag": "0015_jai_consultas_contacto",
+      "breakpoints": true
     }
   ]
 }

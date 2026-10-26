@@ -75,6 +75,7 @@ export function SupportWhatsApp() {
   const [showAll, setShowAll] = useState(false);
   const [teaser, setTeaser] = useState(false);
   const [suggesting, setSuggesting] = useState(false);
+  const [email, setEmail] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastQuestionRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -216,8 +217,10 @@ export function SupportWhatsApp() {
     if (suggesting) {
       setSuggesting(false);
       setMsgs((m) => [...m, { id: nextId++, from: "user", text }]);
-      log(text, "sugerencia", null);
-      setMsgs((m) => [...m, { id: nextId++, from: "jai", lead: "¡Anotadísimo!", text: "Muchísimas gracias por ayudarnos a hacer crecer Jaikuaa. Tu sugerencia ya le llegó al equipo." }]);
+      const contacto = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ? email.trim() : null;
+      void logFn({ data: { texto: text, ruta: pathname, resultado: "sugerencia", faqId: null, contacto } }).catch(() => {});
+      setEmail("");
+      setMsgs((m) => [...m, { id: nextId++, from: "jai", lead: "¡Anotadísimo!", text: "Muchísimas gracias por ayudarnos a hacer crecer Jaikuaa. Tu sugerencia ya le llegó al equipo." + (contacto ? " Si hace falta, te respondemos a tu correo." : "") }]);
       return;
     }
     reply(text, findFaq(text));
@@ -397,7 +400,7 @@ export function SupportWhatsApp() {
                   type="button"
                   onClick={() => {
                     setSuggesting(true);
-                    setMsgs((m) => [...m, { id: nextId++, from: "jai", lead: "¡Me encanta que quieras ayudar!", text: "Este es el buzón de sugerencias. Contame qué te gustaría que mejoremos o agreguemos a Jaikuaa. No hace falta poner tu nombre." }]);
+                    setMsgs((m) => [...m, { id: nextId++, from: "jai", lead: "¡Me encanta que quieras ayudar!", text: "Este es el buzón de sugerencias. Contame qué te gustaría que mejoremos o agreguemos a Jaikuaa. Si querés que te respondamos, dejá tu correo (es opcional)." }]);
                     inputRef.current?.focus();
                   }}
                   className="mb-1 flex w-full items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/10"
@@ -416,6 +419,19 @@ export function SupportWhatsApp() {
             )}
           </div>
 
+          {suggesting && (
+            <div className="border-t border-border bg-card px-2.5 pt-2.5">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                maxLength={200}
+                placeholder="Tu correo (opcional, para responderte)"
+                aria-label="Tu correo (opcional)"
+                className="w-full rounded-full border border-input bg-background px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+          )}
           <form onSubmit={send} className="flex gap-2 border-t border-border bg-card p-2.5">
             <input
               ref={inputRef}
