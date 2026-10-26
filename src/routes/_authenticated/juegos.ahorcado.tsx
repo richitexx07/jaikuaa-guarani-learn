@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { SpeakerButton } from "@/components/audio/speaker-button";
-import { GameShell, LessonFilter, NotEnough, XpNote, pickDistinct, useGameWords } from "@/components/games/game-shell";
+import { LessonFilter, NotEnough, pickDistinct, useGameWords } from "@/components/games/game-shell";
+import { GameStage } from "@/components/games/game-stage";
 import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ACHEGETY, displayLetter, splitAchegety } from "@/lib/achegety";
@@ -40,18 +40,74 @@ function Hangman() {
   const word = useMemo<GameWord | null>(() => pickDistinct(pool, 1)[0] ?? null, [pool, round]);
 
   return (
-    <GameShell title="Ahorcado con chipas" emoji="🥯" sponsorSlot="ahorcado">
-      <LessonFilter value={lesson} onChange={setLesson} />
-      <div className="mt-6">
+    <GameStage
+      title="Ahorcado con chipas"
+      sponsorSlot="ahorcado"
+      css={CSS}
+      ink={A.tinta}
+      background={`linear-gradient(180deg, #FBF1DC 0%, #F6E2BC 62%, ${A.madera} 62%, #6E3F18 100%)`}
+    >
+      <div className="ah-filter flex justify-center">
+        <LessonFilter value={lesson} onChange={setLesson} />
+      </div>
+      <div className="mt-4">
         {q.isLoading ? (
-          <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>
+          <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
         ) : !word ? (
           <NotEnough min={1} />
         ) : (
           <Board key={`${word.gn}-${round}`} word={word} onNext={() => setRound((r) => r + 1)} />
         )}
       </div>
-    </GameShell>
+    </GameStage>
+  );
+}
+
+/* Paleta de la mesa: mantel crema, canasta de karanda'y, chipa dorada. */
+const A = { tinta: "#3A1F0E", madera: "#8A5221", canasta: "#A86A2E", chipa: "#E7B46A", verde: "#2F7A4A", rojo: "#C8331F", papel: "#FFF8EA" };
+
+const CSS = `
+.ah-filter label { color: ${A.tinta}; } .ah-filter select { background: ${A.papel}; border-color: #D9BE8E; }
+.ah-bite { animation: ah-bite .6s cubic-bezier(.3,0,.6,1) 1 both; }
+@keyframes ah-bite { 0% { transform: scale(1) } 30% { transform: scale(1.15) rotate(-8deg) } 100% { transform: translateY(-30px) scale(.3); opacity: 0 } }
+.ah-in { animation: ah-in .35s cubic-bezier(.2,1.4,.4,1) 1 both; }
+@keyframes ah-in { from { transform: translateY(-14px) scale(.6); opacity: 0 } }
+.ah-shake { animation: ah-shake .35s ease-in-out 1; }
+@keyframes ah-shake { 25% { transform: translateX(-6px) } 75% { transform: translateX(6px) } }
+@media (prefers-reduced-motion: reduce) { .ah-bite, .ah-in, .ah-shake { animation: none !important; } .ah-bite { opacity: 0 } }
+`;
+
+/** Canasta con las chipas que quedan. Cada error se come una. */
+function Canasta({ quedan }: { quedan: number }) {
+  const pos: [number, number, number][] = [[62, 74, 22], [104, 64, 23], [146, 74, 22], [82, 92, 20], [126, 92, 20], [104, 100, 19]];
+  return (
+    <svg viewBox="0 0 208 150" className="mx-auto w-60 sm:w-72" aria-hidden>
+      <ellipse cx="104" cy="144" rx="84" ry="6" fill="#000" opacity=".18" />
+      <path d="M24 86 Q104 -6 184 86" fill="none" stroke="#7A4317" strokeWidth="8" strokeLinecap="round" />
+      {pos.map(([x, y, r], i) => {
+        const viva = i < quedan;
+        return (
+          <g key={i} className={viva ? "" : "ah-bite"} style={{ transformBox: "fill-box", transformOrigin: "center" }}>
+            <g transform={`translate(${x} ${y})`}>
+              <circle r={r} fill={A.chipa} />
+              <circle r={r} fill="none" stroke="#A8692C" strokeWidth={r * 0.12} opacity=".55" />
+              <circle r={r * 0.36} fill="#7A4317" />
+              <circle cx={-r * 0.45} cy={-r * 0.5} r={r * 0.09} fill="#A8692C" />
+              <circle cx={r * 0.55} cy={-r * 0.3} r={r * 0.08} fill="#A8692C" />
+              <circle cx={r * 0.2} cy={r * 0.62} r={r * 0.08} fill="#A8692C" />
+            </g>
+          </g>
+        );
+      })}
+      <path d="M22 96 H186 L170 144 H38Z" fill={A.canasta} />
+      {[0, 1, 2, 3].map((r) => (
+        <path key={r} d={`M${25 + r * 4} ${106 + r * 11} H${183 - r * 4}`} stroke="#6E3F18" strokeWidth="3" />
+      ))}
+      {Array.from({ length: 11 }, (_, i) => (
+        <path key={i} d={`M${36 + i * 13.6} 98 L${42 + i * 12.4} 142`} stroke="#C98B4B" strokeWidth="2.2" opacity=".7" />
+      ))}
+      <path d="M22 96 H186" stroke="#6E3F18" strokeWidth="5" strokeLinecap="round" />
+    </svg>
   );
 }
 
@@ -73,96 +129,75 @@ function Board({ word, onNext }: { word: GameWord; onNext: () => void }) {
     if (word.hasAudio) void playGuarani(word.gn);
   }, [done, won, word]);
 
+  const quedan = LIVES - wrong;
   return (
-    <div className="space-y-6">
-      <div className="rounded-2xl border border-border bg-card p-4 text-center shadow-sm">
-        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Pista en español</div>
-        <div className="mt-1 font-display text-xl font-bold text-foreground">{word.es}</div>
+    <div className="space-y-5">
+      <div className="mx-auto w-fit max-w-full -rotate-1 rounded-lg px-6 py-3 text-center shadow-lg" style={{ background: "#5E3413", color: A.papel }}>
+        <div className="text-xs font-semibold opacity-75">Pista en español</div>
+        <div className="font-display text-2xl font-bold">{word.es}</div>
       </div>
 
-      <div className="flex justify-center gap-1.5" aria-label={`Chipas restantes: ${LIVES - wrong}`}>
-        {Array.from({ length: LIVES }, (_, i) => (
-          <Chipa key={i} eaten={i >= LIVES - wrong} />
-        ))}
+      <div key={wrong} className={wrong ? "ah-shake" : ""}>
+        <Canasta quedan={quedan} />
       </div>
+      <p className="-mt-2 text-center text-sm font-semibold" aria-label={`Chipas restantes: ${quedan}`}>
+        {quedan === 1 ? "¡Queda 1 chipa!" : `Quedan ${quedan} chipas`}
+      </p>
 
       <div className="flex flex-wrap justify-center gap-1.5">
-        {tokens.map((t, i) => (
-          <span
-            key={i}
-            className={`flex h-11 min-w-9 items-center justify-center rounded-lg border-b-4 px-1 font-display text-xl font-bold ${
-              guessed.has(t) ? "border-primary text-primary" : lost ? "border-accent text-accent" : "border-border text-transparent"
-            }`}
-          >
-            {guessed.has(t) || lost ? displayLetter(t) : "·"}
-          </span>
-        ))}
+        {tokens.map((t, i) => {
+          const visible = guessed.has(t) || lost;
+          return (
+            <span
+              key={i}
+              className="flex h-14 min-w-11 items-center justify-center rounded-xl border-b-[6px] px-1.5 font-display text-2xl font-bold shadow"
+              style={{ background: A.papel, borderColor: guessed.has(t) ? A.verde : lost ? A.rojo : "#D9BE8E", color: guessed.has(t) ? A.verde : A.rojo }}
+            >
+              {visible ? <span key={`${t}-v`} className="ah-in">{displayLetter(t)}</span> : ""}
+            </span>
+          );
+        })}
       </div>
 
       {done ? (
-        <div className="space-y-3 text-center">
-          <p className="font-display text-xl font-bold text-foreground">
-            {won ? "¡Muy bien!" : "Se acabaron las chipas"}
-          </p>
-          <div className="flex items-center justify-center gap-2 text-lg">
-            <span className="font-semibold text-primary">{word.gn}</span>
+        <div className="space-y-3 rounded-3xl p-5 text-center shadow-xl" style={{ background: A.papel }}>
+          <p className="font-display text-3xl font-bold">{won ? "¡Muy bien!" : "Se acabaron las chipas"}</p>
+          <div className="flex flex-wrap items-center justify-center gap-2 text-lg">
+            <span className="font-display text-2xl font-bold" style={{ color: A.verde }}>{word.gn}</span>
             {word.hasAudio && <SpeakerButton gn={word.gn} size="md" />}
-            <span className="text-muted-foreground">— {word.es}</span>
+            <span className="opacity-70">— {word.es}</span>
           </div>
-          <XpNote xp={won ? XP_WIN : XP_LOSS} />
+          <p className="font-bold" style={{ color: A.verde }}>+{won ? XP_WIN : XP_LOSS} XP</p>
           <div className="flex flex-wrap justify-center gap-2">
-            <Button onClick={onNext}>Otra palabra</Button>
-            {won && <ShareResult text="¡Adiviné una palabra en guaraní en el Ahorcado con chipas de Jaikuaa! ¿Te animás?" />}
+            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: A.rojo }}>Otra palabra</button>
+            {won && <ShareResult text="¡Adiviné una palabra en guaraní en el Ahorcado con chipas de Jaikuaa! ¿Te animás? 🇵🇾" />}
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-9">
+        <div className="grid grid-cols-6 gap-1.5 rounded-3xl p-2 sm:grid-cols-9" style={{ background: "rgba(0,0,0,.18)" }}>
           {ACHEGETY.map((k) => {
             const used = guessed.has(k);
             const hit = used && tokens.includes(k);
             return (
-              <Button variant="ghost"
+              <button
                 key={k}
                 type="button"
                 disabled={used}
                 onClick={() => { feedback(tokens.includes(k) ? "success" : "error"); setGuessed((s) => new Set(s).add(k)); }}
-                className={`h-11 rounded-lg border font-display text-base font-bold transition ${
-                  !used
-                    ? "border-primary/30 bg-card text-foreground hover:border-primary hover:bg-primary/5"
-                    : hit
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-muted text-muted-foreground opacity-50"
-                }`}
+                className="h-12 rounded-xl font-display text-lg font-bold shadow transition active:translate-y-0.5"
+                style={{
+                  background: !used ? A.papel : hit ? A.verde : "#C9AE84",
+                  color: !used ? A.tinta : hit ? "#fff" : "#8A6F4A",
+                  opacity: used && !hit ? 0.55 : 1,
+                  boxShadow: !used ? "0 3px 0 #C9A66B" : "none",
+                }}
               >
                 {displayLetter(k)}
-              </Button>
+              </button>
             );
           })}
         </div>
       )}
     </div>
-  );
-}
-
-function Chipa({ eaten }: { eaten: boolean }) {
-  return (
-    <svg viewBox="0 0 48 48" className="chipa h-11 w-11" data-eaten={eaten} aria-hidden>
-      <defs>
-        <radialGradient id="chipa-g" cx="40%" cy="35%" r="70%">
-          <stop offset="0%" stopColor="var(--stadium-shell-light)" />
-          <stop offset="70%" stopColor="var(--stadium-shell)" />
-          <stop offset="100%" stopColor="var(--stadium-shell-dark)" />
-        </radialGradient>
-      </defs>
-      <path
-        d={eaten ? "M24 6a18 18 0 1 0 18 18c-4 1-7-2-6-6-4 1-7-2-6-6-4 0-6-3-6-6z" : "M24 6a18 18 0 1 0 0.01 0z"}
-        fill="url(#chipa-g)"
-        fillRule="evenodd"
-      />
-      <circle cx="24" cy="24" r="6.5" fill="var(--background)" />
-      {[[15, 15], [32, 13], [36, 30], [14, 33], [26, 38]].map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r="1.3" fill="var(--stadium-shell-dark)" opacity=".6" />
-      ))}
-    </svg>
   );
 }

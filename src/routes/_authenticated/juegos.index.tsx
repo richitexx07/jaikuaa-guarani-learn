@@ -1,16 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GameShell } from "@/components/games/game-shell";
+import { GameStage } from "@/components/games/game-stage";
+import { COVER_TONE, GameCover, type CoverId } from "@/components/games/game-covers";
 import { useRecordVisit } from "@/lib/gamification";
-import { CircleDashed, Grid2X2, Layers, CalendarDays, Goal, Swords, Brain, Wifi, ChefHat, Mic, Scale, Clapperboard, Stethoscope } from 'lucide-react';
 import jaiImg from "@/assets/jai-tradicional.png";
-const jaiAsset = { url: jaiImg };
-import { AoPoiDivider, Terere, Chipa, Arpa, JaiPaw } from "@/components/py-icons";
 
 export const Route = createFileRoute("/_authenticated/juegos/")({
   head: () => ({
     meta: [
       { title: "Juegos | Jaikuaa" },
-      { name: "description", content: "Jugá con las palabras guaraníes validadas: duelo, penales, ahorcado, sopa de letras, memoria y palabra del día." },
+      { name: "description", content: "Jugá con palabras en guaraní: consultorio, karaoke, cocina, cine, penales, ahorcado, duelos y más." },
       { property: "og:title", content: "Juegos | Jaikuaa" },
       { property: "og:description", content: "Juegos de palabras en guaraní con audio humano." },
       { property: "og:type", content: "website" },
@@ -20,70 +18,130 @@ export const Route = createFileRoute("/_authenticated/juegos/")({
   component: GamesHome,
 });
 
-const GAMES = [
-  { to: "/juegos/consultorio", tone: "memory", icon: Stethoscope, title: "Consultorio de Jai", desc: "Guaraní médico: atendé pacientes que hablan guaraní. En español y portugués. Nuevo", xp: "hasta 20 XP" },
-  { to: "/juegos/taanga", tone: "football", icon: Clapperboard, title: "Ta'anga · Claqueta de Jai", desc: "Sé guionista: completá el diálogo y que Jai grite ¡Corte, quedó perfecta! Nuevo", xp: "hasta 20 XP" },
-  { to: "/juegos/tekojoja", tone: "memory", icon: Scale, title: "Tekojoja · Juzgado de Paz", desc: "Resolvé casos de un Juzgado de Paz y aprendé términos jurídicos. Nuevo", xp: "hasta 20 XP" },
-  { to: "/juegos/nee-rape", tone: "search", icon: Wifi, title: "Ñe'ẽ Rape · A distancia", desc: "Desafiá por WhatsApp: cada uno desde su celular. 4 senderos. Nuevo · Multijugador a distancia", xp: "hasta 20 XP" },
-  { to: "/juegos/karaoke", tone: "daily", icon: Mic, title: "Purahéi Karaoke", desc: "Cantá en guaraní al ritmo del arpa y completá el verso. Nuevo", xp: "hasta 20 XP" },
-  { to: "/juegos/tembiu", tone: "chipa", icon: ChefHat, title: "Tembi'u Paraguái", desc: "Armá los platos típicos: sopa paraguaya, mbeju, vori vori… Nuevo", xp: "hasta 20 XP" },
-  { to: "/juegos/duelo", tone: "football", icon: Swords, title: "Duelo Cara a Cara", desc: "En el mismo celular o a distancia, cada uno desde el suyo.", xp: "hasta 20 XP" },
-  { to: "/juegos/trivia-duelo", tone: "daily", icon: Brain, title: "Duelo de Trivia", desc: "¿Quién sabe más del Paraguay? Mismo celular o a distancia.", xp: "hasta 20 XP" },
-  { to: "/juegos/ahorcado", tone: "chipa", icon: CircleDashed, title: "Ahorcado con chipas", desc: "Adiviná la palabra antes de que se acaben las 6 chipas.", xp: "hasta 15 XP" },
-  { to: "/juegos/sopa-de-letras", tone: "search", icon: Grid2X2, title: "Sopa de letras", desc: "Encontrá 6 palabras escondidas en la grilla.", xp: "20 XP" },
-  { to: "/juegos/memoria", tone: "memory", icon: Layers, title: "Memoria", desc: "Uní cada palabra en guaraní con su traducción.", xp: "hasta 20 XP" },
-  { to: "/juegos/penales", tone: "football", icon: Goal, title: "Penales", desc: "Respondé la palabra y pateá al arco. Solo, Duelo o a distancia.", xp: "hasta 20 XP" },
-  { to: "/juegos/palabra-del-dia", tone: "daily", icon: CalendarDays, title: "Palabra del día", desc: "Escuchala y elegí su significado. Una vez por día.", xp: "5 XP" },
-] as const;
+type Game = { id: CoverId; to: string; title: string; desc: string; xp: string; nuevo?: boolean };
 
-const SHELVES = [
-  { title: "Clásicos rápidos", items: ["/juegos/palabra-del-dia", "/juegos/memoria", "/juegos/sopa-de-letras", "/juegos/ahorcado"] },
-  { title: "Tradición, cancha y música", items: ["/juegos/penales", "/juegos/karaoke", "/juegos/tembiu", "/juegos/taanga"] },
-  { title: "Guaraní para el trabajo", items: ["/juegos/consultorio", "/juegos/tekojoja"] },
-  { title: "Duelos a distancia", items: ["/juegos/nee-rape", "/juegos/duelo", "/juegos/trivia-duelo"] },
-] as const;
+const GAMES: Game[] = [
+  { id: "consultorio", to: "/juegos/consultorio", title: "Consultorio de Jai", desc: "Guaraní médico: atendé pacientes que hablan guaraní. En español y portugués.", xp: "≤20 XP", nuevo: true },
+  { id: "karaoke", to: "/juegos/karaoke", title: "Purahéi Karaoke", desc: "Cantá al ritmo del arpa y completá el verso a tiempo.", xp: "≤20 XP", nuevo: true },
+  { id: "tembiu", to: "/juegos/tembiu", title: "Tembi'u Paraguái", desc: "Armá los platos típicos con sus ingredientes.", xp: "≤20 XP", nuevo: true },
+  { id: "taanga", to: "/juegos/taanga", title: "Ta'anga · Claqueta de Jai", desc: "Sé guionista: completá el diálogo de cada escena.", xp: "≤20 XP", nuevo: true },
+  { id: "tekojoja", to: "/juegos/tekojoja", title: "Tekojoja · Juzgado de Paz", desc: "Resolvé casos y aprendé términos jurídicos.", xp: "≤20 XP", nuevo: true },
+  { id: "nee-rape", to: "/juegos/nee-rape", title: "Ñe'ẽ Rape · A distancia", desc: "Desafiá por WhatsApp: cada uno desde su celular.", xp: "≤20 XP", nuevo: true },
+  { id: "penales", to: "/juegos/penales", title: "Penales", desc: "Respondé la palabra y pateá al arco. Solo o en duelo.", xp: "≤20 XP" },
+  { id: "duelo", to: "/juegos/duelo", title: "Duelo Cara a Cara", desc: "Dos jugadores, un celular: el más rápido gana.", xp: "≤20 XP" },
+  { id: "trivia-duelo", to: "/juegos/trivia-duelo", title: "Duelo de Trivia", desc: "¿Quién sabe más del Paraguay?", xp: "≤20 XP" },
+  { id: "ahorcado", to: "/juegos/ahorcado", title: "Ahorcado con chipas", desc: "Adiviná la palabra antes de quedarte sin chipas.", xp: "≤15 XP" },
+  { id: "sopa-de-letras", to: "/juegos/sopa-de-letras", title: "Sopa de letras", desc: "Encontrá 6 palabras escondidas.", xp: "20 XP" },
+  { id: "memoria", to: "/juegos/memoria", title: "Memoria", desc: "Uní cada palabra con su significado.", xp: "≤20 XP" },
+  { id: "palabra-del-dia", to: "/juegos/palabra-del-dia", title: "Palabra del día", desc: "Escuchala y elegí su significado.", xp: "5 XP" },
+];
+
+const SHELVES: { title: string; bajada: string; items: CoverId[] }[] = [
+  { title: "Cultura paraguaya", bajada: "Música, cocina, cine y fútbol", items: ["karaoke", "tembiu", "taanga", "penales"] },
+  { title: "Guaraní para el trabajo", bajada: "Salud y justicia", items: ["consultorio", "tekojoja"] },
+  { title: "De a dos", bajada: "En el mismo celular o a distancia", items: ["nee-rape", "duelo", "trivia-duelo"] },
+  { title: "Clásicos rápidos", bajada: "Cinco minutos por día", items: ["palabra-del-dia", "ahorcado", "sopa-de-letras", "memoria"] },
+];
+
+const CSS = `
+.vit-card { transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s; }
+.vit-card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px -18px rgba(0,0,0,.7); }
+.vit-card:hover .vit-art { transform: scale(1.05); }
+.vit-art { transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+.vit-row { scrollbar-width: none; }
+.vit-row::-webkit-scrollbar { display: none; }
+.vit-jai { animation: vit-bob 3s ease-in-out infinite; }
+@keyframes vit-bob { 50% { transform: translateY(-6px) } }
+.vit-lights span { animation: vit-blink 1.6s steps(2) infinite; }
+.vit-lights span:nth-child(2n) { animation-delay: .8s; }
+@keyframes vit-blink { 50% { opacity: .25 } }
+@media (prefers-reduced-motion: reduce) { .vit-card, .vit-art, .vit-jai, .vit-lights span { animation: none !important; transition: none !important; } }
+`;
+
+const byId = (id: CoverId) => GAMES.find((g) => g.id === id)!;
 
 function GamesHome() {
   useRecordVisit("juegos");
+  const destacado = byId("consultorio");
   return (
-    <GameShell title="Juegos" emoji="🎮" companion={false}>
-      <div className="nanduti-bg relative overflow-hidden rounded-lg border border-border bg-card p-3 shadow-elegant">
-        <div className="flex items-center gap-3">
-          <img src={jaiAsset.url} alt="Jai, el jaguarete" className="penalties-mascot h-16 w-16 shrink-0 object-contain" />
-          <div className="min-w-0">
-            <p className="font-display text-base font-bold text-foreground">¡Mba'éichapa! Soy Jai.</p>
-            <p className="text-xs text-muted-foreground">Elegí un juego y aprendamos jugando.</p>
+    <GameStage
+      title="Juegos"
+      background="radial-gradient(120% 60% at 50% 0%, #1E3A6B 0%, #0D1B33 55%, #0A1426 100%)"
+      css={CSS}
+      wide
+      back={{ to: "/dashboard", label: "← Tablero" }}
+    >
+      {/* Marquesina */}
+      <section className="relative pt-2 sm:pt-6">
+        <div className="vit-lights flex justify-center gap-3 sm:gap-5" aria-hidden>
+          {Array.from({ length: 13 }, (_, i) => (
+            <span key={i} className="h-2 w-2 rounded-full" style={{ background: i % 3 === 0 ? "#D52B1E" : i % 3 === 1 ? "#F6C445" : "#FFFFFF" }} />
+          ))}
+        </div>
+        <div className="mt-4 grid grid-cols-[auto_1fr] items-center gap-3 sm:gap-8">
+          <img src={jaiImg} alt="Jai, el jaguarete" className="vit-jai h-24 w-24 object-contain drop-shadow-2xl sm:h-44 sm:w-44" />
+          <div>
+            <h1 className="font-display text-5xl font-bold leading-none tracking-tight sm:text-7xl">Juegos</h1>
+            <p className="mt-2 text-sm text-white/75 sm:mt-3 sm:text-lg">
+              {GAMES.length} juegos para aprender guaraní jugando, solo o de a dos.
+            </p>
           </div>
         </div>
-        <AoPoiDivider className="mt-3" />
-        <div className="mt-2 flex items-center justify-center gap-4 text-[10px] text-muted-foreground">
-          <span className="flex items-center gap-1"><Terere size={18} />Tereré</span>
-          <span className="flex items-center gap-1"><Chipa size={18} />Chipa</span>
-          <span className="flex items-center gap-1"><Arpa size={18} />Arpa</span>
-          <span className="flex items-center gap-1"><JaiPaw size={18} />Jai</span>
+      </section>
+
+      {/* Destacado */}
+      <Link
+        to={destacado.to}
+        className="vit-card mt-6 grid overflow-hidden rounded-3xl ring-1 ring-white/10 sm:grid-cols-[1.2fr_1fr]"
+        style={{ background: COVER_TONE[destacado.id].bg }}
+      >
+        <div className="overflow-hidden">
+          <GameCover id={destacado.id} className="vit-art block aspect-[16/9] h-full w-full sm:aspect-[4/3]" />
         </div>
-      </div>
+        <div className="flex flex-col justify-center gap-2 p-5 sm:gap-3 sm:p-8">
+          <span className="w-fit rounded-full bg-[#F6C445] px-3 py-1 text-xs font-bold text-[#3A1A05]">Nuevo</span>
+          <h2 className="font-display text-3xl font-bold leading-tight sm:text-4xl">{destacado.title}</h2>
+          <p className="text-white/80">{destacado.desc}</p>
+          <span className="mt-2 inline-flex h-12 w-fit items-center rounded-2xl bg-[#3DE0B0] px-6 font-bold text-[#062A2E]">Empezar el turno</span>
+        </div>
+      </Link>
+
       {SHELVES.map((s) => (
-        <section key={s.title} className="mt-5">
-          <h2 className="mb-2 font-display text-sm font-bold uppercase tracking-wide text-muted-foreground">{s.title}</h2>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:gap-4 xl:grid-cols-4">
-            {GAMES.filter((g) => (s.items as readonly string[]).includes(g.to)).map((g) => (
-              <Link
-                key={g.to}
-                to={g.to}
-                className={`game-card game-card-${g.tone} flex flex-col gap-2 rounded-lg border border-border bg-card p-3 shadow-elegant card-hover hover:shadow-lift`}
-              >
-                <div className="flex items-center justify-between gap-1">
-                  <span className="game-card-icon flex h-10 w-10 items-center justify-center rounded-lg" aria-hidden><g.icon size={22} strokeWidth={1.8}/></span>
-                  <span className="game-card-xp rounded-md px-1.5 py-0.5 text-[10px] font-semibold">{g.xp.replace("hasta ", "≤")}</span>
-                </div>
-                <div className="font-display text-sm font-bold leading-tight text-foreground">{g.title}</div>
-                <p className="line-clamp-2 text-xs text-muted-foreground">{g.desc}</p>
-              </Link>
+        <section key={s.title} className="mt-10">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="font-display text-2xl font-bold">{s.title}</h2>
+            <p className="text-sm text-white/60">{s.bajada}</p>
+          </div>
+          <div className="vit-row -mx-4 mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0">
+            {s.items.map((id) => (
+              <Cover key={id} g={byId(id)} />
             ))}
           </div>
         </section>
       ))}
-    </GameShell>
+    </GameStage>
+  );
+}
+
+function Cover({ g }: { g: Game }) {
+  const tone = COVER_TONE[g.id];
+  return (
+    <Link
+      to={g.to}
+      className="vit-card relative flex w-[72%] shrink-0 snap-start flex-col overflow-hidden rounded-2xl ring-1 ring-white/10 sm:w-[44%] lg:w-auto"
+      style={{ background: tone.bg, color: tone.ink }}
+    >
+      <div className="overflow-hidden">
+        <GameCover id={g.id} className="vit-art block aspect-[4/3] w-full" />
+      </div>
+      {g.nuevo && g.id !== "consultorio" && (
+        <span className="absolute left-3 top-3 rounded-full bg-[#F6C445] px-2.5 py-0.5 text-[11px] font-bold text-[#3A1A05]">Nuevo</span>
+      )}
+      <div className="flex flex-1 flex-col gap-1 p-4">
+        <h3 className="font-display text-lg font-bold leading-tight">{g.title}</h3>
+        <p className="line-clamp-2 text-sm opacity-80">{g.desc}</p>
+        <p className="mt-auto pt-2 text-xs font-semibold opacity-70">{g.xp}</p>
+      </div>
+    </Link>
   );
 }

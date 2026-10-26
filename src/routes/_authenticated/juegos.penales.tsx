@@ -6,7 +6,8 @@ import { Loader2, UserRound, UsersRound, RotateCcw, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SpeakerButton } from '@/components/audio/speaker-button';
-import { GameShell, LessonFilter, NotEnough, shuffle, useGameWords } from '@/components/games/game-shell';
+import { LessonFilter, NotEnough, shuffle, useGameWords } from '@/components/games/game-shell';
+import { GameStage } from '@/components/games/game-stage';
 import { PenaltyPitch } from '@/components/games/penalties/pitch';
 import { GameMascot as PenaltyMascot } from '@/components/games/game-mascot';
 import { useGameKit } from '@/components/games/game-kit';
@@ -22,7 +23,19 @@ import { demoLedText, useDemoBrand } from '@/lib/demo-brand';
 export const Route=createFileRoute('/_authenticated/juegos/penales')({
  head:()=>({meta:[{title:'Penales: Solo y Duelo | Jaikuaa'},{name:'description',content:'Palabras, estadio y una tanda de penales. Jugá solo o compartí un duelo en el mismo celular.'},{property:'og:title',content:'Penales: Solo y Duelo | Jaikuaa'},{property:'og:description',content:'Una tanda de penales con vocabulario publicado y audio de voces reales.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary'}]}),component:Penalties,
 });
-function Penalties(){return <GameShell title="Penales" emoji="⚽" sponsorSlot="penales"><PenaltiesContent/></GameShell>;}
+/* Noche de estadio: cielo azul profundo, césped, reflectores y marcador de luces. */
+const P={noche:'#071A33',cesped:'#0F5A36',led:'#FFB23E',gol:'#3BE38A',mal:'#FF5A4E',blanco:'#F4F7FB'};
+const CSS=`
+.pn-lights span{animation:pn-blink 2.2s ease-in-out infinite}.pn-lights span:nth-child(2n){animation-delay:1.1s}
+@keyframes pn-blink{50%{opacity:.45}}
+.pn-led{font-variant-numeric:tabular-nums;text-shadow:0 0 10px currentColor}
+.pn-dark label{color:rgba(255,255,255,.8)}.pn-dark select{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.25)}.pn-dark select option{color:#000}
+.pn-opt{background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)}
+.pn-opt:not(:disabled):hover{box-shadow:inset 0 0 0 2px ${P.led}}
+@media (prefers-reduced-motion: reduce){.pn-lights span{animation:none}}
+`;
+function Penalties(){return <GameStage title="Penales" sponsorSlot="penales" css={CSS} background={`radial-gradient(70% 35% at 15% 0%, rgba(255,247,214,.18), transparent 70%), radial-gradient(70% 35% at 85% 0%, rgba(255,247,214,.18), transparent 70%), linear-gradient(180deg, #0B2A52 0%, ${P.noche} 45%, #06281A 100%)`}><PenaltiesContent/></GameStage>;}
+function Reflectores(){return <div className="pn-lights flex justify-between px-2" aria-hidden>{[0,1].map(g=><div key={g} className="grid grid-cols-4 gap-1 rounded-md bg-black/40 p-1.5">{Array.from({length:8},(_,i)=><span key={i} className="h-2.5 w-2.5 rounded-full" style={{background:'#FFF7D6',boxShadow:'0 0 10px #FFF7D6'}}/>)}</div>)}</div>;}
 function PenaltiesContent(){
  const {muted}=useGameKit();
  const [lesson,setLesson]=useState<number|null>(null),q=useGameWords(lesson);
@@ -31,15 +44,15 @@ function PenaltiesContent(){
  const [mode,setMode]=useState<'solo'|'duel'>('solo'),[names,setNames]=useState<[string,string]>(['','']),[started,setStarted]=useState(false),[round,setRound]=useState(0);
  const words=useMemo(()=>{const seen=new Set<string>();return (q.data?.words??[]).filter(w=>{const key=w.es.trim().toLowerCase();if(!key||seen.has(key))return false;seen.add(key);return true;});},[q.data]);
  return <div className="penalties-game mx-auto max-w-xl">
- <div className="flex flex-wrap items-center justify-center gap-2"><LessonFilter value={lesson} onChange={v=>{setLesson(v);setStarted(false);setRound(r=>r+1);}}/></div>
+ <Reflectores/><div className="pn-dark mt-3 flex flex-wrap items-center justify-center gap-2"><LessonFilter value={lesson} onChange={v=>{setLesson(v);setStarted(false);setRound(r=>r+1);}}/></div>
  <DemoBrandPanel/>
- {q.isLoading?<div className="flex justify-center py-10"><Loader2 className="animate-spin"/></div>:q.isError?<p className="py-8 text-center">No se pudieron cargar las palabras. Volvé a intentar.</p>:words.length<5?<NotEnough min={5}/>:!started?<div className="space-y-5 py-6">
- <PenaltyMascot message="¡El estadio está listo! Hoy jugamos con palabras y puntería."/>
+ {q.isLoading?<div className="flex justify-center py-10"><Loader2 className="animate-spin"/></div>:q.isError?<p className="py-8 text-center">No se pudieron cargar las palabras. Volvé a intentar.</p>:words.length<5?<NotEnough min={5}/>:!started?<div className="space-y-5 py-5">
+ <div className="text-center"><h1 className="font-display text-5xl font-bold leading-none tracking-tight sm:text-6xl">Penales</h1><p className="mt-2 text-white/75">Respondé bien y el arquero llega tarde.</p></div>
  <PenaltyPitch knew={false} ready={false} muted={muted} ledText={ledText} onShot={()=>{}}/>
- <div className="grid grid-cols-2 gap-3" role="group" aria-label="Modo de juego"><Button variant={mode==='solo'?'default':'outline'} className="h-12" aria-pressed={mode==='solo'} onClick={()=>setMode('solo')}><UserRound/>Solo</Button><Button variant={mode==='duel'?'default':'outline'} className="h-12" aria-pressed={mode==='duel'} onClick={()=>setMode('duel')}><UsersRound/>Duelo</Button></div>
- {mode==='duel'&&<div className="grid gap-3 sm:grid-cols-2">{[0,1].map(i=><label key={i} className="text-sm font-semibold">Jugador {i+1}<Input aria-label={`Nombre del Jugador ${i+1}`} placeholder={`Jugador ${i+1}`} maxLength={20} value={names[i]} onChange={e=>setNames(old=>i===0?[e.target.value,old[1]]:[old[0],e.target.value])} className="mt-2"/></label>)}</div>}
- <Button variant="cta" size="lg" className="w-full" onClick={()=>setStarted(true)}>Empezar tanda</Button>
- <Button asChild variant="outline" size="lg" className="mt-3 h-12 w-full"><Link to="/juegos/nee-rape" search={{ sala: undefined, sendero: "nemongeta" }}>📲 Jugar a distancia (cada uno en su celular)</Link></Button>
+ <div className="grid grid-cols-2 gap-3" role="group" aria-label="Modo de juego">{([['solo',UserRound,'Solo','Vos contra el arquero'],['duel',UsersRound,'Duelo','Dos en el mismo celular']] as const).map(([m,Icon,t,d])=><button key={m} type="button" aria-pressed={mode===m} onClick={()=>setMode(m)} className="flex flex-col items-center gap-1 rounded-2xl p-4 text-center transition active:scale-95" style={{background:mode===m?P.blanco:'rgba(255,255,255,.08)',color:mode===m?P.noche:'#fff',boxShadow:mode===m?`0 0 0 3px ${P.led}`:'inset 0 0 0 2px rgba(255,255,255,.18)'}}><Icon className="h-6 w-6"/><b className="font-display text-lg">{t}</b><span className="text-xs opacity-75">{d}</span></button>)}</div>
+ {mode==='duel'&&<div className="grid gap-3 sm:grid-cols-2 [&_input]:border-white/25 [&_input]:bg-white/10 [&_input]:text-white">{[0,1].map(i=><label key={i} className="text-sm font-semibold">Jugador {i+1}<Input aria-label={`Nombre del Jugador ${i+1}`} placeholder={`Jugador ${i+1}`} maxLength={20} value={names[i]} onChange={e=>setNames(old=>i===0?[e.target.value,old[1]]:[old[0],e.target.value])} className="mt-2"/></label>)}</div>}
+ <button type="button" className="h-16 w-full rounded-2xl font-display text-xl font-bold shadow-lg transition active:scale-[.98]" style={{background:P.led,color:P.noche}} onClick={()=>setStarted(true)}>⚽ Empezar tanda</button>
+ <Button asChild variant="outline" size="lg" className="mt-3 h-12 w-full border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white"><Link to="/juegos/nee-rape" search={{ sala: undefined, sendero: "nemongeta" }}>📲 Jugar a distancia (cada uno en su celular)</Link></Button>
  </div>:<Match key={`${round}:${lesson}:${mode}`} words={words} duel={mode==='duel'} names={[names[0].trim()||'Jugador 1',names[1].trim()||'Jugador 2']} ledText={ledText} muted={muted} onAgain={()=>setRound(r=>r+1)} onModes={()=>setStarted(false)}/>}
  </div>;
 }
@@ -58,18 +71,28 @@ function Match({words,duel,names,ledText,muted,onAgain,onModes}:{words:GameWord[
  function next(){const done=duel?duelFinished(results[0],results[1]):played.length>=5;if(done){setFinished(true);return;}setTurn(t=>t+1);setChoice(null);setLast(null);setGuess(null);}
  const sudden=duel&&turn>=10;
  const message=finished?(duel?(goals[0]===goals[1]?'¡Empate! Un duelo muy parejo.':`¡${goals[0]>goals[1]?names[0]:names[1]} ganó el duelo!`):'¡Tanda completa! Cada palabra suma práctica.') :last?messages[last]:choice!==null?(knew?'¡Respuesta correcta! El arquero reacciona tarde.':'Esta vez no. El arquero está atento, pero todavía podés marcar.'):`${duel?names[player]+': ':''}¡Vamos por el próximo penal!`;
- return <div className="space-y-4 pt-4"><div className={`grid gap-3 ${duel?'grid-cols-2':'grid-cols-1'}`}>
- {(duel?[0,1]:[0]).map(i=><div key={i} className={`min-w-0 border-b-2 py-2 ${!finished&&player===i?'border-accent':'border-border'}`}><div className="flex items-center justify-between gap-2"><span className="break-words text-sm font-semibold">{duel?names[i]:'Tus penales'}</span><strong className="shrink-0 font-display text-2xl">{goals[i]}/{Math.max(5,results[i].length)}</strong></div><div className="mt-2 flex gap-1" aria-label={`Goles de ${duel?names[i]:'la tanda'}`}>
- {Array.from({length:Math.max(5,results[i].length)},(_,n)=><span key={n} className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-xs ${results[i][n]?(isGoal(results[i][n])?'bg-primary text-primary-foreground':'bg-accent text-accent-foreground'):'border-border bg-muted'}`}>{results[i][n]?(isGoal(results[i][n])?'●':'×'):''}</span>)}</div></div>)}
- </div><PenaltyMascot message={message}/>
- {finished?<div className="space-y-5 text-center"><div className="penalties-stars text-4xl" aria-label={`${goals[0]>=5?3:goals[0]>=3?2:goals[0]>=1?1:0} de 3 estrellas`}>{'★'.repeat(goals[0]>=5?3:goals[0]>=3?2:goals[0]>=1?1:0)}{'☆'.repeat(goals[0]>=5?0:goals[0]>=3?1:goals[0]>=1?2:3)}</div>
- <h2 className="font-display text-2xl font-bold">{duel?(goals[0]===goals[1]?'Empate':`Ganó ${goals[0]>goals[1]?names[0]:names[1]}`):`${goals[0]} de 5 goles`}</h2><p className="font-semibold text-accent">+{xp} XP{duel?' · Jugador 1':''}</p>
- <ul className="divide-y divide-border text-left">{played.map((p,i)=><li key={i} className="flex items-center gap-2 py-3 text-sm"><span aria-hidden>{isGoal(p.outcome)?'⚽':'•'}</span><div className="min-w-0 flex-1">{duel&&<span className="block text-xs text-muted-foreground">{names[p.player]}</span>}<span className="font-semibold">{p.word.gn}</span><span className="text-muted-foreground"> — {p.word.es}</span></div>{p.word.hasAudio&&<SpeakerButton gn={p.word.gn}/>}</li>)}</ul>
- <div className="flex flex-wrap justify-center gap-2"><Button variant="cta" onClick={onAgain}><RotateCcw/>{duel?'Revancha':'Otra tanda'}</Button><Button variant="outline" asChild><a href={`https://wa.me/?text=${encodeURIComponent(`Hice ${goals[0]} goles en una tanda de penales. ¿Te animás a superarme? ${typeof window!=='undefined'?window.location.origin:''}/juegos/penales`)}`} target="_blank" rel="noopener noreferrer"><Share2/>Desafiar por WhatsApp</a></Button><Button variant="ghost" onClick={onModes}>Cambiar modo</Button></div>
- </div>:duel&&!guess?<KeeperPick keeper={names[1-player]} shooter={names[player]} onPick={setGuess}/>:<><PenaltyPitch key={turn} guess={duel?guess??undefined:undefined} knew={knew} ready={choice!==null} muted={muted} ledText={ledText} onShot={outcome=>{setLast(outcome);setPlayed(p=>[...p,{word,outcome,player}]);}}/>
- <div className="space-y-3 text-center"><p className="text-xs font-semibold text-muted-foreground">{sudden?`Muerte súbita · ronda ${Math.floor((turn-10)/2)+1} de 3`:`Penal ${duel?Math.floor(turn/2)+1:turn+1} de 5`}{duel?` · ${names[player]}`:''}</p><p className="text-sm text-muted-foreground">¿Cómo se dice en guaraní?</p><h2 className="break-words font-display text-2xl font-bold">{word.es}</h2><div className="grid grid-cols-1 gap-2 sm:grid-cols-3">{options.map(o=><Button key={o.gn} variant={choice!==null&&o.gn===word.gn?'default':choice===o.gn?'destructive':'outline'} disabled={choice!==null} onClick={()=>answer(o.gn)} className="h-auto min-h-12 whitespace-normal break-words px-3 py-3 text-base">{o.gn}</Button>)}</div>
+ const stars=goals[0]>=5?3:goals[0]>=3?2:goals[0]>=1?1:0;
+ return <div className="space-y-4 pt-3">
+ {/* Marcador de luces */}
+ <div className="rounded-2xl border-4 bg-black p-3" style={{borderColor:'#1C2B44'}}>
+  <div className={`grid gap-3 ${duel?'grid-cols-2':'grid-cols-1'}`}>
+  {(duel?[0,1]:[0]).map(i=><div key={i} className="min-w-0 rounded-lg px-2 py-1" style={{background:!finished&&player===i?'rgba(255,178,62,.12)':'transparent'}}>
+   <div className="flex items-center justify-between gap-2"><span className="truncate text-xs font-bold uppercase tracking-wide text-white/70">{duel?names[i]:'Tus penales'}</span><strong className="pn-led shrink-0 font-display text-3xl" style={{color:P.led}}>{goals[i]}</strong></div>
+   <div className="mt-1.5 flex flex-wrap gap-1.5" aria-label={`Goles de ${duel?names[i]:'la tanda'}`}>
+   {Array.from({length:Math.max(5,results[i].length)},(_,n)=>{const r=results[i][n];return <span key={n} className="h-3.5 w-3.5 shrink-0 rounded-full" style={{background:r?(isGoal(r)?P.gol:P.mal):'#2A3448',boxShadow:r?`0 0 8px ${isGoal(r)?P.gol:P.mal}`:'none'}}/>;})}</div>
+  </div>)}
+  </div>
+ </div>
+ <PenaltyMascot message={message}/>
+ {finished?<div className="space-y-5 text-center"><div className="text-5xl tracking-widest" style={{color:P.led}} aria-label={`${stars} de 3 estrellas`}>{'★'.repeat(stars)}<span className="opacity-25">{'★'.repeat(3-stars)}</span></div>
+ <h2 className="font-display text-3xl font-bold">{duel?(goals[0]===goals[1]?'Empate':`Ganó ${goals[0]>goals[1]?names[0]:names[1]}`):`${goals[0]} de 5 goles`}</h2><p className="font-bold" style={{color:P.led}}>+{xp} XP{duel?' · Jugador 1':''}</p>
+ <ul className="divide-y divide-white/10 rounded-2xl bg-white/[.06] px-3 text-left">{played.map((p,i)=><li key={i} className="flex items-center gap-2 py-3 text-sm"><span className="h-3 w-3 shrink-0 rounded-full" style={{background:isGoal(p.outcome)?P.gol:P.mal}} aria-label={isGoal(p.outcome)?'Gol':'Errado'}/><div className="min-w-0 flex-1">{duel&&<span className="block text-xs text-white/60">{names[p.player]}</span>}<span className="font-semibold">{p.word.gn}</span><span className="text-white/60"> — {p.word.es}</span></div>{p.word.hasAudio&&<SpeakerButton gn={p.word.gn}/>}</li>)}</ul>
+ <div className="flex flex-wrap justify-center gap-2"><button type="button" onClick={onAgain} className="inline-flex h-12 items-center gap-2 rounded-2xl px-6 font-bold" style={{background:P.led,color:P.noche}}><RotateCcw className="h-5 w-5"/>{duel?'Revancha':'Otra tanda'}</button><a className="inline-flex h-12 items-center gap-2 rounded-2xl px-5 font-semibold ring-1 ring-white/30" href={`https://wa.me/?text=${encodeURIComponent(`Hice ${goals[0]} goles en una tanda de penales. ¿Te animás a superarme? ${typeof window!=='undefined'?window.location.origin:''}/juegos/penales 🇵🇾`)}`} target="_blank" rel="noopener noreferrer"><Share2 className="h-5 w-5"/>Desafiar por WhatsApp</a><button type="button" className="h-12 rounded-2xl px-4 font-semibold text-white/80" onClick={onModes}>Cambiar modo</button></div>
+ </div>:duel&&!guess?<KeeperPick keeper={names[1-player]} shooter={names[player]} onPick={setGuess}/>:<><div className="overflow-hidden rounded-2xl ring-4 ring-black/40"><PenaltyPitch key={turn} guess={duel?guess??undefined:undefined} knew={knew} ready={choice!==null} muted={muted} ledText={ledText} onShot={outcome=>{setLast(outcome);setPlayed(p=>[...p,{word,outcome,player}]);}}/></div>
+ <div className="space-y-3 text-center"><p className="text-xs font-bold uppercase tracking-wide" style={{color:P.led}}>{sudden?`Muerte súbita · ronda ${Math.floor((turn-10)/2)+1} de 3`:`Penal ${duel?Math.floor(turn/2)+1:turn+1} de 5`}{duel?` · ${names[player]}`:''}</p><p className="text-sm text-white/70">¿Cómo se dice en guaraní?</p><h2 className="break-words font-display text-3xl font-bold">{word.es}</h2><div className="grid grid-cols-1 gap-2 sm:grid-cols-3">{options.map(o=>{const ok=choice!==null&&o.gn===word.gn,bad=choice===o.gn&&!ok;return <button key={o.gn} type="button" disabled={choice!==null} onClick={()=>answer(o.gn)} className="pn-opt min-h-14 whitespace-normal break-words rounded-2xl px-3 py-3 font-display text-lg font-bold transition active:scale-95 disabled:cursor-default" style={ok?{background:P.gol,color:P.noche,boxShadow:'none'}:bad?{background:P.mal,color:'#fff',boxShadow:'none'}:choice!==null?{opacity:.4}:undefined}>{o.gn}</button>;})}</div>
  {choice!==null&&<div className="flex items-center justify-center gap-2 text-sm"><span>Respuesta: <strong>{word.gn}</strong></span>{word.hasAudio&&<SpeakerButton gn={word.gn}/>}</div>}
- {last&&<><p className="font-display text-xl font-bold" aria-live="polite">{labels[last]}</p><Button variant="cta" onClick={next}>{(duel?duelFinished(results[0],results[1]):played.length>=5)?'Ver resultado':'Siguiente penal'}</Button></>}
+ {choice!==null&&!last&&<p className="text-sm font-semibold" style={{color:P.led}}>Ahora deslizá sobre el arco para apuntar y tocá para patear.</p>}
+ {last&&<><p className="font-display text-2xl font-bold" style={{color:isGoal(last)?P.gol:P.mal}} aria-live="polite">{labels[last]}</p><button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold" style={{background:P.led,color:P.noche}} onClick={next}>{(duel?duelFinished(results[0],results[1]):played.length>=5)?'Ver resultado':'Siguiente penal'}</button></>}
  </div></>}
  </div>;
 }
