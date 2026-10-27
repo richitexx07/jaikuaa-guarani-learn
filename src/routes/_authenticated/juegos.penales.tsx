@@ -13,12 +13,13 @@ import { GameStage } from '@/components/games/game-stage';
 import { PenaltyPitch } from '@/components/games/penalties/pitch';
 import { GameMascot as PenaltyMascot } from '@/components/games/game-mascot';
 import { useGameKit } from '@/components/games/game-kit';
-import { duelFinished, isGoal, labels, xpFor, type Dive, type Outcome } from '@/components/games/penalties/physics';
+import { duelFinished, isGoal, xpFor, type Dive, type Outcome } from '@/components/games/penalties/physics';
 import { getPenaltiesLed } from '@/lib/penalties.functions';
 import { playGuarani } from '@/lib/audio';
 import { recordCompletion } from '@/lib/gamification';
 import { celebrate } from '@/lib/confetti';
 import type { GameWord } from '@/lib/games.functions';
+import { usePT } from '@/lib/i18n-penales';
 import { DemoBrandPanel } from '@/components/games/demo-brand-panel';
 import { demoLedText, useDemoBrand } from '@/lib/demo-brand';
 import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from '@/components/games/reto';
@@ -41,7 +42,7 @@ const CSS=`
 function Penalties(){return <GameStage title="Penales" sponsorSlot="penales" css={CSS} background={`radial-gradient(70% 35% at 15% 0%, rgba(255,247,214,.18), transparent 70%), radial-gradient(70% 35% at 85% 0%, rgba(255,247,214,.18), transparent 70%), linear-gradient(180deg, #0B2A52 0%, ${P.noche} 45%, #06281A 100%)`}><PenaltiesContent/></GameStage>;}
 function Reflectores(){return <div className="pn-lights flex justify-between px-2" aria-hidden>{[0,1].map(g=><div key={g} className="grid grid-cols-4 gap-1 rounded-md bg-black/40 p-1.5">{Array.from({length:8},(_,i)=><span key={i} className="h-2.5 w-2.5 rounded-full" style={{background:'#FFF7D6',boxShadow:'0 0 10px #FFF7D6'}}/>)}</div>)}</div>;}
 function PenaltiesContent(){
- const {muted}=useGameKit();
+ const {muted}=useGameKit();const {p}=usePT();
  const partida=useRetoPartida('penales',{total:5}),{reto,seed,otra}=partida;
  const [lesson,setLesson]=useState<number|null>(()=>leccionDeReto(reto)),q=useGameWords(lesson);
  useEffect(()=>{if(reto)setLesson(leccionDeReto(reto));},[reto?.id]);// eslint-disable-line react-hooks/exhaustive-deps
@@ -54,19 +55,19 @@ function PenaltiesContent(){
  <Reflectores/><div className={`pn-dark mt-3 flex-wrap items-center justify-center gap-2 ${remote?'hidden':'flex'}`}><LessonFilter value={lesson} onChange={v=>{otra();setLesson(v);setStarted(false);setRound(r=>r+1);}}/></div>
  {!remote&&<RetoBanner partida={partida} extra={lesson===null?undefined:String(lesson)} className="mt-3"/>}
  <DemoBrandPanel/>
- {remote?<div className="pt-4"><PenalesLive key={remote.code} code={remote.code} host={remote.host} words={words} ledText={ledText} muted={muted} onExit={()=>{setRemote(null);ponerSalaEnLaUrl(null);setStarted(false);}}/></div>:q.isLoading?<div className="flex justify-center py-10"><Loader2 className="animate-spin"/></div>:q.isError?<p className="py-8 text-center">No se pudieron cargar las palabras. Volvé a intentar.</p>:words.length<5?<NotEnough min={5}/>:!started?<div className="space-y-5 py-5">
- <div className="text-center"><h1 className="font-display text-5xl font-bold leading-none tracking-tight sm:text-6xl">Penales</h1><p className="mt-2 text-white/75">Respondé bien y el arquero llega tarde.</p></div>
+ {remote?<div className="pt-4"><PenalesLive key={remote.code} code={remote.code} host={remote.host} words={words} ledText={ledText} muted={muted} onExit={()=>{setRemote(null);ponerSalaEnLaUrl(null);setStarted(false);}}/></div>:q.isLoading?<div className="flex justify-center py-10"><Loader2 className="animate-spin"/></div>:q.isError?<p className="py-8 text-center">{p('loadErr')}</p>:words.length<5?<NotEnough min={5}/>:!started?<div className="space-y-5 py-5">
+ <div className="text-center"><h1 className="font-display text-5xl font-bold leading-none tracking-tight sm:text-6xl">{p('title')}</h1><p className="mt-2 text-white/75">{p('tagline')}</p></div>
  <PenaltyPitch knew={false} ready={false} muted={muted} ledText={ledText} onShot={()=>{}}/>
- <div className="grid grid-cols-3 gap-2" role="group" aria-label="Modo de juego">{([['solo',UserRound,'Solo','Vos contra el arquero'],['duel',UsersRound,'Duelo','Dos en el mismo celular'],['remote',Wifi,'A distancia','Cada uno en su celular']] as const).map(([m,Icon,t,d])=><button key={m} type="button" aria-pressed={mode===m} onClick={()=>setMode(m)} className="flex flex-col items-center gap-1 rounded-2xl p-3 text-center transition active:scale-95" style={{background:mode===m?P.blanco:'rgba(255,255,255,.08)',color:mode===m?P.noche:'#fff',boxShadow:mode===m?`0 0 0 3px ${P.led}`:'inset 0 0 0 2px rgba(255,255,255,.18)'}}><Icon className="h-6 w-6"/><b className="font-display text-lg">{t}</b><span className="text-xs opacity-75">{d}</span></button>)}</div>
- {mode==='duel'&&<div className="grid gap-3 sm:grid-cols-2 [&_input]:border-white/25 [&_input]:bg-white/10 [&_input]:text-white">{[0,1].map(i=><label key={i} className="text-sm font-semibold">Jugador {i+1}<Input aria-label={`Nombre del Jugador ${i+1}`} placeholder={`Jugador ${i+1}`} maxLength={20} value={names[i]} onChange={e=>setNames(old=>i===0?[e.target.value,old[1]]:[old[0],e.target.value])} className="mt-2"/></label>)}</div>}
- {mode==='remote'&&<div className="rounded-2xl bg-white/[.06] p-3 text-sm text-white/80 ring-1 ring-white/15"><p>Uno patea y el otro ataja, cada uno en su celular. Creás la sala e invitás por WhatsApp, Instagram o Facebook.</p><div className="mt-2 flex gap-2 [&_input]:border-white/25 [&_input]:bg-white/10 [&_input]:text-white"><Input value={joinCode} onChange={e=>setJoinCode(e.target.value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,4))} placeholder="¿Tenés un código?" aria-label="Código de sala" className={`h-11 text-center ${joinCode?'font-display text-lg tracking-[0.3em]':''}`}/><button type="button" disabled={joinCode.length!==4} onClick={()=>{ponerSalaEnLaUrl(joinCode);setRemote({code:joinCode,host:false});}} className="h-11 shrink-0 rounded-xl px-4 font-bold ring-1 ring-white/30 disabled:opacity-40">Unirme</button></div></div>}
- <button type="button" className="h-16 w-full rounded-2xl font-display text-xl font-bold shadow-lg transition active:scale-[.98]" style={{background:P.led,color:P.noche}} onClick={()=>{if(mode==='remote'){const c=nuevoCodigoSala();ponerSalaEnLaUrl(c);setRemote({code:c,host:true});}else setStarted(true);}}>{mode==='remote'?'📲 Crear sala e invitar':'⚽ Empezar tanda'}</button>
- </div>:<Match key={`${round}:${lesson}:${mode}:${seed}`} seed={seed} partida={partida} lesson={lesson} words={words} duel={mode==='duel'} names={[names[0].trim()||'Jugador 1',names[1].trim()||'Jugador 2']} ledText={ledText} muted={muted} onAgain={()=>{otra();setRound(r=>r+1);}} onModes={()=>setStarted(false)}/>}
+ <div className="grid grid-cols-3 gap-2" role="group" aria-label={p('modeGroup')}>{([['solo',UserRound,p('solo'),p('soloD')],['duel',UsersRound,p('duel'),p('duelD')],['remote',Wifi,p('remote'),p('remoteD')]] as const).map(([m,Icon,t,d])=><button key={m} type="button" aria-pressed={mode===m} onClick={()=>setMode(m)} className="flex flex-col items-center gap-1 rounded-2xl p-3 text-center transition active:scale-95" style={{background:mode===m?P.blanco:'rgba(255,255,255,.08)',color:mode===m?P.noche:'#fff',boxShadow:mode===m?`0 0 0 3px ${P.led}`:'inset 0 0 0 2px rgba(255,255,255,.18)'}}><Icon className="h-6 w-6"/><b className="font-display text-lg">{t}</b><span className="text-xs opacity-75">{d}</span></button>)}</div>
+ {mode==='duel'&&<div className="grid gap-3 sm:grid-cols-2 [&_input]:border-white/25 [&_input]:bg-white/10 [&_input]:text-white">{[0,1].map(i=><label key={i} className="text-sm font-semibold">{p('player',{n:i+1})}<Input aria-label={p('playerName',{n:i+1})} placeholder={p('player',{n:i+1})} maxLength={20} value={names[i]} onChange={e=>setNames(old=>i===0?[e.target.value,old[1]]:[old[0],e.target.value])} className="mt-2"/></label>)}</div>}
+ {mode==='remote'&&<div className="rounded-2xl bg-white/[.06] p-3 text-sm text-white/80 ring-1 ring-white/15"><p>{p('remoteInfo')}</p><div className="mt-2 flex gap-2 [&_input]:border-white/25 [&_input]:bg-white/10 [&_input]:text-white"><Input value={joinCode} onChange={e=>setJoinCode(e.target.value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,4))} placeholder={p('haveCode')} aria-label={p('roomCode')} className={`h-11 text-center ${joinCode?'font-display text-lg tracking-[0.3em]':''}`}/><button type="button" disabled={joinCode.length!==4} onClick={()=>{ponerSalaEnLaUrl(joinCode);setRemote({code:joinCode,host:false});}} className="h-11 shrink-0 rounded-xl px-4 font-bold ring-1 ring-white/30 disabled:opacity-40">{p('join')}</button></div></div>}
+ <button type="button" className="h-16 w-full rounded-2xl font-display text-xl font-bold shadow-lg transition active:scale-[.98]" style={{background:P.led,color:P.noche}} onClick={()=>{if(mode==='remote'){const c=nuevoCodigoSala();ponerSalaEnLaUrl(c);setRemote({code:c,host:true});}else setStarted(true);}}>{mode==='remote'?p('createRoom'):p('start')}</button>
+ </div>:<Match key={`${round}:${lesson}:${mode}:${seed}`} seed={seed} partida={partida} lesson={lesson} words={words} duel={mode==='duel'} names={[names[0].trim()||p('player',{n:1}),names[1].trim()||p('player',{n:2})]} ledText={ledText} muted={muted} onAgain={()=>{otra();setRound(r=>r+1);}} onModes={()=>setStarted(false)}/>}
  </div>;
 }
 type Played={word:GameWord;outcome:Outcome;player:number};
-const messages:Record<Outcome,string>={goal:'¡Gran gol! El público lo festeja con vos.',angle:'¡Al ángulo! Una definición espectacular.',save:'El arquero llegó. La próxima buscá el rincón.',post:'¡Por centímetros! La pelota dio en el palo.',over:'Se fue por arriba. Un poquito menos de fuerza.',wide:'Se fue afuera. La revancha está cerca.'};
 function Match({seed,partida,lesson,words,duel,names,ledText,muted,onAgain,onModes}:{seed:number;partida:Partida;lesson:number|null;words:GameWord[];duel:boolean;names:[string,string];ledText:string;muted:boolean;onAgain:()=>void;onModes:()=>void}){
+ const {p,msg,label}=usePT();
  const deck=useMemo(()=>shufflerFor(seed)(orderedBy(words,w=>w.gn)),[words,seed]);
  const [turn,setTurn]=useState(0),[choice,setChoice]=useState<string|null>(null),[played,setPlayed]=useState<Played[]>([]),[last,setLast]=useState<Outcome|null>(null),[finished,setFinished]=useState(false),[guess,setGuess]=useState<Dive|null>(null);
  const word=deck[turn%deck.length];
@@ -78,41 +79,42 @@ function Match({seed,partida,lesson,words,duel,names,ledText,muted,onAgain,onMod
  function answer(gn:string){if(choice!==null)return;setChoice(gn);if(word.hasAudio&&!muted)void playGuarani(word.gn);}
  function next(){const done=duel?duelFinished(results[0],results[1]):played.length>=5;if(done){setFinished(true);return;}setTurn(t=>t+1);setChoice(null);setLast(null);setGuess(null);}
  const sudden=duel&&turn>=10;
- const message=finished?(duel?(goals[0]===goals[1]?'¡Empate! Un duelo muy parejo.':`¡${goals[0]>goals[1]?names[0]:names[1]} ganó el duelo!`):'¡Tanda completa! Cada palabra suma práctica.') :last?messages[last]:choice!==null?(knew?'¡Respuesta correcta! El arquero reacciona tarde.':'Esta vez no. El arquero está atento, pero todavía podés marcar.'):`${duel?names[player]+': ':''}¡Vamos por el próximo penal!`;
+ const message=finished?(duel?(goals[0]===goals[1]?p('drawMsg'):p('wonMsg',{n:goals[0]>goals[1]?names[0]:names[1]})):p('doneMsg')) :last?msg(last):choice!==null?(knew?p('rightMsg'):p('wrongMsg')):`${duel?names[player]+': ':''}${p('goNext')}`;
  const stars=goals[0]>=5?3:goals[0]>=3?2:goals[0]>=1?1:0;
  return <div className="space-y-4 pt-3">
  {/* Marcador de luces */}
  <div className="rounded-2xl border-4 bg-black p-3" style={{borderColor:'#1C2B44'}}>
   <div className={`grid gap-3 ${duel?'grid-cols-2':'grid-cols-1'}`}>
   {(duel?[0,1]:[0]).map(i=><div key={i} className="min-w-0 rounded-lg px-2 py-1" style={{background:!finished&&player===i?'rgba(255,178,62,.12)':'transparent'}}>
-   <div className="flex items-center justify-between gap-2"><span className="truncate text-xs font-bold uppercase tracking-wide text-white/70">{duel?names[i]:'Tus penales'}</span><strong className="pn-led shrink-0 font-display text-3xl" style={{color:P.led}}>{goals[i]}</strong></div>
-   <div className="mt-1.5 flex flex-wrap gap-1.5" aria-label={`Goles de ${duel?names[i]:'la tanda'}`}>
+   <div className="flex items-center justify-between gap-2"><span className="truncate text-xs font-bold uppercase tracking-wide text-white/70">{duel?names[i]:p('yourPens')}</span><strong className="pn-led shrink-0 font-display text-3xl" style={{color:P.led}}>{goals[i]}</strong></div>
+   <div className="mt-1.5 flex flex-wrap gap-1.5" aria-label={p('goalsOf',{n:duel?names[i]:p('theRound')})}>
    {Array.from({length:Math.max(5,results[i].length)},(_,n)=>{const r=results[i][n];return <span key={n} className="h-3.5 w-3.5 shrink-0 rounded-full" style={{background:r?(isGoal(r)?P.gol:P.mal):'#2A3448',boxShadow:r?`0 0 8px ${isGoal(r)?P.gol:P.mal}`:'none'}}/>;})}</div>
   </div>)}
   </div>
  </div>
  <PenaltyMascot message={message} mood={finished?(duel||goals[0]>=3?'victory':'success'):last?(isGoal(last)?'success':'error'):choice!==null?(knew?'success':'error'):'idle'}/>
  {finished?<div className="space-y-5 text-center"><div className="text-5xl tracking-widest" style={{color:P.led}} aria-label={`${stars} de 3 estrellas`}>{'★'.repeat(stars)}<span className="opacity-25">{'★'.repeat(3-stars)}</span></div>
- <h2 className="font-display text-3xl font-bold">{duel?(goals[0]===goals[1]?'Empate':`Ganó ${goals[0]>goals[1]?names[0]:names[1]}`):`${goals[0]} de 5 goles`}</h2><p className="font-bold" style={{color:P.led}}>+{xp} XP{duel?' · Jugador 1':''}</p>
- <ul className="divide-y divide-white/10 rounded-2xl bg-white/[.06] px-3 text-left">{played.map((p,i)=><li key={i} className="flex items-center gap-2 py-3 text-sm"><span className="h-3 w-3 shrink-0 rounded-full" style={{background:isGoal(p.outcome)?P.gol:P.mal}} aria-label={isGoal(p.outcome)?'Gol':'Errado'}/><div className="min-w-0 flex-1">{duel&&<span className="block text-xs text-white/60">{names[p.player]}</span>}<span className="font-semibold">{p.word.gn}</span><span className="text-white/60"> — {p.word.es}</span></div>{p.word.hasAudio&&<SpeakerButton gn={p.word.gn}/>}</li>)}</ul>
- <div className="flex flex-wrap justify-center gap-2"><button type="button" onClick={onAgain} className="inline-flex h-12 items-center gap-2 rounded-2xl px-6 font-bold" style={{background:P.led,color:P.noche}}><RotateCcw className="h-5 w-5"/>{duel?'Revancha':'Otra tanda'}</button><button type="button" className="h-12 rounded-2xl px-4 font-semibold text-white/80" onClick={onModes}>Cambiar modo</button></div>
+ <h2 className="font-display text-3xl font-bold">{duel?(goals[0]===goals[1]?p('draw'):p('won',{n:goals[0]>goals[1]?names[0]:names[1]})):p('ofFive',{n:goals[0]})}</h2><p className="font-bold" style={{color:P.led}}>+{xp} XP{duel?` · ${p('player',{n:1})}`:''}</p>
+ <ul className="divide-y divide-white/10 rounded-2xl bg-white/[.06] px-3 text-left">{played.map((pl,i)=><li key={i} className="flex items-center gap-2 py-3 text-sm"><span className="h-3 w-3 shrink-0 rounded-full" style={{background:isGoal(pl.outcome)?P.gol:P.mal}} aria-label={isGoal(pl.outcome)?p('goal'):p('missed')}/><div className="min-w-0 flex-1">{duel&&<span className="block text-xs text-white/60">{names[pl.player]}</span>}<span className="font-semibold">{pl.word.gn}</span><span className="text-white/60"> — {pl.word.es}</span></div>{pl.word.hasAudio&&<SpeakerButton gn={pl.word.gn}/>}</li>)}</ul>
+ <div className="flex flex-wrap justify-center gap-2"><button type="button" onClick={onAgain} className="inline-flex h-12 items-center gap-2 rounded-2xl px-6 font-bold" style={{background:P.led,color:P.noche}}><RotateCcw className="h-5 w-5"/>{duel?p('rematch'):p('again')}</button><button type="button" className="h-12 rounded-2xl px-4 font-semibold text-white/80" onClick={onModes}>{p('changeMode')}</button></div>
 {!duel&&<RetoFinal partida={partida} puntaje={goals[0]} extra={lesson===null?undefined:String(lesson)}/>}
- </div>:duel&&!guess?<KeeperPick keeper={names[1-player]} shooter={names[player]} onPick={setGuess}/>:<><div className="overflow-hidden rounded-2xl ring-4 ring-black/40"><PenaltyPitch key={turn} guess={duel?guess??undefined:undefined} knew={knew} ready={choice!==null} muted={muted} ledText={ledText} onShot={outcome=>{setLast(outcome);setPlayed(p=>[...p,{word,outcome,player}]);}}/></div>
- <div className="space-y-3 text-center"><p className="text-xs font-bold uppercase tracking-wide" style={{color:P.led}}>{sudden?`Muerte súbita · ronda ${Math.floor((turn-10)/2)+1} de 3`:`Penal ${duel?Math.floor(turn/2)+1:turn+1} de 5`}{duel?` · ${names[player]}`:''}</p><p className="text-sm text-white/70">¿Cómo se dice en guaraní?</p><h2 className="break-words font-display text-3xl font-bold">{word.es}</h2><div className="grid grid-cols-1 gap-2 sm:grid-cols-3">{options.map(o=>{const ok=choice!==null&&o.gn===word.gn,bad=choice===o.gn&&!ok;return <button key={o.gn} type="button" disabled={choice!==null} onClick={()=>answer(o.gn)} className="pn-opt min-h-14 whitespace-normal break-words rounded-2xl px-3 py-3 font-display text-lg font-bold transition active:scale-95 disabled:cursor-default" style={ok?{background:P.gol,color:P.noche,boxShadow:'none'}:bad?{background:P.mal,color:'#fff',boxShadow:'none'}:choice!==null?{opacity:.4}:undefined}>{o.gn}</button>;})}</div>
- {choice!==null&&<div className="flex items-center justify-center gap-2 text-sm"><span>Respuesta: <strong>{word.gn}</strong></span>{word.hasAudio&&<SpeakerButton gn={word.gn}/>}</div>}
- {choice!==null&&!last&&<p className="text-sm font-semibold" style={{color:P.led}}>Ahora deslizá sobre el arco para apuntar y tocá para patear.</p>}
- {last&&<><p className="font-display text-2xl font-bold" style={{color:isGoal(last)?P.gol:P.mal}} aria-live="polite">{labels[last]}</p><button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold" style={{background:P.led,color:P.noche}} onClick={next}>{(duel?duelFinished(results[0],results[1]):played.length>=5)?'Ver resultado':'Siguiente penal'}</button></>}
+ </div>:duel&&!guess?<KeeperPick keeper={names[1-player]} shooter={names[player]} onPick={setGuess}/>:<><div className="overflow-hidden rounded-2xl ring-4 ring-black/40"><PenaltyPitch key={turn} guess={duel?guess??undefined:undefined} knew={knew} ready={choice!==null} muted={muted} ledText={ledText} onShot={outcome=>{setLast(outcome);setPlayed(prev=>[...prev,{word,outcome,player}]);}}/></div>
+ <div className="space-y-3 text-center"><p className="text-xs font-bold uppercase tracking-wide" style={{color:P.led}}>{sudden?p('sudden',{n:Math.floor((turn-10)/2)+1}):p('penN',{n:duel?Math.floor(turn/2)+1:turn+1})}{duel?` · ${names[player]}`:''}</p><p className="text-sm text-white/70">{p('howSay')}</p><h2 className="break-words font-display text-3xl font-bold">{word.es}</h2><div className="grid grid-cols-1 gap-2 sm:grid-cols-3">{options.map(o=>{const ok=choice!==null&&o.gn===word.gn,bad=choice===o.gn&&!ok;return <button key={o.gn} type="button" disabled={choice!==null} onClick={()=>answer(o.gn)} className="pn-opt min-h-14 whitespace-normal break-words rounded-2xl px-3 py-3 font-display text-lg font-bold transition active:scale-95 disabled:cursor-default" style={ok?{background:P.gol,color:P.noche,boxShadow:'none'}:bad?{background:P.mal,color:'#fff',boxShadow:'none'}:choice!==null?{opacity:.4}:undefined}>{o.gn}</button>;})}</div>
+ {choice!==null&&<div className="flex items-center justify-center gap-2 text-sm"><span>{p('answer')} <strong>{word.gn}</strong></span>{word.hasAudio&&<SpeakerButton gn={word.gn}/>}</div>}
+ {choice!==null&&!last&&<p className="text-sm font-semibold" style={{color:P.led}}>{p('aim')}</p>}
+ {last&&<><p className="font-display text-2xl font-bold" style={{color:isGoal(last)?P.gol:P.mal}} aria-live="polite">{label(last)}</p><button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold" style={{background:P.led,color:P.noche}} onClick={next}>{(duel?duelFinished(results[0],results[1]):played.length>=5)?p('result'):p('nextPen')}</button></>}
  </div></>}
  </div>;
 }
 
 function KeeperPick({keeper,shooter,onPick}:{keeper:string;shooter:string;onPick:(d:Dive)=>void}){
- const opts:[Dive,string,string][]=[['left','⬅','Izquierda'],['center','⬆','Centro'],['right','➡','Derecha']];
- return <section className="penalties-keeper-pick space-y-4 rounded-2xl p-5 text-center" aria-label="Turno del arquero">
-  <p className="text-xs font-semibold uppercase tracking-widest">🧤 Turno del arquero</p>
-  <h2 className="font-display text-2xl font-bold">{keeper}, elegí en secreto hacia dónde te tirás</h2>
-  <p className="text-sm opacity-80">Que {shooter} no mire. Si adivinás el lado del tiro, ¡lo atajás! Los tiros al ángulo superior no se pueden atajar.</p>
+ const {p}=usePT();
+ const opts:[Dive,string,string][]=[['left','⬅',p('left')],['center','⬆',p('center')],['right','➡',p('right')]];
+ return <section className="penalties-keeper-pick space-y-4 rounded-2xl p-5 text-center" aria-label={p('keeperTurn')}>
+  <p className="text-xs font-semibold uppercase tracking-widest">🧤 {p('keeperTurn')}</p>
+  <h2 className="font-display text-2xl font-bold">{p('keeperPick',{k:keeper})}</h2>
+  <p className="text-sm opacity-80">{p('keeperInfo',{s:shooter})}</p>
   <div className="grid grid-cols-3 gap-2">{opts.map(([d,i,l])=><Button key={d} variant="outline" className="h-20 flex-col gap-1 text-base font-bold" onClick={()=>{try{navigator.vibrate?.(20);}catch{}onPick(d);}}><span className="text-2xl" aria-hidden>{i}</span>{l}</Button>)}</div>
-  <p className="text-xs opacity-70">Después pasale el celular a {shooter}.</p>
+  <p className="text-xs opacity-70">{p('passPhone',{s:shooter})}</p>
  </section>;
 }
