@@ -7,6 +7,7 @@ import {
   WifiOff,
   Cpu,
   Landmark,
+  Globe,
   Code2,
   Database,
   FlaskConical,
@@ -42,12 +43,12 @@ export const Route = createFileRoute("/ficha-tecnica")({
 
 /** Cifras medidas sobre el repositorio el 27/10/2026. Actualizar a mano al re-medir. */
 const METRICAS = [
-  { icon: Code2, valor: "52.000+", label: "líneas de TypeScript" },
-  { icon: RouteIcon, valor: "78", label: "pantallas y rutas" },
+  { icon: Code2, valor: "54.500+", label: "líneas de TypeScript" },
+  { icon: RouteIcon, valor: "81", label: "pantallas y rutas" },
   { icon: Database, valor: "30", label: "tablas con seguridad por fila" },
   { icon: FlaskConical, valor: "506", label: "pruebas automáticas, todas OK" },
   { icon: Server, valor: "27", label: "módulos de funciones de servidor" },
-  { icon: GitBranch, valor: "960", label: "versiones registradas en Git" },
+  { icon: GitBranch, valor: "967", label: "versiones registradas en Git" },
 ] as const;
 
 const SECCIONES = [
@@ -93,6 +94,16 @@ const SECCIONES = [
       "Motor morfológico HFST (autómatas de estados finitos) desarrollado aparte por el CTO. En desarrollo, todavía no conectado.",
       "Principio de diseño: el motor opina, los docentes deciden. Ningún contenido en guaraní se publica sin validación humana.",
       "Traductor y tutor automáticos apagados a propósito hasta contar con validación.",
+    ],
+  },
+  {
+    icon: Globe,
+    titulo: "Alcance internacional",
+    items: [
+      "Portadas propias en portugués (/pt) e inglés (/en), pensadas para inversores, diplomacia, turismo y extranjeros que viven o hacen negocios en Paraguay.",
+      "Selector de idioma ES / PT / EN en la cabecera de la portada.",
+      "Posicionamiento en buscadores por idioma: cada portada tiene su propio título, descripción y enlaces alternos (hreflang) para que Google muestre la versión correcta según el idioma de quien busca.",
+      "Base para el modelo comercial: el guaraní es gratis para paraguayos; el público internacional es el segmento pago.",
     ],
   },
 ] as const;
