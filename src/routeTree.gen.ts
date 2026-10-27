@@ -15,9 +15,11 @@ import { Route as AuspiciantesRouteImport } from './routes/auspiciantes'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CineRouteImport } from './routes/cine'
 import { Route as ComenzarRouteImport } from './routes/comenzar'
+import { Route as DeRouteImport } from './routes/de'
 import { Route as EnRouteImport } from './routes/en'
 import { Route as FichaAuspiciantesRouteImport } from './routes/ficha-auspiciantes'
 import { Route as FichaTecnicaRouteImport } from './routes/ficha-tecnica'
+import { Route as FrRouteImport } from './routes/fr'
 import { Route as InstitucionesRouteImport } from './routes/instituciones'
 import { Route as InversionRouteImport } from './routes/inversion'
 import { Route as PilotoAteneoRouteImport } from './routes/piloto-ateneo'
@@ -123,6 +125,11 @@ const ComenzarRoute = ComenzarRouteImport.update({
   path: '/comenzar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeRoute = DeRouteImport.update({
+  id: '/de',
+  path: '/de',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnRoute = EnRouteImport.update({
   id: '/en',
   path: '/en',
@@ -136,6 +143,11 @@ const FichaAuspiciantesRoute = FichaAuspiciantesRouteImport.update({
 const FichaTecnicaRoute = FichaTecnicaRouteImport.update({
   id: '/ficha-tecnica',
   path: '/ficha-tecnica',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrRoute = FrRouteImport.update({
+  id: '/fr',
+  path: '/fr',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InstitucionesRoute = InstitucionesRouteImport.update({
@@ -562,9 +574,11 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
   '/comenzar': typeof ComenzarRoute
+  '/de': typeof DeRoute
   '/en': typeof EnRoute
   '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/ficha-tecnica': typeof FichaTecnicaRoute
+  '/fr': typeof FrRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
@@ -647,9 +661,11 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
   '/comenzar': typeof ComenzarRoute
+  '/de': typeof DeRoute
   '/en': typeof EnRoute
   '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/ficha-tecnica': typeof FichaTecnicaRoute
+  '/fr': typeof FrRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
@@ -731,9 +747,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
   '/comenzar': typeof ComenzarRoute
+  '/de': typeof DeRoute
   '/en': typeof EnRoute
   '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/ficha-tecnica': typeof FichaTecnicaRoute
+  '/fr': typeof FrRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
@@ -818,9 +836,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cine'
     | '/comenzar'
+    | '/de'
     | '/en'
     | '/ficha-auspiciantes'
     | '/ficha-tecnica'
+    | '/fr'
     | '/instituciones'
     | '/inversion'
     | '/piloto-ateneo'
@@ -903,9 +923,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cine'
     | '/comenzar'
+    | '/de'
     | '/en'
     | '/ficha-auspiciantes'
     | '/ficha-tecnica'
+    | '/fr'
     | '/instituciones'
     | '/inversion'
     | '/piloto-ateneo'
@@ -986,9 +1008,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cine'
     | '/comenzar'
+    | '/de'
     | '/en'
     | '/ficha-auspiciantes'
     | '/ficha-tecnica'
+    | '/fr'
     | '/instituciones'
     | '/inversion'
     | '/piloto-ateneo'
@@ -1073,9 +1097,11 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CineRoute: typeof CineRoute
   ComenzarRoute: typeof ComenzarRoute
+  DeRoute: typeof DeRoute
   EnRoute: typeof EnRoute
   FichaAuspiciantesRoute: typeof FichaAuspiciantesRoute
   FichaTecnicaRoute: typeof FichaTecnicaRoute
+  FrRoute: typeof FrRoute
   InstitucionesRoute: typeof InstitucionesRoute
   InversionRoute: typeof InversionRoute
   PilotoAteneoRoute: typeof PilotoAteneoRoute
@@ -1139,6 +1165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComenzarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/de': {
+      id: '/de'
+      path: '/de'
+      fullPath: '/de'
+      preLoaderRoute: typeof DeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/en': {
       id: '/en'
       path: '/en'
@@ -1158,6 +1191,13 @@ declare module '@tanstack/react-router' {
       path: '/ficha-tecnica'
       fullPath: '/ficha-tecnica'
       preLoaderRoute: typeof FichaTecnicaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr': {
+      id: '/fr'
+      path: '/fr'
+      fullPath: '/fr'
+      preLoaderRoute: typeof FrRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/instituciones': {
@@ -1865,9 +1905,11 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CineRoute: CineRoute,
   ComenzarRoute: ComenzarRoute,
+  DeRoute: DeRoute,
   EnRoute: EnRoute,
   FichaAuspiciantesRoute: FichaAuspiciantesRoute,
   FichaTecnicaRoute: FichaTecnicaRoute,
+  FrRoute: FrRoute,
   InstitucionesRoute: InstitucionesRoute,
   InversionRoute: InversionRoute,
   PilotoAteneoRoute: PilotoAteneoRoute,

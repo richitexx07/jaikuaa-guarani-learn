@@ -8,7 +8,7 @@ import { LanguageSwitcher } from "@/components/marketing/language-switcher";
 import heroImg from "@/assets/intl-hero.jpg";
 
 export type IntlCopy = {
-  lang: "pt" | "en" | "zh";
+  lang: "pt" | "en" | "zh" | "de" | "fr";
   /** Aviso visible de traducción preliminar (pendiente de revisión nativa). */
   notice?: string;
   eyebrow: string;
@@ -29,9 +29,9 @@ export type IntlCopy = {
 const ICONS = [Briefcase, AudioLines, Clock];
 
 export function IntlLanding({ c }: { c: IntlCopy }) {
-  useEffect(() => { if (c.lang !== "zh") setAppLang(c.lang); }, [c.lang]);
+  useEffect(() => { if (c.lang === "pt" || c.lang === "en") setAppLang(c.lang); }, [c.lang]);
   return (
-    <div lang={c.lang === "pt" ? "pt-BR" : c.lang === "zh" ? "zh-Hant-TW" : "en"} className="flex min-h-screen flex-col bg-background">
+    <div lang={({ pt: "pt-BR", en: "en", zh: "zh-Hant-TW", de: "de", fr: "fr" } as const)[c.lang]} className="flex min-h-screen flex-col bg-background">
       <header className="w-full border-b border-border/50 bg-background">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-primary">
