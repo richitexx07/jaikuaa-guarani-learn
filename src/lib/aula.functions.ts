@@ -87,7 +87,10 @@ async function nombres(ids: string[]): Promise<Map<string, string>> {
   return m;
 }
 
-async function aulaDelDocente(aulaId: string, userId: string, isAdmin: boolean): Promise<AulaRow> {
+async function aulaDelDocente(aulaId: string, userId: string, yo: { isAdmin: boolean; esDocente: boolean }): Promise<AulaRow> {
+  // Quien perdió la habilitación de docente ya no puede ver ni tocar sus aulas viejas.
+  if (!yo.esDocente) throw new Error("Tu acceso de docente no está activo.");
+  const isAdmin = yo.isAdmin;
   const db = await admin();
   const { data } = await db.from("aulas").select("*").eq("id", aulaId).maybeSingle();
   if (!data || (data.docente_id !== userId && !isAdmin)) throw new Error("No encontramos esa aula.");
@@ -312,7 +315,7 @@ export const archivarAula = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ aulaId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const yo = await quienSoy(context.supabase, context.userId);
-    await aulaDelDocente(data.aulaId, context.userId, yo.isAdmin);
+    await aulaDelDocente(data.aulaId, context.userId, yo);
     const db = await admin();
     await db.from("aulas").update({ activa: false }).eq("id", data.aulaId);
     return { ok: true };
@@ -324,7 +327,7 @@ export const getAula = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ aulaId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const yo = await quienSoy(context.supabase, context.userId);
-    const aula = await aulaDelDocente(data.aulaId, context.userId, yo.isAdmin);
+    const aula = await aulaDelDocente(data.aulaId, context.userId, yo);
     const db = await admin();
     const [m, t, lec] = await Promise.all([
       db.from("aula_miembros").select("user_id, joined_at").eq("aula_id", aula.id),
@@ -383,7 +386,7 @@ export const agregarTarea = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const yo = await quienSoy(context.supabase, context.userId);
-    const aula = await aulaDelDocente(data.aulaId, context.userId, yo.isAdmin);
+    const aula = await aulaDelDocente(data.aulaId, context.userId, yo);
     const db = await admin();
     let titulo = "";
     let ref = data.ref;
@@ -419,7 +422,7 @@ export const borrarTarea = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ aulaId: z.string().uuid(), tareaId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const yo = await quienSoy(context.supabase, context.userId);
-    await aulaDelDocente(data.aulaId, context.userId, yo.isAdmin);
+    await aulaDelDocente(data.aulaId, context.userId, yo);
     const db = await admin();
     await db.from("aula_tareas").delete().eq("id", data.tareaId).eq("aula_id", data.aulaId);
     return { ok: true };
@@ -430,7 +433,7 @@ export const quitarAlumno = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ aulaId: z.string().uuid(), userId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const yo = await quienSoy(context.supabase, context.userId);
-    await aulaDelDocente(data.aulaId, context.userId, yo.isAdmin);
+    await aulaDelDocente(data.aulaId, context.userId, yo);
     const db = await admin();
     await db.from("aula_miembros").delete().eq("aula_id", data.aulaId).eq("user_id", data.userId);
     return { ok: true };
@@ -442,7 +445,7 @@ export const getConstancia = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ aulaId: z.string().uuid(), userId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const yo = await quienSoy(context.supabase, context.userId);
-    const aula = await aulaDelDocente(data.aulaId, context.userId, yo.isAdmin);
+    const aula = await aulaDelDocente(data.aulaId, context.userId, yo);
     const db = await admin();
     const { data: mem } = await db
       .from("aula_miembros")
