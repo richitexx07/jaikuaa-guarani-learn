@@ -46,30 +46,30 @@ function LogrosPage() {
         </div>
       </header>
 
-      <main className="flex-1 px-4 py-10 sm:px-6 sm:py-14">
+      <main className="flex-1 px-4 pb-28 pt-8 sm:px-6 sm:pt-14">
         <div className="mx-auto max-w-3xl">
           <div className="text-center">
             <img
               src={jaiFesteja}
               alt="Jai festeja con los brazos arriba"
-              className="mx-auto mb-2 h-32 w-auto object-contain drop-shadow-lg sm:h-40"
+              className="mx-auto mb-1 h-24 w-auto object-contain drop-shadow-lg sm:mb-2 sm:h-40"
             />
             <div className="inline-flex items-center justify-center rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
               Tus logros <span aria-hidden className="ml-2">🏆</span>
             </div>
-            <h1 className="mt-4 font-display text-3xl font-bold text-foreground sm:text-4xl">
+            <h1 className="mt-3 font-display text-2xl font-bold text-foreground sm:mt-4 sm:text-4xl">
               ¡Mirá cuánto avanzaste!
             </h1>
-            <p className="mx-auto mt-3 max-w-lg text-base text-muted-foreground">
+            <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground sm:mt-3 sm:text-base">
               Sumá XP, mantené tu racha y desbloqueá logros mientras aprendés Guaraní.
             </p>
           </div>
 
-          <div className="mt-8">
+          <div className="mt-5 sm:mt-8">
             <StatsBar />
           </div>
 
-          <h2 className="mt-10 font-display text-2xl font-bold text-foreground">
+          <h2 className="mt-7 font-display text-2xl font-bold text-foreground sm:mt-10">
             Logros
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">

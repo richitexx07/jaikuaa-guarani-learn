@@ -42,7 +42,7 @@ function TriviaLanding() {
           <section className="relative overflow-hidden rounded-3xl shadow-elegant">
             <img
               src={bannerTrivia}
-              alt="Jai, presentador de un programa de preguntas, junto a una ruleta de colores"
+              alt="Jai, presentador de un programa de preguntas, con dos pulsadores de concurso"
               className="aspect-[16/10] w-full object-cover sm:aspect-[16/8]"
               width={800}
               height={600}

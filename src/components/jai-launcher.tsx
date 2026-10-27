@@ -73,10 +73,10 @@ export function JaiLauncher({ launcherRef, onOpen }: { launcherRef: RefObject<HT
         play("flip", onOpen);
       }}
       aria-label="Abrir a Jai, tu compañero de Jaikuaa"
-      className="jai-enter group relative ml-auto block h-20 w-20 rounded-full [perspective:600px] focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-24 sm:w-24"
+      className="jai-enter group relative ml-auto block h-16 w-16 rounded-full [perspective:600px] focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-24 sm:w-24"
     >
       <span className="jai-halo absolute inset-x-2 bottom-1 top-6 rounded-full" aria-hidden />
-      <span className="absolute inset-x-1 bottom-0 h-14 rounded-full bg-primary shadow-lift ring-4 ring-background transition group-hover:scale-105 sm:h-16" aria-hidden />
+      <span className="absolute inset-x-1 bottom-0 h-11 rounded-full bg-primary shadow-lift ring-4 ring-background transition group-hover:scale-105 sm:h-16" aria-hidden />
       <span className={`jai-ground absolute inset-x-3 -bottom-1 h-2 rounded-full bg-foreground/25 blur-[2px] ${trick !== "idle" ? "jai-ground-" + trick : ""}`} aria-hidden />
       {fx > 0 && trick !== "idle" && (
         <span key={fx} className="pointer-events-none absolute inset-0" aria-hidden>

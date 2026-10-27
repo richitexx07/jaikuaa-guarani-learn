@@ -20,11 +20,11 @@ export function BackButton() {
       type="button"
       onClick={goBack}
       aria-label="Volver a la pantalla anterior"
-      className={`fixed left-3 z-40 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/95 px-4 py-2.5 text-sm font-semibold text-primary shadow-lg transition active:scale-95 hover:bg-accent print:hidden ${
+      className={`fixed left-3 z-40 inline-flex h-12 w-12 items-center justify-center gap-1.5 rounded-full border border-border bg-background/95 text-sm sm:h-auto sm:w-auto sm:px-4 sm:py-2.5 font-semibold text-primary shadow-lg transition active:scale-95 hover:bg-accent print:hidden ${
         aboveNav ? "bottom-20 md:bottom-4" : "bottom-4"
       }`}
     >
-      <ArrowLeft className="h-4 w-4" /> Volver
+      <ArrowLeft className="h-5 w-5 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Volver</span>
     </button>
   );
 }

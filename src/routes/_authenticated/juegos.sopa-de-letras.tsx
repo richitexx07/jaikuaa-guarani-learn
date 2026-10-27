@@ -9,6 +9,9 @@ import { useGameFeedback } from "@/components/games/game-kit";
 import { ACHEGETY, displayLetter, splitAchegety } from "@/lib/achegety";
 import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
+import jaiPiensa from "@/assets/jai/jai-piensa.webp";
+import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
+import jaiFesteja from "@/assets/jai/jai-festeja.webp";
 import type { GameWord } from "@/lib/games.functions";
 
 export const Route = createFileRoute("/_authenticated/juegos/sopa-de-letras")({
@@ -116,7 +119,9 @@ const CSS = `
 @keyframes sp-mark { from { transform: scaleX(0) } }
 .sp-cell { transition: transform .1s; }
 .sp-cell[data-trail="true"] { transform: scale(1.12); }
-@media (prefers-reduced-motion: reduce) { .sp-mark { animation: none } .sp-cell { transition: none } }
+.sp-jai { animation: sp-pop .45s cubic-bezier(.2,1.4,.4,1) both; }
+@keyframes sp-pop { from { transform: scale(.7); opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { .sp-mark, .sp-jai { animation: none } .sp-cell { transition: none } }
 `;
 
 function Board({ puzzle, onNext }: { puzzle: Puzzle; onNext: () => void }) {
@@ -200,9 +205,23 @@ function Board({ puzzle, onNext }: { puzzle: Puzzle; onNext: () => void }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-sm opacity-75">Deslizá el dedo sobre cada palabra (horizontal o vertical).</p>
-        <p className="shrink-0 font-display text-lg font-bold">{found.size}/{placed.length}</p>
+      <div className="flex items-center gap-3 rounded-2xl bg-white/80 p-2 pr-4 ring-1 ring-[#C9DCF0]">
+        <img
+          key={found.size}
+          src={done ? jaiFesteja : found.size > 0 ? jaiAplaude : jaiPiensa}
+          alt=""
+          className="sp-jai h-16 w-16 shrink-0 object-contain"
+        />
+        <p className="min-w-0 flex-1 text-sm leading-snug">
+          {done
+            ? "¡Las encontraste todas!"
+            : found.size > 0
+              ? `¡Bien! Te faltan ${placed.length - found.size}.`
+              : "Deslizá el dedo sobre cada palabra, en línea recta (horizontal o vertical)."}
+        </p>
+        <p className="shrink-0 rounded-full px-3 py-1 font-display text-lg font-bold text-white" style={{ background: S.tinta }}>
+          {found.size}/{placed.length}
+        </p>
       </div>
       <div className="mx-auto w-full max-w-[min(30rem,60vh)] rounded-2xl bg-white p-2 shadow-[0_10px_30px_-12px_rgba(19,41,75,.35)] ring-1 ring-[#C9DCF0] lg:max-w-xl">
         <div className="relative">
@@ -241,25 +260,31 @@ function Board({ puzzle, onNext }: { puzzle: Puzzle; onNext: () => void }) {
         </div>
       </div>
 
-      <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5">
-        {placed.map((p, i) => (
-          <li key={i} className="flex min-w-0 flex-wrap items-center gap-1.5 py-1 text-sm sm:text-base">
-            <span className="grid h-5 w-5 shrink-0 place-items-center rounded border-2" style={{ borderColor: S.tinta, background: found.has(i) ? MARCADORES[i % MARCADORES.length] : "#fff" }}>
-              {found.has(i) && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
-            </span>
-            <span className={found.has(i) ? "line-through opacity-50" : ""}>{p.word.es}</span>
-            {found.has(i) && (
-              <>
-                <span className="rounded px-1 font-display font-bold" style={{ background: MARCADORES[i % MARCADORES.length] }}>{p.word.gn}</span>
-                {p.word.hasAudio && <SpeakerButton gn={p.word.gn} />}
-              </>
-            )}
-          </li>
-        ))}
+      <ul className="grid grid-cols-2 gap-2">
+        {placed.map((p, i) => {
+          const ok = found.has(i);
+          return (
+            <li
+              key={i}
+              className={`flex min-h-12 min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 rounded-xl px-3 py-2 text-sm transition sm:text-base ${ok ? "" : "ring-1 ring-[#C9DCF0]"}`}
+              style={{ background: ok ? MARCADORES[i % MARCADORES.length] : "#FFFFFF" }}
+            >
+              {ok && <Check className="h-4 w-4 shrink-0" strokeWidth={3} aria-hidden />}
+              <span className={ok ? "text-xs font-medium opacity-70" : "font-semibold"}>{p.word.es}</span>
+              {ok && (
+                <span className="flex items-center gap-1">
+                  <span className="font-display text-base font-bold">{p.word.gn}</span>
+                  {p.word.hasAudio && <SpeakerButton gn={p.word.gn} />}
+                </span>
+              )}
+            </li>
+          );
+        })}
       </ul>
 
       {done && (
         <div className="space-y-3 rounded-3xl bg-white p-6 text-center shadow-lg ring-1 ring-[#C9DCF0]">
+          <img src={jaiFesteja} alt="Jai festeja" className="mx-auto h-32 w-auto object-contain" />
           <p className="font-display text-3xl font-bold">¡Encontraste todas!</p>
           <p className="text-3xl tracking-widest text-[#F2B544]" aria-label="3 de 3 estrellas">★★★</p>
           <p className="font-bold text-[#2F7A4A]">+{XP} XP</p>
