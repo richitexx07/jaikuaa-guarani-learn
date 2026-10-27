@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTX } from "@/lib/i18n-pages";
 import { useEffect, useState } from "react";
 import { loadEscolarGrade, temasFor, type EscolarGrade } from "@/lib/guarani-tema";
 
@@ -14,19 +15,20 @@ export const Route = createFileRoute("/_authenticated/guarani-escolar/tema/")({
 });
 
 function TemaIndex() {
+  const tx = useTX();
   const [grade, setGrade] = useState<EscolarGrade>("6° grado");
   useEffect(() => setGrade(loadEscolarGrade()), []);
   return (
     <div className="mx-auto max-w-4xl">
       <div className="text-center">
         <div className="inline-flex items-center justify-center rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
-          Práctica por Tema <span aria-hidden className="ml-2">📚</span>
+          {tx("geP.tema")} <span aria-hidden className="ml-2">📚</span>
         </div>
         <h1 className="mt-4 font-display text-3xl font-bold text-foreground sm:text-4xl">
-          Elegí un tema para practicar
+          {tx("gtTitle")}
         </h1>
         <p className="mx-auto mt-3 max-w-lg text-base text-muted-foreground">
-          Contenido para <span className="font-semibold text-foreground">{grade}</span>. Cada tema tiene una breve explicación, vocabulario y un quiz de 5 preguntas.
+          {tx("gtSub", { g: grade })}
         </p>
       </div>
 
@@ -50,8 +52,8 @@ function TemaIndex() {
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-              <span>{tema.vocab.length} palabras · {tema.quiz.length} preguntas</span>
-              <span className="font-semibold text-primary group-hover:text-accent">Practicar →</span>
+              <span>{tx("gtCount", { a: tema.vocab.length, b: tema.quiz.length })}</span>
+              <span className="font-semibold text-primary group-hover:text-accent">{tx("gtPractice")}</span>
             </div>
           </Link>
         ))}

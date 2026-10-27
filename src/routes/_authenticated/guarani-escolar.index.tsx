@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTX, type TXKey } from "@/lib/i18n-pages";
 import { useEffect, useState } from "react";
 import { ESCOLAR_GRADES, loadEscolarGrade, saveEscolarGrade, type EscolarGrade } from "@/lib/guarani-tema";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ const PATHS = [
 ];
 
 function GuaraniEscolarEntry() {
+  const tx = useTX();
   const [grade, setGradeState] = useState<Grade>("6° grado");
   useEffect(() => setGradeState(loadEscolarGrade()), []);
   const setGrade = (g: Grade) => { setGradeState(g); saveEscolarGrade(g); };
@@ -48,26 +50,26 @@ function GuaraniEscolarEntry() {
     <div className="mx-auto max-w-4xl">
       <img
         src={bannerEscolar}
-        alt="Jai levanta la mano en un aula paraguaya, con un libro abierto sobre el pupitre"
+        alt={tx("geAlt")}
         className="mb-6 aspect-[16/9] w-full rounded-3xl object-cover shadow-elegant sm:aspect-[21/9]"
         width={1280}
         height={720}
       />
       <div className="text-center">
         <div className="inline-flex items-center justify-center rounded-full bg-accent/10 px-3 py-1 text-sm font-semibold text-accent">
-          Guaraní Escolar <span aria-hidden className="ml-2">🎒</span>
+          {tx("geBadge")} <span aria-hidden className="ml-2">🎒</span>
         </div>
         <h1 className="mt-4 font-display text-3xl font-bold text-foreground sm:text-4xl">
-          ¿Qué necesitás hoy?
+          {tx("geTitle")}
         </h1>
         <p className="mx-auto mt-3 max-w-lg text-base text-muted-foreground">
-          Todo lo que necesitás para entender y aprobar Guaraní en la escuela, paso a paso.
+          {tx("geSub")}
         </p>
       </div>
 
       <div className="mt-8 rounded-2xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
         <label className="block text-center text-sm font-medium text-muted-foreground">
-          Elegí tu año
+          {tx("geYear")}
         </label>
         <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
           {GRADES.map((g) => (
@@ -83,7 +85,7 @@ function GuaraniEscolarEntry() {
           ))}
         </div>
         <p className="mt-3 text-center text-xs text-muted-foreground">
-          Contenido adaptado para <span className="font-semibold text-foreground">{grade}</span>.
+          {tx("geFor", { g: grade })}
         </p>
       </div>
 
@@ -98,15 +100,15 @@ function GuaraniEscolarEntry() {
             <img src={path.img} alt="" className="h-20 w-20 shrink-0 object-contain sm:mx-auto sm:h-28 sm:w-28" loading="lazy" />
             <div className="flex-1">
             <h2 className="font-display sm:mt-4 text-xl font-semibold text-foreground">
-              {path.title}
+              {tx(`geP.${path.to.split("/").pop()}` as TXKey)}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {path.description}
+              {tx(`gePD.${path.to.split("/").pop()}` as TXKey)}
             </p>
             </div>
             <span className="text-2xl text-muted-foreground sm:hidden" aria-hidden>›</span>
             <span className="hidden sm:mt-5 sm:inline-flex h-9 items-center justify-center rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground shadow transition group-hover:bg-accent/90 group-active:scale-95">
-              Entrar →
+              {tx("geEnter")}
             </span>
           </Link>
         ))}
