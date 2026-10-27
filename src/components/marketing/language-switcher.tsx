@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Globe } from "lucide-react";
-import { setAppLang } from "@/lib/i18n";
+import { isAppLang, setAppLang } from "@/lib/i18n";
 
 const LANGS = [
   { code: "es", label: "ES", to: "/" },
@@ -19,7 +19,7 @@ export function LanguageSwitcher({ current }: { current: "es" | "pt" | "en" | "z
         <Link
           key={l.code}
           to={l.to}
-          onClick={() => { if (l.code === "es" || l.code === "pt" || l.code === "en") setAppLang(l.code); }}
+          onClick={() => { if (isAppLang(l.code)) setAppLang(l.code); }}
           aria-current={l.code === current ? "page" : undefined}
           className={
             l.code === current

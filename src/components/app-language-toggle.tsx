@@ -1,10 +1,11 @@
 import { Globe } from "lucide-react";
-import { APP_LANGS, setAppLang, useT } from "@/lib/i18n";
+import { APP_LANGS, PRELIMINARY_LANGS, setAppLang, useT } from "@/lib/i18n";
 
 /** Selector ES/PT/EN para usar dentro de la app; recuerda la elección en el teléfono. */
 export function AppLanguageToggle({ className = "" }: { className?: string }) {
   const { lang, t } = useT();
   return (
+    <div className="flex flex-col items-end">
     <div
       role="group"
       aria-label={t("lang.label")}
@@ -26,6 +27,10 @@ export function AppLanguageToggle({ className = "" }: { className?: string }) {
           {l.toUpperCase()}
         </button>
       ))}
+    </div>
+    {PRELIMINARY_LANGS.includes(lang) && (
+      <span role="note" className="mt-0.5 text-[10px] font-medium text-muted-foreground">{t("lang.preliminary")}</span>
+    )}
     </div>
   );
 }

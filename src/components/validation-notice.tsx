@@ -1,4 +1,5 @@
 import { ShieldCheck } from "lucide-react";
+import { useT } from "@/lib/i18n";
 
 /**
  * Aviso para secciones cuyo contenido en guaraní todavía no fue validado.
@@ -18,6 +19,7 @@ export function ValidationNotice() {
  * Deja claro que la plataforma no se lanzó y que el guaraní está en revisión por especialistas.
  */
 export function PreLaunchBanner() {
+  const { t } = useT();
   return (
     <div
       role="note"
@@ -25,17 +27,17 @@ export function PreLaunchBanner() {
     >
       <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden />
       <span>
-        <strong>Acceso anticipado:</strong> Jaikuaa todavía no se lanzó oficialmente. Las palabras están en
-        revisión por docentes especialistas; si ves un error, avisanos.
+        <strong>{t("pl.strong")}</strong> {t("pl.rest")}
       </span>
     </div>
   );
 }
 
 export function ValidationBadge() {
+  const { t } = useT();
   return (
     <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
-      En validación
+      {t("val.badge")}
     </span>
   );
 }
