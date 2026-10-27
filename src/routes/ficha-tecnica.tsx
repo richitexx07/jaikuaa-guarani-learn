@@ -42,12 +42,12 @@ export const Route = createFileRoute("/ficha-tecnica")({
 
 /** Cifras medidas sobre el repositorio el 27/10/2026. Actualizar a mano al re-medir. */
 const METRICAS = [
-  { icon: Code2, valor: "52.000+", label: "líneas de TypeScript" },
-  { icon: RouteIcon, valor: "78", label: "pantallas y rutas" },
+  { icon: Code2, valor: "54.500+", label: "líneas de TypeScript" },
+  { icon: RouteIcon, valor: "81", label: "pantallas y rutas" },
   { icon: Database, valor: "30", label: "tablas con seguridad por fila" },
   { icon: FlaskConical, valor: "506", label: "pruebas automáticas, todas OK" },
   { icon: Server, valor: "27", label: "módulos de funciones de servidor" },
-  { icon: GitBranch, valor: "960", label: "versiones registradas en Git" },
+  { icon: GitBranch, valor: "967", label: "versiones registradas en Git" },
 ] as const;
 
 const SECCIONES = [
