@@ -4,8 +4,8 @@ import { Check, Loader2 } from "lucide-react";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import { LessonFilter, NotEnough, useGameWords, useIsWide } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
-import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
-import { mulberry32, orderedBy, seededShuffle, type Reto } from "@/lib/reto";
+import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from "@/components/games/reto";
+import { mulberry32, orderedBy, seededShuffle } from "@/lib/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ACHEGETY, displayLetter, splitAchegety } from "@/lib/achegety";
 import { playGuarani } from "@/lib/audio";
@@ -75,10 +75,15 @@ function build(pool: { word: GameWord; tokens: string[] }[], size: number, seed:
 }
 
 function WordSearch() {
-  const { reto, seed, otra } = useRetoPartida("sopa");
+  const partida = useRetoPartida("sopa", { total: COUNT, unidad: "segundos", menosEsMejor: true });
+  const { reto, seed, otra } = partida;
   // En el reto viaja «lección:tamaño» para armar la misma sopa.
   const [retoLeccion, retoSize] = (reto?.x ?? "").split(":");
   const [lesson, setLesson] = useState<number | null>(() => (retoLeccion && /^\d+$/.test(retoLeccion) ? Number(retoLeccion) : null));
+  useEffect(() => {
+    const l = (reto?.x ?? "").split(":")[0];
+    if (reto) setLesson(l && /^\d+$/.test(l) ? Number(l) : null);
+  }, [reto?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const q = useGameWords(lesson);
   const wide = useIsWide();
   const size = reto && (retoSize === "8" || retoSize === "10") ? Number(retoSize) : wide ? 10 : 8;
@@ -108,8 +113,8 @@ function WordSearch() {
           <NotEnough min={COUNT} />
         ) : (
           <>
-            <RetoBanner reto={reto} className="mb-3" />
-            <Board key={`${seed}-${size}`} puzzle={puzzle} seed={seed} reto={reto} extra={`${lesson ?? ""}:${size}`} onNext={otra} />
+            <RetoBanner partida={partida} extra={`${lesson ?? ""}:${size}`} className="mb-3" />
+            <Board key={`${seed}-${size}`} puzzle={puzzle} partida={partida} extra={`${lesson ?? ""}:${size}`} onNext={otra} />
           </>
         )}
       </div>
@@ -132,7 +137,7 @@ const CSS = `
 @media (prefers-reduced-motion: reduce) { .sp-mark, .sp-jai { animation: none } .sp-cell { transition: none } }
 `;
 
-function Board({ puzzle, seed, reto, extra, onNext }: { puzzle: Puzzle; seed: number; reto: Reto | null; extra: string; onNext: () => void }) {
+function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Partida; extra: string; onNext: () => void }) {
   const feedback = useGameFeedback();
   const { size, grid, placed } = puzzle;
   const [start, setStart] = useState<number | null>(null);
@@ -305,7 +310,7 @@ function Board({ puzzle, seed, reto, extra, onNext }: { puzzle: Puzzle; seed: nu
           <div className="flex flex-wrap justify-center gap-2">
             <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: S.tinta }}>Otra sopa</button>
           </div>
-          {segundos > 0 && <RetoFinal juego="sopa" seed={seed} puntaje={segundos} total={COUNT} reto={reto} extra={extra} menosEsMejor unidad="segundos" />}
+          {segundos > 0 && <RetoFinal partida={partida} puntaje={segundos} extra={extra} />}
         </div>
       )}
     </div>

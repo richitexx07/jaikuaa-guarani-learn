@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Copy, Loader2, MessageCircle, RotateCcw, Users, Volume2, Wifi } from "lucide-react";
-import { toast } from "sonner";
+import { Loader2, RotateCcw, Users, Volume2, Wifi } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { XpNote, shuffle, useGameWords } from "@/components/games/game-shell";
@@ -9,6 +8,7 @@ import { GameStage } from "@/components/games/game-stage";
 import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { useSala } from "@/lib/use-sala";
+import { Compartir } from "@/components/games/reto";
 import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
 import { ROULETTE, TRIVIA } from "@/lib/trivia";
@@ -390,12 +390,9 @@ function Remote({ code, isHost, sendero, pool, onExit }: { code: string; isHost:
         {!sala.rival.present && (
           <div className="grid gap-3">
             <p className="text-sm font-semibold text-foreground">1. Mandale el desafío · 2. Cuando abra, arranca solo</p>
-            <Button asChild size="lg" className="h-14 text-base shadow-lg">
-              <a href={`https://wa.me/?text=${encodeURIComponent(invite)}`} target="_blank" rel="noreferrer"><MessageCircle className="mr-2 h-5 w-5" /> Mandar por WhatsApp</a>
-            </Button>
-            <Button variant="outline" onClick={() => { void navigator.clipboard?.writeText(link); toast.success("Enlace copiado"); }}>
-              <Copy className="mr-2 h-4 w-4" /> Copiar enlace
-            </Button>
+            <div className="rounded-2xl bg-white p-3 text-left text-[#13233F]">
+              <Compartir url={link} texto={invite} titulo="Ñe'ẽ Rape" />
+            </div>
           </div>
         )}
         <Button variant="ghost" onClick={salir}>Cancelar</Button>

@@ -2,7 +2,9 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
-import { Loader2, UserRound, UsersRound, RotateCcw } from 'lucide-react';
+import { Loader2, UserRound, UsersRound, RotateCcw, Wifi } from 'lucide-react';
+import { PenalesLive } from '@/components/games/penalties/live-penales';
+import { nuevoCodigoSala, ponerSalaEnLaUrl, salaDeLaUrl } from '@/lib/use-sala';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SpeakerButton } from '@/components/audio/speaker-button';
@@ -19,8 +21,8 @@ import { celebrate } from '@/lib/confetti';
 import type { GameWord } from '@/lib/games.functions';
 import { DemoBrandPanel } from '@/components/games/demo-brand-panel';
 import { demoLedText, useDemoBrand } from '@/lib/demo-brand';
-import { RetoBanner, RetoFinal, useRetoPartida } from '@/components/games/reto';
-import { leccionDeReto, orderedBy, shufflerFor, type Reto } from '@/lib/reto';
+import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from '@/components/games/reto';
+import { leccionDeReto, orderedBy, shufflerFor } from '@/lib/reto';
 
 export const Route=createFileRoute('/_authenticated/juegos/penales')({
  head:()=>({meta:[{title:'Penales: Solo y Duelo | Jaikuaa'},{name:'description',content:'Palabras, estadio y una tanda de penales. Jugá solo o compartí un duelo en el mismo celular.'},{property:'og:title',content:'Penales: Solo y Duelo | Jaikuaa'},{property:'og:description',content:'Una tanda de penales con vocabulario publicado y audio de voces reales.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary'}]}),component:Penalties,
@@ -40,29 +42,31 @@ function Penalties(){return <GameStage title="Penales" sponsorSlot="penales" css
 function Reflectores(){return <div className="pn-lights flex justify-between px-2" aria-hidden>{[0,1].map(g=><div key={g} className="grid grid-cols-4 gap-1 rounded-md bg-black/40 p-1.5">{Array.from({length:8},(_,i)=><span key={i} className="h-2.5 w-2.5 rounded-full" style={{background:'#FFF7D6',boxShadow:'0 0 10px #FFF7D6'}}/>)}</div>)}</div>;}
 function PenaltiesContent(){
  const {muted}=useGameKit();
- const {reto,seed,otra}=useRetoPartida('penales');
+ const partida=useRetoPartida('penales',{total:5}),{reto,seed,otra}=partida;
  const [lesson,setLesson]=useState<number|null>(()=>leccionDeReto(reto)),q=useGameWords(lesson);
+ useEffect(()=>{if(reto)setLesson(leccionDeReto(reto));},[reto?.id]);// eslint-disable-line react-hooks/exhaustive-deps
  const fn=useServerFn(getPenaltiesLed),led=useQuery({queryKey:['penales-led'],queryFn:()=>fn()});
  const demo=useDemoBrand(),ledText=demo?demoLedText(demo):(led.data?.text??'JAIKUAA · TU MARCA AQUÍ');
- const [mode,setMode]=useState<'solo'|'duel'>('solo'),[names,setNames]=useState<[string,string]>(['','']),[started,setStarted]=useState(false),[round,setRound]=useState(0);
+ const [remote,setRemote]=useState<{code:string;host:boolean}|null>(()=>{const c=salaDeLaUrl();return c?{code:c,host:false}:null;}),[joinCode,setJoinCode]=useState('');
+ const [mode,setMode]=useState<'solo'|'duel'|'remote'>('solo'),[names,setNames]=useState<[string,string]>(['','']),[started,setStarted]=useState(false),[round,setRound]=useState(0);
  const words=useMemo(()=>{const seen=new Set<string>();return (q.data?.words??[]).filter(w=>{const key=w.es.trim().toLowerCase();if(!key||seen.has(key))return false;seen.add(key);return true;});},[q.data]);
  return <div className="penalties-game mx-auto max-w-xl">
- <Reflectores/><div className="pn-dark mt-3 flex flex-wrap items-center justify-center gap-2"><LessonFilter value={lesson} onChange={v=>{otra();setLesson(v);setStarted(false);setRound(r=>r+1);}}/></div>
- <RetoBanner reto={reto} className="mt-3"/>
+ <Reflectores/><div className={`pn-dark mt-3 flex-wrap items-center justify-center gap-2 ${remote?'hidden':'flex'}`}><LessonFilter value={lesson} onChange={v=>{otra();setLesson(v);setStarted(false);setRound(r=>r+1);}}/></div>
+ {!remote&&<RetoBanner partida={partida} extra={lesson===null?undefined:String(lesson)} className="mt-3"/>}
  <DemoBrandPanel/>
- {q.isLoading?<div className="flex justify-center py-10"><Loader2 className="animate-spin"/></div>:q.isError?<p className="py-8 text-center">No se pudieron cargar las palabras. Volvé a intentar.</p>:words.length<5?<NotEnough min={5}/>:!started?<div className="space-y-5 py-5">
+ {remote?<div className="pt-4"><PenalesLive key={remote.code} code={remote.code} host={remote.host} words={words} ledText={ledText} muted={muted} onExit={()=>{setRemote(null);ponerSalaEnLaUrl(null);setStarted(false);}}/></div>:q.isLoading?<div className="flex justify-center py-10"><Loader2 className="animate-spin"/></div>:q.isError?<p className="py-8 text-center">No se pudieron cargar las palabras. Volvé a intentar.</p>:words.length<5?<NotEnough min={5}/>:!started?<div className="space-y-5 py-5">
  <div className="text-center"><h1 className="font-display text-5xl font-bold leading-none tracking-tight sm:text-6xl">Penales</h1><p className="mt-2 text-white/75">Respondé bien y el arquero llega tarde.</p></div>
  <PenaltyPitch knew={false} ready={false} muted={muted} ledText={ledText} onShot={()=>{}}/>
- <div className="grid grid-cols-2 gap-3" role="group" aria-label="Modo de juego">{([['solo',UserRound,'Solo','Vos contra el arquero'],['duel',UsersRound,'Duelo','Dos en el mismo celular']] as const).map(([m,Icon,t,d])=><button key={m} type="button" aria-pressed={mode===m} onClick={()=>setMode(m)} className="flex flex-col items-center gap-1 rounded-2xl p-4 text-center transition active:scale-95" style={{background:mode===m?P.blanco:'rgba(255,255,255,.08)',color:mode===m?P.noche:'#fff',boxShadow:mode===m?`0 0 0 3px ${P.led}`:'inset 0 0 0 2px rgba(255,255,255,.18)'}}><Icon className="h-6 w-6"/><b className="font-display text-lg">{t}</b><span className="text-xs opacity-75">{d}</span></button>)}</div>
+ <div className="grid grid-cols-3 gap-2" role="group" aria-label="Modo de juego">{([['solo',UserRound,'Solo','Vos contra el arquero'],['duel',UsersRound,'Duelo','Dos en el mismo celular'],['remote',Wifi,'A distancia','Cada uno en su celular']] as const).map(([m,Icon,t,d])=><button key={m} type="button" aria-pressed={mode===m} onClick={()=>setMode(m)} className="flex flex-col items-center gap-1 rounded-2xl p-3 text-center transition active:scale-95" style={{background:mode===m?P.blanco:'rgba(255,255,255,.08)',color:mode===m?P.noche:'#fff',boxShadow:mode===m?`0 0 0 3px ${P.led}`:'inset 0 0 0 2px rgba(255,255,255,.18)'}}><Icon className="h-6 w-6"/><b className="font-display text-lg">{t}</b><span className="text-xs opacity-75">{d}</span></button>)}</div>
  {mode==='duel'&&<div className="grid gap-3 sm:grid-cols-2 [&_input]:border-white/25 [&_input]:bg-white/10 [&_input]:text-white">{[0,1].map(i=><label key={i} className="text-sm font-semibold">Jugador {i+1}<Input aria-label={`Nombre del Jugador ${i+1}`} placeholder={`Jugador ${i+1}`} maxLength={20} value={names[i]} onChange={e=>setNames(old=>i===0?[e.target.value,old[1]]:[old[0],e.target.value])} className="mt-2"/></label>)}</div>}
- <button type="button" className="h-16 w-full rounded-2xl font-display text-xl font-bold shadow-lg transition active:scale-[.98]" style={{background:P.led,color:P.noche}} onClick={()=>setStarted(true)}>⚽ Empezar tanda</button>
- <p className="text-center text-sm text-white/70">📲 ¿A distancia? Jugá tu tanda solo y al final retá a un amigo por WhatsApp: le llegan las mismas palabras.</p>
- </div>:<Match key={`${round}:${lesson}:${mode}:${seed}`} seed={seed} reto={mode==='solo'?reto:null} lesson={lesson} words={words} duel={mode==='duel'} names={[names[0].trim()||'Jugador 1',names[1].trim()||'Jugador 2']} ledText={ledText} muted={muted} onAgain={()=>{otra();setRound(r=>r+1);}} onModes={()=>setStarted(false)}/>}
+ {mode==='remote'&&<div className="rounded-2xl bg-white/[.06] p-3 text-sm text-white/80 ring-1 ring-white/15"><p>Uno patea y el otro ataja, cada uno en su celular. Creás la sala e invitás por WhatsApp, Instagram o Facebook.</p><div className="mt-2 flex gap-2 [&_input]:border-white/25 [&_input]:bg-white/10 [&_input]:text-white"><Input value={joinCode} onChange={e=>setJoinCode(e.target.value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,4))} placeholder="¿Tenés un código?" aria-label="Código de sala" className={`h-11 text-center ${joinCode?'font-display text-lg tracking-[0.3em]':''}`}/><button type="button" disabled={joinCode.length!==4} onClick={()=>{ponerSalaEnLaUrl(joinCode);setRemote({code:joinCode,host:false});}} className="h-11 shrink-0 rounded-xl px-4 font-bold ring-1 ring-white/30 disabled:opacity-40">Unirme</button></div></div>}
+ <button type="button" className="h-16 w-full rounded-2xl font-display text-xl font-bold shadow-lg transition active:scale-[.98]" style={{background:P.led,color:P.noche}} onClick={()=>{if(mode==='remote'){const c=nuevoCodigoSala();ponerSalaEnLaUrl(c);setRemote({code:c,host:true});}else setStarted(true);}}>{mode==='remote'?'📲 Crear sala e invitar':'⚽ Empezar tanda'}</button>
+ </div>:<Match key={`${round}:${lesson}:${mode}:${seed}`} seed={seed} partida={partida} lesson={lesson} words={words} duel={mode==='duel'} names={[names[0].trim()||'Jugador 1',names[1].trim()||'Jugador 2']} ledText={ledText} muted={muted} onAgain={()=>{otra();setRound(r=>r+1);}} onModes={()=>setStarted(false)}/>}
  </div>;
 }
 type Played={word:GameWord;outcome:Outcome;player:number};
 const messages:Record<Outcome,string>={goal:'¡Gran gol! El público lo festeja con vos.',angle:'¡Al ángulo! Una definición espectacular.',save:'El arquero llegó. La próxima buscá el rincón.',post:'¡Por centímetros! La pelota dio en el palo.',over:'Se fue por arriba. Un poquito menos de fuerza.',wide:'Se fue afuera. La revancha está cerca.'};
-function Match({seed,reto,lesson,words,duel,names,ledText,muted,onAgain,onModes}:{seed:number;reto:Reto|null;lesson:number|null;words:GameWord[];duel:boolean;names:[string,string];ledText:string;muted:boolean;onAgain:()=>void;onModes:()=>void}){
+function Match({seed,partida,lesson,words,duel,names,ledText,muted,onAgain,onModes}:{seed:number;partida:Partida;lesson:number|null;words:GameWord[];duel:boolean;names:[string,string];ledText:string;muted:boolean;onAgain:()=>void;onModes:()=>void}){
  const deck=useMemo(()=>shufflerFor(seed)(orderedBy(words,w=>w.gn)),[words,seed]);
  const [turn,setTurn]=useState(0),[choice,setChoice]=useState<string|null>(null),[played,setPlayed]=useState<Played[]>([]),[last,setLast]=useState<Outcome|null>(null),[finished,setFinished]=useState(false),[guess,setGuess]=useState<Dive|null>(null);
  const word=deck[turn%deck.length];
@@ -92,7 +96,7 @@ function Match({seed,reto,lesson,words,duel,names,ledText,muted,onAgain,onModes}
  <h2 className="font-display text-3xl font-bold">{duel?(goals[0]===goals[1]?'Empate':`Ganó ${goals[0]>goals[1]?names[0]:names[1]}`):`${goals[0]} de 5 goles`}</h2><p className="font-bold" style={{color:P.led}}>+{xp} XP{duel?' · Jugador 1':''}</p>
  <ul className="divide-y divide-white/10 rounded-2xl bg-white/[.06] px-3 text-left">{played.map((p,i)=><li key={i} className="flex items-center gap-2 py-3 text-sm"><span className="h-3 w-3 shrink-0 rounded-full" style={{background:isGoal(p.outcome)?P.gol:P.mal}} aria-label={isGoal(p.outcome)?'Gol':'Errado'}/><div className="min-w-0 flex-1">{duel&&<span className="block text-xs text-white/60">{names[p.player]}</span>}<span className="font-semibold">{p.word.gn}</span><span className="text-white/60"> — {p.word.es}</span></div>{p.word.hasAudio&&<SpeakerButton gn={p.word.gn}/>}</li>)}</ul>
  <div className="flex flex-wrap justify-center gap-2"><button type="button" onClick={onAgain} className="inline-flex h-12 items-center gap-2 rounded-2xl px-6 font-bold" style={{background:P.led,color:P.noche}}><RotateCcw className="h-5 w-5"/>{duel?'Revancha':'Otra tanda'}</button><button type="button" className="h-12 rounded-2xl px-4 font-semibold text-white/80" onClick={onModes}>Cambiar modo</button></div>
-{!duel&&<RetoFinal juego="penales" seed={seed} puntaje={goals[0]} total={5} reto={reto} extra={lesson===null?undefined:String(lesson)}/>}
+{!duel&&<RetoFinal partida={partida} puntaje={goals[0]} extra={lesson===null?undefined:String(lesson)}/>}
  </div>:duel&&!guess?<KeeperPick keeper={names[1-player]} shooter={names[player]} onPick={setGuess}/>:<><div className="overflow-hidden rounded-2xl ring-4 ring-black/40"><PenaltyPitch key={turn} guess={duel?guess??undefined:undefined} knew={knew} ready={choice!==null} muted={muted} ledText={ledText} onShot={outcome=>{setLast(outcome);setPlayed(p=>[...p,{word,outcome,player}]);}}/></div>
  <div className="space-y-3 text-center"><p className="text-xs font-bold uppercase tracking-wide" style={{color:P.led}}>{sudden?`Muerte súbita · ronda ${Math.floor((turn-10)/2)+1} de 3`:`Penal ${duel?Math.floor(turn/2)+1:turn+1} de 5`}{duel?` · ${names[player]}`:''}</p><p className="text-sm text-white/70">¿Cómo se dice en guaraní?</p><h2 className="break-words font-display text-3xl font-bold">{word.es}</h2><div className="grid grid-cols-1 gap-2 sm:grid-cols-3">{options.map(o=>{const ok=choice!==null&&o.gn===word.gn,bad=choice===o.gn&&!ok;return <button key={o.gn} type="button" disabled={choice!==null} onClick={()=>answer(o.gn)} className="pn-opt min-h-14 whitespace-normal break-words rounded-2xl px-3 py-3 font-display text-lg font-bold transition active:scale-95 disabled:cursor-default" style={ok?{background:P.gol,color:P.noche,boxShadow:'none'}:bad?{background:P.mal,color:'#fff',boxShadow:'none'}:choice!==null?{opacity:.4}:undefined}>{o.gn}</button>;})}</div>
  {choice!==null&&<div className="flex items-center justify-center gap-2 text-sm"><span>Respuesta: <strong>{word.gn}</strong></span>{word.hasAudio&&<SpeakerButton gn={word.gn}/>}</div>}

@@ -105,8 +105,9 @@ function TriviaQuiz() {
   const navigate = useNavigate();
 
   const [runKey, setRunKey] = useState(0);
-  const { reto, seed, otra } = useRetoPartida("trivia");
-  const retoAqui = reto?.x === category ? reto : null;
+  const partida = useRetoPartida("trivia", { total: cat.questions.length });
+  const { reto, otra } = partida;
+  const coincide = !reto || reto.x === category;
   const [idx, setIdx] = useState(0);
   const [phase, setPhase] = useState<Phase>("playing");
   const [selected, setSelected] = useState<number | null>(null);
@@ -275,7 +276,7 @@ function TriviaQuiz() {
                 </div>
               )}
 
-              {idx === 0 && <RetoBanner reto={retoAqui} className="mb-3" />}
+              {idx === 0 && <RetoBanner partida={partida} extra={category} coincide={coincide} className="mb-3" />}
 
               {/* Question card */}
               <div key={idx} className="rounded-2xl border border-border/60 bg-card p-5 shadow-elegant animate-fade-in sm:p-7">
@@ -377,7 +378,7 @@ function TriviaQuiz() {
               onReplay={() => { otra(); reset(); }}
               onChoose={() => navigate({ to: "/trivia" })}
             />
-            <RetoFinal juego="trivia" seed={seed} puntaje={correctCount} total={total} reto={retoAqui} extra={category} className="mt-4" />
+            <RetoFinal partida={partida} puntaje={correctCount} total={total} extra={category} coincide={coincide} className="mt-4" />
             </>
           )}
         </div>

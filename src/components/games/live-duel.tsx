@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Copy, Loader2, MessageCircle, RotateCcw, Users, Volume2, WifiOff, Wifi, X } from "lucide-react";
-import { toast } from "sonner";
+import { Loader2, RotateCcw, Users, Volume2, WifiOff, Wifi, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
 import { nuevoCodigoSala, useSala } from "@/lib/use-sala";
+import { Compartir } from "@/components/games/reto";
 
 /**
  * Duelo en vivo a distancia: cada uno en su celular, la misma pregunta aparece en los dos y gana
@@ -57,7 +57,7 @@ export function LiveDuelStart({ theme, onStart }: { theme: LiveTheme; onStart: (
       >
         <Wifi className="h-5 w-5" aria-hidden /> Jugar a distancia
       </button>
-      <p className="mt-1.5 text-center text-xs opacity-70">Cada uno en su celular. Le mandás la invitación por WhatsApp.</p>
+      <p className="mt-1.5 text-center text-xs opacity-70">Cada uno en su celular. Invitás por WhatsApp, Instagram o Facebook.</p>
       <div className="mt-2 flex gap-2">
         <Input
           value={join}
@@ -463,13 +463,8 @@ export function LiveDuel({
             Sala <span className="font-display text-lg font-bold tracking-[0.3em]">{code}</span>
           </p>
           {!sala.rival.present && sala.isHost && (
-            <div className="mt-4 grid grid-cols-[1fr_auto] gap-2">
-              <a href={`https://wa.me/?text=${encodeURIComponent(invite)}`} target="_blank" rel="noopener noreferrer" className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-[#1FA855] font-bold text-white">
-                <MessageCircle className="h-5 w-5" aria-hidden /> Invitar por WhatsApp
-              </a>
-              <button type="button" aria-label="Copiar enlace" className="grid h-12 w-12 place-items-center rounded-2xl ring-1 ring-black/15" onClick={() => { void navigator.clipboard?.writeText(link); toast.success("Enlace copiado"); }}>
-                <Copy className="h-5 w-5" aria-hidden />
-              </button>
+            <div className="mt-4 text-left">
+              <Compartir url={link} texto={invite} titulo={title} />
             </div>
           )}
           {!sala.rival.present && !sala.isHost && <p className="mt-3 text-sm opacity-75">Cuando tu amigo esté en la sala, arranca solo.</p>}

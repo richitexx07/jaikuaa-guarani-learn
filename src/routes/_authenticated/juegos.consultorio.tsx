@@ -30,8 +30,8 @@ import {
   type Ronda,
 } from "@/lib/consultorio";
 import jaiImg from "@/assets/jai-doctor.webp";
-import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
-import { mulberry32, orderedBy, type Reto } from "@/lib/reto";
+import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from "@/components/games/reto";
+import { mulberry32, orderedBy } from "@/lib/reto";
 
 export const Route = createFileRoute("/_authenticated/juegos/consultorio")({
   head: () => ({
@@ -131,8 +131,9 @@ function Consultorio() {
   const cargando = cuerpoQ.isLoading || frasesQ.isLoading;
   const pocos = frases.length < 8;
 
-  const { reto, seed, otra } = useRetoPartida("consultorio");
-  const jugado = useRef(false);
+  const partida = useRetoPartida("consultorio", { total: PACIENTES_POR_TURNO });
+  const { seed, otra } = partida;
+  const usada = useRef<number | null>(null);
   const [fase, setFase] = useState<Fase>("intro");
   const [rondas, setRondas] = useState<Ronda[]>([]);
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
@@ -162,8 +163,8 @@ function Consultorio() {
 
   function empezar() {
     // El primer turno usa la semilla del reto (si vino uno); los siguientes, una nueva.
-    const s = jugado.current ? otra() : seed;
-    jugado.current = true;
+    const s = usada.current === seed ? otra() : seed;
+    usada.current = s;
     const rs = armarTurno(orderedBy(cuerpo, (w) => w.gn), orderedBy(frases, (f) => f.id), mulberry32(s));
     if (rs.length === 0) return;
     setRondas(rs);
@@ -268,7 +269,7 @@ function Consultorio() {
       </header>
 
       <main className="mx-auto max-w-3xl px-4">
-        {fase === "intro" && <RetoBanner reto={reto} className="mt-4" />}
+        {fase === "intro" && <RetoBanner partida={partida} className="mt-4" />}
         {fase === "intro" && (
           <Intro
             idioma={idioma}
@@ -321,8 +322,7 @@ function Consultorio() {
             puntos={puntos}
             xp={ganado ?? 0}
             onOtro={empezar}
-            seed={seed}
-            reto={reto}
+            partida={partida}
           />
         )}
       </main>
@@ -731,8 +731,7 @@ function Fin({
   puntos,
   xp,
   onOtro,
-  seed,
-  reto,
+  partida,
 }: {
   idioma: Idioma;
   aciertos: number;
@@ -742,8 +741,7 @@ function Fin({
   puntos: number;
   xp: number;
   onOtro: () => void;
-  seed: number;
-  reto: Reto | null;
+  partida: Partida;
 }) {
   const e = estrellas(aciertos, total);
   return (
@@ -778,7 +776,7 @@ function Fin({
           {xp > 0 && <p className="mt-4 text-sm text-white/80">+{xp} XP</p>}
         </div>
       </div>
-      <RetoFinal juego="consultorio" seed={seed} puntaje={aciertos} total={total} reto={reto} className="mt-5" />
+      <RetoFinal partida={partida} puntaje={aciertos} total={total} className="mt-5" />
       <button
         type="button"
         onClick={onOtro}

@@ -2,8 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shuffle } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
-import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
-import type { Reto } from "@/lib/reto";
+import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from "@/components/games/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
@@ -76,8 +75,11 @@ const CSS = `
 `;
 
 function Karaoke() {
-  const { reto, seed, otra } = useRetoPartida("karaoke");
+  const partida = useRetoPartida("karaoke", { total: 20 });
+  const { reto, seed, otra } = partida;
   const [songId, setSongId] = useState<string | null>(() => reto?.x ?? null);
+  // Si el reto llega después (se carga de internet), abre su canción.
+  useEffect(() => { if (reto?.x) setSongId(reto.x); }, [reto?.id, reto?.x]);
   const { idx, loading } = useJuegoTextos();
   const songs = useMemo(() => applyKaraoke(SONGS, idx), [idx]);
   const song = songs.find((s) => s.id === songId) ?? null;
@@ -95,8 +97,8 @@ function Karaoke() {
         <Setlist songs={songs} onPick={(s) => setSongId(s.id)} />
       ) : (
         <>
-          <RetoBanner reto={reto?.x === song.id ? reto : null} className="mb-3" />
-          <Stage key={`${song.id}-${seed}`} song={song} seed={seed} reto={reto?.x === song.id ? reto : null} onAgain={otra} onBack={() => { otra(); setSongId(null); }} />
+          <RetoBanner partida={partida} extra={song.id} total={song.lines.length * 5} coincide={!reto || reto.x === song.id} className="mb-3" />
+          <Stage key={`${song.id}-${seed}`} song={song} partida={partida} onAgain={otra} onBack={() => { otra(); setSongId(null); }} />
         </>
       )}
     </GameStage>
@@ -189,7 +191,7 @@ function Setlist({ songs, onPick }: { songs: Song[]; onPick: (s: Song) => void }
   );
 }
 
-function Stage({ song, seed, reto, onAgain, onBack }: { song: Song; seed: number; reto: Reto | null; onAgain: () => void; onBack: () => void }) {
+function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partida; onAgain: () => void; onBack: () => void }) {
   const feedback = useGameFeedback();
   const beatSec = 60 / song.bpm;
   const lead = 4; // cuenta regresiva
@@ -269,7 +271,7 @@ function Stage({ song, seed, reto, onAgain, onBack }: { song: Song; seed: number
           <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: K.oro, color: K.noche }}>Cantar de nuevo</button>
           <button type="button" onClick={onBack} className="h-12 rounded-2xl px-6 font-bold ring-1 ring-white/30">Otra canción</button>
         </div>
-        <RetoFinal juego="karaoke" seed={seed} puntaje={points} total={song.lines.length * 5} reto={reto} extra={song.id} />
+        <RetoFinal partida={partida} puntaje={points} total={song.lines.length * 5} extra={song.id} coincide={!partida.reto || partida.reto.x === song.id} />
       </section>
     );
   }

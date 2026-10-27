@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GameStage } from "@/components/games/game-stage";
-import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
+import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from "@/components/games/reto";
 import { shufflerFor } from "@/lib/reto";
-import type { Reto } from "@/lib/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
@@ -46,7 +45,8 @@ const CSS = `
 `;
 
 function Tembiu() {
-  const { reto, seed, otra } = useRetoPartida("tembiu");
+  const partida = useRetoPartida("tembiu", { total: ROUNDS });
+  const { seed, otra } = partida;
   const { idx, loading } = useJuegoTextos();
   const ing = useMemo(() => applyTembiu(ING, idx), [idx]);
   return (
@@ -57,7 +57,7 @@ function Tembiu() {
       background={`radial-gradient(80% 40% at 50% 100%, #C2552B 0%, transparent 70%), repeating-linear-gradient(0deg, transparent 0 34px, rgba(0,0,0,.08) 34px 36px), linear-gradient(180deg, ${T.adobe} 0%, ${T.barro} 55%, ${T.oscuro} 100%)`}
     >
       <ValidationNotice />
-      {loading ? <p className="py-16 text-center text-sm opacity-70">Preparando la cocina…</p> : <><RetoBanner reto={reto} className="mb-3" /><Kitchen key={seed} seed={seed} reto={reto} ing={ing} onAgain={otra} /></>}
+      {loading ? <p className="py-16 text-center text-sm opacity-70">Preparando la cocina…</p> : <><RetoBanner partida={partida} className="mb-3" /><Kitchen key={seed} seed={seed} partida={partida} ing={ing} onAgain={otra} /></>}
     </GameStage>
   );
 }
@@ -104,7 +104,7 @@ function Olla({ picked, hot, ing }: { picked: string[]; hot: boolean; ing: typeo
   );
 }
 
-function Kitchen({ onAgain, ing, seed, reto }: { onAgain: () => void; ing: typeof ING; seed: number; reto: Reto | null }) {
+function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: typeof ING; seed: number; partida: Partida }) {
   const feedback = useGameFeedback();
   const dishes = useMemo(() => shufflerFor(seed)(DISHES).slice(0, ROUNDS), []);
   const [i, setI] = useState(0);
@@ -150,7 +150,7 @@ function Kitchen({ onAgain, ing, seed, reto }: { onAgain: () => void; ing: typeo
           </ul>
           <p className="mt-4 font-bold" style={{ color: T.verde }}>+{xp} XP</p>
         </div>
-        <RetoFinal juego="tembiu" seed={seed} puntaje={score} total={ROUNDS} reto={reto} />
+        <RetoFinal partida={partida} puntaje={score} />
         <div className="flex flex-wrap justify-center gap-2">
           <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: T.ocre, color: T.tinta }}>Cocinar de nuevo</button>
         </div>

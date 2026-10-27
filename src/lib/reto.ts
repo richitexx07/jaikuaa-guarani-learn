@@ -166,6 +166,6 @@ export function retoDeLaUrl(juego: RetoJuego): Reto | null {
 }
 
 /** La lección elegida por quien retó (para que el amigo juegue con las mismas palabras). */
-export function leccionDeReto(r: Reto | null): number | null {
+export function leccionDeReto(r: { x?: string } | null): number | null {
   return r?.x && /^\d{1,3}$/.test(r.x) ? Number(r.x) : null;
 }

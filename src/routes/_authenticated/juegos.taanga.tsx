@@ -2,9 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shuffle } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
-import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
+import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from "@/components/games/reto";
 import { shufflerFor } from "@/lib/reto";
-import type { Reto } from "@/lib/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
@@ -56,7 +55,8 @@ const CSS = `
 `;
 
 function Taanga() {
-  const { reto, seed, otra } = useRetoPartida("taanga");
+  const partida = useRetoPartida("taanga", { total: ROUNDS });
+  const { seed, otra } = partida;
   const { idx, loading } = useJuegoTextos();
   const all = useMemo(() => applyTaanga(SCENES, idx), [idx]);
   return (
@@ -67,7 +67,7 @@ function Taanga() {
       background={`radial-gradient(70% 45% at 85% 0%, rgba(244,192,78,.22) 0%, transparent 70%), ${F.carbon}`}
     >
       <ValidationNotice />
-      {loading ? <p className="py-16 text-center text-sm opacity-70">Preparando el set…</p> : <><RetoBanner reto={reto} className="mb-3" /><Set key={seed} seed={seed} reto={reto} all={all} onAgain={otra} /></>}
+      {loading ? <p className="py-16 text-center text-sm opacity-70">Preparando el set…</p> : <><RetoBanner partida={partida} className="mb-3" /><Set key={seed} seed={seed} partida={partida} all={all} onAgain={otra} /></>}
     </GameStage>
   );
 }
@@ -98,7 +98,7 @@ function Claqueta({ escena, toma, lugar, cerrada }: { escena: number; toma: numb
   );
 }
 
-function Set({ onAgain, all, seed, reto }: { onAgain: () => void; all: Scene[]; seed: number; reto: Reto | null }) {
+function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[]; seed: number; partida: Partida }) {
   const feedback = useGameFeedback();
   const scenes = useMemo(() => shufflerFor(seed)(all).slice(0, ROUNDS), []);
   const [i, setI] = useState(0);
@@ -148,7 +148,7 @@ function Set({ onAgain, all, seed, reto }: { onAgain: () => void; all: Scene[]; 
           </div>
           <div className="tg-frame h-4" style={{ background: F.panel }} />
         </div>
-        <RetoFinal juego="taanga" seed={seed} puntaje={score} total={ROUNDS} reto={reto} />
+        <RetoFinal partida={partida} puntaje={score} />
         <div className="flex flex-wrap justify-center gap-2">
           <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: F.tungsteno, color: F.carbon }}>Nuevo rodaje</button>
         </div>

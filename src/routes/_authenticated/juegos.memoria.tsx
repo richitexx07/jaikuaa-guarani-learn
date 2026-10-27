@@ -4,8 +4,8 @@ import { Loader2 } from "lucide-react";
 import { LessonFilter, NotEnough, useGameWords } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
 import { Volume2 } from "lucide-react";
-import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
-import { leccionDeReto, orderedBy, shufflerFor, type Reto } from "@/lib/reto";
+import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from "@/components/games/reto";
+import { leccionDeReto, orderedBy, shufflerFor } from "@/lib/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
@@ -28,8 +28,11 @@ export const Route = createFileRoute("/_authenticated/juegos/memoria")({
 const PAIRS = 6;
 
 function Memory() {
-  const { reto, seed, otra } = useRetoPartida("memoria");
+  const partida = useRetoPartida("memoria", { total: PAIRS, unidad: "intentos", menosEsMejor: true });
+  const { reto, seed, otra } = partida;
   const [lesson, setLesson] = useState<number | null>(() => leccionDeReto(reto));
+  // Si el reto llega después (se carga de internet), usa su lección.
+  useEffect(() => { if (reto) setLesson(leccionDeReto(reto)); }, [reto?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const q = useGameWords(lesson);
   const words = useMemo(() => {
     // Traducciones distintas para que cada par sea inequívoco.
@@ -63,8 +66,8 @@ function Memory() {
           <NotEnough min={PAIRS} />
         ) : (
           <>
-            <RetoBanner reto={reto} className="mb-3" />
-            <Board key={seed} words={words} seed={seed} reto={reto} lesson={lesson} onNext={otra} />
+            <RetoBanner partida={partida} extra={lesson === null ? undefined : String(lesson)} className="mb-3" />
+            <Board key={seed} words={words} seed={seed} partida={partida} lesson={lesson} onNext={otra} />
           </>
         )}
       </div>
@@ -119,7 +122,7 @@ function Roseton({ color = M.oro, lleno = true, className = "" }: { color?: stri
 
 type Card = { id: number; pair: number; kind: "gn" | "es"; text: string; word: GameWord };
 
-function Board({ words, seed, reto, lesson, onNext }: { words: GameWord[]; seed: number; reto: Reto | null; lesson: number | null; onNext: () => void }) {
+function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; seed: number; partida: Partida; lesson: number | null; onNext: () => void }) {
   const feedback = useGameFeedback();
   const cards = useMemo<Card[]>(
     () =>
@@ -221,7 +224,7 @@ function Board({ words, seed, reto, lesson, onNext }: { words: GameWord[]; seed:
           <div className="flex flex-wrap justify-center gap-2">
             <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: M.tinta }}>Jugar de nuevo</button>
           </div>
-          <RetoFinal juego="memoria" seed={seed} puntaje={attempts} total={PAIRS} reto={reto} extra={lesson === null ? undefined : String(lesson)} menosEsMejor unidad="intentos" />
+          <RetoFinal partida={partida} puntaje={attempts} extra={lesson === null ? undefined : String(lesson)} />
         </div>
       )}
     </div>

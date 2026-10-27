@@ -4,8 +4,8 @@ import { Loader2 } from "lucide-react";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import { LessonFilter, NotEnough, useGameWords } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
-import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
-import { leccionDeReto, orderedBy, shufflerFor, type Reto } from "@/lib/reto";
+import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from "@/components/games/reto";
+import { leccionDeReto, orderedBy, shufflerFor } from "@/lib/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ACHEGETY, displayLetter, splitAchegety } from "@/lib/achegety";
 import { playGuarani } from "@/lib/audio";
@@ -31,8 +31,11 @@ const XP_WIN = 15;
 const XP_LOSS = 5;
 
 function Hangman() {
-  const { reto, seed, otra } = useRetoPartida("ahorcado");
+  const partida = useRetoPartida("ahorcado", { total: LIVES });
+  const { reto, seed, otra } = partida;
   const [lesson, setLesson] = useState<number | null>(() => leccionDeReto(reto));
+  // Si el reto llega después (se carga de internet), usa su lección.
+  useEffect(() => { if (reto) setLesson(leccionDeReto(reto)); }, [reto?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const q = useGameWords(lesson);
   const pool = useMemo(
     () => (q.data?.words ?? []).filter((w) => !/\s/.test(w.gn.trim()) && splitAchegety(w.gn.trim())),
@@ -58,8 +61,8 @@ function Hangman() {
           <NotEnough min={1} />
         ) : (
           <>
-            <RetoBanner reto={reto} className="mb-3" />
-            <Board key={`${word.gn}-${seed}`} word={word} seed={seed} reto={reto} lesson={lesson} onNext={otra} />
+            <RetoBanner partida={partida} extra={lesson === null ? undefined : String(lesson)} className="mb-3" />
+            <Board key={`${word.gn}-${seed}`} word={word} partida={partida} lesson={lesson} onNext={otra} />
           </>
         )}
       </div>
@@ -115,7 +118,7 @@ function Canasta({ quedan }: { quedan: number }) {
   );
 }
 
-function Board({ word, seed, reto, lesson, onNext }: { word: GameWord; seed: number; reto: Reto | null; lesson: number | null; onNext: () => void }) {
+function Board({ word, partida, lesson, onNext }: { word: GameWord; partida: Partida; lesson: number | null; onNext: () => void }) {
   const feedback = useGameFeedback();
   const tokens = useMemo(() => splitAchegety(word.gn.trim()) ?? [], [word]);
   const [guessed, setGuessed] = useState<Set<string>>(new Set());
@@ -175,7 +178,7 @@ function Board({ word, seed, reto, lesson, onNext }: { word: GameWord; seed: num
           <div className="flex flex-wrap justify-center gap-2">
             <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: A.rojo }}>Otra palabra</button>
           </div>
-          <RetoFinal juego="ahorcado" seed={seed} puntaje={won ? LIVES - wrong : 0} total={LIVES} reto={reto} extra={lesson === null ? undefined : String(lesson)} />
+          <RetoFinal partida={partida} puntaje={won ? LIVES - wrong : 0} extra={lesson === null ? undefined : String(lesson)} />
         </div>
       ) : (
         <div className="grid grid-cols-6 gap-1.5 rounded-3xl p-2 sm:grid-cols-9" style={{ background: "rgba(0,0,0,.18)" }}>
