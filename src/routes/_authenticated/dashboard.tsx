@@ -57,6 +57,18 @@ import bannerAprender from "@/assets/banners/banner-aprender.webp";
 import bannerCurso from "@/assets/banners/banner-curso.webp";
 import bannerEscolar from "@/assets/banners/banner-escolar.webp";
 import coverKaraoke from "@/assets/covers/cover-karaoke.webp";
+import miniKaraoke from "@/assets/covers/mini/mini-karaoke.webp";
+import miniPenales from "@/assets/covers/mini/mini-penales.webp";
+import miniTembiu from "@/assets/covers/mini/mini-tembiu.webp";
+import miniTaanga from "@/assets/covers/mini/mini-taanga.webp";
+import miniTrivia from "@/assets/covers/mini/mini-trivia-duelo.webp";
+import miniTekojoja from "@/assets/covers/mini/mini-tekojoja.webp";
+import miniMemoria from "@/assets/covers/mini/mini-memoria.webp";
+import miniConsultorio from "@/assets/covers/mini/mini-consultorio.webp";
+import miniDuelo from "@/assets/covers/mini/mini-duelo.webp";
+import miniSopa from "@/assets/covers/mini/mini-sopa-de-letras.webp";
+import miniAhorcado from "@/assets/covers/mini/mini-ahorcado.webp";
+import miniNeeRape from "@/assets/covers/mini/mini-nee-rape.webp";
 import coverPalabra from "@/assets/covers/cover-palabra-del-dia.webp";
 import coverPenales from "@/assets/covers/cover-penales.webp";
 import coverTrivia from "@/assets/covers/cover-trivia-duelo.webp";
@@ -191,7 +203,54 @@ function PilotCard() {
   );
 }
 
-function BigAction({ to, img, title, desc, tone }: { to: "/curso/$lang" | "/juegos" | "/juegos/palabra-del-dia"; img: string; title: string; desc: string; tone: "primary" | "accent" | "card" }) {
+/** Los juegos que van pasando en el botón «Jugar» (empieza con Jai y el arpa). */
+const JUEGOS_ROTAN: { img: string; nombre: string }[] = [
+  { img: miniKaraoke, nombre: "Karaoke" },
+  { img: miniPenales, nombre: "Penales" },
+  { img: miniTembiu, nombre: "Tembi'u" },
+  { img: miniTrivia, nombre: "Trivia" },
+  { img: miniTaanga, nombre: "Ta'anga" },
+  { img: miniMemoria, nombre: "Memoria" },
+  { img: miniConsultorio, nombre: "Consultorio" },
+  { img: miniDuelo, nombre: "Duelo" },
+  { img: miniTekojoja, nombre: "Tekojoja" },
+  { img: miniSopa, nombre: "Sopa" },
+  { img: miniAhorcado, nombre: "Ahorcado" },
+  { img: miniNeeRape, nombre: "Ñe'ẽ Rape" },
+];
+
+/** Imagen que va cambiando suave de un juego a otro (quieta si el celular pide menos movimiento). */
+function RotatingThumb({ items, className }: { items: { img: string; nombre: string }[]; className: string }) {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (typeof window === "undefined" || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const t = window.setInterval(() => {
+      if (document.visibilityState === "visible") setI((n) => (n + 1) % items.length);
+    }, 2600);
+    return () => window.clearInterval(t);
+  }, [items.length]);
+  return (
+    <span className={`relative block overflow-hidden ${className}`} aria-hidden>
+      {items.map((it, k) => (
+        <img
+          key={it.nombre}
+          src={it.img}
+          alt=""
+          width={184}
+          height={144}
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-700 ease-out"
+          style={{ opacity: k === i ? 1 : 0, transform: k === i ? "scale(1)" : "scale(1.08)" }}
+        />
+      ))}
+      <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1 pb-0.5 pt-3 text-center text-[10px] font-bold leading-none text-white">
+        {items[i]?.nombre}
+      </span>
+    </span>
+  );
+}
+
+function BigAction({ to, img, rotate, title, desc, tone }: { to: "/curso/$lang" | "/juegos" | "/juegos/palabra-del-dia"; img: string; rotate?: { img: string; nombre: string }[]; title: string; desc: string; tone: "primary" | "accent" | "card" }) {
   const cls =
     tone === "primary"
       ? "bg-primary text-primary-foreground"
@@ -204,7 +263,11 @@ function BigAction({ to, img, title, desc, tone }: { to: "/curso/$lang" | "/jueg
       params={to === "/curso/$lang" ? { lang: "guarani" } : undefined}
       className={`flex min-h-[76px] items-center gap-3 overflow-hidden rounded-2xl p-2 pr-4 shadow-lift transition-transform active:scale-[0.98] sm:min-h-[88px] ${cls}`}
     >
-      <img src={img} alt="" className="h-[60px] w-[76px] shrink-0 rounded-xl object-cover sm:h-[72px] sm:w-[92px]" loading="lazy" />
+      {rotate ? (
+        <RotatingThumb items={rotate} className="h-[60px] w-[76px] shrink-0 rounded-xl sm:h-[72px] sm:w-[92px]" />
+      ) : (
+        <img src={img} alt="" className="h-[60px] w-[76px] shrink-0 rounded-xl object-cover sm:h-[72px] sm:w-[92px]" loading="lazy" />
+      )}
       <span className="min-w-0 flex-1">
         <span className="block font-display text-lg font-bold leading-tight sm:text-xl">{title}</span>
         <span className="block text-xs leading-snug opacity-90 sm:text-sm">{desc}</span>
@@ -380,7 +443,7 @@ function Dashboard() {
           {/* 2. TRES BOTONES GIGANTES */}
           <nav aria-label="Elegí qué hacer" className="mt-5 grid gap-3 sm:grid-cols-3">
             <BigAction to="/curso/$lang" img={bannerCurso} title="Aprender" desc="Seguí tu curso con voces reales" tone="primary" />
-            <BigAction to="/juegos" img={coverKaraoke} title="Jugar" desc="13 juegos para aprender jugando" tone="accent" />
+            <BigAction to="/juegos" img={coverKaraoke} rotate={JUEGOS_ROTAN} title="Jugar" desc="13 juegos para aprender jugando" tone="accent" />
             <BigAction to="/juegos/palabra-del-dia" img={coverPalabra} title="Palabra del día" desc="Una palabra nueva, en 1 minuto" tone="card" />
           </nav>
 
