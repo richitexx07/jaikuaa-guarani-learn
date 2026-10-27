@@ -8,7 +8,9 @@ import { LanguageSwitcher } from "@/components/marketing/language-switcher";
 import heroImg from "@/assets/intl-hero.jpg";
 
 export type IntlCopy = {
-  lang: "pt" | "en";
+  lang: "pt" | "en" | "zh";
+  /** Aviso visible de traducción preliminar (pendiente de revisión nativa). */
+  notice?: string;
   eyebrow: string;
   title: string;
   titleAccent: string;
@@ -27,9 +29,9 @@ export type IntlCopy = {
 const ICONS = [Briefcase, AudioLines, Clock];
 
 export function IntlLanding({ c }: { c: IntlCopy }) {
-  useEffect(() => { setAppLang(c.lang); }, [c.lang]);
+  useEffect(() => { if (c.lang !== "zh") setAppLang(c.lang); }, [c.lang]);
   return (
-    <div lang={c.lang === "pt" ? "pt-BR" : "en"} className="flex min-h-screen flex-col bg-background">
+    <div lang={c.lang === "pt" ? "pt-BR" : c.lang === "zh" ? "zh-Hant-TW" : "en"} className="flex min-h-screen flex-col bg-background">
       <header className="w-full border-b border-border/50 bg-background">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-primary">
@@ -38,6 +40,11 @@ export function IntlLanding({ c }: { c: IntlCopy }) {
           <LanguageSwitcher current={c.lang} />
         </div>
       </header>
+      {c.notice && (
+        <div role="note" className="border-b border-border/50 bg-muted px-4 py-2 text-center text-xs font-medium text-muted-foreground">
+          {c.notice}
+        </div>
+      )}
 
       <main className="flex-1">
         <section className="relative overflow-hidden bg-primary text-primary-foreground">

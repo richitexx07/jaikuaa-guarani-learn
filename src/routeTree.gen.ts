@@ -30,6 +30,7 @@ import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as TecladoRouteImport } from './routes/teclado'
 import { Route as TerminosRouteImport } from './routes/terminos'
 import { Route as TurismoRouteImport } from './routes/turismo'
+import { Route as ZhRouteImport } from './routes/zh'
 import { Route as AuthenticatedAgroRouteImport } from './routes/_authenticated/agro'
 import { Route as AuthenticatedCertificadoRouteImport } from './routes/_authenticated/certificado'
 import { Route as AuthenticatedCuadernoRouteImport } from './routes/_authenticated/cuaderno'
@@ -195,6 +196,11 @@ const TerminosRoute = TerminosRouteImport.update({
 const TurismoRoute = TurismoRouteImport.update({
   id: '/turismo',
   path: '/turismo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ZhRoute = ZhRouteImport.update({
+  id: '/zh',
+  path: '/zh',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAgroRoute = AuthenticatedAgroRouteImport.update({
@@ -571,6 +577,7 @@ export interface FileRoutesByFullPath {
   '/teclado': typeof TecladoRoute
   '/terminos': typeof TerminosRoute
   '/turismo': typeof TurismoRoute
+  '/zh': typeof ZhRoute
   '/agro': typeof AuthenticatedAgroRoute
   '/certificado': typeof AuthenticatedCertificadoRoute
   '/cuaderno': typeof AuthenticatedCuadernoRoute
@@ -655,6 +662,7 @@ export interface FileRoutesByTo {
   '/teclado': typeof TecladoRoute
   '/terminos': typeof TerminosRoute
   '/turismo': typeof TurismoRoute
+  '/zh': typeof ZhRoute
   '/agro': typeof AuthenticatedAgroRoute
   '/certificado': typeof AuthenticatedCertificadoRoute
   '/cuaderno': typeof AuthenticatedCuadernoRoute
@@ -738,6 +746,7 @@ export interface FileRoutesById {
   '/teclado': typeof TecladoRoute
   '/terminos': typeof TerminosRoute
   '/turismo': typeof TurismoRoute
+  '/zh': typeof ZhRoute
   '/_authenticated/agro': typeof AuthenticatedAgroRoute
   '/_authenticated/certificado': typeof AuthenticatedCertificadoRoute
   '/_authenticated/cuaderno': typeof AuthenticatedCuadernoRoute
@@ -824,6 +833,7 @@ export interface FileRouteTypes {
     | '/teclado'
     | '/terminos'
     | '/turismo'
+    | '/zh'
     | '/agro'
     | '/certificado'
     | '/cuaderno'
@@ -908,6 +918,7 @@ export interface FileRouteTypes {
     | '/teclado'
     | '/terminos'
     | '/turismo'
+    | '/zh'
     | '/agro'
     | '/certificado'
     | '/cuaderno'
@@ -990,6 +1001,7 @@ export interface FileRouteTypes {
     | '/teclado'
     | '/terminos'
     | '/turismo'
+    | '/zh'
     | '/_authenticated/agro'
     | '/_authenticated/certificado'
     | '/_authenticated/cuaderno'
@@ -1076,6 +1088,7 @@ export interface RootRouteChildren {
   TecladoRoute: typeof TecladoRoute
   TerminosRoute: typeof TerminosRoute
   TurismoRoute: typeof TurismoRoute
+  ZhRoute: typeof ZhRoute
   ApiTutorRoute: typeof ApiTutorRoute
   StudioSplatRoute: typeof StudioSplatRoute
   VerificarCodeRoute: typeof VerificarCodeRoute
@@ -1229,6 +1242,13 @@ declare module '@tanstack/react-router' {
       path: '/turismo'
       fullPath: '/turismo'
       preLoaderRoute: typeof TurismoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zh': {
+      id: '/zh'
+      path: '/zh'
+      fullPath: '/zh'
+      preLoaderRoute: typeof ZhRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/agro': {
@@ -1860,6 +1880,7 @@ const rootRouteChildren: RootRouteChildren = {
   TecladoRoute: TecladoRoute,
   TerminosRoute: TerminosRoute,
   TurismoRoute: TurismoRoute,
+  ZhRoute: ZhRoute,
   ApiTutorRoute: ApiTutorRoute,
   StudioSplatRoute: StudioSplatRoute,
   VerificarCodeRoute: VerificarCodeRoute,
