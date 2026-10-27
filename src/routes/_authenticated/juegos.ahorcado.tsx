@@ -11,6 +11,7 @@ import { ACHEGETY, displayLetter, splitAchegety } from "@/lib/achegety";
 import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
 import type { GameWord } from "@/lib/games.functions";
+import { useGT } from "@/lib/i18n-games";
 
 export const Route = createFileRoute("/_authenticated/juegos/ahorcado")({
   head: () => ({
@@ -120,6 +121,7 @@ function Canasta({ quedan }: { quedan: number }) {
 
 function Board({ word, partida, lesson, onNext }: { word: GameWord; partida: Partida; lesson: number | null; onNext: () => void }) {
   const feedback = useGameFeedback();
+  const { g: tr } = useGT();
   const tokens = useMemo(() => splitAchegety(word.gn.trim()) ?? [], [word]);
   const [guessed, setGuessed] = useState<Set<string>>(new Set());
   const wrong = [...guessed].filter((g) => !tokens.includes(g)).length;
@@ -140,15 +142,15 @@ function Board({ word, partida, lesson, onNext }: { word: GameWord; partida: Par
   return (
     <div className="space-y-5">
       <div className="mx-auto w-fit max-w-full -rotate-1 rounded-lg px-6 py-3 text-center shadow-lg" style={{ background: "#5E3413", color: A.papel }}>
-        <div className="text-xs font-semibold opacity-75">Pista en español</div>
+        <div className="text-xs font-semibold opacity-75">{tr("hintEs")}</div>
         <div className="font-display text-2xl font-bold">{word.es}</div>
       </div>
 
       <div key={wrong} className={wrong ? "ah-shake" : ""}>
         <Canasta quedan={quedan} />
       </div>
-      <p className="-mt-2 text-center text-sm font-semibold" aria-label={`Chipas restantes: ${quedan}`}>
-        {quedan === 1 ? "¡Queda 1 chipa!" : `Quedan ${quedan} chipas`}
+      <p className="-mt-2 text-center text-sm font-semibold" aria-label={tr("chipasLeftLabel", { n: quedan })}>
+        {quedan === 1 ? tr("oneChipa") : tr("nChipas", { n: quedan })}
       </p>
 
       <div className="flex flex-wrap justify-center gap-1.5">
@@ -168,7 +170,7 @@ function Board({ word, partida, lesson, onNext }: { word: GameWord; partida: Par
 
       {done ? (
         <div className="space-y-3 rounded-3xl p-5 text-center shadow-xl" style={{ background: A.papel }}>
-          <p className="font-display text-3xl font-bold">{won ? "¡Muy bien!" : "Se acabaron las chipas"}</p>
+          <p className="font-display text-3xl font-bold">{won ? tr("wellDone") : tr("outOfChipas")}</p>
           <div className="flex flex-wrap items-center justify-center gap-2 text-lg">
             <span className="font-display text-2xl font-bold" style={{ color: A.verde }}>{word.gn}</span>
             {word.hasAudio && <SpeakerButton gn={word.gn} size="md" />}
@@ -176,7 +178,7 @@ function Board({ word, partida, lesson, onNext }: { word: GameWord; partida: Par
           </div>
           <p className="font-bold" style={{ color: A.verde }}>+{won ? XP_WIN : XP_LOSS} XP</p>
           <div className="flex flex-wrap justify-center gap-2">
-            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: A.rojo }}>Otra palabra</button>
+            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: A.rojo }}>{tr("anotherWord")}</button>
           </div>
           <RetoFinal partida={partida} puntaje={won ? LIVES - wrong : 0} extra={lesson === null ? undefined : String(lesson)} />
         </div>

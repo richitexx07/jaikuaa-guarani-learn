@@ -43,6 +43,13 @@ export const GT = {
   pairsFound: { es: "Pares encontrados: {a} de {b}", pt: "Pares encontrados: {a} de {b}", en: "Pairs found: {a} of {b}", de: "Gefundene Paare: {a} von {b}", fr: "Paires trouvées : {a} sur {b}", zh: "已找到配對：{a} / {b}" },
   memoryDone: { es: "¡Tejiste los {p} pares en {a} intentos!", pt: "Você formou os {p} pares em {a} tentativas!", en: "You matched all {p} pairs in {a} attempts!", de: "Du hast alle {p} Paare in {a} Versuchen gefunden!", fr: "Tu as trouvé les {p} paires en {a} essais !", zh: "你用 {a} 次嘗試完成了 {p} 組配對！" },
   stars: { es: "{n} de 3 estrellas", pt: "{n} de 3 estrelas", en: "{n} of 3 stars", de: "{n} von 3 Sternen", fr: "{n} étoiles sur 3", zh: "3 顆星中的 {n} 顆" },
+  hintEs: { es: "Pista en español", pt: "Dica em espanhol", en: "Hint in Spanish", de: "Hinweis auf Spanisch", fr: "Indice en espagnol", zh: "西班牙語提示" },
+  chipasLeftLabel: { es: "Chipas restantes: {n}", pt: "Chipas restantes: {n}", en: "Chipas left: {n}", de: "Verbleibende Chipas: {n}", fr: "Chipas restantes : {n}", zh: "剩餘 Chipa：{n}" },
+  oneChipa: { es: "¡Queda 1 chipa!", pt: "Resta 1 chipa!", en: "Only 1 chipa left!", de: "Nur noch 1 Chipa!", fr: "Plus qu'une chipa !", zh: "只剩 1 個 Chipa！" },
+  nChipas: { es: "Quedan {n} chipas", pt: "Restam {n} chipas", en: "{n} chipas left", de: "Noch {n} Chipas", fr: "Il reste {n} chipas", zh: "還剩 {n} 個 Chipa" },
+  wellDone: { es: "¡Muy bien!", pt: "Muito bem!", en: "Well done!", de: "Sehr gut!", fr: "Très bien !", zh: "太棒了！" },
+  outOfChipas: { es: "Se acabaron las chipas", pt: "Acabaram as chipas", en: "You ran out of chipas", de: "Keine Chipas mehr", fr: "Plus de chipas", zh: "Chipa 用完了" },
+  anotherWord: { es: "Otra palabra", pt: "Outra palavra", en: "Another word", de: "Noch ein Wort", fr: "Un autre mot", zh: "換一個詞" },
 } satisfies Record<string, L>;
 
 export type GKey = keyof typeof GT;
