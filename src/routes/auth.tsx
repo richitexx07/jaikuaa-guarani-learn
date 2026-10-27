@@ -14,6 +14,7 @@ import { cleanRefCode, REF_STORAGE_KEY } from "@/lib/ambassador";
 import { createAfterLoginRedirect, peekAfterLogin } from "@/lib/after-login";
 import { EarlyAccessBadge } from "@/components/early-access-badge";
 import { NandutiDisc } from "@/components/nanduti-disc";
+import { RespaldosStrip } from "@/components/respaldos-strip";
 import jaiSaluda from "@/assets/jai/jai-saluda.webp";
 import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 
@@ -289,15 +290,7 @@ function AuthPage() {
           </p>
 
           <TrustBadges className="mt-8" />
-          {/* Solo respaldos vigentes (Senado, Diputados, SPL). El Ateneo y el ISL se suman cuando estén firmados y validados. */}
-          <p className="mt-4 text-center text-[11px] leading-relaxed text-muted-foreground">
-            Declarada de interés nacional y educativo por la Cámara de Senadores (Declaración N.° 547/2026) y por la
-            Cámara de Diputados (Declaración N.° 2001), y de interés lingüístico por la Secretaría de Políticas
-            Lingüísticas (Resolución N.° 116/2026).{" "}
-            <Link to="/respaldos" className="font-medium text-accent hover:underline">
-              Ver respaldos
-            </Link>
-          </p>
+          <RespaldosStrip className="mt-8" />
         </div>
       </main>
       <SiteFooter />

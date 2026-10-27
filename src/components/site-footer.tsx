@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Lock } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 
 /** Bandera del Paraguay en SVG: se ve igual en cualquier celular o computadora. */
@@ -73,7 +74,7 @@ export function TrustBadges({ className = "" }: { className?: string }) {
   return (
     <div className={`flex flex-wrap items-center justify-center gap-2 ${className}`}>
       <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
-        <span aria-hidden>🔒</span> Tus datos están protegidos
+        <Lock className="h-3 w-3" aria-hidden /> Tus datos están protegidos
       </span>
       <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
         <FlagParaguay className="h-3 w-4" /> Hecho en Paraguay

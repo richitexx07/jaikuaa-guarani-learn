@@ -9,6 +9,7 @@ import { getFoundingSponsors } from "@/lib/sponsors.functions";
 import { DisplayToggles } from "@/components/display-toggles";
 import { EarlyAccessBadge } from "@/components/early-access-badge";
 import { NandutiDisc } from "@/components/nanduti-disc";
+import { RespaldosStrip } from "@/components/respaldos-strip";
 import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 import bannerCurso from "@/assets/banners/banner-curso.webp";
 import bannerEscolar from "@/assets/banners/banner-escolar.webp";
@@ -45,6 +46,9 @@ function Index() {
         <Adentro />
         <LiveAudioPreview />
         <FoundingSponsors />
+        <div className="border-t border-border/50 px-4 py-12 sm:px-6">
+          <RespaldosStrip />
+        </div>
       </main>
       <Footer />
     </div>
@@ -106,10 +110,7 @@ function Hero() {
             </Button>
           </div>
           <p className="mx-auto mt-6 max-w-md text-xs text-muted-foreground lg:mx-0">
-            No vendemos tus datos ni los compartimos con terceros para publicidad.{" "}
-            <Link to="/respaldos" className="font-medium text-accent hover:underline">
-              Ver respaldos institucionales
-            </Link>
+            No vendemos tus datos ni los compartimos con terceros para publicidad.
           </p>
         </div>
 
