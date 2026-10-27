@@ -73,6 +73,7 @@ const SECCIONES = [
       "Doble firma humana: quien propone una palabra no puede ser quien la valida (control en servidor y restricción en la base).",
       "Certificados con código aleatorio, verificables en una página pública que muestra solo los datos impresos.",
       "Escaneos de seguridad antes de cada publicación. Juegos sin chat libre, pensados para menores.",
+      "Certificados: el servidor exige lecciones publicadas, hechas en orden y con un tope diario antes de contarlas. Planillas descargadas protegidas contra fórmulas. Docentes sin habilitación vigente pierden acceso a sus aulas.",
     ],
   },
   {
@@ -100,12 +101,25 @@ const SECCIONES = [
     icon: Globe,
     titulo: "Alcance internacional",
     items: [
-      "Portadas propias en portugués (/pt) e inglés (/en), pensadas para inversores, diplomacia, turismo y extranjeros que viven o hacen negocios en Paraguay.",
-      "Selector de idioma ES / PT / EN en la portada, en el ingreso y dentro de la app: el usuario puede cambiar de idioma en cualquier momento y la elección queda recordada en su dispositivo.",
-      "Interfaz multi-idioma (i18n): registro, inicio de sesión, panel principal y menú inferior en castellano, portugués e inglés. Solo se traducen botones y textos de sistema; el contenido en guaraní lo siguen validando los docentes.",
-      "Próxima etapa: lecciones con explicaciones en portugués e inglés sobre palabras ya validadas, con revisión de especialistas.",
-      "Posicionamiento en buscadores por idioma: cada portada tiene su propio título, descripción y enlaces alternos (hreflang) para que Google muestre la versión correcta según el idioma de quien busca.",
+      "Portadas propias en seis idiomas: castellano, portugués (/pt), inglés (/en), alemán (/de), francés (/fr) y chino tradicional (/zh), pensadas para inversores, diplomacia, turismo y extranjeros que viven o hacen negocios en Paraguay.",
+      "Selector de idioma en la portada, en el ingreso y dentro de la app: se puede cambiar en cualquier momento y la elección queda recordada en el dispositivo.",
+      "Interfaz completa en los seis idiomas: ingreso, panel, curso y lecciones, logros, ranking, glosario, certificado, embajadores, trivia, agro, guaraní escolar, páginas públicas y los 16 juegos (reglas, botones y resultados).",
+      "El contenido en guaraní no se traduce automáticamente: significados, preguntas y notas culturales siguen en castellano con el aviso «En validación» hasta que lo revisen especialistas. Alemán, francés y chino son traducciones preliminares, pendientes de revisión nativa.",
+      "Privacidad y Términos: el castellano es la versión oficial; en otros idiomas se muestra un aviso.",
+      "Posicionamiento en buscadores por idioma: cada portada tiene su propio título, descripción y enlaces alternos (hreflang).",
       "Base para el modelo comercial: el guaraní es gratis para paraguayos; el público internacional es el segmento pago.",
+    ],
+  },
+  {
+    icon: Globe,
+    titulo: "Modelo de negocio",
+    items: [
+      "Guaraní básico gratis para todos los paraguayos. Pagan especializaciones, instituciones, auspiciantes y el público extranjero.",
+      "Público internacional: con la app en seis idiomas, cursos y certificados para extranjeros se vuelven el segmento pago principal. Cobro internacional: pendiente de integrar la pasarela de pagos.",
+      "Instituciones y empresas: grupos, aulas y encargos de vocabulario por rubro (por ejemplo, agro), con revisión pagada a docentes especialistas.",
+      "Auspiciantes: espacios nativos dentro de juegos y desafíos, con informe de impresiones. Sin sorteos ni premios hasta tener los permisos.",
+      "Industrias culturales: asesoría lingüística para producciones audiovisuales, editoriales y turismo receptivo, junto con especialistas en la lengua.",
+      "Embajadores: programa de referidos para que la comunidad comparta la plataforma; el esquema de incentivo está en definición.",
     ],
   },
 ] as const;
@@ -114,6 +128,7 @@ const RESPALDOS = [
   "Honorable Cámara de Senadores — Declaración 547/2026.",
   "Honorable Cámara de Diputados — Declaración N.° 2001 (Exp. 95904).",
   "Secretaría de Políticas Lingüísticas — Resolución 116/2026.",
+  "Marca ante la DINAPI: en trámite — Solicitud N.° 2658897.",
   "Jaikuaa desarrolla un plan piloto con el Ateneo de Lengua y Cultura Guaraní (convenio del 25/09/2026).",
 ] as const;
 

@@ -1,3 +1,4 @@
+import { csvCell } from "@/lib/csv-safe";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -94,7 +95,7 @@ function NotebookPage() {
         x.lastActive ?? "",
       ]),
     ];
-    const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const csv = rows.map((r) => r.map((c) => csvCell(c)).join(",")).join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv" }));
     a.download = `cuaderno-${d.cohort ?? "grupo"}.csv`;

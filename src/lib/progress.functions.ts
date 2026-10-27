@@ -28,6 +28,60 @@ function shiftDay(iso: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+/** Tope de lecciones nuevas de guaraní por usuario en 24 horas. */
+export const MAX_NEW_LESSONS_PER_DAY = 10;
+
+/**
+ * Regla del servidor para lecciones de guaraní (cuentan para el certificado):
+ * la lección debe existir publicada, se hacen en orden (la anterior ya hecha)
+ * y hay un tope de lecciones nuevas por día (no traba el envío sin internet).
+ */
+export function checkLessonOrder(
+  n: number,
+  published: Set<number>,
+  done: { n: number; at: string }[],
+  now: number,
+): string | null {
+  if (!published.has(n)) return "Lección no válida";
+  const doneSet = new Set(done.map((d) => d.n));
+  if (doneSet.has(n)) return null; // repasar una lección ya hecha siempre se permite
+  const prev = [...published].filter((x) => x < n).sort((a, b) => b - a)[0];
+  if (prev !== undefined && !doneSet.has(prev)) return "Primero completá la lección anterior";
+  const firstByLesson = new Map<number, number>();
+  for (const d of done) {
+    const t = Date.parse(d.at);
+    if (!Number.isFinite(t)) continue;
+    const prevT = firstByLesson.get(d.n);
+    if (prevT === undefined || t < prevT) firstByLesson.set(d.n, t);
+  }
+  const recent = [...firstByLesson.values()].filter((t) => now - t < 24 * 3600 * 1000).length;
+  if (recent >= MAX_NEW_LESSONS_PER_DAY) return "Llegaste al máximo de lecciones nuevas por hoy";
+  return null;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function assertGuaraniLessonAllowed(db: any, userId: string, sourceRef: string) {
+  const m = /^guarani:(\d{1,4})$/.exec(sourceRef);
+  if (!m) throw new Error("Lección no válida");
+  const n = Number(m[1]);
+  const [{ data: lessons }, { data: done }] = await Promise.all([
+    db.from("lessons").select("sort_order").eq("status", "published").limit(1000),
+    db
+      .from("xp_transactions")
+      .select("source_ref, created_at")
+      .eq("user_id", userId)
+      .eq("source", "lesson")
+      .like("source_ref", "guarani:%")
+      .limit(5000),
+  ]);
+  const published = new Set<number>((lessons ?? []).map((l: { sort_order: number }) => l.sort_order));
+  const rows = ((done ?? []) as { source_ref: string | null; created_at: string }[])
+    .map((d) => ({ n: Number(String(d.source_ref ?? "").split(":")[1]), at: d.created_at }))
+    .filter((d) => Number.isFinite(d.n));
+  const err = checkLessonOrder(n, published, rows, Date.now());
+  if (err) throw new Error(err);
+}
+
 export type ServerStats = {
   userId: string;
   xp: number;
@@ -92,6 +146,10 @@ export const recordActivity = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (data.source === "game" && !GAME_REFS.has(data.sourceRef)) throw new Error("Juego no válido");
+    const isGuarani = data.source === "lesson" && data.isGuaraniLesson;
+    if (isGuarani) {
+      await assertGuaraniLessonAllowed(supabaseAdmin, context.userId, data.sourceRef);
+    }
     const amount = Math.min(data.xp, XP_CAP[data.source] ?? 0);
     // Visitas: como máximo una por día por usuario (sync_id fijo por fecha).
     const syncId = data.source === "visit" ? `visit:${asuncionToday()}` : data.syncId;
