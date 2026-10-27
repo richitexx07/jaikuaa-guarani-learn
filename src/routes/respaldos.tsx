@@ -105,7 +105,7 @@ function RespaldosPage() {
 
           <div className="mt-8 flex justify-center">
             <Button variant="cta" size="lg" asChild>
-              <Link to="/comenzar">Empezar — Libre acceso</Link>
+              <Link to="/comenzar">Empezar gratis</Link>
             </Button>
           </div>
         </div>

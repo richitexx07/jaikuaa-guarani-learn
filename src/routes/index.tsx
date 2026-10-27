@@ -95,15 +95,15 @@ function Hero() {
             <span className="text-accent">en guaraní.</span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl lg:mx-0">
-            Desafíos diarios, juegos y voces reales. Plataforma paraguaya para aprender guaraní.
+            Un ratito por día, desde el celular. Lecciones cortas, juegos y voces de paraguayos de verdad.
           </p>
           <p className="mt-3 text-sm font-medium text-primary/80">
-            +109 palabras con voz humana paraguaya 🇵🇾
+            Ya son 109 palabras grabadas por paraguayos, y seguimos grabando.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
             <Button variant="cta" size="lg" asChild>
-              <Link to="/comenzar">Empezar — Libre acceso</Link>
+              <Link to="/comenzar">Empezar gratis</Link>
             </Button>
             <Button variant="ghost" size="lg" asChild>
               <Link to="/auth" search={{ mode: "login" }}>Iniciar sesión</Link>
@@ -133,9 +133,9 @@ function Hero() {
 }
 
 const ADENTRO = [
-  { img: bannerCurso, title: "Un curso paso a paso", desc: "Lecciones cortas con voces humanas paraguayas, a tu ritmo." },
-  { img: coverKaraoke, title: "15 juegos", desc: "Karaoke, cocina, penales, duelos y guaraní para el trabajo." },
-  { img: bannerEscolar, title: "Guaraní Escolar", desc: "Organizado por grado, para entender y aprobar en la escuela." },
+  { img: bannerCurso, title: "Un curso paso a paso", desc: "Lecciones cortas, para hacer en la parada del colectivo o en la ronda de tereré." },
+  { img: coverKaraoke, title: "15 juegos", desc: "Karaoke con arpa, penales, cocina paraguaya, duelos con amigos y guaraní para el trabajo." },
+  { img: bannerEscolar, title: "Guaraní Escolar", desc: "Por grado, para entender la tarea y llegar tranquilo al examen." },
 ];
 
 function Adentro() {
@@ -143,7 +143,7 @@ function Adentro() {
     <section className="px-4 pb-16 sm:px-6">
       <div className="mx-auto max-w-6xl">
         <h2 className="text-center font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-          Lo que vas a encontrar
+          Adentro de Jaikuaa
         </h2>
         <div className="mt-8 grid gap-5 md:grid-cols-3">
           {ADENTRO.map((a) => (
@@ -176,10 +176,10 @@ function LiveAudioPreview() {
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 text-center">
           <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-            Escuchá guaraní real 🔊
+            Escuchá cómo suena
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Voces humanas paraguayas. Tocá una palabra para escucharla.
+            Grabado por paraguayos, no por una máquina. Tocá una palabra.
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

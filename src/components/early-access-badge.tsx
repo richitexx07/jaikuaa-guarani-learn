@@ -11,11 +11,9 @@ export function EarlyAccessBadge({ className = "" }: { className?: string }) {
         <span className="flex-1 bg-primary" />
       </div>
       <div className="px-4 py-2.5">
-        <p className="font-display text-xs font-bold uppercase tracking-widest text-primary">
-          Acceso anticipado · Comunidad pionera
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Probá Jaikuaa antes del lanzamiento oficial, aprendé gratis y acumulá tus XP desde ahora.
+        <p className="text-sm text-muted-foreground">
+          <span className="font-semibold text-primary">Todavía no lanzamos oficialmente.</span> Igual ya podés usarlo
+          gratis, y lo que aprendas desde hoy queda guardado.
         </p>
       </div>
     </div>
