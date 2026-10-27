@@ -72,7 +72,7 @@ export function JaiLauncher({ launcherRef, onOpen }: { launcherRef: RefObject<HT
         busy.current = false;
         play("flip", onOpen);
       }}
-      aria-label="Abrir a Jai, tu compañero de Jaikuaa"
+      aria-label={tx("jaiOpen")}
       className="jai-enter group relative ml-auto block h-16 w-16 rounded-full [perspective:600px] focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-24 sm:w-24"
     >
       <span className="jai-halo absolute inset-x-2 bottom-1 top-6 rounded-full" aria-hidden />

@@ -15,6 +15,8 @@ import jaiAtencion from "@/assets/jai-atencion-pro.webp";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import { celebrate } from "@/lib/confetti";
 import { EarlyAccessBadge } from "@/components/early-access-badge";
+import { AppLanguageToggle } from "@/components/app-language-toggle";
+import { useTX, type TXKey } from "@/lib/i18n-pages";
 
 export const Route = createFileRoute("/comenzar")({
   ssr: false,
@@ -66,8 +68,9 @@ function JaiCharacter({ src = jaiBienvenida, size = 176, alt = "Jai, el jaguaré
 
 /** Avance en tres pasos: barritas que se van llenando. */
 function Progress({ step }: { step: 1 | 2 | 3 }) {
+  const tx = useTX();
   return (
-    <div className="flex items-center gap-2" aria-label={`Paso ${step} de 3`}>
+    <div className="flex items-center gap-2" aria-label={tx("czStep", { n: step })}>
       {[1, 2, 3].map((n) => (
         <span key={n} className={`h-2 w-10 rounded-full transition-colors ${n <= step ? "bg-accent" : "bg-muted"}`} />
       ))}
@@ -76,19 +79,21 @@ function Progress({ step }: { step: 1 | 2 | 3 }) {
 }
 
 function SkipLink({ onSkip }: { onSkip: () => void }) {
+  const tx = useTX();
   return (
     <button
       type="button"
       onClick={onSkip}
       className="text-xs text-muted-foreground/70 underline-offset-4 hover:text-muted-foreground hover:underline"
     >
-      Saltar
+      {tx("czSkip")}
     </button>
   );
 }
 
 function Onboarding() {
   const navigate = useNavigate();
+  const tx = useTX();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [motivation, setMotivation] = useState<Motivation | null>(null);
   const [lessonIdx, setLessonIdx] = useState(0);
@@ -125,16 +130,16 @@ function Onboarding() {
       <div className="mx-auto flex w-full max-w-lg flex-col gap-6">
         <header className="flex items-center justify-between">
           <Progress step={step} />
-          {step < 3 || !lessonDone ? <SkipLink onSkip={skip} /> : <span />}
+          <div className="flex items-center gap-3"><AppLanguageToggle />{step < 3 || !lessonDone ? <SkipLink onSkip={skip} /> : null}</div>
         </header>
 
         {step === 1 && (
           <section className="flex flex-col items-center gap-6 text-center">
             <JaiCharacter size={150} />
             <h1 className="font-display text-2xl font-semibold leading-snug text-primary sm:text-3xl">
-              ¡Mba'éichapa! Soy Jai, el jaguaréte de Jaikuaa.
+              {tx("czHi")}
               <br />
-              <span className="text-foreground">¿Para qué querés aprender guaraní?</span>
+              <span className="text-foreground">{tx("czWhy")}</span>
             </h1>
             <EarlyAccessBadge className="-mt-2" />
             <div className="flex w-full flex-col gap-3">
@@ -146,7 +151,7 @@ function Onboarding() {
                   className="flex min-h-[68px] w-full items-center gap-4 rounded-2xl border border-border bg-card px-3 py-2 text-left text-base font-semibold text-foreground shadow-sm transition hover:border-primary/40 hover:shadow-md active:scale-[0.98]"
                 >
                   <img src={o.img} alt="" className="h-14 w-14 shrink-0 rounded-xl bg-primary/5 object-contain p-0.5" />
-                  <span className="flex-1">{o.label}</span>
+                  <span className="flex-1">{tx(`czO.${o.id}` as TXKey)}</span>
                   <span className="text-xl text-muted-foreground" aria-hidden>›</span>
                 </button>
               ))}
@@ -158,10 +163,10 @@ function Onboarding() {
           <section className="flex flex-col items-center gap-6 text-center">
             <JaiCharacter src={jaiAplaude} alt="Jai aplaude" />
             <p className="rounded-2xl bg-card px-6 py-5 font-display text-lg leading-relaxed text-foreground shadow-sm sm:text-xl">
-              {REACTIONS[motivation]}
+              {tx(`czR.${motivation}` as TXKey)}
             </p>
             <Button variant="cta" size="lg" className="w-full" onClick={() => setStep(3)}>
-              Empezar
+              {tx("czStart")}
             </Button>
           </section>
         )}
@@ -171,7 +176,7 @@ function Onboarding() {
             <JaiCharacter src={jaiProfe} size={128} alt="Jai, el profe" />
             <div className="w-full rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
               <p className="mb-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Palabra {lessonIdx + 1} de {MINI_LESSON.length}
+                {tx("czWord", { a: lessonIdx + 1, b: MINI_LESSON.length })}
               </p>
               <div className="flex flex-col items-center gap-3">
                 <div className="flex items-center gap-3">
@@ -180,7 +185,7 @@ function Onboarding() {
                   </span>
                   <SpeakerButton gn={MINI_LESSON[lessonIdx].gn} size="md" />
                 </div>
-                <p className="text-base text-muted-foreground">{MINI_LESSON[lessonIdx].es}</p>
+                <p className="text-base text-muted-foreground"><span className="sr-only">{tx("czMeaning")}: </span>{MINI_LESSON[lessonIdx].es}</p>
               </div>
               <Button
                 variant="cta"
@@ -191,7 +196,7 @@ function Onboarding() {
                   else completeLesson();
                 }}
               >
-                {lessonIdx < MINI_LESSON.length - 1 ? "Siguiente" : "Terminar"}
+                {lessonIdx < MINI_LESSON.length - 1 ? tx("czNext") : tx("czFinish")}
               </Button>
             </div>
           </section>
@@ -201,19 +206,19 @@ function Onboarding() {
           <section className="flex flex-col items-center gap-6 text-center">
             <JaiCharacter src={jaiFesteja} alt="Jai festeja" />
             <p className="font-display text-2xl font-semibold leading-snug text-primary sm:text-3xl">
-              ¡Ganaste tu primera racha!
+              {tx("czStreak")}
               <br />
-              <span className="text-foreground">Volvé mañana para seguir.</span>
+              <span className="text-foreground">{tx("czTomorrow")}</span>
             </p>
             <Button variant="cta" size="lg" className="w-full" onClick={finishOnboarding}>
-              Crear mi cuenta y guardar mi progreso
+              {tx("czCreate")}
             </Button>
             <button
               type="button"
               onClick={finishOnboarding}
               className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
             >
-              Ahora no
+              {tx("czLater")}
             </button>
           </section>
         )}
