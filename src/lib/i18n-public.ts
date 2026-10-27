@@ -252,6 +252,18 @@ const T = {
   "auRu4": ["Las marcas no intervienen en el contenido en guaraní: lo elaboran y validan especialistas en la lengua.", "As marcas não interferem no conteúdo em guarani: ele é elaborado e validado por especialistas na língua.", "Brands do not influence Guarani content: it is prepared and validated by language specialists.", "Marken greifen nicht in Guaraní-Inhalte ein: Diese erstellen und prüfen Sprachfachleute.", "Les marques n'interviennent pas dans le contenu en guarani : il est élaboré et validé par des spécialistes.", "品牌不介入瓜拉尼語內容：內容由語言專家製作與驗證。"],
   "auProg": ["Programa Auspiciantes Fundadores", "Programa Patrocinadores Fundadores", "Founding Sponsors Program", "Programm Gründungssponsoren", "Programme Partenaires fondateurs", "創始贊助商計畫"],
   "auProgT": ["Un grupo reducido de empresas paraguayas que acompañan el lanzamiento de Jaikuaa. Conversemos sobre el espacio que mejor se ajusta a tu marca.", "Um grupo reduzido de empresas paraguaias que acompanham o lançamento do Jaikuaa. Vamos conversar sobre o espaço que melhor se ajusta à sua marca.", "A small group of Paraguayan companies supporting Jaikuaa's launch. Let's talk about the space that best fits your brand.", "Eine kleine Gruppe paraguayischer Unternehmen, die den Start von Jaikuaa begleiten. Sprechen wir über die passende Fläche für deine Marke.", "Un petit groupe d'entreprises paraguayennes qui accompagnent le lancement de Jaikuaa. Parlons de l'espace qui convient le mieux à votre marque.", "一小群支持 Jaikuaa 上線的巴拉圭企業。一起討論最適合你品牌的版位。"],
+  // Pie y botón volver
+  "ftMade": ["Hecho en Paraguay", "Feito no Paraguai", "Made in Paraguay", "Made in Paraguay", "Fait au Paraguay", "巴拉圭製作"],
+  "ftLove": ["con amor por nuestra lengua.", "com amor pela nossa língua.", "with love for our language.", "mit Liebe zu unserer Sprache.", "avec amour pour notre langue.", "滿懷對我們語言的愛。"],
+  "ftBacking": ["Respaldos", "Respaldos", "Backing", "Unterstützung", "Soutiens", "支持"],
+  "ftPriv": ["Política de Privacidad", "Política de Privacidade", "Privacy Policy", "Datenschutz", "Politique de confidentialité", "隱私政策"],
+  "ftTerms": ["Términos y Condiciones", "Termos e Condições", "Terms and Conditions", "AGB", "Conditions générales", "條款與條件"],
+  "ftSlogan": ["Aprendé · Hablá · Ñane Ñe'ẽ", "Aprenda · Fale · Ñane Ñe'ẽ", "Learn · Speak · Ñane Ñe'ẽ", "Lerne · Sprich · Ñane Ñe'ẽ", "Apprenez · Parlez · Ñane Ñe'ẽ", "學習 · 說 · Ñane Ñe'ẽ"],
+  "ftRights": ["Todos los derechos reservados.", "Todos os direitos reservados.", "All rights reserved.", "Alle Rechte vorbehalten.", "Tous droits réservés.", "版權所有。"],
+  "ftSafe": ["Tus datos están protegidos", "Seus dados estão protegidos", "Your data is protected", "Deine Daten sind geschützt", "Vos données sont protégées", "你的資料受到保護"],
+  "flagLabel": ["Bandera del Paraguay", "Bandeira do Paraguai", "Flag of Paraguay", "Flagge Paraguays", "Drapeau du Paraguay", "巴拉圭國旗"],
+  "bbBack": ["Volver", "Voltar", "Back", "Zurück", "Retour", "返回"],
+  "bbBackAria": ["Volver a la pantalla anterior", "Voltar à tela anterior", "Back to the previous screen", "Zurück zum vorherigen Bildschirm", "Retour à l'écran précédent", "返回上一個畫面"],
 } satisfies Record<string, Row>;
 
 export type PubKey = keyof typeof T;
