@@ -9,6 +9,8 @@ import { recordCompletion } from "@/lib/gamification";
 import { SONGS, type Song } from "@/lib/juegos-contenido";
 import { applyKaraoke } from "@/lib/juego-textos";
 import { useJuegoTextos } from "@/lib/use-juego-textos";
+import { louderBlob } from "@/lib/audio-louder";
+import { renderArpa, sesionDeAudio } from "@/lib/karaoke-arpa";
 import { Mic, Square, Play } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/juegos/karaoke")({
@@ -25,19 +27,35 @@ export const Route = createFileRoute("/_authenticated/juegos/karaoke")({
   component: Karaoke,
 });
 
+/** Arpa en vivo: solo se usa si el celular no pudo armar la pista de audio. */
 class Arpa {
   ctx: AudioContext | null = null;
+  out: AudioNode | null = null;
+  /** Se llama al tocar «Cantemos» (los celulares solo dejan sonar después de un toque). */
+  unlock() {
+    try {
+      if (!this.ctx) {
+        const a = new AudioContext();
+        // Más volumen, con un compresor para que no se rompa el sonido.
+        const master = a.createGain(); master.gain.value = 3.5;
+        const comp = a.createDynamicsCompressor();
+        master.connect(comp).connect(a.destination);
+        this.ctx = a; this.out = master;
+      }
+      void this.ctx.resume();
+    } catch { /* audio opcional */ }
+  }
   pluck(freq: number, when = 0, vol = 0.07) {
     try {
-      const a = this.ctx ?? (this.ctx = new AudioContext());
-      void a.resume();
+      this.unlock();
+      const a = this.ctx!;
       const t = a.currentTime + when;
       const o = a.createOscillator(), g = a.createGain();
       o.type = "triangle"; o.frequency.value = freq;
       g.gain.setValueAtTime(0.0001, t);
       g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
       g.gain.exponentialRampToValueAtTime(0.0001, t + 1.1);
-      o.connect(g).connect(a.destination); o.start(t); o.stop(t + 1.2);
+      o.connect(g).connect(this.out ?? a.destination); o.start(t); o.stop(t + 1.2);
     } catch { /* audio opcional */ }
   }
   beat(chord: number[], beatSec: number) {
@@ -45,7 +63,7 @@ class Arpa {
     this.pluck(chord[0] / 2, 0, 0.09);
     this.pluck(chord[2] * 2, beatSec * 0.5, 0.035);
   }
-  stop() { void this.ctx?.close(); this.ctx = null; }
+  stop() { void this.ctx?.close(); this.ctx = null; this.out = null; }
 }
 
 /* Paleta del escenario: noche violeta, reflectores magenta y oro, arpa de madera. */
@@ -210,22 +228,72 @@ function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partid
   const total = lead + timeline.length;
   const done = beat >= total;
 
-  useEffect(() => () => arpa.current.stop(), []);
+  // La pista del arpa se arma apenas se abre la canción, para tenerla lista al tocar «Cantemos».
+  const [pista, setPista] = useState<string | null>(null);
+  useEffect(() => {
+    let vivo = true;
+    let url: string | null = null;
+    void renderArpa(song.chords, total, beatSec).then((b) => {
+      if (!vivo || !b) return;
+      url = URL.createObjectURL(b);
+      setPista(url);
+    });
+    return () => { vivo = false; if (url) URL.revokeObjectURL(url); };
+  }, [song, total, beatSec]);
+  // «audio»: el juego sigue el reloj de la pista. «vivo»: arpa en vivo con un temporizador.
+  const [reloj, setReloj] = useState<"audio" | "vivo">("vivo");
+  const audio = useRef<HTMLAudioElement | null>(null);
+  const procesado = useRef(-1);
+
+  useEffect(() => () => { arpa.current.stop(); audio.current?.pause(); audio.current = null; }, []);
   useEffect(() => {
     if (!playing) return;
+    const a = audio.current;
+    if (reloj === "audio" && a) {
+      const id = setInterval(() => {
+        const b = Math.floor(a.currentTime / beatSec);
+        setBeat((prev) => (b > prev ? b : prev));
+      }, 40);
+      return () => clearInterval(id);
+    }
     const id = setInterval(() => setBeat((b) => b + 1), beatSec * 1000);
     return () => clearInterval(id);
-  }, [playing, beatSec]);
+  }, [playing, beatSec, reloj]);
   useEffect(() => {
     if (!playing || beat < 0) return;
-    if (beat >= total) { setPlaying(false); return; }
-    arpa.current.beat(song.chords[Math.floor(beat / 2) % song.chords.length], beatSec);
-    // Si el hueco pasó sin respuesta, cuenta como fallo.
-    const pos = timeline[beat - lead];
-    if (pos && pos.word === -1 && answers[pos.line] === undefined) {
-      setAnswers((a) => ({ ...a, [pos.line]: "miss" })); setCombo(0); feedback("error");
+    // Con la pista, el reloj puede saltar un pulso: se revisan todos los que pasaron.
+    const hasta = Math.min(beat, total - 1);
+    const fallos: number[] = [];
+    for (let b = procesado.current + 1; b <= hasta; b++) {
+      // Si el hueco pasó sin respuesta, cuenta como fallo.
+      const pos = timeline[b - lead];
+      if (pos && pos.word === -1 && answers[pos.line] === undefined) fallos.push(pos.line);
     }
+    procesado.current = Math.max(procesado.current, hasta);
+    if (reloj === "vivo" && beat < total) arpa.current.beat(song.chords[Math.floor(beat / 2) % song.chords.length], beatSec);
+    if (fallos.length) {
+      setAnswers((a) => { const n = { ...a }; for (const l of fallos) if (n[l] === undefined) n[l] = "miss"; return n; });
+      setCombo(0); feedback("error");
+    }
+    if (beat >= total) setPlaying(false);
   }, [beat]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function empezar() {
+    sesionDeAudio("playback");
+    procesado.current = -1;
+    if (pista) {
+      const a = new Audio(pista);
+      audio.current = a;
+      setReloj("audio");
+      // Si el celular no deja reproducir, sigue con el arpa en vivo sin cortar el juego.
+      a.play().catch(() => { audio.current = null; arpa.current.unlock(); setReloj("vivo"); });
+    } else {
+      arpa.current.unlock();
+      setReloj("vivo");
+    }
+    setBeat(0);
+    setPlaying(true);
+  }
 
   const cur = beat >= lead ? timeline[beat - lead] : undefined;
   const lineIdx = cur?.line ?? (beat < lead ? 0 : song.lines.length - 1);
@@ -372,7 +440,7 @@ function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partid
           type="button"
           className="flex h-16 w-full items-center justify-center gap-3 rounded-2xl font-display text-xl font-bold shadow-lg transition active:scale-[.98]"
           style={{ background: K.oro, color: K.noche }}
-          onClick={() => { setBeat(0); setPlaying(true); arpa.current.beat(song.chords[0], beatSec); }}
+          onClick={empezar}
         >
           <Play className="h-6 w-6" fill="currentColor" /> ¡Ñapurahéi! (Cantemos)
         </button>
@@ -389,12 +457,19 @@ function Recorder({ song }: { song: Song }) {
   useEffect(() => () => { if (url) URL.revokeObjectURL(url); }, [url]);
   async function start() {
     try {
+      sesionDeAudio("play-and-record");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const r = new MediaRecorder(stream); const chunks: Blob[] = [];
       r.ondataavailable = (e) => chunks.push(e.data);
-      r.onstop = () => { stream.getTracks().forEach((t) => t.stop()); setUrl(URL.createObjectURL(new Blob(chunks, { type: r.mimeType }))); setState("ready"); };
+      r.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        // Al terminar de grabar, el sonido vuelve al parlante (en el iPhone quedaba bajito, por el auricular).
+        sesionDeAudio("playback");
+        // La grabación se sube de volumen para escucharla bien.
+        void louderBlob(new Blob(chunks, { type: r.mimeType })).then((b) => { setUrl(URL.createObjectURL(b)); setState("ready"); });
+      };
       r.start(); rec.current = r; setState("rec");
-    } catch { setState("denied"); }
+    } catch { sesionDeAudio("playback"); setState("denied"); }
   }
   return (
     <div className="rounded-3xl bg-white/[.07] p-5 text-left ring-1 ring-white/10">
