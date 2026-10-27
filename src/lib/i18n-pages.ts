@@ -49,6 +49,23 @@ const T = {
   glCountOf: ["{a} de {n} palabras", "{a} de {n} palavras", "{a} of {n} words", "{a} von {n} Wörtern", "{a} sur {n} mots", "{n} 個詞中的 {a} 個"],
   glNone: ["No encontramos esa palabra en el glosario.", "Não encontramos essa palavra no glossário.", "We couldn't find that word in the glossary.", "Dieses Wort ist nicht im Glossar.", "Ce mot n'est pas dans le glossaire.", "詞彙表中找不到這個詞。"],
   glReviewed: ["Revisada por docente", "Revisada por professor", "Teacher-reviewed", "Von Lehrkraft geprüft", "Vérifié par un enseignant", "已由教師審核"],
+  // Curso
+  csBanner: ["Jai camina con su mochila por un sendero de piedras entre lomas y lapachos", "Jai caminha com sua mochila por uma trilha de pedras entre morros e ipês", "Jai walks with his backpack along a stone path among hills and lapacho trees", "Jai wandert mit Rucksack über einen Steinpfad zwischen Hügeln und Lapacho-Bäumen", "Jai marche avec son sac à dos sur un sentier de pierres entre collines et lapachos", "Jai 背著背包走在山丘與風鈴木之間的石子路上"],
+  csTitle: ["Curso de {n}", "Curso de {n}", "{n} course", "{n}-Kurs", "Cours de {n}", "{n}課程"],
+  csFeatured: ["Destacado", "Destaque", "Featured", "Empfohlen", "À la une", "精選"],
+  csLessons: ["{n} lecciones con voces humanas paraguayas", "{n} lições com vozes humanas paraguaias", "{n} lessons with real Paraguayan voices", "{n} Lektionen mit echten paraguayischen Stimmen", "{n} leçons avec de vraies voix paraguayennes", "{n} 堂課，使用巴拉圭真人語音"],
+  csProgress: ["Tu progreso", "Seu progresso", "Your progress", "Dein Fortschritt", "Votre progression", "你的進度"],
+  csOf: ["{a} de {b}", "{a} de {b}", "{a} of {b}", "{a} von {b}", "{a} sur {b}", "{a} / {b}"],
+  csStartWith: ["Empezar con la Lección {n}", "Começar a Lição {n}", "Start Lesson {n}", "Lektion {n} starten", "Commencer la leçon {n}", "開始第 {n} 課"],
+  csContinueWith: ["Continuar con la Lección {n}", "Continuar com a Lição {n}", "Continue with Lesson {n}", "Weiter mit Lektion {n}", "Continuer avec la leçon {n}", "繼續第 {n} 課"],
+  csInValidation: ["En validación", "Em validação", "Under validation", "In Prüfung", "En validation", "審核中"],
+  csDone: ["Completada · podés repasarla", "Concluída · pode revisar", "Completed · you can review it", "Abgeschlossen · du kannst sie wiederholen", "Terminée · vous pouvez la réviser", "已完成 · 可以複習"],
+  csAvailable: ["Disponible", "Disponível", "Available", "Verfügbar", "Disponible", "可學習"],
+  csLocked: ["Completá la anterior para abrirla", "Conclua a anterior para abrir", "Finish the previous one to unlock", "Schließe die vorherige ab, um sie zu öffnen", "Terminez la précédente pour l'ouvrir", "完成上一課即可解鎖"],
+  csLesson: ["Lección {n}", "Lição {n}", "Lesson {n}", "Lektion {n}", "Leçon {n}", "第 {n} 課"],
+  csReview: ["Repasar", "Revisar", "Review", "Wiederholen", "Réviser", "複習"],
+  csStart: ["Empezar", "Começar", "Start", "Starten", "Commencer", "開始"],
+  csLockedLabel: ["Bloqueada", "Bloqueada", "Locked", "Gesperrt", "Verrouillée", "未解鎖"],
 } satisfies Record<string, Row>;
 
 export type TXKey = keyof typeof T;
