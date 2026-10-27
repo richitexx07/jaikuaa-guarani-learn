@@ -9,6 +9,7 @@ import { getAudioSignedUrls } from "./audio.functions";
 import { slugify } from "./slug";
 import { offlineGet, offlineSet } from "./offline-store";
 import { isOffline } from "./offline-data";
+import { archivosDeLaPagina, guardarArchivos } from "./pwa";
 
 /* Claves del almacén del teléfono (las usan también las pantallas). */
 export const K = {
@@ -85,7 +86,10 @@ async function cachePages(paths: string[], onStep: () => void): Promise<number> 
       const url = new URL(path, window.location.origin).toString();
       const res = await fetch(url, { credentials: "same-origin", headers: { Accept: "text/html" } });
       if (res.ok && (res.headers.get("content-type") ?? "").includes("text/html")) {
+        // También se guardan el código y los estilos que esa página necesita para abrir sin señal.
+        const html = await res.clone().text();
         await cache.put(url, res);
+        await guardarArchivos(archivosDeLaPagina(html, url));
         ok++;
       }
     } catch {}

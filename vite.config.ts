@@ -6,6 +6,18 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { VitePWA } from "vite-plugin-pwa";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+
+// La lista de archivos que se guardan al instalar no depende de dónde deja el build los archivos:
+// la página sin señal y el ícono van siempre.
+const rev = (path: string) => {
+  try {
+    return createHash("md5").update(readFileSync(path)).digest("hex").slice(0, 12);
+  } catch {
+    return String(Date.now());
+  }
+};
 
 export default defineConfig({
   tanstackStart: {
@@ -23,7 +35,15 @@ export default defineConfig({
         filename: "sw.js",
         outDir: "dist/client",
         workbox: {
-          globPatterns: ["**/*.{js,css,png,svg,ico,woff2,webp,webmanifest}", "offline.html"],
+          // El código y los estilos NO van en esta lista: se guardan al usarse (ver «jaikuaa-app»
+          // abajo) y así no se borran al publicar una versión nueva. Si se borraran, una pantalla
+          // guardada antes quedaría colgada en la pantalla de inicio sin señal.
+          globPatterns: ["offline.html"],
+          additionalManifestEntries: [
+            { url: "/offline.html", revision: rev("public/offline.html") },
+            { url: "/manifest.webmanifest", revision: rev("public/manifest.webmanifest") },
+            { url: "/icon-192.png", revision: rev("public/icon-192.png") },
+          ],
           navigateFallback: null,
           cleanupOutdatedCaches: true,
           maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
@@ -46,6 +66,29 @@ export default defineConfig({
                       (await caches.match("/offline.html", { ignoreSearch: true })) ?? undefined,
                   },
                 ],
+              },
+            },
+            {
+              // Los archivos de la app (código, estilos, imágenes de los juegos). Su nombre cambia con
+              // cada versión, así que una copia guardada nunca queda vieja. Se guardan al usarlos y
+              // se conservan las de versiones anteriores: una pantalla guardada hace días sigue
+              // abriendo sin señal aunque después se haya publicado una versión nueva.
+              urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith("/assets/"),
+              handler: "CacheFirst",
+              options: {
+                cacheName: "jaikuaa-app",
+                expiration: { maxEntries: 1500, maxAgeSeconds: 90 * 24 * 3600 },
+                cacheableResponse: { statuses: [200] },
+              },
+            },
+            {
+              // Imágenes subidas al proyecto (logo de inicio, portadas).
+              urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith("/__l5e/assets-v1/"),
+              handler: "CacheFirst",
+              options: {
+                cacheName: "jaikuaa-imagenes",
+                expiration: { maxEntries: 200, maxAgeSeconds: 90 * 24 * 3600 },
+                cacheableResponse: { statuses: [200] },
               },
             },
             {

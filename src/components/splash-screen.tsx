@@ -40,6 +40,8 @@ export function SplashScreen() {
         opacity: fading ? 0 : 1,
         transition: `opacity ${FADE_MS}ms ease-out`,
         pointerEvents: fading ? "none" : "auto",
+        // Por si la app tarda en arrancar (por ejemplo sin señal): la pantalla de inicio se va sola.
+        animation: "jaikuaa-splash-out 450ms ease-out 3s forwards",
       }}
     >
       <div
@@ -79,6 +81,9 @@ export function SplashScreen() {
         </div>
       </div>
       <style>{`
+        @keyframes jaikuaa-splash-out {
+          to { opacity: 0; visibility: hidden; pointer-events: none; }
+        }
         @keyframes jaikuaa-splash-in {
           from { opacity: 0; transform: translateY(8px) scale(0.98); }
           to { opacity: 1; transform: translateY(0) scale(1); }
