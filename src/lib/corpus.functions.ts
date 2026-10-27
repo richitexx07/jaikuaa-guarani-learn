@@ -352,8 +352,8 @@ export const listCorpusWords = createServerFn({ method: "POST" })
       .order("gn")
       .limit(data.limit);
     if (ids) q = q.in("id", ids);
-    if (data.search.trim())
-      q = q.or(`gn.ilike.%${data.search.trim()}%,es.ilike.%${data.search.trim()}%`);
+    const term = safeSearchTerm(data.search);
+    if (term) q = q.or(`gn.ilike.%${term}%,es.ilike.%${term}%`);
     if (data.onlyMissingAudio) q = q.eq("has_audio", false);
     if (data.onlyPendingValidation) q = q.or("status.eq.draft,validated_by.is.null");
     if (data.category === "none") q = q.is("category", null);
@@ -1032,3 +1032,8 @@ export const quickValidateWord = createServerFn({ method: "POST" })
     if (logError) console.error("corpus_word_changes:", logError.message);
     return { ok: true, prevStatus: before.status as "draft" | "published", already: false };
   });
+
+/** Limpia la búsqueda para que no cambie la lógica del filtro (comas, paréntesis, comodines). */
+export function safeSearchTerm(raw: string): string {
+  return raw.replace(/[,()*%\\:"'.]/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
+}
