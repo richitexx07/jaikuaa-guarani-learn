@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { usePubTx } from "@/lib/i18n-public";
+import { AppLanguageToggle } from "@/components/app-language-toggle";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
 
@@ -19,6 +21,7 @@ export const Route = createFileRoute("/terminos")({
 });
 
 function TerminosPage() {
+  const t = usePubTx();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border/50">
@@ -26,10 +29,12 @@ function TerminosPage() {
           <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-primary">
             <BrandLogo />
           </Link>
+          <AppLanguageToggle className="ml-auto" />
         </div>
       </header>
       <main className="flex-1 px-4 py-12 sm:px-6 sm:py-16">
         <article className="mx-auto max-w-3xl">
+          {t("legalNote") && <p className="mb-4 rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">{t("legalNote")}</p>}
           <p className="text-sm text-muted-foreground">Última actualización: junio de 2026</p>
           <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Términos y Condiciones

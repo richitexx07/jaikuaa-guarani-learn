@@ -33,7 +33,7 @@ function SobrePage() {
           <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-primary">
             <BrandLogo />
           </Link>
-          <AppLanguageToggle />
+          <AppLanguageToggle className="ml-auto" />
         </div>
       </header>
 
