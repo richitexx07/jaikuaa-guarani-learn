@@ -6,6 +6,8 @@ import type { ReactElement } from "react";
  */
 export type CoverId =
   | "consultorio"
+  | "ventanilla"
+  | "chacra"
   | "taanga"
   | "tekojoja"
   | "nee-rape"
@@ -22,6 +24,8 @@ export type CoverId =
 /** Color de fondo y de texto de cada portada (el título va debajo, sobre este color). */
 export const COVER_TONE: Record<CoverId, { bg: string; ink: string }> = {
   consultorio: { bg: "#0F4C55", ink: "#FFFFFF" },
+  ventanilla: { bg: "#123A63", ink: "#FFFFFF" },
+  chacra: { bg: "#3E7C3A", ink: "#FFFFFF" },
   taanga: { bg: "#1A191F", ink: "#FFFFFF" },
   tekojoja: { bg: "#4A1F2B", ink: "#FFFFFF" },
   "nee-rape": { bg: "#1F5E43", ink: "#FFFFFF" },
@@ -91,6 +95,30 @@ const ART: Record<CoverId, ReactElement> = {
         <rect x="10" y="74" width="36" height="5" rx="2" fill="#26252B" opacity=".5" />
       </g>
       <circle cx="168" cy="26" r="7" fill="#E5322D" />
+    </>
+  ),
+  ventanilla: (
+    <>
+      <rect width="200" height="150" fill="#123A63" />
+      <rect x="45" y="18" width="110" height="80" rx="10" fill="#C8DEF0" stroke="#fff" strokeWidth="4" />
+      <rect x="0" y="104" width="200" height="46" fill="#B7895A" />
+      <rect x="0" y="100" width="200" height="8" fill="#E8D3AE" />
+      <circle cx="100" cy="58" r="16" fill="#E9B44C" />
+      <rect x="12" y="18" width="24" height="18" rx="4" fill="#0A1423" />
+      <circle cx="24" cy="27" r="4" fill="#FFB23E" />
+    </>
+  ),
+  chacra: (
+    <>
+      <rect width="200" height="150" fill="#7EC8E3" />
+      <circle cx="160" cy="30" r="16" fill="#FFC94A" />
+      <rect x="0" y="92" width="200" height="58" fill="#3E7C3A" />
+      <g fill="#B4532A">
+        <path d="M70 92 L20 150 H40 L80 92 Z" />
+        <path d="M110 92 L140 150 H160 L120 92 Z" />
+      </g>
+      <path d="M95 92 V40" stroke="#2E6E28" strokeWidth="5" />
+      <ellipse cx="95" cy="55" rx="6" ry="12" fill="#F0BE3C" />
     </>
   ),
   tekojoja: (

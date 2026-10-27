@@ -29,7 +29,7 @@ async function roles(
   return { isStaff: a.data === true || e.data === true };
 }
 
-const JuegoSchema = z.enum(["trivia", "tekojoja", "karaoke", "tembiu", "taanga"]);
+const JuegoSchema = z.enum(["trivia", "tekojoja", "karaoke", "tembiu", "taanga", "chacra"]);
 
 export const listJuegoTextos = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

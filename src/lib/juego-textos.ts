@@ -7,8 +7,9 @@
  */
 import { CASES, DISHES, ING, SCENES, SONGS, type Case, type Scene, type Song } from "@/lib/juegos-contenido";
 import { TRIVIA, TRIVIA_ORDER, type TriviaCategoryId, type TriviaQuestion } from "@/lib/trivia";
+import { CASOS_CHACRA } from "@/lib/chacra";
 
-export type JuegoId = "trivia" | "tekojoja" | "karaoke" | "tembiu" | "taanga";
+export type JuegoId = "trivia" | "tekojoja" | "karaoke" | "tembiu" | "taanga" | "chacra";
 
 export type JuegoTexto = {
   juego: JuegoId;
@@ -26,6 +27,7 @@ export const JUEGO_CAMPOS: Record<JuegoId, readonly string[]> = {
   karaoke: ["verso", "completar", "incorrectas", "revisado"],
   tembiu: ["gn", "revisado"],
   taanga: ["antes", "palabra", "despues", "incorrectas", "revisado"],
+  chacra: ["productor", "revisado"],
 };
 
 export const REVISADO = "si";
@@ -193,6 +195,12 @@ export const JUEGOS_EDITOR: { id: JuegoId; nombre: string; quien: string; explic
     explica: "Corregí la frase de cada escena y la palabra que falta.",
   },
   {
+    id: "chacra",
+    nombre: "Jai en la chacra",
+    quien: "Docente de guaraní",
+    explica: "Escribí lo que cuenta cada productor en guaraní. Aparece arriba del caso en castellano.",
+  },
+  {
     id: "tekojoja",
     nombre: "Tekojoja",
     quien: "Guaraní jurídico",
@@ -244,6 +252,13 @@ export function itemsEditor(juego: JuegoId): ItemEditor[] {
           { campo: "despues", label: "Texto después de la palabra", actual: s.after },
           { campo: "incorrectas", label: "Opciones incorrectas", ayuda: "Separadas por comas.", actual: s.wrong.join(", ") },
         ],
+      }));
+    case "chacra":
+      return CASOS_CHACRA.map((c, i) => ({
+        clave: String(i),
+        titulo: `${c.emoji} ${c.productor}`,
+        contexto: [c.historia, `Palabra clave: ${c.palabra}`],
+        campos: [{ campo: "productor", label: "Lo que dice el productor, en guaraní", largo: true }],
       }));
     case "tekojoja":
       return CASES.map((c, i) => ({

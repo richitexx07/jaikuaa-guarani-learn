@@ -12,6 +12,8 @@ export const SPONSOR_SLOTS = {
   "nee-rape": { key: "juego_sponsor_nee_rape", label: "Ñe'ẽ Rape (desafío a distancia)" },
   tembiu: { key: "juego_sponsor_tembiu", label: "Tembi'u Paraguái (gastronomía)" },
   karaoke: { key: "juego_sponsor_karaoke", label: "Purahéi Karaoke (música)" },
+  ventanilla: { key: "juego_sponsor_ventanilla", label: "Ventanilla de Jai (atención al público)" },
+  chacra: { key: "juego_sponsor_chacra", label: "Jai en la chacra (campo)" },
 } as const;
 
 export type SponsorSlot = keyof typeof SPONSOR_SLOTS;

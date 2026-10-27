@@ -1,13 +1,19 @@
 import { useEffect, useRef, type KeyboardEvent, type PointerEvent } from 'react';
 import { drawStadium } from './stadium';
-import { freshScene, G, H, W, labels, powerAt, resolveShot, type Dive, type Outcome, type Scene } from './physics';
+import { freshScene, G, H, W, labels, powerAt, resolveShot, type Dive, type Outcome, type Point, type Scene, type Shot } from './physics';
 import { StadiumSound } from '../game-sound';
 import { celebrate } from '@/lib/confetti';
 
-export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess}:{knew:boolean;ready:boolean;ledText:string;muted:boolean;onShot:(o:Outcome)=>void;guess?:Dive}){
+/** watch: modo espectador (el arquero a distancia ve en vivo cómo apunta y patea el otro). onAim/onKick: el que patea avisa lo que hace. */
+export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,onKick}:{knew:boolean;ready:boolean;ledText:string;muted:boolean;onShot:(o:Outcome)=>void;guess?:Dive;watch?:{aim?:Point|null;phase?:'aim'|'power'|null;shot?:Shot|null};onAim?:(p:Point,phase:'aim'|'power')=>void;onKick?:(shot:Shot)=>void}){
  const canvas=useRef<HTMLCanvasElement>(null),scene=useRef<Scene>(freshScene()),animation=useRef<((now:number)=>void)|null>(null),sound=useRef(new StadiumSound());
  const callback=useRef(onShot);callback.current=onShot;
  const settings=useRef({ledText,muted});settings.current={ledText,muted};
+ const aimCb=useRef(onAim);aimCb.current=onAim;const kickCb=useRef(onKick);kickCb.current=onKick;
+ const spectator=!!watch;scene.current.spectator=spectator;
+ // Espectador: copia lo que hace el que patea.
+ useEffect(()=>{if(!watch)return;const s=scene.current;if(s.phase==='shot'||s.phase==='result')return;if(watch.aim)s.aim=watch.aim;if(watch.phase==='power'&&s.phase!=='power'){s.phase='power';s.powerStart=performance.now();}else if(watch.phase==='aim')s.phase='aim';},[watch?.aim?.x,watch?.aim?.y,watch?.phase]);// eslint-disable-line react-hooks/exhaustive-deps
+ useEffect(()=>{if(watch?.shot&&scene.current.phase!=='shot'&&scene.current.phase!=='result')animate(watch.shot,performance.now());},[watch?.shot]);// eslint-disable-line react-hooks/exhaustive-deps
  useEffect(()=>{scene.current.knew=knew;if(ready){scene.current.phase='aim';canvas.current?.focus({preventScroll:true});sound.current.muted=muted;sound.current.play('answer');}},[ready,knew]);
  useEffect(()=>{
   const el=canvas.current,ctx=el?.getContext('2d');if(!el||!ctx)return;
@@ -19,7 +25,11 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess}:{knew:boole
  function kick(){
   const s=scene.current;if(s.phase!=='power'||!s.aim)return;
   const now=performance.now(),reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const shot=resolveShot(s.aim,powerAt(now,s.powerStart,s.knew),s.knew,now,reduce,guess);s.phase='shot';sound.current.muted=settings.current.muted;sound.current.play('kick');
+  const shot=resolveShot(s.aim,powerAt(now,s.powerStart,s.knew),s.knew,now,reduce,guess);
+  kickCb.current?.(shot);animate(shot,now);
+ }
+ function animate(shot:Shot,now:number){
+  const s=scene.current,reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;s.phase='shot';sound.current.muted=settings.current.muted;sound.current.play('kick');
   animation.current=(t)=>{
    const q=Math.min(1,(t-now)/shot.duration),e=1-Math.pow(1-q,2.2);
    s.ball={x:400+(shot.end.x-400)*e,y:520+(shot.end.y-520)*e-Math.sin(q*Math.PI)*50,r:16-6*e};
@@ -32,13 +42,15 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess}:{knew:boole
    }
   };
  }
- function activate(point?:{x:number;y:number}){const s=scene.current;if(s.phase==='aim'){const p=point??s.aim;if(!p)return;if(p.x<G.x-40||p.x>G.x+G.w+40||p.y<G.y-40||p.y>G.y+G.h)return;s.aim=p;s.powerStart=performance.now();s.phase='power';}else if(s.phase==='power')kick();}
+ function activate(point?:{x:number;y:number}){if(spectator)return;const s=scene.current;if(s.phase==='aim'){const p=point??s.aim;if(!p)return;if(p.x<G.x-40||p.x>G.x+G.w+40||p.y<G.y-40||p.y>G.y+G.h)return;s.aim=p;s.powerStart=performance.now();s.phase='power';aimCb.current?.(p,'power');}else if(s.phase==='power')kick();}
+ const lastAimSent=useRef(0);
+ function sendAim(p:Point){const n=performance.now();if(n-lastAimSent.current<90)return;lastAimSent.current=n;aimCb.current?.(p,'aim');}
  const dragging=useRef(false);
  function pt(e:PointerEvent<HTMLCanvasElement>){const r=e.currentTarget.getBoundingClientRect();return {x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height};}
  const clamp=(p:{x:number;y:number})=>({x:Math.max(G.x-30,Math.min(G.x+G.w+30,p.x)),y:Math.max(G.y-30,Math.min(G.y+G.h-5,p.y))});
- function down(e:PointerEvent<HTMLCanvasElement>){e.preventDefault();const s=scene.current;if(s.phase==='aim'){dragging.current=true;try{e.currentTarget.setPointerCapture(e.pointerId);}catch{}s.aim=clamp(pt(e));}else activate();}
- function move(e:PointerEvent<HTMLCanvasElement>){const s=scene.current;if(s.phase!=='aim')return;if(dragging.current||e.pointerType==='mouse')s.aim=clamp(pt(e));}
+ function down(e:PointerEvent<HTMLCanvasElement>){e.preventDefault();if(spectator)return;const s=scene.current;if(s.phase==='aim'){dragging.current=true;try{e.currentTarget.setPointerCapture(e.pointerId);}catch{}s.aim=clamp(pt(e));sendAim(s.aim);}else activate();}
+ function move(e:PointerEvent<HTMLCanvasElement>){if(spectator)return;const s=scene.current;if(s.phase!=='aim')return;if(dragging.current||e.pointerType==='mouse'){s.aim=clamp(pt(e));sendAim(s.aim);}}
  function up(e:PointerEvent<HTMLCanvasElement>){if(!dragging.current)return;dragging.current=false;const s=scene.current;if(s.phase==='aim'){const p=clamp(pt(e));try{navigator.vibrate?.(15);}catch{}activate(p);}}
- function keyboard(e:KeyboardEvent<HTMLCanvasElement>){const s=scene.current;const delta:Record<string,[number,number]>={ArrowLeft:[-25,0],ArrowRight:[25,0],ArrowUp:[0,-20],ArrowDown:[0,20]};const d=delta[e.key];if(d&&s.phase==='aim'){e.preventDefault();const p=s.aim??{x:400,y:225};s.aim={x:Math.max(120,Math.min(680,p.x+d[0])),y:Math.max(80,Math.min(330,p.y+d[1]))};}if(e.key==='Enter'||e.key===' '){e.preventDefault();activate();}}
+ function keyboard(e:KeyboardEvent<HTMLCanvasElement>){if(spectator)return;const s=scene.current;const delta:Record<string,[number,number]>={ArrowLeft:[-25,0],ArrowRight:[25,0],ArrowUp:[0,-20],ArrowDown:[0,20]};const d=delta[e.key];if(d&&s.phase==='aim'){e.preventDefault();const p=s.aim??{x:400,y:225};s.aim={x:Math.max(120,Math.min(680,p.x+d[0])),y:Math.max(80,Math.min(330,p.y+d[1]))};sendAim(s.aim);}if(e.key==='Enter'||e.key===' '){e.preventDefault();activate();}}
  return <canvas ref={canvas} width={W} height={H} tabIndex={0} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={()=>{dragging.current=false;}} onKeyDown={keyboard} className="mx-auto block aspect-[4/3] w-full max-h-[42vh] max-w-[56vh] touch-none rounded-lg focus-visible:outline-2 focus-visible:outline-accent" aria-label="Arco: deslizá el dedo para apuntar con la flecha, soltá y tocá otra vez para patear"/>;
 }

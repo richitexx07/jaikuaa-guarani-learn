@@ -1,7 +1,7 @@
 export const W=800,H=600,G={x:150,y:110,w:500,h:230},POST=12,BR=16;
 export type Outcome='goal'|'angle'|'save'|'post'|'over'|'wide';
 export type Point={x:number;y:number};
-export type Scene={phase:'ask'|'aim'|'power'|'shot'|'result'; knew:boolean; aim:Point|null; powerStart:number; ball:Point & {r:number}; keeper:Point & {ang:number;stretch:number}; net:(Point & {t:number})|null; cheer:number; banner:{t:number;txt:string;c:string}|null; shake?:number};
+export type Scene={phase:'ask'|'aim'|'power'|'shot'|'result'; knew:boolean; spectator?:boolean; aim:Point|null; powerStart:number; ball:Point & {r:number}; keeper:Point & {ang:number;stretch:number}; net:(Point & {t:number})|null; cheer:number; banner:{t:number;txt:string;c:string}|null; shake?:number};
 export const labels:Record<Outcome,string>={goal:'¡GOOOL!',angle:'¡GOLAZO AL ÁNGULO!',save:'¡ATAJÓ!',post:'¡PALO!',over:'¡POR ARRIBA!',wide:'¡AFUERA!'};
 export function freshScene():Scene {return {phase:'ask',knew:false,aim:{x:400,y:225},powerStart:0,ball:{x:400,y:520,r:BR},keeper:{x:400,y:278,ang:0,stretch:0},net:null,cheer:0,banner:null};}
 export function powerZone(knew:boolean):[number,number]{return knew?[.52,.86]:[.62,.8];}
@@ -25,3 +25,6 @@ export function resolveShot(aim:Point,p:number,knew:boolean,now:number,reduce=fa
 export function isGoal(o:Outcome){return o==='goal'||o==='angle';}
 export function xpFor(results:Outcome[]){return Math.min(20,results.reduce((n,r)=>n+(r==='angle'?6:r==='goal'?4:0),0));}
 export function duelFinished(a:Outcome[],b:Outcome[]){if(a.length!==b.length||a.length<5)return false;return a.filter(isGoal).length!==b.filter(isGoal).length||a.length>=8;}
+
+/** Un tiro ya resuelto (para mostrarlo igual en el celular del arquero). */
+export type Shot=ReturnType<typeof resolveShot>;

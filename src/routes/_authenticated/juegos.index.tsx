@@ -23,6 +23,8 @@ type Game = { id: CoverId; to: string; title: string; desc: string; xp: string; 
 
 const GAMES: Game[] = [
   { id: "consultorio", to: "/juegos/consultorio", title: "Consultorio de Jai", desc: "Guaraní médico: atendé pacientes que hablan guaraní. En español y portugués.", xp: "≤20 XP", nuevo: true },
+  { id: "ventanilla", to: "/juegos/ventanilla", title: "Ventanilla de Jai", desc: "Atención al público: atendé la fila en guaraní, como en un banco o una oficina.", xp: "≤20 XP", nuevo: true },
+  { id: "chacra", to: "/juegos/chacra", title: "Jai en la chacra", desc: "Sos técnico de campo: entendé lo que necesita cada productor.", xp: "≤20 XP", nuevo: true },
   { id: "karaoke", to: "/juegos/karaoke", title: "Purahéi Karaoke", desc: "Cantá al ritmo del arpa y completá el verso a tiempo.", xp: "≤20 XP", nuevo: true },
   { id: "tembiu", to: "/juegos/tembiu", title: "Tembi'u Paraguái", desc: "Armá los platos típicos con sus ingredientes.", xp: "≤20 XP", nuevo: true },
   { id: "taanga", to: "/juegos/taanga", title: "Ta'anga · Claqueta de Jai", desc: "Sé guionista: completá el diálogo de cada escena.", xp: "≤20 XP", nuevo: true },
@@ -39,7 +41,7 @@ const GAMES: Game[] = [
 
 const SHELVES: { title: string; bajada: string; items: CoverId[] }[] = [
   { title: "Cultura paraguaya", bajada: "Música, cocina, cine y fútbol", items: ["karaoke", "tembiu", "taanga", "penales"] },
-  { title: "Guaraní para el trabajo", bajada: "Salud y justicia", items: ["consultorio", "tekojoja"] },
+  { title: "Guaraní para el trabajo", bajada: "Salud, atención al público, campo y justicia", items: ["consultorio", "ventanilla", "chacra", "tekojoja"] },
   { title: "De a dos", bajada: "En el mismo celular o cada uno en el suyo", items: ["nee-rape", "duelo", "trivia-duelo"] },
   { title: "Clásicos rápidos", bajada: "Cinco minutos por día", items: ["palabra-del-dia", "ahorcado", "sopa-de-letras", "memoria"] },
 ];

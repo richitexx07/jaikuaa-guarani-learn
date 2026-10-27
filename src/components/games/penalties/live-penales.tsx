@@ -4,7 +4,7 @@ import { SpeakerButton } from "@/components/audio/speaker-button";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { Compartir } from "@/components/games/reto";
 import { PenaltyPitch } from "@/components/games/penalties/pitch";
-import { duelFinished, isGoal, labels, xpFor, type Dive, type Outcome } from "@/components/games/penalties/physics";
+import { duelFinished, isGoal, labels, xpFor, type Dive, type Outcome, type Point, type Shot } from "@/components/games/penalties/physics";
 import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
 import { newSeed, orderedBy, shufflerFor } from "@/lib/reto";
@@ -21,7 +21,7 @@ import type { GameWord } from "@/lib/games.functions";
  */
 
 const P = { noche: "#071A33", led: "#FFB23E", gol: "#3BE38A", mal: "#FF5A4E", blanco: "#F4F7FB", host: "#2F6FDE", guest: "#D9452B" };
-const EVENTS = ["start", "dive", "answer", "shot", "sync", "hello", "ended", "llena", "rematch"] as const;
+const EVENTS = ["start", "dive", "answer", "aim", "kick", "shot", "sync", "hello", "ended", "llena", "rematch"] as const;
 const GRACE_RIVAL_MS = 30000;
 const GRACE_ME_MS = 45000;
 const NEXT_MS = 2600;
@@ -52,6 +52,10 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
   const [myDive, setMyDive] = useState<Dive | null>(null);
   const [choice, setChoice] = useState<string | null>(null);
   const [rivalChoice, setRivalChoice] = useState<string | null>(null);
+  // Lo que ve el arquero en vivo: hacia dónde apunta el otro y el tiro.
+  const [watchAim, setWatchAim] = useState<{ aim: Point; phase: "aim" | "power" } | null>(null);
+  const [watchShot, setWatchShot] = useState<Shot | null>(null);
+  const kickRecibido = useRef(-1);
   const [last, setLast] = useState<Outcome | null>(null);
   const [end, setEnd] = useState<End>(null);
   const [llena, setLlena] = useState(false);
@@ -91,6 +95,9 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
     setMyDive(null);
     setChoice(null);
     setRivalChoice(null);
+    setWatchAim(null);
+    setWatchShot(null);
+    kickRecibido.current = -1;
     setLast(null);
     setEnd(null);
     setVerFinal(duelFinished(r.host, r.guest) || r.host.length + r.guest.length >= 16);
@@ -118,6 +125,8 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
       setMyDive(null);
       setChoice(null);
       setRivalChoice(null);
+      setWatchAim(null);
+      setWatchShot(null);
       setLast(null);
     }, NEXT_MS);
   }, [feedback]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -154,7 +163,18 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
         apply(nm, e === "start" ? { host: [], guest: [] } : { host: r.host ?? [], guest: r.guest ?? [] }, e === "start");
       } else if (e === "dive" && Number(p.t) === t) setDive(p.dive as Dive);
       else if (e === "answer" && Number(p.t) === t) setRivalChoice(String(p.gn));
-      else if (e === "shot") applyShot(Number(p.t), p.outcome as Outcome);
+      else if (e === "aim" && Number(p.t) === t) setWatchAim({ aim: { x: Number(p.x), y: Number(p.y) }, phase: p.phase === "power" ? "power" : "aim" });
+      else if (e === "kick" && Number(p.t) === t && p.shot) {
+        kickRecibido.current = t;
+        setWatchShot(p.shot as Shot);
+      }
+      // Si vi el tiro en vivo, el resultado lo pone mi propia animación al terminar.
+      else if (e === "shot") {
+        const tt = Number(p.t);
+        if (kickRecibido.current !== tt) applyShot(tt, p.outcome as Outcome);
+        // Por las dudas: si mi animación no termina (celular lento), igual se cuenta el penal.
+        else window.setTimeout(() => applyShot(tt, p.outcome as Outcome), 3000);
+      }
       else if (e === "rematch" && role === "host") startMatch();
       else if (e === "hello" && m && from && (from === m.hostUid || from === m.guestUid)) {
         if (endRef.current) send("ended");
@@ -303,11 +323,13 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
     );
   }
 
-  const shooter: Role = t % 2 === 0 ? "host" : "guest";
+  // Mientras se ve el resultado de un penal, se sigue mostrando ese penal (no el próximo).
+  const tv = last ? Math.max(0, t - 1) : t;
+  const shooter: Role = tv % 2 === 0 ? "host" : "guest";
   const iShoot = role === shooter;
-  const word = match.words[t % match.words.length]!;
-  const options = match.options[t % match.options.length] ?? [];
-  const sudden = t >= 10;
+  const word = match.words[tv % match.words.length]!;
+  const options = match.options[tv % match.options.length] ?? [];
+  const sudden = tv >= 10;
   const shooterName = iShoot ? myName : rivalName;
   const knew = choice === word.gn;
   const waitLeft = pauseSince === null ? 0 : Math.max(0, Math.ceil((pauseSince + (pauseReason === "yo" ? GRACE_ME_MS : GRACE_RIVAL_MS) - now) / 1000));
@@ -357,7 +379,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
       ) : (
         <>
           <p className="text-center text-xs font-bold uppercase tracking-wide" style={{ color: P.led }}>
-            {sudden ? `Muerte súbita · ${shooterName} patea` : `Penal ${Math.floor(t / 2) + 1} de 5 · ${shooterName} patea`}
+            {sudden ? `Muerte súbita · ${shooterName} patea` : `Penal ${Math.floor(tv / 2) + 1} de 5 · ${shooterName} patea`}
           </p>
 
           {last ? (
@@ -383,6 +405,8 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
                     muted={muted}
                     ledText={ledText}
                     onShot={(o) => { send("shot", { t, outcome: o }); applyShot(t, o); }}
+                    onAim={(pt, phase) => send("aim", { t, x: Math.round(pt.x), y: Math.round(pt.y), phase })}
+                    onKick={(shotData) => send("kick", { t, shot: shotData })}
                   />
                 </div>
                 <div className="space-y-3 text-center">
@@ -428,15 +452,29 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
               </div>
             </section>
           ) : (
-            <div className={card}>
-              <p className="text-xs font-semibold uppercase tracking-widest">🧤 Te tiraste a la {myDive === "left" ? "izquierda" : myDive === "right" ? "derecha" : "al centro"}</p>
-              <p className="mt-2 font-display text-xl font-bold">{rivalName} está pateando…</p>
-              <p className="mt-1 text-sm opacity-75">La palabra: «{word.es}»</p>
-              {rivalChoice && (
-                <p className="mt-2 flex items-center justify-center gap-2 text-sm">
-                  Respondió <b>{rivalChoice}</b> {rivalChoice === word.gn ? "✅" : "❌"} {word.hasAudio && <SpeakerButton gn={word.gn} />}
-                </p>
-              )}
+            <div className="space-y-3">
+              <div className="overflow-hidden rounded-2xl ring-4 ring-black/40">
+                <PenaltyPitch
+                  key={`ver-${t}`}
+                  guess={myDive}
+                  knew={rivalChoice === word.gn}
+                  ready={false}
+                  muted={muted}
+                  ledText={ledText}
+                  watch={{ aim: watchAim?.aim ?? null, phase: watchAim?.phase ?? null, shot: watchShot }}
+                  onShot={(o) => { if (kickRecibido.current === t) applyShot(t, o); }}
+                />
+              </div>
+              <div className="rounded-2xl bg-white/[.07] p-3 text-center text-white">
+                <p className="text-xs font-semibold uppercase tracking-widest text-white/70">🧤 Te tiraste {myDive === "left" ? "a la izquierda" : myDive === "right" ? "a la derecha" : "al centro"}</p>
+                <p className="mt-1 font-display text-lg font-bold">{watchShot ? "¡Pateó!" : watchAim ? `${rivalName} está apuntando…` : `${rivalName} está respondiendo…`}</p>
+                <p className="mt-1 text-sm text-white/75">La palabra: «{word.es}»</p>
+                {rivalChoice && (
+                  <p className="mt-1 flex items-center justify-center gap-2 text-sm">
+                    Respondió <b>{rivalChoice}</b> {rivalChoice === word.gn ? "✅" : "❌"} {word.hasAudio && <SpeakerButton gn={word.gn} />}
+                  </p>
+                )}
+              </div>
             </div>
           )}
         </>

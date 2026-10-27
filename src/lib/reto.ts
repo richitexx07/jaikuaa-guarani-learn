@@ -16,7 +16,9 @@ export type RetoJuego =
   | "tekojoja"
   | "karaoke"
   | "trivia"
-  | "consultorio";
+  | "consultorio"
+  | "ventanilla"
+  | "chacra";
 
 export type Reto = {
   /** Juego */
@@ -48,6 +50,8 @@ export const RETO_RUTA: Record<RetoJuego, string> = {
   karaoke: "/juegos/karaoke",
   trivia: "/trivia",
   consultorio: "/juegos/consultorio",
+  ventanilla: "/juegos/ventanilla",
+  chacra: "/juegos/chacra",
 };
 
 export const RETO_NOMBRE: Record<RetoJuego, string> = {
@@ -61,6 +65,8 @@ export const RETO_NOMBRE: Record<RetoJuego, string> = {
   karaoke: "Purahéi Karaoke",
   trivia: "Preguntados",
   consultorio: "Consultorio de Jai",
+  ventanilla: "Ventanilla de Jai",
+  chacra: "Jai en la chacra",
 };
 
 const JUEGOS = Object.keys(RETO_RUTA) as RetoJuego[];

@@ -33,6 +33,7 @@ const RUTA_JUEGO: Record<JuegoId, string> = {
   tembiu: "/juegos/tembiu",
   taanga: "/juegos/taanga",
   tekojoja: "/juegos/tekojoja",
+  chacra: "/juegos/chacra",
 };
 
 export const Route = createFileRoute("/_authenticated/docente/juegos")({
@@ -114,6 +115,14 @@ function GuaraniDeLosJuegos() {
             <strong className="text-foreground">Está bien así</strong>. Escribí el guaraní vos: no copies de traductores
             automáticos.
           </p>
+
+          <div className="mt-4 rounded-2xl border border-primary/25 bg-primary/5 p-3 text-sm">
+            <p className="font-semibold text-foreground">Ventanilla de Jai y Consultorio usan las frases del Modo mostrador.</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Link to="/mostrador/editar" search={{ rubro: "atencion" }} className="inline-flex min-h-11 items-center rounded-full bg-primary px-4 font-semibold text-primary-foreground">Frases de atención al público</Link>
+              <Link to="/mostrador/editar" search={{ rubro: "salud" }} className="inline-flex min-h-11 items-center rounded-full border border-primary px-4 font-semibold text-primary">Frases de salud</Link>
+            </div>
+          </div>
 
           <nav aria-label="Juegos" className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
             {JUEGOS_EDITOR.map((j) => {

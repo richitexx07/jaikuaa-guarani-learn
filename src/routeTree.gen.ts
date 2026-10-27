@@ -64,6 +64,7 @@ import { Route as AuthenticatedGuaraniEscolarSemanalRouteImport } from './routes
 import { Route as AuthenticatedGuaraniEscolarTemaRouteImport } from './routes/_authenticated/guarani-escolar.tema'
 import { Route as AuthenticatedJuegosIndexRouteImport } from './routes/_authenticated/juegos.index'
 import { Route as AuthenticatedJuegosAhorcadoRouteImport } from './routes/_authenticated/juegos.ahorcado'
+import { Route as AuthenticatedJuegosChacraRouteImport } from './routes/_authenticated/juegos.chacra'
 import { Route as AuthenticatedJuegosConsultorioRouteImport } from './routes/_authenticated/juegos.consultorio'
 import { Route as AuthenticatedJuegosDueloRouteImport } from './routes/_authenticated/juegos.duelo'
 import { Route as AuthenticatedJuegosKaraokeRouteImport } from './routes/_authenticated/juegos.karaoke'
@@ -76,6 +77,7 @@ import { Route as AuthenticatedJuegosTaangaRouteImport } from './routes/_authent
 import { Route as AuthenticatedJuegosTekojojaRouteImport } from './routes/_authenticated/juegos.tekojoja'
 import { Route as AuthenticatedJuegosTembiuRouteImport } from './routes/_authenticated/juegos.tembiu'
 import { Route as AuthenticatedJuegosTriviaDueloRouteImport } from './routes/_authenticated/juegos.trivia-duelo'
+import { Route as AuthenticatedJuegosVentanillaRouteImport } from './routes/_authenticated/juegos.ventanilla'
 import { Route as AuthenticatedMostradorIndexRouteImport } from './routes/_authenticated/mostrador.index'
 import { Route as AuthenticatedMostradorEditarRouteImport } from './routes/_authenticated/mostrador.editar'
 import { Route as AuthenticatedPracticaIndexRouteImport } from './routes/_authenticated/practica.index'
@@ -379,6 +381,12 @@ const AuthenticatedJuegosAhorcadoRoute =
     path: '/juegos/ahorcado',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedJuegosChacraRoute =
+  AuthenticatedJuegosChacraRouteImport.update({
+    id: '/juegos/chacra',
+    path: '/juegos/chacra',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedJuegosConsultorioRoute =
   AuthenticatedJuegosConsultorioRouteImport.update({
     id: '/juegos/consultorio',
@@ -449,6 +457,12 @@ const AuthenticatedJuegosTriviaDueloRoute =
   AuthenticatedJuegosTriviaDueloRouteImport.update({
     id: '/juegos/trivia-duelo',
     path: '/juegos/trivia-duelo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedJuegosVentanillaRoute =
+  AuthenticatedJuegosVentanillaRouteImport.update({
+    id: '/juegos/ventanilla',
+    path: '/juegos/ventanilla',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedMostradorIndexRoute =
@@ -569,6 +583,7 @@ export interface FileRoutesByFullPath {
   '/guarani-escolar/semanal': typeof AuthenticatedGuaraniEscolarSemanalRoute
   '/guarani-escolar/tema': typeof AuthenticatedGuaraniEscolarTemaRouteWithChildren
   '/juegos/ahorcado': typeof AuthenticatedJuegosAhorcadoRoute
+  '/juegos/chacra': typeof AuthenticatedJuegosChacraRoute
   '/juegos/consultorio': typeof AuthenticatedJuegosConsultorioRoute
   '/juegos/duelo': typeof AuthenticatedJuegosDueloRoute
   '/juegos/karaoke': typeof AuthenticatedJuegosKaraokeRoute
@@ -581,6 +596,7 @@ export interface FileRoutesByFullPath {
   '/juegos/tekojoja': typeof AuthenticatedJuegosTekojojaRoute
   '/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
+  '/juegos/ventanilla': typeof AuthenticatedJuegosVentanillaRoute
   '/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
@@ -645,6 +661,7 @@ export interface FileRoutesByTo {
   '/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
   '/guarani-escolar/semanal': typeof AuthenticatedGuaraniEscolarSemanalRoute
   '/juegos/ahorcado': typeof AuthenticatedJuegosAhorcadoRoute
+  '/juegos/chacra': typeof AuthenticatedJuegosChacraRoute
   '/juegos/consultorio': typeof AuthenticatedJuegosConsultorioRoute
   '/juegos/duelo': typeof AuthenticatedJuegosDueloRoute
   '/juegos/karaoke': typeof AuthenticatedJuegosKaraokeRoute
@@ -657,6 +674,7 @@ export interface FileRoutesByTo {
   '/juegos/tekojoja': typeof AuthenticatedJuegosTekojojaRoute
   '/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
+  '/juegos/ventanilla': typeof AuthenticatedJuegosVentanillaRoute
   '/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
@@ -726,6 +744,7 @@ export interface FileRoutesById {
   '/_authenticated/guarani-escolar/semanal': typeof AuthenticatedGuaraniEscolarSemanalRoute
   '/_authenticated/guarani-escolar/tema': typeof AuthenticatedGuaraniEscolarTemaRouteWithChildren
   '/_authenticated/juegos/ahorcado': typeof AuthenticatedJuegosAhorcadoRoute
+  '/_authenticated/juegos/chacra': typeof AuthenticatedJuegosChacraRoute
   '/_authenticated/juegos/consultorio': typeof AuthenticatedJuegosConsultorioRoute
   '/_authenticated/juegos/duelo': typeof AuthenticatedJuegosDueloRoute
   '/_authenticated/juegos/karaoke': typeof AuthenticatedJuegosKaraokeRoute
@@ -738,6 +757,7 @@ export interface FileRoutesById {
   '/_authenticated/juegos/tekojoja': typeof AuthenticatedJuegosTekojojaRoute
   '/_authenticated/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/_authenticated/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
+  '/_authenticated/juegos/ventanilla': typeof AuthenticatedJuegosVentanillaRoute
   '/_authenticated/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
   '/_authenticated/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/_authenticated/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
@@ -807,6 +827,7 @@ export interface FileRouteTypes {
     | '/guarani-escolar/semanal'
     | '/guarani-escolar/tema'
     | '/juegos/ahorcado'
+    | '/juegos/chacra'
     | '/juegos/consultorio'
     | '/juegos/duelo'
     | '/juegos/karaoke'
@@ -819,6 +840,7 @@ export interface FileRouteTypes {
     | '/juegos/tekojoja'
     | '/juegos/tembiu'
     | '/juegos/trivia-duelo'
+    | '/juegos/ventanilla'
     | '/mostrador/editar'
     | '/practica/registro'
     | '/trivia/$category'
@@ -883,6 +905,7 @@ export interface FileRouteTypes {
     | '/guarani-escolar/rescate'
     | '/guarani-escolar/semanal'
     | '/juegos/ahorcado'
+    | '/juegos/chacra'
     | '/juegos/consultorio'
     | '/juegos/duelo'
     | '/juegos/karaoke'
@@ -895,6 +918,7 @@ export interface FileRouteTypes {
     | '/juegos/tekojoja'
     | '/juegos/tembiu'
     | '/juegos/trivia-duelo'
+    | '/juegos/ventanilla'
     | '/mostrador/editar'
     | '/practica/registro'
     | '/trivia/$category'
@@ -963,6 +987,7 @@ export interface FileRouteTypes {
     | '/_authenticated/guarani-escolar/semanal'
     | '/_authenticated/guarani-escolar/tema'
     | '/_authenticated/juegos/ahorcado'
+    | '/_authenticated/juegos/chacra'
     | '/_authenticated/juegos/consultorio'
     | '/_authenticated/juegos/duelo'
     | '/_authenticated/juegos/karaoke'
@@ -975,6 +1000,7 @@ export interface FileRouteTypes {
     | '/_authenticated/juegos/tekojoja'
     | '/_authenticated/juegos/tembiu'
     | '/_authenticated/juegos/trivia-duelo'
+    | '/_authenticated/juegos/ventanilla'
     | '/_authenticated/mostrador/editar'
     | '/_authenticated/practica/registro'
     | '/_authenticated/trivia/$category'
@@ -1404,6 +1430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJuegosAhorcadoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/juegos/chacra': {
+      id: '/_authenticated/juegos/chacra'
+      path: '/juegos/chacra'
+      fullPath: '/juegos/chacra'
+      preLoaderRoute: typeof AuthenticatedJuegosChacraRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/juegos/consultorio': {
       id: '/_authenticated/juegos/consultorio'
       path: '/juegos/consultorio'
@@ -1486,6 +1519,13 @@ declare module '@tanstack/react-router' {
       path: '/juegos/trivia-duelo'
       fullPath: '/juegos/trivia-duelo'
       preLoaderRoute: typeof AuthenticatedJuegosTriviaDueloRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/juegos/ventanilla': {
+      id: '/_authenticated/juegos/ventanilla'
+      path: '/juegos/ventanilla'
+      fullPath: '/juegos/ventanilla'
+      preLoaderRoute: typeof AuthenticatedJuegosVentanillaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/mostrador/': {
@@ -1653,6 +1693,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDocenteConstanciaRoute: typeof AuthenticatedDocenteConstanciaRoute
   AuthenticatedDocenteJuegosRoute: typeof AuthenticatedDocenteJuegosRoute
   AuthenticatedJuegosAhorcadoRoute: typeof AuthenticatedJuegosAhorcadoRoute
+  AuthenticatedJuegosChacraRoute: typeof AuthenticatedJuegosChacraRoute
   AuthenticatedJuegosConsultorioRoute: typeof AuthenticatedJuegosConsultorioRoute
   AuthenticatedJuegosDueloRoute: typeof AuthenticatedJuegosDueloRoute
   AuthenticatedJuegosKaraokeRoute: typeof AuthenticatedJuegosKaraokeRoute
@@ -1665,6 +1706,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedJuegosTekojojaRoute: typeof AuthenticatedJuegosTekojojaRoute
   AuthenticatedJuegosTembiuRoute: typeof AuthenticatedJuegosTembiuRoute
   AuthenticatedJuegosTriviaDueloRoute: typeof AuthenticatedJuegosTriviaDueloRoute
+  AuthenticatedJuegosVentanillaRoute: typeof AuthenticatedJuegosVentanillaRoute
   AuthenticatedMostradorEditarRoute: typeof AuthenticatedMostradorEditarRoute
   AuthenticatedPracticaRegistroRoute: typeof AuthenticatedPracticaRegistroRoute
   AuthenticatedTriviaCategoryRoute: typeof AuthenticatedTriviaCategoryRoute
@@ -1706,6 +1748,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDocenteConstanciaRoute: AuthenticatedDocenteConstanciaRoute,
   AuthenticatedDocenteJuegosRoute: AuthenticatedDocenteJuegosRoute,
   AuthenticatedJuegosAhorcadoRoute: AuthenticatedJuegosAhorcadoRoute,
+  AuthenticatedJuegosChacraRoute: AuthenticatedJuegosChacraRoute,
   AuthenticatedJuegosConsultorioRoute: AuthenticatedJuegosConsultorioRoute,
   AuthenticatedJuegosDueloRoute: AuthenticatedJuegosDueloRoute,
   AuthenticatedJuegosKaraokeRoute: AuthenticatedJuegosKaraokeRoute,
@@ -1718,6 +1761,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedJuegosTekojojaRoute: AuthenticatedJuegosTekojojaRoute,
   AuthenticatedJuegosTembiuRoute: AuthenticatedJuegosTembiuRoute,
   AuthenticatedJuegosTriviaDueloRoute: AuthenticatedJuegosTriviaDueloRoute,
+  AuthenticatedJuegosVentanillaRoute: AuthenticatedJuegosVentanillaRoute,
   AuthenticatedMostradorEditarRoute: AuthenticatedMostradorEditarRoute,
   AuthenticatedPracticaRegistroRoute: AuthenticatedPracticaRegistroRoute,
   AuthenticatedTriviaCategoryRoute: AuthenticatedTriviaCategoryRoute,

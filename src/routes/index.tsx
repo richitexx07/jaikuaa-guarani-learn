@@ -134,7 +134,7 @@ function Hero() {
 
 const ADENTRO = [
   { img: bannerCurso, title: "Un curso paso a paso", desc: "Lecciones cortas con voces humanas paraguayas, a tu ritmo." },
-  { img: coverKaraoke, title: "13 juegos", desc: "Karaoke, cocina, penales, duelos y más para practicar jugando." },
+  { img: coverKaraoke, title: "15 juegos", desc: "Karaoke, cocina, penales, duelos y guaraní para el trabajo." },
   { img: bannerEscolar, title: "Guaraní Escolar", desc: "Organizado por grado, para entender y aprobar en la escuela." },
 ];
 

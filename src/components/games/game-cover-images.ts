@@ -1,5 +1,7 @@
 import type { CoverId } from "./game-covers";
 import consultorio from "@/assets/covers/cover-consultorio.webp";
+import ventanilla from "@/assets/covers/cover-ventanilla.webp";
+import chacra from "@/assets/covers/cover-chacra.webp";
 import karaoke from "@/assets/covers/cover-karaoke.webp";
 import tembiu from "@/assets/covers/cover-tembiu.webp";
 import taanga from "@/assets/covers/cover-taanga.webp";
@@ -16,6 +18,8 @@ import palabraDelDia from "@/assets/covers/cover-palabra-del-dia.webp";
 /** Portadas ilustradas de cada juego (Jai en escena, sin texto dentro de la imagen). */
 export const COVER_IMAGE: Record<CoverId, string> = {
   consultorio,
+  ventanilla,
+  chacra,
   karaoke,
   tembiu,
   taanga,

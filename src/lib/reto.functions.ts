@@ -8,7 +8,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
  * Instagram o Facebook). Cuenta el primer intento de cada persona.
  */
 
-const JUEGOS = ["penales", "ahorcado", "memoria", "sopa", "tembiu", "taanga", "tekojoja", "karaoke", "trivia", "consultorio"] as const;
+const JUEGOS = ["penales", "ahorcado", "memoria", "sopa", "tembiu", "taanga", "tekojoja", "karaoke", "trivia", "consultorio", "ventanilla", "chacra"] as const;
 
 // Las tablas nuevas todavía no están en los tipos generados.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

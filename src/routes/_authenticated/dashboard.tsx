@@ -69,6 +69,8 @@ import miniDuelo from "@/assets/covers/mini/mini-duelo.webp";
 import miniSopa from "@/assets/covers/mini/mini-sopa-de-letras.webp";
 import miniAhorcado from "@/assets/covers/mini/mini-ahorcado.webp";
 import miniNeeRape from "@/assets/covers/mini/mini-nee-rape.webp";
+import miniVentanilla from "@/assets/covers/mini/mini-ventanilla.webp";
+import miniChacra from "@/assets/covers/mini/mini-chacra.webp";
 import coverPalabra from "@/assets/covers/cover-palabra-del-dia.webp";
 import coverPenales from "@/assets/covers/cover-penales.webp";
 import coverTrivia from "@/assets/covers/cover-trivia-duelo.webp";
@@ -212,6 +214,8 @@ const JUEGOS_ROTAN: { img: string; nombre: string }[] = [
   { img: miniTaanga, nombre: "Ta'anga" },
   { img: miniMemoria, nombre: "Memoria" },
   { img: miniConsultorio, nombre: "Consultorio" },
+  { img: miniVentanilla, nombre: "Ventanilla" },
+  { img: miniChacra, nombre: "Chacra" },
   { img: miniDuelo, nombre: "Duelo" },
   { img: miniTekojoja, nombre: "Tekojoja" },
   { img: miniSopa, nombre: "Sopa" },
@@ -443,7 +447,7 @@ function Dashboard() {
           {/* 2. TRES BOTONES GIGANTES */}
           <nav aria-label="Elegí qué hacer" className="mt-5 grid gap-3 sm:grid-cols-3">
             <BigAction to="/curso/$lang" img={bannerCurso} title="Aprender" desc="Seguí tu curso con voces reales" tone="primary" />
-            <BigAction to="/juegos" img={coverKaraoke} rotate={JUEGOS_ROTAN} title="Jugar" desc="13 juegos para aprender jugando" tone="accent" />
+            <BigAction to="/juegos" img={coverKaraoke} rotate={JUEGOS_ROTAN} title="Jugar" desc="15 juegos para aprender jugando" tone="accent" />
             <BigAction to="/juegos/palabra-del-dia" img={coverPalabra} title="Palabra del día" desc="Una palabra nueva, en 1 minuto" tone="card" />
           </nav>
 
@@ -530,7 +534,7 @@ function Dashboard() {
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <FreeCard to="/trivia" img={coverTrivia} cover title="Preguntados paraguayo" desc="Recorré el Sendero de Jai: gastronomía, mitos, deportes, música y más." accent="accent" inValidation />
-                <FreeCard to="/juegos" img={coverPenales} cover title="13 juegos" desc="Karaoke, cocina, penales, duelos, sopa de letras y más." accent="accent" />
+                <FreeCard to="/juegos" img={coverPenales} cover title="15 juegos" desc="Karaoke, cocina, penales, duelos, ventanilla, chacra y más." accent="accent" />
                 <FreeCard to="/ranking" img={jaiTrofeo} title="Ranking semanal" desc="Mirá quiénes estudiaron más esta semana en tu grupo." accent="primary" />
               </div>
               <div className="mt-6 rounded-2xl border border-dashed border-border bg-muted/40 p-4">
