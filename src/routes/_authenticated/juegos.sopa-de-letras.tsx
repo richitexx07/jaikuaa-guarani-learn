@@ -14,6 +14,7 @@ import jaiPiensa from "@/assets/jai/jai-piensa.webp";
 import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
 import jaiFesteja from "@/assets/jai/jai-festeja.webp";
 import type { GameWord } from "@/lib/games.functions";
+import { useSDT } from "@/lib/i18n-sopa-duelo";
 
 export const Route = createFileRoute("/_authenticated/juegos/sopa-de-letras")({
   head: () => ({
@@ -139,6 +140,7 @@ const CSS = `
 
 function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Partida; extra: string; onNext: () => void }) {
   const feedback = useGameFeedback();
+  const tt = useSDT();
   const { size, grid, placed } = puzzle;
   const [start, setStart] = useState<number | null>(null);
   const [found, setFound] = useState<Set<number>>(new Set());
@@ -232,10 +234,10 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
         />
         <p className="min-w-0 flex-1 text-sm leading-snug">
           {done
-            ? "¡Las encontraste todas!"
+            ? tt("allFound")
             : found.size > 0
-              ? `¡Bien! Te faltan ${placed.length - found.size}.`
-              : "Deslizá el dedo sobre cada palabra, en línea recta (horizontal o vertical)."}
+              ? tt("left", { n: placed.length - found.size })
+              : tt("swipe")}
         </p>
         <p className="shrink-0 rounded-full px-3 py-1 font-display text-lg font-bold text-white" style={{ background: S.tinta }}>
           {found.size}/{placed.length}
@@ -302,13 +304,13 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
 
       {done && (
         <div className="space-y-3 rounded-3xl bg-white p-6 text-center shadow-lg ring-1 ring-[#C9DCF0]">
-          <img src={jaiFesteja} alt="Jai festeja" className="mx-auto h-32 w-auto object-contain" />
-          <p className="font-display text-3xl font-bold">¡Encontraste todas!</p>
-          {segundos > 0 && <p className="text-sm opacity-75">En {segundos} segundos</p>}
-          <p className="text-3xl tracking-widest text-[#F2B544]" aria-label="3 de 3 estrellas">★★★</p>
+          <img src={jaiFesteja} alt={tt("jaiCheers")} className="mx-auto h-32 w-auto object-contain" />
+          <p className="font-display text-3xl font-bold">{tt("foundTitle")}</p>
+          {segundos > 0 && <p className="text-sm opacity-75">{tt("inSeconds", { n: segundos })}</p>}
+          <p className="text-3xl tracking-widest text-[#F2B544]" aria-label={tt("stars3")}>★★★</p>
           <p className="font-bold text-[#2F7A4A]">+{XP} XP</p>
           <div className="flex flex-wrap justify-center gap-2">
-            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: S.tinta }}>Otra sopa</button>
+            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: S.tinta }}>{tt("anotherSoup")}</button>
           </div>
           {segundos > 0 && <RetoFinal partida={partida} puntaje={segundos} extra={extra} />}
         </div>
