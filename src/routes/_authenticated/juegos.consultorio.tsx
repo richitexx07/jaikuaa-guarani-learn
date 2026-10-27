@@ -86,6 +86,8 @@ function Consultorio() {
     try {
       const v = localStorage.getItem("jaikuaa:consultorio-idioma");
       if (v === "pt" || v === "es") setIdioma(v);
+      // Sin elección guardada: sigue el idioma de la app (portugués si la app está en portugués).
+      else if (localStorage.getItem("jaikuaa_lang") === "pt") setIdioma("pt");
     } catch {}
   }, []);
   const cambiarIdioma = (v: Idioma) => {
