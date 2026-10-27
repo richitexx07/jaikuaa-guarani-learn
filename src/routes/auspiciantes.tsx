@@ -7,7 +7,6 @@ import jaiEmbajador from "@/assets/jai/jai-embajador.webp";
 import coverPalabra from "@/assets/covers/cover-palabra-del-dia.webp";
 import coverAhorcado from "@/assets/covers/cover-ahorcado.webp";
 import coverSopa from "@/assets/covers/cover-sopa-de-letras.webp";
-import jaiTrofeo from "@/assets/jai/jai-trofeo.webp";
 import jaiProfe from "@/assets/jai-profe.webp";
 import { HeroJai, InfoCard, MarketingHeader, Section, WhatsAppCta } from "@/components/marketing/page-parts";
 
@@ -140,9 +139,6 @@ function AuspiciantesPage() {
               }
             >
               {t("auWallT")}
-            </SlotCard>
-            <SlotCard title={t("auPrize")} mock={<img src={jaiTrofeo} alt="" className="mx-auto h-28 w-auto object-contain" loading="lazy" />}>
-              {t("auPrizeT")}
             </SlotCard>
             <SlotCard title={t("auTrain")} mock={<img src={jaiProfe} alt="" className="mx-auto h-28 w-auto object-contain" loading="lazy" />}>
               {t("auTrainT")}
