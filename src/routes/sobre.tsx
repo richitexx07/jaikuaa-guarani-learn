@@ -2,6 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
+import { CheckCircle2, Gamepad2, Gift, Home, Mic, type LucideIcon } from "lucide-react";
+import { HeroJai } from "@/components/marketing/page-parts";
+import jaiSaluda from "@/assets/jai/jai-saluda.webp";
+import jaiFesteja from "@/assets/jai/jai-festeja.webp";
 import { Mail } from "lucide-react";
 
 export const Route = createFileRoute("/sobre")({
@@ -31,8 +35,9 @@ function SobrePage() {
 
       <main className="flex-1">
         {/* Título e intro */}
-        <section className="px-4 pt-16 pb-12 sm:px-6 sm:pt-24 sm:pb-16">
+        <section className="px-4 pt-8 pb-12 sm:px-6 sm:pt-16 sm:pb-16">
           <div className="mx-auto max-w-3xl text-center">
+            <HeroJai src={jaiSaluda} alt="Jai, el jaguarete de Jaikuaa, saluda" />
             <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
               Sobre Jaikuaa
             </h1>
@@ -63,19 +68,19 @@ function SobrePage() {
               Qué nos hace diferentes
             </h2>
             <div className="mt-8 grid gap-5 sm:grid-cols-2">
-              <ValueCard emoji="🎙️" title="Voz humana real">
+              <ValueCard icon={Mic} title="Voz humana real">
                 Pronunciación paraguaya auténtica. Nada de voz robótica.
               </ValueCard>
-              <ValueCard emoji="🏠" title="Para toda la vida">
+              <ValueCard icon={Home} title="Para toda la vida">
                 Contenido pensado para la escuela, la familia y el trabajo.
               </ValueCard>
-              <ValueCard emoji="✅" title="Puro y jopara">
+              <ValueCard icon={CheckCircle2} title="Puro y jopara">
                 Distinción clara entre el guaraní puro (teete) y el jopara del habla cotidiana.
               </ValueCard>
-              <ValueCard emoji="🎮" title="Aprendizaje con juego">
+              <ValueCard icon={Gamepad2} title="Aprendizaje con juego">
                 Para que enseñar y aprender no aburra.
               </ValueCard>
-              <ValueCard emoji="🎁" title="Guaraní básico gratis">
+              <ValueCard icon={Gift} title="Guaraní básico gratis">
                 El curso básico de guaraní es gratuito para los paraguayos.
               </ValueCard>
             </div>
@@ -141,8 +146,9 @@ function SobrePage() {
         {/* Cierre destacado */}
         <section className="px-4 py-16 sm:px-6 sm:py-24">
           <div className="mx-auto max-w-3xl text-center">
+            <img src={jaiFesteja} alt="" className="mx-auto mb-4 h-32 w-auto object-contain" loading="lazy" />
             <p className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-              Jaikuaa — conozcamos juntos. 🐆
+              Jaikuaa — conozcamos juntos.
             </p>
           </div>
         </section>
@@ -153,10 +159,12 @@ function SobrePage() {
   );
 }
 
-function ValueCard({ emoji, title, children }: { emoji: string; title: string; children: React.ReactNode }) {
+function ValueCard({ icon: Icon, title, children }: { icon: LucideIcon; title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-elegant card-hover">
-      <div className="text-4xl" aria-hidden>{emoji}</div>
+      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary" aria-hidden>
+        <Icon className="h-6 w-6" />
+      </span>
       <h3 className="mt-3 font-display text-lg font-semibold text-foreground">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{children}</p>
     </div>

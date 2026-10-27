@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
+import { HeroJai } from "@/components/marketing/page-parts";
+import jaiGraduado from "@/assets/jai/jai-graduado.webp";
 import { FileText } from "lucide-react";
 
 export const Route = createFileRoute("/respaldos")({
@@ -63,8 +65,9 @@ function RespaldosPage() {
         </div>
       </header>
 
-      <main className="flex-1 px-4 py-16 sm:px-6 sm:py-20">
+      <main className="flex-1 px-4 pb-16 pt-8 sm:px-6 sm:pb-20 sm:pt-14">
         <div className="mx-auto max-w-3xl">
+          <HeroJai src={jaiGraduado} alt="Jai con birrete y diploma" />
           <h1 className="text-center font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Respaldos institucionales
           </h1>

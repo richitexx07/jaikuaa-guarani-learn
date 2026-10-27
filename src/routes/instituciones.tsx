@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteFooter } from "@/components/site-footer";
-import { BackingList, InfoCard, MarketingHeader, Section, WhatsAppCta } from "@/components/marketing/page-parts";
+import { BarChart3, BookOpen, Handshake, KeyRound, MessagesSquare, Mic, Scale, Smartphone, WifiOff } from "lucide-react";
+import jaiAtencion from "@/assets/jai-atencion-pro.webp";
+import { BackingList, HeroJai, InfoCard, MarketingHeader, Section, WhatsAppCta } from "@/components/marketing/page-parts";
 
 const MSG = "Hola, quisiera información sobre el plan piloto de Jaikuaa para nuestra institución.";
 
@@ -35,8 +37,9 @@ function InstitucionesPage() {
     <div className="flex min-h-screen flex-col bg-background">
       <MarketingHeader />
       <main className="flex-1">
-        <section className="px-4 pt-16 pb-10 sm:px-6 sm:pt-24">
+        <section className="px-4 pt-8 pb-10 sm:px-6 sm:pt-16">
           <div className="mx-auto max-w-3xl text-center">
+            <HeroJai src={jaiAtencion} alt="Jai, de saco y corbata, listo para atender" />
             <span className="inline-flex rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
               Para instituciones
             </span>
@@ -55,15 +58,15 @@ function InstitucionesPage() {
 
         <Section title="Por qué importa">
           <div className="grid gap-5 sm:grid-cols-3">
-            <InfoCard emoji="🗣️" title="Es la lengua de la gente">
+            <InfoCard icon={MessagesSquare} title="Es la lengua de la gente">
               El 66,9 % de la población habla guaraní (Encuesta Permanente de Hogares Continua 2022, INE). Muchas
               personas entienden mejor un trámite, una indicación o un aviso en su idioma.
             </InfoCard>
-            <InfoCard emoji="⚖️" title="Lo pide la ley">
+            <InfoCard icon={Scale} title="Lo pide la ley">
               La Ley N.° 4.251/10 de Lenguas establece que las dos lenguas oficiales tienen vigencia y uso en todas las
               instituciones públicas (Art. 3).
             </InfoCard>
-            <InfoCard emoji="🤝" title="Mejor atención">
+            <InfoCard icon={Handshake} title="Mejor atención">
               Un funcionario que se comunica bien en guaraní genera confianza y evita malentendidos con quienes atiende.
             </InfoCard>
           </div>
@@ -71,23 +74,23 @@ function InstitucionesPage() {
 
         <Section title="Qué incluye el piloto" intro="Sin costo para la institución durante las 12 semanas.">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <InfoCard emoji="🔑" title="Acceso con código propio">
+            <InfoCard icon={KeyRound} title="Acceso con código propio">
               Todos los participantes entran con el código de su institución, desde el celular o la computadora.
             </InfoCard>
-            <InfoCard emoji="🎙️" title="Lecciones con voz humana">
+            <InfoCard icon={Mic} title="Lecciones con voz humana">
               Contenido en revisión por docentes especialistas y audios grabados por hablantes paraguayos.
             </InfoCard>
-            <InfoCard emoji="📚" title="Vocabulario de tu área">
+            <InfoCard icon={BookOpen} title="Vocabulario de tu área">
               La institución aporta sus términos técnicos y los especialistas elaboran y validan su versión en guaraní
               antes de publicarla: salud, agro, atención al público, jurídico y más.
             </InfoCard>
-            <InfoCard emoji="📊" title="Panel de seguimiento">
+            <InfoCard icon={BarChart3} title="Panel de seguimiento">
               Quién participa, cuánto avanza cada persona, informe mensual e informe final de resultados.
             </InfoCard>
-            <InfoCard emoji="📱" title="App en el celular">
+            <InfoCard icon={Smartphone} title="App en el celular">
               Jaikuaa se instala en la pantalla del teléfono y se abre como una aplicación.
             </InfoCard>
-            <InfoCard emoji="📶" title="Uso sin conexión">
+            <InfoCard icon={WifiOff} title="Uso sin conexión">
               Las lecciones y audios que ya abriste quedan guardados en el teléfono para estudiar donde no hay señal; el
               avance se sincroniza al volver la conexión.
             </InfoCard>

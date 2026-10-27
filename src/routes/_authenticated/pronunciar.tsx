@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GrabateCompara } from "@/components/voz/grabate-compara";
 import { withOfflineCache } from "@/lib/offline-data";
+import { PageHero } from "@/components/page-hero";
+import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 import { listPalabrasConVoz, type PalabraConVoz } from "@/lib/voz.functions";
 
 export const Route = createFileRoute("/_authenticated/pronunciar")({
@@ -82,12 +84,9 @@ function Pronunciar() {
 
       <main className="flex-1 px-4 pb-28 pt-6 sm:px-6 sm:py-10">
         <div className="mx-auto max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-accent">Pronunciación</p>
-          <h1 className="mt-1 font-display text-2xl font-bold text-foreground sm:text-3xl">Grabate y compará</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Escuchá cómo lo dice un hablante paraguayo, grabate diciendo lo mismo y escuchá las dos voces una después de la
-            otra. Repetí hasta que suene parecido.
-          </p>
+          <PageHero img={jaiBienvenida} imgAlt="Jai con auriculares" eyebrow="Pronunciación" title="Grabate y compará">
+            Escuchá a un hablante paraguayo, grabate diciendo lo mismo y compará las dos voces.
+          </PageHero>
 
           {isLoading && <Loader2 className="mx-auto mt-10 h-6 w-6 animate-spin text-muted-foreground" />}
           {error && <p className="mt-6 text-sm text-destructive">{(error as Error).message}</p>}

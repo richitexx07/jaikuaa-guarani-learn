@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import { ReportErrorButton } from "@/components/report-error-button";
+import { PageHero } from "@/components/page-hero";
+import jaiProfe from "@/assets/jai-profe.webp";
 import { listGlossary } from "@/lib/glossary.functions";
 
 export const Route = createFileRoute("/_authenticated/glosario")({
@@ -63,13 +65,11 @@ function GlossaryPage() {
         </div>
       </header>
 
-      <main className="flex-1 px-4 py-6 sm:px-6 sm:py-10">
+      <main className="flex-1 px-4 pb-28 pt-5 sm:px-6 sm:pt-10">
         <div className="mx-auto max-w-3xl">
-          <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl">Glosario</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Las palabras publicadas de Jaikuaa, con su significado y su audio. Si ves algo que parece estar mal,
-            tocá la banderita: lo revisa el equipo docente.
-          </p>
+          <PageHero img={jaiProfe} imgAlt="Jai, el profe, con su libro" title="Glosario">
+            Las palabras publicadas, con su significado y su audio. Si ves algo raro, tocá la banderita.
+          </PageHero>
 
           <div className="relative mt-6">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
@@ -118,8 +118,8 @@ function GlossaryPage() {
                         <div className="text-sm text-muted-foreground">{w.es}</div>
                       </div>
                       {w.validated && (
-                        <span className="hidden shrink-0 text-[11px] font-medium text-primary/80 sm:inline">
-                          ✓ Validado por docente
+                        <span className="hidden shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200 sm:inline-flex">
+                          Revisada por docente
                         </span>
                       )}
                       <ReportErrorButton gn={w.gn} es={w.es} lugar="Glosario" />

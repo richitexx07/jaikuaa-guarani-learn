@@ -2,6 +2,8 @@ import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, MessageCircle, X } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import type { LucideIcon } from "lucide-react";
+import { NandutiDisc } from "@/components/nanduti-disc";
 import { SUPPORT_WHATSAPP } from "@/lib/contact";
 
 const NAV_LINKS = [
@@ -84,12 +86,16 @@ export function Section({ title, intro, children }: { title: string; intro?: str
   );
 }
 
-export function InfoCard({ emoji, img, title, children, tag }: { emoji?: string; img?: string; title: string; children: ReactNode; tag?: string }) {
+export function InfoCard({ emoji, img, icon: Icon, title, children, tag }: { emoji?: string; img?: string; icon?: LucideIcon; title: string; children: ReactNode; tag?: string }) {
   return (
     <div className="flex flex-col gap-2 rounded-2xl border border-border/60 bg-card p-6 shadow-elegant">
       <div className="flex items-center justify-between">
         {img ? (
           <img src={img} alt="" className="h-16 w-16 object-contain" loading="lazy" />
+        ) : Icon ? (
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary" aria-hidden>
+            <Icon className="h-6 w-6" />
+          </span>
         ) : (
           <span className="text-2xl" aria-hidden>
             {emoji}
@@ -124,5 +130,15 @@ export function BackingList() {
         </li>
       ))}
     </ul>
+  );
+}
+
+/** Jai sobre el disco de ñandutí, para las cabeceras de las páginas públicas. */
+export function HeroJai({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div className="relative mx-auto mb-5 h-36 w-36 sm:h-44 sm:w-44">
+      <NandutiDisc className="absolute inset-0 h-full w-full text-primary" />
+      <img src={src} alt={alt} className="relative h-full w-full object-contain drop-shadow-xl" />
+    </div>
   );
 }

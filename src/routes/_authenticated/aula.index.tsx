@@ -8,6 +8,8 @@ import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getMisAulas, salirAula, unirseAula } from "@/lib/aula.functions";
+import { PageHero } from "@/components/page-hero";
+import jaiProfe from "@/assets/jai-profe.webp";
 import { estadoTarea, fechaCorta, normalizarCodigo } from "@/lib/aula";
 
 export const Route = createFileRoute("/_authenticated/aula/")({
@@ -82,11 +84,11 @@ function AulaAlumno() {
 
       <main className="flex-1 px-4 pb-28 pt-6 sm:px-6 sm:py-10">
         <div className="mx-auto max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-accent">Aula</p>
-          <h1 className="mt-1 font-display text-2xl font-bold text-foreground sm:text-3xl">Mi aula</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Entrá con el código que te dio tu docente. Vas a ver las tareas que te asigna y tu docente va a ver tu avance
-            (solo tu nombre y lo que completaste).
+          <PageHero img={jaiProfe} imgAlt="Jai, el profe" eyebrow="Aula" title="Mi aula">
+            Entrá con el código de tu docente y mirá tus tareas.
+          </PageHero>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Tu docente solo ve tu nombre y lo que completaste.
           </p>
 
           <div className="mt-5 rounded-2xl border border-primary/30 bg-card p-4 shadow-sm">

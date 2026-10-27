@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useServerFn } from "@tanstack/react-start";
 import { getGameWords } from "@/lib/games.functions";
 import { buildIndex, clean, isNasal, lastWord, PARES, type Fix } from "@/lib/limpiador";
+import { PageHero } from "@/components/page-hero";
+import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 import jaiImg from "@/assets/jai-tradicional.png";
 
 export const Route = createFileRoute("/teclado")({
@@ -88,7 +90,7 @@ function TecladoPage() {
     const blob = await (await fetch(card)).blob();
     const file = new File([blob], "jaikuaa-tarjeta.png", { type: "image/png" });
     if (navigator.canShare?.({ files: [file] })) {
-      try { await navigator.share({ files: [file], text: "Desde Jaikuaa 🐆" }); return; } catch { /* cancelado */ }
+      try { await navigator.share({ files: [file], text: "Desde Jaikuaa 🇵🇾" }); return; } catch { /* cancelado */ }
     }
     const a = document.createElement("a"); a.href = card; a.download = "jaikuaa-tarjeta.png"; a.click();
   }
@@ -128,9 +130,10 @@ function TecladoPage() {
 
   return (
     <main className="mx-auto max-w-xl px-4 py-6 pb-28">
-      <Link to="/" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground"><ArrowLeft className="h-4 w-4" /> Volver</Link>
-      <h1 className="font-display text-2xl font-bold text-foreground">⌨️ Teclado Guaraní</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Escribí con tu teclado de siempre y usá estas teclas para las letras del Achegety. Después copiá o mandá por WhatsApp.</p>
+      <Link to="/" className="mb-3 inline-flex items-center gap-1 text-sm text-muted-foreground"><ArrowLeft className="h-4 w-4" /> Volver</Link>
+      <PageHero img={jaiBienvenida} imgAlt="Jai con su celular" title="Teclado Guaraní">
+        Usá estas teclas para las letras del Achegety y después copiá o mandá por WhatsApp.
+      </PageHero>
 
       <Textarea ref={ref} value={text} onChange={(e) => setText(e.target.value)} rows={5}
         placeholder="Mba'éichapa…" className="mt-4 text-lg" aria-label="Texto en guaraní" />
@@ -161,7 +164,7 @@ function TecladoPage() {
         </Button>
       </div>
       <section className="mt-6 space-y-3 rounded-xl border border-border bg-card p-4">
-        <h2 className="font-display text-lg font-bold text-foreground">✨ Ayudas mágicas</h2>
+        <h2 className="flex items-center gap-2 font-display text-lg font-bold text-foreground"><Wand2 className="h-5 w-5 text-primary" aria-hidden /> Ayudas mágicas</h2>
         <Button className="w-full" variant="secondary" onClick={limpiar} disabled={!text || !words}>
           <Wand2 /> Limpiador Guaraní (pusó y nasales)
         </Button>

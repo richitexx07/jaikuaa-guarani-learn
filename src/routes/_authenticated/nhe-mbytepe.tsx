@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
+import jaiSaluda from "@/assets/jai/jai-saluda.webp";
 import { ValidationNotice } from "@/components/validation-notice";
 
 export const Route = createFileRoute("/_authenticated/nhe-mbytepe")({
@@ -159,13 +160,11 @@ function NheMbytepe() {
         </div>
       </header>
 
-      <main className="flex-1 px-4 py-10 sm:px-6 sm:py-14">
+      <main className="flex-1 px-4 pb-28 pt-6 sm:px-6 sm:pt-14">
         <div className="mx-auto max-w-4xl">
           <div className="text-center">
-            <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-              🗣️ Ñe'ẽ Mbytépe
-            </div>
-            <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+            <img src={jaiSaluda} alt="Jai saluda" className="mx-auto h-28 w-auto object-contain drop-shadow-lg sm:h-36" />
+            <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
               Ñe'ẽ Mbytépe
             </h1>
             <p className="mt-2 text-base font-medium text-muted-foreground sm:text-lg">

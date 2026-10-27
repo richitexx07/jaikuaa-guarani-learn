@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/site-footer";
-import { InfoCard, MarketingHeader, Section, WhatsAppCta } from "@/components/marketing/page-parts";
+import { BarChart3, CalendarDays, CheckCircle2, GraduationCap, ReceiptText, Zap } from "lucide-react";
+import jaiEmbajador from "@/assets/jai/jai-embajador.webp";
+import coverPalabra from "@/assets/covers/cover-palabra-del-dia.webp";
+import coverAhorcado from "@/assets/covers/cover-ahorcado.webp";
+import coverSopa from "@/assets/covers/cover-sopa-de-letras.webp";
+import jaiTrofeo from "@/assets/jai/jai-trofeo.webp";
+import jaiProfe from "@/assets/jai-profe.webp";
+import { HeroJai, InfoCard, MarketingHeader, Section, WhatsAppCta } from "@/components/marketing/page-parts";
 
 const MSG = "Hola, me interesa sumar mi marca como auspiciante de Jaikuaa.";
 
@@ -32,13 +39,12 @@ export const Route = createFileRoute("/auspiciantes")({
 });
 
 /** Vista de ejemplo de cómo aparece la marca dentro de un juego. */
-function GameMock({ emoji, title, feminine }: { emoji: string; title: string; feminine?: boolean }) {
+function GameMock({ img, title, feminine }: { img: string; title: string; feminine?: boolean }) {
   return (
-    <div className="rounded-xl border border-border/60 bg-background p-4 text-center">
-      <div className="font-display text-lg font-bold text-foreground">
-        <span aria-hidden>{emoji}</span> {title}
-      </div>
-      <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+    <div className="overflow-hidden rounded-xl border border-border/60 bg-background text-center">
+      <img src={img} alt="" className="aspect-[16/9] w-full object-cover" loading="lazy" />
+      <div className="px-3 pt-2 font-display text-lg font-bold text-foreground">{title}</div>
+      <p className="mt-1 px-3 pb-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
         {feminine ? "Presentada por" : "Presentado por"} <span className="font-bold text-accent">Tu marca</span>
       </p>
     </div>
@@ -60,8 +66,9 @@ function AuspiciantesPage() {
     <div className="flex min-h-screen flex-col bg-background">
       <MarketingHeader />
       <main className="flex-1">
-        <section className="px-4 pt-16 pb-10 sm:px-6 sm:pt-24">
+        <section className="px-4 pt-8 pb-10 sm:px-6 sm:pt-16">
           <div className="mx-auto max-w-3xl text-center">
+            <HeroJai src={jaiEmbajador} alt="Jai con un megáfono" />
             <span className="inline-flex rounded-full border border-accent/30 bg-accent/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent">
               Para auspiciantes
             </span>
@@ -84,10 +91,10 @@ function AuspiciantesPage() {
               Un proyecto declarado de Interés Nacional y Educativo por el Senado (Declaración N.° 547/2026) y de
               interés lingüístico por la Secretaría de Políticas Lingüísticas (Resolución N.° 116/2026).
             </InfoCard>
-            <InfoCard emoji="📅" title="Presencia diaria">
+            <InfoCard icon={CalendarDays} title="Presencia diaria">
               La Palabra del día y los juegos son lo que los usuarios abren todos los días. Tu marca acompaña ese hábito.
             </InfoCard>
-            <InfoCard emoji="🎓" title="Asociación positiva">
+            <InfoCard icon={GraduationCap} title="Asociación positiva">
               Tu marca queda unida a la educación y al orgullo por nuestra lengua, no a una publicidad que interrumpe.
             </InfoCard>
           </div>
@@ -95,15 +102,15 @@ function AuspiciantesPage() {
 
         <Section title="Espacios disponibles" intro="Así aparece tu marca dentro de la plataforma.">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <SlotCard title="Palabra del día" mock={<GameMock emoji="📅" title="Palabra del día" feminine />}>
+            <SlotCard title="Palabra del día" mock={<GameMock img={coverPalabra} title="Palabra del día" feminine />}>
               Una palabra guaraní por día, con audio humano. El espacio más visitado de la plataforma.
             </SlotCard>
             <SlotCard
               title="Juegos educativos"
               mock={
                 <div className="grid gap-2">
-                  <GameMock emoji="🥯" title="Ahorcado con chipas" />
-                  <GameMock emoji="🔤" title="Sopa de letras" />
+                  <GameMock img={coverAhorcado} title="Ahorcado con chipas" />
+                  <GameMock img={coverSopa} title="Sopa de letras" />
                 </div>
               }
             >
@@ -134,11 +141,11 @@ function AuspiciantesPage() {
             >
               Las primeras empresas que acompañan el lanzamiento quedan en la portada de jaikuaa.com.
             </SlotCard>
-            <SlotCard title="Premios para quienes más aprenden" mock={<div className="rounded-lg bg-background p-4 text-center text-3xl">🎁</div>}>
+            <SlotCard title="Premios para quienes más aprenden" mock={<img src={jaiTrofeo} alt="" className="mx-auto h-28 w-auto object-contain" loading="lazy" />}>
               Vales, descuentos o productos de tu marca para los usuarios más constantes. En preparación, conforme a
               las autorizaciones que correspondan.
             </SlotCard>
-            <SlotCard title="Capacitación de tu personal" mock={<div className="rounded-lg bg-background p-4 text-center text-3xl">🤝</div>}>
+            <SlotCard title="Capacitación de tu personal" mock={<img src={jaiProfe} alt="" className="mx-auto h-28 w-auto object-contain" loading="lazy" />}>
               Guaraní para tu equipo de atención al cliente, con vocabulario de tu rubro revisado por docentes especialistas.
             </SlotCard>
           </div>
@@ -174,7 +181,7 @@ function AuspiciantesPage() {
                 <h3 className="mt-3 font-display text-xl font-bold text-foreground">{p.title}</h3>
                 <ul className="mt-4 flex-1 space-y-2 text-sm text-muted-foreground">
                   {p.items.map((i) => (
-                    <li key={i}>✓ {i}</li>
+                    <li key={i} className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />{i}</li>
                   ))}
                 </ul>
                 <div className="mt-6">
@@ -187,13 +194,13 @@ function AuspiciantesPage() {
 
         <Section title="Resultados medibles">
           <div className="grid gap-5 sm:grid-cols-3">
-            <InfoCard emoji="📊" title="Vistas reales">
+            <InfoCard icon={BarChart3} title="Vistas reales">
               Contamos cada vez que tu marca se muestra, una vez por persona por día: sin cifras infladas.
             </InfoCard>
-            <InfoCard emoji="🧾" title="Informe imprimible">
+            <InfoCard icon={ReceiptText} title="Informe imprimible">
               Recibís un informe con vistas y personas alcanzadas por espacio, listo para tu área de marketing o RSE.
             </InfoCard>
-            <InfoCard emoji="⚡" title="Sin frenar la app">
+            <InfoCard icon={Zap} title="Sin frenar la app">
               Tu marca carga al instante, también con poca señal, porque es parte de la plataforma.
             </InfoCard>
           </div>
