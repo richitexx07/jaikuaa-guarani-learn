@@ -31,6 +31,13 @@ function nuevoId(): string {
   return s;
 }
 
+/** Un puntaje es posible solo si no supera el máximo del reto (o, si gana el menor, si es mayor a 0). */
+export function puntajeValido(puntaje: number, total: number, menos: boolean): boolean {
+  if (!Number.isInteger(puntaje) || puntaje < 0) return false;
+  if (menos) return puntaje > 0;
+  return total > 0 ? puntaje <= total : puntaje === 0;
+}
+
 export type RetoResultado = { nombre: string; puntaje: number; mio: boolean };
 export type RetoGuardado = {
   id: string;
@@ -105,7 +112,7 @@ export const crearReto = createServerFn({ method: "POST" })
       if (!error) break;
       if (k === 3) throw new Error("No se pudo crear el reto. Probá de nuevo.");
     }
-    if (data.puntaje !== undefined) {
+    if (data.puntaje !== undefined && puntajeValido(data.puntaje, data.total, !!data.menos)) {
       await db.from("reto_resultados").insert({ reto_id: id, user_id: context.userId, nombre, puntaje: data.puntaje });
     }
     return { id };
@@ -126,6 +133,11 @@ export const guardarResultadoReto = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const db = await admin();
+    const { data: r } = await db.from("retos").select("total, menos_es_mejor, created_at").eq("id", data.id).maybeSingle();
+    if (!r) throw new Error("Reto no encontrado");
+    if (!puntajeValido(data.puntaje, r.total ?? 0, !!r.menos_es_mejor)) throw new Error("Puntaje no válido");
+    const ok = await db.rpc("consume_rate_limit", { _key: `reto:${context.userId}`, _limit: 20, _window_seconds: 600 });
+    if (ok.data === false) throw new Error("Demasiados intentos. Esperá unos minutos.");
     const nombre = await nombreDe(db, context.userId);
     // Cuenta el primer intento: si ya jugó este reto, no se cambia.
     await db

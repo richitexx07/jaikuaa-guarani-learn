@@ -13,6 +13,24 @@ const XP_CAP: Record<string, number> = {
   game: 20,
 };
 
+/** Tope diario de XP por tipo de actividad (hora de Paraguay). */
+export const XP_DAILY_CAP: Record<string, number> = {
+  lesson: 600,
+  exam: 180,
+  trivia: 300,
+  weekly: 20,
+  onboarding: 15,
+  visit: 0,
+  game: 200,
+};
+
+/** Cuánto XP se puede anotar todavía hoy para esa actividad. */
+export function allowedXp(requested: number, source: string, alreadyToday: number): number {
+  const perEvent = Math.min(Math.max(0, requested), XP_CAP[source] ?? 0);
+  const left = Math.max(0, (XP_DAILY_CAP[source] ?? 0) - Math.max(0, alreadyToday));
+  return Math.min(perEvent, left);
+}
+
 /** Juegos que se registran con recordActivity (la Palabra del día tiene su propio flujo). */
 const GAME_REFS = new Set(["ahorcado", "sopa-de-letras", "memoria", "penales", "duelo", "trivia-duelo", "nee-rape", "tembiu", "karaoke", "tekojoja", "taanga", "consultorio"]);
 
@@ -150,7 +168,22 @@ export const recordActivity = createServerFn({ method: "POST" })
     if (isGuarani) {
       await assertGuaraniLessonAllowed(supabaseAdmin, context.userId, data.sourceRef);
     }
-    const amount = Math.min(data.xp, XP_CAP[data.source] ?? 0);
+    const okRate = await supabaseAdmin.rpc("consume_rate_limit", {
+      _key: `xp:${context.userId}`,
+      _limit: 30,
+      _window_seconds: 600,
+    } as never);
+    if (okRate.data === false) throw new Error("Demasiadas actividades seguidas. Esperá unos minutos.");
+    const dayStart = new Date(`${asuncionToday()}T00:00:00-03:00`).toISOString();
+    const { data: todayRows } = await supabaseAdmin
+      .from("xp_transactions")
+      .select("amount")
+      .eq("user_id", context.userId)
+      .eq("source", data.source)
+      .gte("created_at", dayStart)
+      .limit(1000);
+    const already = ((todayRows ?? []) as { amount: number }[]).reduce((a, r) => a + (r.amount ?? 0), 0);
+    const amount = allowedXp(data.xp, data.source, already);
     // Visitas: como máximo una por día por usuario (sync_id fijo por fecha).
     const syncId = data.source === "visit" ? `visit:${asuncionToday()}` : data.syncId;
     const { error } = await supabaseAdmin.rpc("record_activity", {
