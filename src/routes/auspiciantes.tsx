@@ -7,7 +7,6 @@ import jaiEmbajador from "@/assets/jai/jai-embajador.webp";
 import coverPalabra from "@/assets/covers/cover-palabra-del-dia.webp";
 import coverAhorcado from "@/assets/covers/cover-ahorcado.webp";
 import coverSopa from "@/assets/covers/cover-sopa-de-letras.webp";
-import jaiTrofeo from "@/assets/jai/jai-trofeo.webp";
 import jaiProfe from "@/assets/jai-profe.webp";
 import { HeroJai, InfoCard, MarketingHeader, Section, WhatsAppCta } from "@/components/marketing/page-parts";
 
