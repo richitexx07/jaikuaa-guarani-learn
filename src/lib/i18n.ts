@@ -1,16 +1,19 @@
 import { useSyncExternalStore } from "react";
+import { EXTRA } from "./i18n-extra";
 
 /**
  * Idioma de la interfaz (ES/PT/EN). Solo traduce botones y textos de sistema;
  * nunca contenido en guaraní (eso lo validan los docentes).
  */
-export type AppLang = "es" | "pt" | "en";
-export const APP_LANGS: AppLang[] = ["es", "pt", "en"];
+export type AppLang = "es" | "pt" | "en" | "de" | "fr";
+export const APP_LANGS: AppLang[] = ["es", "pt", "en", "de", "fr"];
+/** Idiomas con traducción preliminar, pendiente de revisión por un hablante nativo. */
+export const PRELIMINARY_LANGS: AppLang[] = ["de", "fr"];
 const KEY = "jaikuaa_lang";
 const listeners = new Set<() => void>();
 
 export function isAppLang(v: unknown): v is AppLang {
-  return v === "es" || v === "pt" || v === "en";
+  return v === "es" || v === "pt" || v === "en" || v === "de" || v === "fr";
 }
 
 function read(): AppLang {
@@ -46,6 +49,7 @@ export function useAppLang(): AppLang {
   return useSyncExternalStore(subscribe, read, () => "es");
 }
 
+type BaseLang = "es" | "pt" | "en";
 const DICT = {
   "nav.learn": { es: "Aprender", pt: "Aprender", en: "Learn" },
   "nav.games": { es: "Juegos", pt: "Jogos", en: "Games" },
@@ -105,11 +109,47 @@ const DICT = {
   "auth.errEmail": { es: "Email inválido", pt: "E-mail inválido", en: "Invalid email" },
   "auth.errPwLen": { es: "Mínimo 6 caracteres", pt: "Mínimo de 6 caracteres", en: "At least 6 characters" },
   "auth.errName": { es: "Ingresá tu nombre", pt: "Digite seu nome", en: "Enter your name" },
-} as const satisfies Record<string, Record<AppLang, string>>;
+  "d.learnIntro": { es: "Contenido pedagógico ordenado, con audio humano.", pt: "Conteúdo pedagógico organizado, com áudio humano.", en: "Structured lessons with real human audio." },
+  "d.course.t": { es: "Curso de Guaraní", pt: "Curso de Guarani", en: "Guarani Course" },
+  "d.course.d": { es: "10 lecciones con audio humano real. Empezá desde cero y sumá XP.", pt: "10 lições com áudio humano real. Comece do zero e ganhe XP.", en: "10 lessons with real human audio. Start from scratch and earn XP." },
+  "d.school.t": { es: "Guaraní Escolar", pt: "Guarani Escolar", en: "School Guarani" },
+  "d.school.d": { es: "Organizado según los grados escolares.", pt: "Organizado por séries escolares.", en: "Organized by school grade." },
+  "d.ach.t": { es: "Mis logros", pt: "Minhas conquistas", en: "My achievements" },
+  "d.ach.d": { es: "Tus insignias, racha y avance.", pt: "Suas insígnias, sequência e progresso.", en: "Your badges, streak and progress." },
+  "d.invite.t": { es: "Invitar a alguien", pt: "Convidar alguém", en: "Invite someone" },
+  "d.invite.d": { es: "¿Querés invitar a un amigo o familiar? Compartí tu enlace acá.", pt: "Quer convidar um amigo ou familiar? Compartilhe seu link aqui.", en: "Want to invite a friend or family member? Share your link here." },
+  "d.cert.t": { es: "Certificado", pt: "Certificado", en: "Certificate" },
+  "d.cert.d": { es: "Terminá el Curso de Guaraní y descargá tu certificado.", pt: "Conclua o Curso de Guarani e baixe seu certificado.", en: "Finish the Guarani Course and download your certificate." },
+  "d.playIntro": { es: "Practicá lo aprendido jugando. Todo gratis.", pt: "Pratique o que aprendeu jogando. Tudo grátis.", en: "Practice what you learned by playing. All free." },
+  "d.trivia.t": { es: "Preguntados paraguayo", pt: "Quiz paraguaio", en: "Paraguayan quiz" },
+  "d.trivia.d": { es: "Recorré el Sendero de Jai: gastronomía, mitos, deportes, música y más.", pt: "Percorra a Trilha do Jai: gastronomia, mitos, esportes, música e mais.", en: "Follow Jai's Trail: food, myths, sports, music and more." },
+  "d.games.t": { es: "15 juegos", pt: "15 jogos", en: "15 games" },
+  "d.games.d": { es: "Karaoke, cocina, penales, duelos, ventanilla, chacra y más.", pt: "Karaokê, cozinha, pênaltis, duelos, guichê, roça e mais.", en: "Karaoke, cooking, penalties, duels, service counter, farm and more." },
+  "d.rank.t": { es: "Ranking semanal", pt: "Ranking semanal", en: "Weekly ranking" },
+  "d.rank.d": { es: "Mirá quiénes estudiaron más esta semana en tu grupo.", pt: "Veja quem estudou mais nesta semana no seu grupo.", en: "See who studied the most this week in your group." },
+  "d.more.t": { es: "Vienen más juegos", pt: "Mais jogos a caminho", en: "More games coming" },
+  "d.more.d": { es: "A medida que la comunidad vaya creciendo, iremos sumando más juegos en guaraní.", pt: "À medida que a comunidade crescer, vamos adicionar mais jogos em guarani.", en: "As the community grows, we will keep adding more Guarani games." },
+  "d.more.link": { es: "Ver todos los juegos", pt: "Ver todos os jogos", en: "See all games" },
+  "d.toolsIntro": { es: "Apoyo y consulta.", pt: "Apoio e consulta.", en: "Support and reference." },
+  "d.aula.t": { es: "Mi aula", pt: "Minha turma", en: "My class" },
+  "d.aula.d": { es: "Entrá con el código de tu docente y mirá tus tareas.", pt: "Entre com o código do seu professor e veja suas tarefas.", en: "Join with your teacher's code and see your tasks." },
+  "d.pron.t": { es: "Grabate y compará", pt: "Grave-se e compare", en: "Record and compare" },
+  "d.pron.d": { es: "Escuchá a un hablante, grabate y compará las dos voces.", pt: "Ouça um falante, grave-se e compare as duas vozes.", en: "Listen to a speaker, record yourself and compare both voices." },
+  "d.mostr.t": { es: "Atendé en guaraní", pt: "Atenda em guarani", en: "Serve customers in Guarani" },
+  "d.mostr.d": { es: "Modo mostrador: hacé escuchar frases grabadas por hablantes al atender.", pt: "Modo balcão: toque frases gravadas por falantes ao atender.", en: "Counter mode: play phrases recorded by speakers while serving." },
+  "d.kb.t": { es: "Teclado Guaraní", pt: "Teclado Guarani", en: "Guarani keyboard" },
+  "d.kb.d": { es: "Escribí con ã, g̃ y puso, y mandalo por WhatsApp.", pt: "Escreva com ã, g̃ e puso, e envie pelo WhatsApp.", en: "Type ã, g̃ and puso, and send it on WhatsApp." },
+  "d.gloss.t": { es: "Glosario", pt: "Glossário", en: "Glossary" },
+  "d.gloss.d": { es: "Las palabras publicadas, con su significado y su audio.", pt: "As palavras publicadas, com significado e áudio.", en: "Published words, with their meaning and audio." },
+  "d.agro.d": { es: "Guaraní técnico del campo: suelo, cultivos y ganado.", pt: "Guarani técnico do campo: solo, cultivos e gado.", en: "Technical farm Guarani: soil, crops and livestock." },
+  "d.street.d": { es: "El guaraní que se habla en la calle.", pt: "O guarani falado nas ruas.", en: "The Guarani spoken on the street." },
+  "lang.preliminary": { es: "Traducción preliminar, en validación", pt: "Tradução preliminar, em validação", en: "Preliminary translation, under review" },
+} as const satisfies Record<string, Record<BaseLang, string>>;
 
 export type TKey = keyof typeof DICT;
 
 export function translate(lang: AppLang, key: TKey): string {
+  if (lang === "de" || lang === "fr") return EXTRA[lang][key];
   return DICT[key][lang];
 }
 
