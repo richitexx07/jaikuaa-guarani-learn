@@ -1,3 +1,4 @@
+import { useJU } from "@/lib/i18n-juegos-ui";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shuffle } from "@/components/games/game-shell";
@@ -99,6 +100,7 @@ function Karaoke() {
   // Si el reto llega después (se carga de internet), abre su canción.
   useEffect(() => { if (reto?.x) setSongId(reto.x); }, [reto?.id, reto?.x]);
   const { idx, loading } = useJuegoTextos();
+  const tt = useJU();
   const songs = useMemo(() => applyKaraoke(SONGS, idx), [idx]);
   const song = songs.find((s) => s.id === songId) ?? null;
   return (
@@ -110,7 +112,7 @@ function Karaoke() {
     >
       <ValidationNotice />
       {loading ? (
-        <p className="py-16 text-center text-sm text-white/70">Afinando el arpa…</p>
+        <p className="py-16 text-center text-sm text-white/70">{tt("kkLoading")}</p>
       ) : !song ? (
         <Setlist songs={songs} onPick={(s) => setSongId(s.id)} />
       ) : (
@@ -166,6 +168,7 @@ function Reflectores({ beat }: { beat: number }) {
 }
 
 function Setlist({ songs, onPick }: { songs: Song[]; onPick: (s: Song) => void }) {
+  const tt = useJU();
   return (
     <section className="pt-2">
       <div className="relative overflow-hidden rounded-3xl ring-1 ring-white/10" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.45))" }}>
@@ -173,13 +176,13 @@ function Setlist({ songs, onPick }: { songs: Song[]; onPick: (s: Song) => void }
         <div className="relative grid grid-cols-[1fr_auto] items-end gap-2 p-6 sm:p-8">
           <div>
             <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-6xl">Purahéi Karaoke</h1>
-            <p className="mt-3 max-w-sm text-white/80">La letra se ilumina al ritmo del arpa. Cuando aparece el hueco, tocá la palabra justa a tiempo.</p>
+            <p className="mt-3 max-w-sm text-white/80">{tt("kkIntro")}</p>
           </div>
           <Arpa_ beat={-1} idle className="h-32 w-auto sm:h-44" />
         </div>
         <div className="h-3" style={{ background: `repeating-linear-gradient(90deg, ${K.oro} 0 14px, ${K.magenta} 14px 28px)` }} />
       </div>
-      <h2 className="mt-8 font-display text-xl font-bold">Elegí la canción</h2>
+      <h2 className="mt-8 font-display text-xl font-bold">{tt("kkChoose")}</h2>
       <div className="mt-3 space-y-3">
         {songs.map((s) => (
           <button
@@ -197,7 +200,7 @@ function Setlist({ songs, onPick }: { songs: Song[]; onPick: (s: Song) => void }
             </svg>
             <span className="min-w-0 flex-1">
               <b className="block truncate font-display text-lg">{s.title}</b>
-              <span className="text-sm text-white/65">{s.style} · {s.bpm} pulsos por minuto</span>
+              <span className="text-sm text-white/65">{s.style} · {s.bpm} {tt("kkBpm")}</span>
             </span>
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full" style={{ background: K.oro, color: K.noche }}>
               <Play className="h-5 w-5" fill="currentColor" />
@@ -211,6 +214,7 @@ function Setlist({ songs, onPick }: { songs: Song[]; onPick: (s: Song) => void }
 
 function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partida; onAgain: () => void; onBack: () => void }) {
   const feedback = useGameFeedback();
+  const tt = useJU();
   const beatSec = 60 / song.bpm;
   const lead = 4; // cuenta regresiva
   const timeline = useMemo(() => {
@@ -327,17 +331,17 @@ function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partid
         <div className="relative overflow-hidden rounded-3xl px-6 py-8 ring-1 ring-white/10" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,.45))" }}>
           <Reflectores beat={0} />
           <p className="relative text-5xl"><span className="kk-clap" aria-hidden>👏</span></p>
-          <h2 className="relative mt-3 font-display text-3xl font-bold leading-tight">¡Cantaste «{song.title}»!</h2>
-          <p className="relative mt-3 text-4xl tracking-widest" style={{ color: K.oro }} aria-label={`${stars} de 3 estrellas`}>
+          <h2 className="relative mt-3 font-display text-3xl font-bold leading-tight">{tt("kkSang", { n: song.title })}</h2>
+          <p className="relative mt-3 text-4xl tracking-widest" style={{ color: K.oro }} aria-label={tt("stars", { n: stars })}>
             {"★".repeat(stars)}<span className="opacity-25">{"★".repeat(3 - stars)}</span>
           </p>
-          <p className="relative mt-2 text-white/80">{perfect} de {song.lines.length} versos perfectos · {points} puntos</p>
+          <p className="relative mt-2 text-white/80">{tt("kkLines", { p: perfect, n: song.lines.length, s: points })}</p>
           <p className="relative mt-1 font-bold" style={{ color: K.oro }}>+{xp} XP</p>
         </div>
         <Recorder song={song} />
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: K.oro, color: K.noche }}>Cantar de nuevo</button>
-          <button type="button" onClick={onBack} className="h-12 rounded-2xl px-6 font-bold ring-1 ring-white/30">Otra canción</button>
+          <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: K.oro, color: K.noche }}>{tt("kkAgain")}</button>
+          <button type="button" onClick={onBack} className="h-12 rounded-2xl px-6 font-bold ring-1 ring-white/30">{tt("kkOther")}</button>
         </div>
         <RetoFinal partida={partida} puntaje={points} total={song.lines.length * 5} extra={song.id} coincide={!partida.reto || partida.reto.x === song.id} />
       </section>
@@ -354,7 +358,7 @@ function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partid
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <span className="rounded-full px-3 py-1 text-sm font-bold" style={{ background: combo > 1 ? K.magenta : "rgba(255,255,255,.1)" }}>×{combo}</span>
-          <span className="rounded-full bg-white/10 px-3 py-1 text-sm"><b>{points}</b> pts</span>
+          <span className="rounded-full bg-white/10 px-3 py-1 text-sm"><b>{points}</b> {tt("kkPts")}</span>
         </div>
       </div>
 
@@ -369,7 +373,7 @@ function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partid
               ))}
             </div>
             {!playing && beat < 0 ? (
-              <p className="py-6 font-display text-2xl font-bold">¿Listo para cantar?</p>
+              <p className="py-6 font-display text-2xl font-bold">{tt("kkReady")}</p>
             ) : beat < lead ? (
               <p key={beat} className="kk-count py-2 font-display text-7xl font-bold" style={{ color: K.oro }}>{lead - beat}</p>
             ) : (
@@ -412,7 +416,7 @@ function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partid
         </div>
       </div>
 
-      <div className="flex justify-center gap-1.5" aria-label={`Versos: ${hecho} de ${song.lines.length}`}>
+      <div className="flex justify-center gap-1.5" aria-label={tt("kkVerses", { h: hecho, n: song.lines.length })}>
         {song.lines.map((_, i) => {
           const g = answers[i];
           return <span key={i} className="h-2 w-8 rounded-full" style={{ background: g === "perfect" ? K.oro : g === "good" ? "#F7E6C4" : g === "miss" ? "#7A3355" : "rgba(255,255,255,.15)" }} />;
@@ -442,15 +446,16 @@ function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partid
           style={{ background: K.oro, color: K.noche }}
           onClick={empezar}
         >
-          <Play className="h-6 w-6" fill="currentColor" /> ¡Ñapurahéi! (Cantemos)
+          <Play className="h-6 w-6" fill="currentColor" /> ¡Ñapurahéi! {tt("kkSing")}
         </button>
       )}
-      <p className="text-center text-sm text-white/60">Tocá la palabra que falta justo cuando suena: más cerca del pulso, más puntos.</p>
+      <p className="text-center text-sm text-white/60">{tt("kkTip")}</p>
     </section>
   );
 }
 
 function Recorder({ song }: { song: Song }) {
+  const tt = useJU();
   const [state, setState] = useState<"idle" | "rec" | "ready" | "denied">("idle");
   const [url, setUrl] = useState<string | null>(null);
   const rec = useRef<MediaRecorder | null>(null);
@@ -473,15 +478,15 @@ function Recorder({ song }: { song: Song }) {
   }
   return (
     <div className="rounded-3xl bg-white/[.07] p-5 text-left ring-1 ring-white/10">
-      <p className="flex items-center gap-2 font-display text-lg font-bold"><Mic className="h-5 w-5" style={{ color: K.magenta }} /> Grabate y escuchate</p>
-      <p className="mb-3 text-sm text-white/65">Leé la letra en voz alta. La grabación queda solo en tu celular.</p>
+      <p className="flex items-center gap-2 font-display text-lg font-bold"><Mic className="h-5 w-5" style={{ color: K.magenta }} /> {tt("kkRecTitle")}</p>
+      <p className="mb-3 text-sm text-white/65">{tt("kkRecInfo")}</p>
       <div className="mb-4 space-y-1 font-display text-lg">{song.lines.map((l, i) => <p key={i}>{l.words.join(" ")}</p>)}</div>
       {state === "rec" ? (
-        <button type="button" onClick={() => rec.current?.stop()} className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#D52B1E] px-4 font-semibold"><Square className="h-4 w-4" /> Detener</button>
+        <button type="button" onClick={() => rec.current?.stop()} className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#D52B1E] px-4 font-semibold"><Square className="h-4 w-4" /> {tt("kkStop")}</button>
       ) : (
-        <button type="button" onClick={start} className="inline-flex h-11 items-center gap-2 rounded-xl px-4 font-semibold ring-1 ring-white/30"><Mic className="h-4 w-4" /> {state === "ready" ? "Grabar otra vez" : "Grabar mi voz"}</button>
+        <button type="button" onClick={start} className="inline-flex h-11 items-center gap-2 rounded-xl px-4 font-semibold ring-1 ring-white/30"><Mic className="h-4 w-4" /> {state === "ready" ? tt("kkRecAgain") : tt("kkRec")}</button>
       )}
-      {state === "denied" && <p className="mt-2 text-sm text-[#FF8A8A]">Necesitamos permiso del micrófono para grabar.</p>}
+      {state === "denied" && <p className="mt-2 text-sm text-[#FF8A8A]">{tt("kkMic")}</p>}
       {url && state === "ready" && <audio className="mt-3 w-full" controls src={url} />}
     </div>
   );
