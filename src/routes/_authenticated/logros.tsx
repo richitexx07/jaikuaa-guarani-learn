@@ -1,3 +1,4 @@
+import { useTX, type TXKey } from "@/lib/i18n-pages";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
 import { Lock } from "lucide-react";
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/_authenticated/logros")({
 
 function LogrosPage() {
   const stats = useStats();
+  const tx = useTX();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border/50">
@@ -41,7 +43,7 @@ function LogrosPage() {
             <BrandLogo />
           </Link>
           <Button asChild variant="outline" size="sm">
-            <Link to="/dashboard">← Volver al panel</Link>
+            <Link to="/dashboard">{tx("backPanel")}</Link>
           </Button>
         </div>
       </header>
@@ -51,17 +53,17 @@ function LogrosPage() {
           <div className="text-center">
             <img
               src={jaiFesteja}
-              alt="Jai festeja con los brazos arriba"
+              alt={tx("lgJaiAlt")}
               className="mx-auto mb-1 h-24 w-auto object-contain drop-shadow-lg sm:mb-2 sm:h-40"
             />
             <div className="inline-flex items-center justify-center rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
-              Tus logros <span aria-hidden className="ml-2">🏆</span>
+              {tx("lgYours")} <span aria-hidden className="ml-2">🏆</span>
             </div>
             <h1 className="mt-3 font-display text-2xl font-bold text-foreground sm:mt-4 sm:text-4xl">
-              ¡Mirá cuánto avanzaste!
+              {tx("lgTitle")}
             </h1>
             <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground sm:mt-3 sm:text-base">
-              Sumá XP, mantené tu racha y desbloqueá logros mientras aprendés Guaraní.
+              {tx("lgSub")}
             </p>
           </div>
 
@@ -70,10 +72,10 @@ function LogrosPage() {
           </div>
 
           <h2 className="mt-7 font-display text-2xl font-bold text-foreground sm:mt-10">
-            Logros
+            {tx("lgHeading")}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Desbloqueaste <span className="font-semibold text-foreground">{stats.badges.length}</span> de {BADGES.length}.
+            {tx("lgUnlocked", { a: stats.badges.length, b: BADGES.length })}
           </p>
 
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -118,16 +120,16 @@ function LogrosPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-display text-lg font-semibold text-foreground">
-                        {b.name}
+                        {tx(`badge.${b.id}` as TXKey)}
                       </h3>
                       {earned && (
                         <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent-foreground">
-                          Conseguido
+                          {tx("lgEarned")}
                         </span>
                       )}
                     </div>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {b.description}
+                      {tx(`badgeD.${b.id}` as TXKey)}
                     </p>
                   </div>
                 </div>

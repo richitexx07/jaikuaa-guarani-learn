@@ -1,3 +1,4 @@
+import { useTX, type TXKey } from "@/lib/i18n-pages";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/ranking")({
 const MEDALS = ["🥇", "🥈", "🥉"];
 
 function Row({ r }: { r: RankingRow }) {
+  const tx = useTX();
   return (
     <li
       className={`flex items-center justify-between rounded-xl border px-4 py-3 ${
@@ -33,7 +35,7 @@ function Row({ r }: { r: RankingRow }) {
         </span>
         <span className="font-semibold text-foreground">
           {r.name}
-          {r.isMe && <span className="ml-2 text-xs font-medium text-accent">(vos)</span>}
+          {r.isMe && <span className="ml-2 text-xs font-medium text-accent">{tx("you")}</span>}
         </span>
       </div>
       <span className="font-display font-bold text-primary">{r.xp} XP</span>
@@ -43,17 +45,18 @@ function Row({ r }: { r: RankingRow }) {
 
 /** Los tres primeros en un podio: el 1.º al medio y más alto. */
 function Podium({ rows }: { rows: RankingRow[] }) {
+  const tx = useTX();
   const order = [rows[1], rows[0], rows[2]];
   const alto = ["h-20", "h-28", "h-14"];
   const tono = ["bg-[#C9D1DC] text-[#1E2A3A]", "bg-[#F6C445] text-[#3A1A05]", "bg-[#D9925B] text-[#3A1A05]"];
   return (
-    <ol className="mt-8 grid grid-cols-3 items-end gap-2 sm:gap-3" aria-label="Podio de la semana">
+    <ol className="mt-8 grid grid-cols-3 items-end gap-2 sm:gap-3" aria-label={tx("rkPodium")}>
       {order.map((r, i) => (
         <li key={r.rank} className="flex flex-col items-center text-center">
           <span className="text-2xl" aria-hidden>{MEDALS[r.rank - 1]}</span>
           <span className={`mt-1 w-full truncate px-1 text-sm font-semibold ${r.isMe ? "text-accent" : "text-foreground"}`}>
             {r.name}
-            {r.isMe && " (vos)"}
+            {r.isMe && ` ${tx("you")}`}
           </span>
           <span className="text-xs font-bold text-primary">{r.xp} XP</span>
           <div className={`mt-2 flex w-full items-start justify-center rounded-t-2xl pt-2 font-display text-2xl font-bold shadow-inner ${alto[i]} ${tono[i]}`}>
@@ -66,6 +69,7 @@ function Podium({ rows }: { rows: RankingRow[] }) {
 }
 
 function RankingPage() {
+  const tx = useTX();
   const fn = useServerFn(getWeeklyRanking);
   const q = useQuery({ queryKey: ["weekly-ranking"], queryFn: () => fn(), staleTime: 60_000 });
   const d = q.data;
@@ -77,7 +81,7 @@ function RankingPage() {
             <BrandLogo />
           </Link>
           <Button asChild variant="outline" size="sm">
-            <Link to="/dashboard">← Volver al panel</Link>
+            <Link to="/dashboard">{tx("backPanel")}</Link>
           </Button>
         </div>
       </header>
@@ -86,13 +90,13 @@ function RankingPage() {
           <div className="text-center">
             <img
               src={jaiTrofeo}
-              alt="Jai levanta un trofeo dorado sobre el podio"
+              alt={tx("rkJaiAlt")}
               className="mx-auto h-40 w-auto object-contain drop-shadow-xl sm:h-48"
             />
-            <h1 className="mt-3 font-display text-3xl font-bold text-foreground sm:text-4xl">Ranking semanal</h1>
+            <h1 className="mt-3 font-display text-3xl font-bold text-foreground sm:text-4xl">{tx("rkTitle")}</h1>
             {d && (
               <p className="mt-2 text-sm text-muted-foreground">
-                {d.group} · desde el lunes {new Date(d.weekStart).toLocaleDateString("es-PY", { timeZone: "America/Asuncion" })}
+                {d.group} · {tx("rkSince", { d: new Date(d.weekStart).toLocaleDateString("es-PY", { timeZone: "America/Asuncion" }) })}
               </p>
             )}
           </div>
@@ -102,7 +106,7 @@ function RankingPage() {
             </div>
           ) : d.top.length === 0 ? (
             <p className="mt-8 rounded-xl border border-border/60 bg-card p-6 text-center text-muted-foreground">
-              Todavía nadie sumó puntos esta semana. ¡Hacé una lección y aparecé primero!
+              {tx("rkEmpty")}
             </p>
           ) : (
             <>
@@ -124,18 +128,17 @@ function RankingPage() {
           )}
           {d && (
             <p className="mt-6 text-center text-sm text-muted-foreground">
-              Esta semana sumaste <span className="font-semibold text-foreground">{d.myXp} XP</span>. El ranking se
-              reinicia cada lunes. Solo se muestra el nombre de pila.
+              {tx("rkMine", { x: d.myXp })}
             </p>
           )}
           <div className="mt-6 flex justify-center gap-2">
             <Button asChild variant="cta">
               <Link to="/curso/$lang" params={{ lang: "guarani" }}>
-                Sumar puntos
+                {tx("rkEarn")}
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/juegos">Juegos</Link>
+              <Link to="/juegos">{tx("games")}</Link>
             </Button>
           </div>
         </div>

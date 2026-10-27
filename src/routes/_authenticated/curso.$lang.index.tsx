@@ -1,3 +1,4 @@
+import { useTX, type TXKey } from "@/lib/i18n-pages";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ function CourseIndex() {
   const { lang: langSlug } = useParams({ from: "/_authenticated/curso/$lang/" });
   const lang = getLanguage(langSlug)!;
   const isGuarani = lang.slug === "guarani";
+  const tx = useTX();
   const listFn = useServerFn(listCourseLessons);
   const lessonsQ = useQuery({
     queryKey: ["course-lessons"],
@@ -65,7 +67,7 @@ function CourseIndex() {
             <BrandLogo />
           </Link>
           <Button asChild variant="outline" size="sm">
-            <Link to="/dashboard">← Volver</Link>
+            <Link to="/dashboard">{tx("back")}</Link>
           </Button>
         </div>
       </header>
@@ -78,7 +80,7 @@ function CourseIndex() {
           <section className="relative overflow-hidden rounded-3xl bg-[#0D1B33] shadow-elegant">
             <img
               src={bannerCurso}
-              alt="Jai camina con su mochila por un sendero de piedras entre lomas y lapachos"
+              alt={tx("csBanner")}
               className="aspect-[16/9] w-full object-cover sm:aspect-[16/8]"
               width={1280}
               height={720}
@@ -86,19 +88,19 @@ function CourseIndex() {
             <div className="absolute inset-0 hidden bg-gradient-to-l from-[#0D1B33]/90 via-[#0D1B33]/40 to-transparent sm:block" />
             <div className="p-5 text-white sm:absolute sm:inset-y-0 sm:right-0 sm:flex sm:w-[55%] sm:flex-col sm:justify-end sm:p-7">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">Curso de {lang.name}</h1>
+                <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">{tx("csTitle", { n: lang.name })}</h1>
                 {lang.featured && (
-                  <span className="rounded-full bg-[#F6C445] px-2.5 py-0.5 text-xs font-bold text-[#3A1A05]">Destacado</span>
+                  <span className="rounded-full bg-[#F6C445] px-2.5 py-0.5 text-xs font-bold text-[#3A1A05]">{tx("csFeatured")}</span>
                 )}
               </div>
               <p className="mt-1 text-sm text-white/80">
-                {isGuarani ? `${lessons.length} lecciones` : "10 lecciones"} con voces humanas paraguayas
+                {tx("csLessons", { n: isGuarani ? lessons.length : 10 })}
               </p>
               {isGuarani && dbLessons.length > 0 && (
                 <div className="mt-3 max-w-md">
                   <div className="flex items-center justify-between text-xs font-semibold text-white/85">
-                    <span>Tu progreso</span>
-                    <span>{doneCount} de {dbLessons.length}</span>
+                    <span>{tx("csProgress")}</span>
+                    <span>{tx("csOf", { a: doneCount, b: dbLessons.length })}</span>
                   </div>
                   <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-white/25">
                     <div className="h-full rounded-full bg-[#3DE0B0] transition-all" style={{ width: `${(doneCount / dbLessons.length) * 100}%` }} />
@@ -111,7 +113,7 @@ function CourseIndex() {
           {isGuarani && nextN !== undefined && (
             <Button asChild variant="cta" size="lg" className="mt-5 h-14 w-full text-base">
               <Link to="/curso/$lang/leccion/$n" params={{ lang: lang.slug, n: String(nextN) }}>
-                {doneCount === 0 ? "Empezar" : "Continuar"} con la Lección {nextN}
+                {doneCount === 0 ? tx("csStartWith", { n: nextN }) : tx("csContinueWith", { n: nextN })}
               </Link>
             </Button>
           )}
@@ -127,12 +129,12 @@ function CourseIndex() {
               const title = info?.title;
               const last = i === lessons.length - 1;
               const estado = inValidation
-                ? "En validación"
+                ? tx("csInValidation")
                 : isDone
-                  ? "Completada · podés repasarla"
+                  ? tx("csDone")
                   : unlocked
-                    ? "Disponible"
-                    : "Completá la anterior para abrirla";
+                    ? tx("csAvailable")
+                    : tx("csLocked");
               const card = (
                 <div
                   className={`flex flex-1 items-center justify-between gap-3 rounded-2xl border p-4 transition sm:p-5 ${
@@ -145,17 +147,17 @@ function CourseIndex() {
                 >
                   <div className="min-w-0">
                     <p className={`font-display text-base font-semibold ${unlocked ? "text-foreground" : "text-muted-foreground"}`}>
-                      Lección {n}
+                      {tx("csLesson", { n })}
                       {title && <span className="font-normal text-muted-foreground"> · {title}</span>}
                     </p>
                     <p className="text-xs text-muted-foreground">{estado}</p>
                   </div>
                   {unlocked ? (
                     <span className={`inline-flex h-9 shrink-0 items-center rounded-full px-4 text-sm font-semibold ${isDone ? "bg-muted text-foreground" : "bg-accent text-accent-foreground"}`}>
-                      {isDone ? "Repasar" : "Empezar"}
+                      {isDone ? tx("csReview") : tx("csStart")}
                     </span>
                   ) : (
-                    <Lock className="h-5 w-5 shrink-0 text-muted-foreground" aria-label="Bloqueada" />
+                    <Lock className="h-5 w-5 shrink-0 text-muted-foreground" aria-label={tx("csLockedLabel")} />
                   )}
                 </div>
               );

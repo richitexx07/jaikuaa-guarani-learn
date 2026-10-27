@@ -1,3 +1,4 @@
+import { useTX, type TXKey } from "@/lib/i18n-pages";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -50,6 +51,7 @@ export const Route = createFileRoute("/_authenticated/certificado")({
 });
 
 function CertificadoPage() {
+  const tx = useTX();
   const fn = useServerFn(getCertificateStatus);
   const issue = useServerFn(issueCertificate);
   const q = useQuery({
@@ -78,7 +80,7 @@ function CertificadoPage() {
             <BrandLogo />
           </Link>
           <Button asChild variant="outline" size="sm">
-            <Link to="/dashboard">← Volver al panel</Link>
+            <Link to="/dashboard">{tx("backPanel")}</Link>
           </Button>
         </div>
       </header>
@@ -86,7 +88,7 @@ function CertificadoPage() {
         <div className="mx-auto max-w-4xl">
           {q.error ? (
             <p className="mx-auto max-w-lg rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
-              Sin conexión. Cuando tengas señal vas a ver acá cuántas lecciones te faltan para tu certificado.
+              {tx("ctOffline")}
             </p>
           ) : q.isLoading || !d ? (
             <div className="flex justify-center py-10">
@@ -94,12 +96,10 @@ function CertificadoPage() {
             </div>
           ) : !d.eligible ? (
             <div className="mx-auto max-w-lg rounded-2xl border border-border/60 bg-card p-8 text-center shadow-elegant">
-              <img src={jaiGraduado} alt="Jai con birrete y su diploma" className="mx-auto h-40 w-auto object-contain drop-shadow-xl" />
-              <h1 className="mt-4 font-display text-2xl font-bold text-foreground">Tu certificado te espera</h1>
+              <img src={jaiGraduado} alt={tx("ctJaiAlt")} className="mx-auto h-40 w-auto object-contain drop-shadow-xl" />
+              <h1 className="mt-4 font-display text-2xl font-bold text-foreground">{tx("ctWaiting")}</h1>
               <p className="mt-2 text-muted-foreground">
-                Completaste <span className="font-semibold text-foreground">{d.completed}</span> de{" "}
-                <span className="font-semibold text-foreground">{d.required}</span> lecciones del Curso de Guaraní.
-                Terminá todas para descargar tu certificado.
+                {tx("ctProgress", { a: d.completed, b: d.required })}
               </p>
               <div className="mx-auto mt-5 h-2 max-w-xs overflow-hidden rounded-full bg-muted">
                 <div
@@ -109,20 +109,20 @@ function CertificadoPage() {
               </div>
               <Button asChild variant="cta" className="mt-6">
                 <Link to="/curso/$lang" params={{ lang: "guarani" }}>
-                  Seguir con el curso
+                  {tx("ctContinue")}
                 </Link>
               </Button>
             </div>
           ) : (
             <>
               <div className="mb-6 flex flex-col items-center gap-2 text-center print:hidden">
-                <img src={jaiGraduado} alt="Jai con birrete y su diploma" className="h-36 w-auto object-contain drop-shadow-xl" />
-                <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl">¡Terminaste el curso!</h1>
+                <img src={jaiGraduado} alt={tx("ctJaiAlt")} className="h-36 w-auto object-contain drop-shadow-xl" />
+                <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl">{tx("ctDone")}</h1>
               </div>
               {!d.name && (
                 <div className="mx-auto mb-6 max-w-md print:hidden">
                   <label className="text-sm font-semibold">
-                    Tu nombre completo, como querés que figure
+                    {tx("ctName")}
                     <Input value={typedName} onChange={(e) => setTypedName(e.target.value)} maxLength={80} className="mt-2" />
                   </label>
                 </div>
@@ -130,12 +130,11 @@ function CertificadoPage() {
               <div className="mb-6 flex justify-center gap-2 print:hidden">
                 {d.code ? (
                   <Button variant="cta" onClick={() => window.print()}>
-                    <Printer aria-hidden /> Descargar o imprimir
+                    <Printer aria-hidden /> {tx("ctPrint")}
                   </Button>
                 ) : queued ? (
                   <p className="max-w-md rounded-xl border border-primary/30 bg-primary/5 p-4 text-center text-sm text-foreground">
-                    📜 ¡Lo ganaste! Tu certificado a nombre de <strong>{queued}</strong> se emite solo cuando vuelva la
-                    señal. Después lo descargás desde esta misma pantalla.
+                    {tx("ctQueued", { n: queued })}
                   </p>
                 ) : isOffline() ? (
                   <Button
@@ -146,7 +145,7 @@ function CertificadoPage() {
                       setQueued(name);
                     }}
                   >
-                    <BadgeCheck aria-hidden /> Pedir mi certificado
+                    <BadgeCheck aria-hidden /> {tx("ctRequest")}
                   </Button>
                 ) : (
                   <Button
@@ -162,12 +161,12 @@ function CertificadoPage() {
                       }
                     }}
                   >
-                    {issuing ? <Loader2 className="animate-spin" aria-hidden /> : <BadgeCheck aria-hidden />} Emitir mi certificado
+                    {issuing ? <Loader2 className="animate-spin" aria-hidden /> : <BadgeCheck aria-hidden />} {tx("ctIssue")}
                   </Button>
                 )}
               </div>
               <p className="mb-4 text-center text-xs text-muted-foreground print:hidden">
-                En el celular o la computadora, elegí "Guardar como PDF" en la ventana de impresión.
+                {tx("ctPdf")} {tx("ctOfficial")}
               </p>
               <article className="relative mx-auto aspect-[1.414/1] w-full rounded-2xl border-[10px] border-double border-primary/70 bg-white p-8 text-center text-neutral-900 shadow-elegant sm:p-12 print:shadow-none">
                 <div className="flex justify-center">
