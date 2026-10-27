@@ -8,6 +8,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getFoundingSponsors } from "@/lib/sponsors.functions";
 import { DisplayToggles } from "@/components/display-toggles";
 import { EarlyAccessBadge } from "@/components/early-access-badge";
+import { LanguageSwitcher } from "@/components/marketing/language-switcher";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import { RespaldosStrip } from "@/components/respaldos-strip";
 import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
@@ -67,6 +68,7 @@ function Header() {
           <BrandLogo />
         </a>
         <div className="flex items-center gap-3">
+          <LanguageSwitcher current="es" />
           <DisplayToggles />
         </div>
       </div>
