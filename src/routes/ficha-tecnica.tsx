@@ -101,7 +101,9 @@ const SECCIONES = [
     titulo: "Alcance internacional",
     items: [
       "Portadas propias en portugués (/pt) e inglés (/en), pensadas para inversores, diplomacia, turismo y extranjeros que viven o hacen negocios en Paraguay.",
-      "Selector de idioma ES / PT / EN en la cabecera de la portada.",
+      "Selector de idioma ES / PT / EN en la portada, en el ingreso y dentro de la app: el usuario puede cambiar de idioma en cualquier momento y la elección queda recordada en su dispositivo.",
+      "Interfaz multi-idioma (i18n): registro, inicio de sesión, panel principal y menú inferior en castellano, portugués e inglés. Solo se traducen botones y textos de sistema; el contenido en guaraní lo siguen validando los docentes.",
+      "Próxima etapa: lecciones con explicaciones en portugués e inglés sobre palabras ya validadas, con revisión de especialistas.",
       "Posicionamiento en buscadores por idioma: cada portada tiene su propio título, descripción y enlaces alternos (hreflang) para que Google muestre la versión correcta según el idioma de quien busca.",
       "Base para el modelo comercial: el guaraní es gratis para paraguayos; el público internacional es el segmento pago.",
     ],

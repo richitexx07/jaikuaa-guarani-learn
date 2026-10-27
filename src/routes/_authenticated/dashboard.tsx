@@ -3,6 +3,8 @@ import { ValidationBadge } from "@/components/validation-notice";
 import { DisplayToggles } from "@/components/display-toggles";
 import { AI_GUARANI_TOOLS_ENABLED } from "@/lib/features";
 import { BrandLogo } from "@/components/brand-logo";
+import { AppLanguageToggle } from "@/components/app-language-toggle";
+import { useT } from "@/lib/i18n";
 import {
   BookOpen,
   CheckCircle2,
@@ -346,6 +348,7 @@ function writeCachedName(name: string) {
 type TeaserKey = "karaoke" | "vivo" | null;
 
 function Dashboard() {
+  const { t } = useT();
   const navigate = useNavigate();
   const [name, setName] = useState<string>(() => readCachedName());
   const [openTeaser, setOpenTeaser] = useState<TeaserKey>(null);
@@ -413,16 +416,17 @@ function Dashboard() {
             <BrandLogo className="hidden sm:inline-flex" />
           </Link>
           <div className="flex min-w-0 items-center gap-1 sm:gap-2">
+            <AppLanguageToggle />
             <DisplayToggles />
             <AdminCorpusLink />
             <Button
               variant="outline"
               size="sm"
               onClick={handleSignOut}
-              aria-label="Cerrar sesión"
+              aria-label={t("signOut")}
             >
               <LogOut />
-              <span className="hidden sm:inline">Cerrar sesión</span>
+              <span className="hidden sm:inline">{t("signOut")}</span>
             </Button>
           </div>
         </div>
@@ -438,17 +442,17 @@ function Dashboard() {
             </div>
             <div className="min-w-0">
               <h1 className="font-display text-2xl font-bold leading-tight text-foreground sm:text-4xl">
-                ¡Mba'éichapa, {name ? <span className="text-accent">{name}</span> : "amigo"}! {greeting.emoji}
+                ¡Mba'éichapa, {name ? <span className="text-accent">{name}</span> : t("dash.friend")}! {greeting.emoji}
               </h1>
-              <p className="mt-1 text-base text-muted-foreground">¿Qué querés hacer hoy? Tocá un botón.</p>
+              <p className="mt-1 text-base text-muted-foreground">{t("dash.question")}</p>
             </div>
           </div>
 
           {/* 2. TRES BOTONES GIGANTES */}
           <nav aria-label="Elegí qué hacer" className="mt-5 grid gap-3 sm:grid-cols-3">
-            <BigAction to="/curso/$lang" img={bannerCurso} title="Aprender" desc="Seguí tu curso con voces reales" tone="primary" />
-            <BigAction to="/juegos" img={coverKaraoke} rotate={JUEGOS_ROTAN} title="Jugar" desc="15 juegos para aprender jugando" tone="accent" />
-            <BigAction to="/juegos/palabra-del-dia" img={coverPalabra} title="Palabra del día" desc="Una palabra nueva, en 1 minuto" tone="card" />
+            <BigAction to="/curso/$lang" img={bannerCurso} title={t("nav.learn")} desc={t("dash.learnDesc")} tone="primary" />
+            <BigAction to="/juegos" img={coverKaraoke} rotate={JUEGOS_ROTAN} title={t("dash.play")} desc={t("dash.playDesc")} tone="accent" />
+            <BigAction to="/juegos/palabra-del-dia" img={coverPalabra} title={t("dash.word")} desc={t("dash.wordDesc")} tone="card" />
           </nav>
 
           {/* INVITAR — franja compacta con vida */}
@@ -462,11 +466,11 @@ function Dashboard() {
               <svg viewBox="0 0 24 24" className="relative h-5 w-5" fill="currentColor"><path d="M12 21s-7-4.35-9.5-8.5C.9 9.6 2.6 6 6 6c2 0 3.2 1.1 4 2.3h4C14.8 7.1 16 6 18 6c3.4 0 5.1 3.6 3.5 6.5C19 16.65 12 21 12 21z"/></svg>
             </span>
             <div className="relative min-w-0 flex-1">
-              <p className="font-display text-sm font-bold leading-tight text-foreground">¿Querés aprender y jugar?</p>
-              <p className="text-xs text-muted-foreground">Invitá a un amigo o familiar</p>
+              <p className="font-display text-sm font-bold leading-tight text-foreground">{t("dash.inviteTitle")}</p>
+              <p className="text-xs text-muted-foreground">{t("dash.inviteDesc")}</p>
             </div>
             <span className="relative inline-flex shrink-0 items-center gap-1 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm transition-transform group-hover:scale-105">
-              Compartir
+              {t("dash.share")}
               <span className="transition-transform group-hover:translate-x-0.5">→</span>
             </span>
           </Link>
@@ -474,15 +478,14 @@ function Dashboard() {
           <div className="mt-6 space-y-3">
             <StatsBar />
             <p className="px-1 text-xs text-muted-foreground">
-              <span className="font-semibold text-foreground">Tus puntos no vencen.</span> Muy pronto vas a poder canjear
-              tus XP por premios y descuentos con marcas y comercios paraguayos.
+              <span className="font-semibold text-foreground">{t("dash.xpStrong")}</span> {t("dash.xpRest")}
             </p>
             <StreakBanner />
             <OfflinePackCard />
           </div>
 
           <h2 className="mt-10 text-center font-display text-lg font-semibold text-muted-foreground">
-            Más cosas para explorar
+            {t("dash.explore")}
           </h2>
 
           {/* 3. ACCESO DOCENTE */}
@@ -494,16 +497,16 @@ function Dashboard() {
           <Tabs defaultValue="aprender" className="mt-4">
             <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-2xl p-1 sm:grid-cols-4">
               <TabsTrigger value="aprender" className="min-h-11 rounded-xl py-2.5 text-sm">
-                <BookOpen className="mr-1.5 h-4 w-4" aria-hidden /> Aprender
+                <BookOpen className="mr-1.5 h-4 w-4" aria-hidden /> {t("nav.learn")}
               </TabsTrigger>
               <TabsTrigger value="jugar" className="min-h-11 rounded-xl py-2.5 text-sm">
-                <Gamepad2 className="mr-1.5 h-4 w-4" aria-hidden /> Jugar
+                <Gamepad2 className="mr-1.5 h-4 w-4" aria-hidden /> {t("dash.play")}
               </TabsTrigger>
               <TabsTrigger value="herramientas" className="min-h-11 rounded-xl py-2.5 text-sm">
-                <Wrench className="mr-1.5 h-4 w-4" aria-hidden /> Herramientas
+                <Wrench className="mr-1.5 h-4 w-4" aria-hidden /> {t("dash.tools")}
               </TabsTrigger>
               <TabsTrigger value="noticias" className="min-h-11 rounded-xl py-2.5 text-sm">
-                <Newspaper className="mr-1.5 h-4 w-4" aria-hidden /> Noticias
+                <Newspaper className="mr-1.5 h-4 w-4" aria-hidden /> {t("dash.news")}
               </TabsTrigger>
             </TabsList>
 

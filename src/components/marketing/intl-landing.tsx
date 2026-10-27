@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { setAppLang } from "@/lib/i18n";
 import { Link } from "@tanstack/react-router";
 import { AudioLines, Briefcase, Clock, Landmark, ShieldCheck } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
@@ -25,6 +27,7 @@ export type IntlCopy = {
 const ICONS = [Briefcase, AudioLines, Clock];
 
 export function IntlLanding({ c }: { c: IntlCopy }) {
+  useEffect(() => { setAppLang(c.lang); }, [c.lang]);
   return (
     <div lang={c.lang === "pt" ? "pt-BR" : "en"} className="flex min-h-screen flex-col bg-background">
       <header className="w-full border-b border-border/50 bg-background">

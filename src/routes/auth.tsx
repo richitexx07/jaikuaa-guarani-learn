@@ -15,6 +15,8 @@ import { createAfterLoginRedirect, peekAfterLogin } from "@/lib/after-login";
 import { EarlyAccessBadge } from "@/components/early-access-badge";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import { RespaldosStrip } from "@/components/respaldos-strip";
+import { AppLanguageToggle } from "@/components/app-language-toggle";
+import { translate, useT } from "@/lib/i18n";
 import jaiSaluda from "@/assets/jai/jai-saluda.webp";
 import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 
@@ -39,19 +41,21 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const loginSchema = z.object({
-  email: z.string().trim().email("Email inválido").max(255),
-  password: z.string().min(6, "Mínimo 6 caracteres").max(72),
+type Lang = Parameters<typeof translate>[0];
+const loginSchemaFor = (l: Lang) => z.object({
+  email: z.string().trim().email(translate(l, "auth.errEmail")).max(255),
+  password: z.string().min(6, translate(l, "auth.errPwLen")).max(72),
 });
 
-const signupSchema = loginSchema.extend({
-  name: z.string().trim().min(1, "Ingresá tu nombre").max(100),
+const signupSchemaFor = (l: Lang) => loginSchemaFor(l).extend({
+  name: z.string().trim().min(1, translate(l, "auth.errName")).max(100),
 });
 
 function AuthPage() {
   const { mode } = Route.useSearch();
   const navigate = useNavigate();
   const isLogin = mode === "login";
+  const { t, lang } = useT();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -94,7 +98,7 @@ function AuthPage() {
     setLoading(true);
     try {
       if (isLogin) {
-        const parsed = loginSchema.safeParse({ email, password });
+        const parsed = loginSchemaFor(lang).safeParse({ email, password });
         if (!parsed.success) {
           setErrorMsg(parsed.error.issues[0].message);
           return;
@@ -104,16 +108,16 @@ function AuthPage() {
           const code = (error as { code?: string }).code;
           const msg = error.message?.toLowerCase() ?? "";
           if (code === "invalid_credentials" || msg.includes("invalid login")) {
-            setErrorMsg("Email o contraseña incorrectos. Si te registraste con Google, iniciá sesión con Google.");
+            setErrorMsg(t("auth.errInvalid"));
           } else if (msg.includes("email not confirmed")) {
-            setErrorMsg("Tenés que confirmar tu email antes de iniciar sesión.");
+            setErrorMsg(t("auth.errConfirm"));
           } else {
-            setErrorMsg("No pudimos iniciar tu sesión. Intentá de nuevo.");
+            setErrorMsg(t("auth.errLogin"));
           }
           return;
         }
         if (!data.session) {
-          setErrorMsg("No pudimos iniciar tu sesión. Intentá de nuevo.");
+          setErrorMsg(t("auth.errLogin"));
           return;
         }
         try {
@@ -123,7 +127,7 @@ function AuthPage() {
         }
         goNext();
       } else {
-        const parsed = signupSchema.safeParse({ name, email, password });
+        const parsed = signupSchemaFor(lang).safeParse({ name, email, password });
         if (!parsed.success) {
           setErrorMsg(parsed.error.issues[0].message);
           return;
@@ -137,14 +141,14 @@ function AuthPage() {
           },
         });
         if (error) {
-          setErrorMsg(error.message.includes("registered") ? "Ese email ya está registrado." : "No pudimos crear tu cuenta.");
+          setErrorMsg(error.message.includes("registered") ? t("auth.errExists") : t("auth.errCreate"));
           return;
         }
-        toast.success("¡Cuenta creada! Revisá tu email si te lo pide.");
+        toast.success(t("auth.created"));
         goNext();
       }
     } catch (err) {
-      setErrorMsg("Ocurrió un error inesperado. Intentá de nuevo.");
+      setErrorMsg(t("auth.errUnexpected"));
       console.error("Auth error:", err);
     } finally {
       setLoading(false);
@@ -156,7 +160,7 @@ function AuthPage() {
       redirect_uri: `${window.location.origin}/auth`,
     });
     if (result.error) {
-      toast.error("No pudimos conectar con Google.");
+      toast.error(t("auth.errGoogle"));
       return;
     }
     if (result.redirected) return;
@@ -166,10 +170,11 @@ function AuthPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border/50">
-        <div className="mx-auto flex h-16 max-w-5xl items-center px-4 sm:px-6">
+        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-primary">
             <BrandLogo />
           </Link>
+          <AppLanguageToggle />
         </div>
       </header>
       <main className="flex flex-1 justify-center px-4 pb-12 pt-6 sm:px-6 sm:pt-10">
@@ -184,43 +189,43 @@ function AuthPage() {
           </div>
           <div className="mt-2 text-center">
             <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              {isLogin ? "Iniciar sesión" : "Registrarse"}
+              {isLogin ? t("auth.login") : t("auth.signup")}
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              {isLogin ? "Bienvenido de vuelta a Jaikuaa." : "Creá tu cuenta y empezá a aprender hoy."}
+              {isLogin ? t("auth.welcomeBack") : t("auth.createIntro")}
             </p>
           </div>
           <EarlyAccessBadge className="mt-5" />
           {invitedToGame && (
             <div className="mt-6 rounded-2xl border-2 border-primary/30 bg-primary/10 p-4 text-center">
-              <p className="font-display text-lg font-bold text-primary">¡Te desafiaron a un juego!</p>
-              <p className="mt-1 text-sm text-muted-foreground">Entrá con Google y vas directo a la sala de tu amigo.</p>
+              <p className="font-display text-lg font-bold text-primary">{t("auth.challenged")}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{t("auth.challengedDesc")}</p>
             </div>
           )}
 
           <Button type="button" variant="outline" size="lg" className="mt-8 h-14 w-full border-2 text-base font-semibold" onClick={handleGoogle}>
-            <GoogleIcon /> Continuar con Google
+            <GoogleIcon /> {t("auth.google")}
           </Button>
-          <p className="mt-2 text-center text-xs text-muted-foreground">Entrás en un toque, sin contraseña.</p>
+          <p className="mt-2 text-center text-xs text-muted-foreground">{t("auth.oneTap")}</p>
           <p className="mt-1 text-center text-xs text-muted-foreground">
-            Solo usamos tu nombre y tu correo. Nunca publicamos nada en tu nombre.
+            {t("auth.privacy1")}
           </p>
           <p className="mt-1 text-center text-xs text-muted-foreground">
-            No vendemos tus datos ni los compartimos con terceros para publicidad.
+            {t("auth.privacy2")}
           </p>
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-background px-2 text-muted-foreground">¿Preferís no usar Google? {isLogin ? "Ingresá" : "Registrate"} con tu correo</span>
+              <span className="bg-background px-2 text-muted-foreground">{isLogin ? t("auth.orEmailLogin") : t("auth.orEmailSignup")}</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div className="space-y-2">
-                <Label htmlFor="name">Nombre</Label>
-                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" autoComplete="name" required />
+                <Label htmlFor="name">{t("auth.name")}</Label>
+                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder={t("auth.namePh")} autoComplete="name" required />
               </div>
             )}
             <div className="space-y-2">
@@ -228,7 +233,7 @@ function AuthPage() {
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vos@email.com" autoComplete="email" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password">{t("auth.password")}</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -245,7 +250,7 @@ function AuthPage() {
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute inset-y-0 right-0 flex items-center justify-center px-3 text-muted-foreground transition-colors hover:text-foreground focus:text-foreground focus:outline-none"
-                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  aria-label={showPassword ? t("auth.hidePw") : t("auth.showPw")}
                 >
                   {showPassword ? <EyeOff size={18} aria-hidden /> : <Eye size={18} aria-hidden />}
                 </button>
@@ -260,10 +265,10 @@ function AuthPage() {
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="h-4 w-4 cursor-pointer rounded border-input accent-accent"
                   />
-                  Mantener sesión iniciada
+                  {t("auth.remember")}
                 </label>
                 <Link to="/recuperar" className="text-sm font-medium text-accent hover:underline">
-                  ¿Olvidaste tu contraseña?
+                  {t("auth.forgot")}
                 </Link>
               </div>
             )}
@@ -277,15 +282,15 @@ function AuthPage() {
               </div>
             )}
             <Button type="submit" variant="cta" size="lg" className="w-full" disabled={loading}>
-              {loading ? "Cargando..." : isLogin ? "Iniciar sesión" : "Crear cuenta"}
+              {loading ? t("auth.loading") : isLogin ? t("auth.login") : t("auth.create")}
             </Button>
           </form>
 
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            {isLogin ? "¿No tenés cuenta? " : "¿Ya tenés cuenta? "}
+            {isLogin ? t("auth.noAccount") : t("auth.haveAccount")}
             <Link to="/auth" search={{ mode: isLogin ? "signup" : "login" }} className="font-medium text-accent hover:underline">
-              {isLogin ? "Registrate" : "Iniciá sesión"}
+              {isLogin ? t("auth.toSignup") : t("auth.toLogin")}
             </Link>
           </p>
 
