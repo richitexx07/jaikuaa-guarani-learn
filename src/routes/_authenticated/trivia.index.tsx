@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTX } from "@/lib/i18n-pages";
 import { ValidationNotice } from "@/components/validation-notice";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/trivia/")({
 });
 
 function TriviaLanding() {
+  const tx = useTX();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <ValidationNotice />
@@ -32,7 +34,7 @@ function TriviaLanding() {
             to="/dashboard"
             className="text-sm font-medium text-muted-foreground hover:text-primary"
           >
-            ← Volver
+            {tx("back")}
           </Link>
         </div>
       </header>
@@ -42,7 +44,7 @@ function TriviaLanding() {
           <section className="relative overflow-hidden rounded-3xl shadow-elegant">
             <img
               src={bannerTrivia}
-              alt="Jai, presentador de un programa de preguntas, con dos pulsadores de concurso"
+              alt={tx("trAlt")}
               className="aspect-[16/10] w-full object-cover sm:aspect-[16/8]"
               width={800}
               height={600}
@@ -51,7 +53,7 @@ function TriviaLanding() {
             <div className="absolute inset-x-0 bottom-0 p-5 text-white sm:p-7">
               <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl">Jaikuaápa</h1>
               <p className="mt-1 max-w-xl text-base text-white/85 sm:text-lg">
-                Recorré el sendero y demostrá cuánto sabés del Paraguay.
+                {tx("trSub")}
               </p>
             </div>
           </section>
@@ -62,7 +64,7 @@ function TriviaLanding() {
 
           <p className="mt-10 text-center">
             <span className="inline-flex items-center gap-1 rounded-md border border-dashed border-primary/20 bg-primary/5 px-2 py-1 text-[10px] font-medium text-primary/80">
-              En proceso de validación
+              {tx("inValidation")}
             </span>
           </p>
 
