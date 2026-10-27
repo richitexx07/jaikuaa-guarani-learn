@@ -28,13 +28,13 @@ function shiftDay(iso: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** Tiempo mínimo entre dos lecciones nuevas de guaraní (una lección real lleva más). */
-export const MIN_SECONDS_BETWEEN_NEW_LESSONS = 60;
+/** Tope de lecciones nuevas de guaraní por usuario en 24 horas. */
+export const MAX_NEW_LESSONS_PER_DAY = 10;
 
 /**
  * Regla del servidor para lecciones de guaraní (cuentan para el certificado):
  * la lección debe existir publicada, se hacen en orden (la anterior ya hecha)
- * y entre dos lecciones nuevas debe pasar un tiempo mínimo.
+ * y hay un tope de lecciones nuevas por día (no traba el envío sin internet).
  */
 export function checkLessonOrder(
   n: number,
@@ -47,8 +47,15 @@ export function checkLessonOrder(
   if (doneSet.has(n)) return null; // repasar una lección ya hecha siempre se permite
   const prev = [...published].filter((x) => x < n).sort((a, b) => b - a)[0];
   if (prev !== undefined && !doneSet.has(prev)) return "Primero completá la lección anterior";
-  const last = done.map((d) => Date.parse(d.at)).filter(Number.isFinite).sort((a, b) => b - a)[0];
-  if (last !== undefined && now - last < MIN_SECONDS_BETWEEN_NEW_LESSONS * 1000) return "Demasiado rápido";
+  const firstByLesson = new Map<number, number>();
+  for (const d of done) {
+    const t = Date.parse(d.at);
+    if (!Number.isFinite(t)) continue;
+    const prevT = firstByLesson.get(d.n);
+    if (prevT === undefined || t < prevT) firstByLesson.set(d.n, t);
+  }
+  const recent = [...firstByLesson.values()].filter((t) => now - t < 24 * 3600 * 1000).length;
+  if (recent >= MAX_NEW_LESSONS_PER_DAY) return "Llegaste al máximo de lecciones nuevas por hoy";
   return null;
 }
 

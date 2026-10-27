@@ -20,8 +20,10 @@ describe("lecciones de guaraní en orden", () => {
   it("rechaza una lección que no existe", () => {
     expect(checkLessonOrder(9, pub, [], now)).toBe("Lección no válida");
   });
-  it("rechaza dos lecciones nuevas en menos de 60 segundos", () => {
-    expect(checkLessonOrder(2, pub, [{ n: 1, at: "2026-10-27T11:59:30Z" }], now)).toBe("Demasiado rápido");
+  it("rechaza la lección nueva número 11 en el mismo día", () => {
+    const many = new Set(Array.from({ length: 12 }, (_, i) => i + 1));
+    const done = Array.from({ length: 10 }, (_, i) => ({ n: i + 1, at: "2026-10-27T11:00:00Z" }));
+    expect(checkLessonOrder(11, many, done, now)).toBe("Llegaste al máximo de lecciones nuevas por hoy");
   });
   it("permite la siguiente lección en orden y con tiempo", () => {
     expect(checkLessonOrder(2, pub, [{ n: 1, at: "2026-10-27T11:50:00Z" }], now)).toBeNull();
