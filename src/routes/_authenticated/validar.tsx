@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Check, Loader2, SkipForward, Undo2, X } from "lucide-react";
+import { BookOpen, Check, Loader2, SkipForward, Undo2, WifiOff, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SpeakerButton } from "@/components/audio/speaker-button";
@@ -16,6 +16,10 @@ import { OfflineMissingError, isNetworkError, withOfflineCache } from "@/lib/off
 import { queueReport, queueValidation, queuedValidationIds, unqueueValidation } from "@/lib/staff-offline";
 import { useConnection } from "@/components/offline/use-connection";
 import { DictateButton } from "@/components/pilot/dictate-button";
+import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
+import jaiPiensa from "@/assets/jai/jai-piensa.webp";
+import jaiProfe from "@/assets/jai-profe.webp";
 import { reportContentError } from "@/lib/content-reports.functions";
 
 export const Route = createFileRoute("/_authenticated/validar")({
@@ -232,7 +236,7 @@ function QuickValidatePage() {
   if (q.isError && q.error instanceof OfflineMissingError) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <div className="text-5xl" aria-hidden>📶</div>
+        <WifiOff className="mx-auto h-12 w-12 text-primary" aria-hidden />
         <h1 className="mt-3 font-display text-2xl font-bold">Hace falta señal una vez</h1>
         <p className="mt-2 text-muted-foreground">
           Abrí esta pantalla una vez con internet: la lista de palabras queda guardada en tu celular y después podés
@@ -246,7 +250,8 @@ function QuickValidatePage() {
   }
   if (q.isError) {
     return (
-      <div className="mx-auto max-w-md px-4 py-20 text-center">
+      <div className="mx-auto max-w-md px-4 py-14 text-center">
+        <img src={jaiProfe} alt="Jai, el profe" className="mx-auto mb-3 h-32 w-auto object-contain" />
         <h1 className="font-display text-2xl font-bold">Solo para docentes validadores</h1>
         <p className="mt-2 text-muted-foreground">
           Esta pantalla es para los docentes que validan las palabras de Jaikuaa. Si sos docente, pedí tu acceso
@@ -276,7 +281,7 @@ function QuickValidatePage() {
           </Button>
         </div>
       </div>
-      <h1 className="mt-2 font-display text-2xl font-bold text-foreground">⚡ Validación rápida</h1>
+      <h1 className="mt-2 flex items-center gap-2 font-display text-2xl font-bold text-foreground"><Zap className="h-6 w-6 text-primary" aria-hidden /> Validación rápida</h1>
       <p className="text-sm text-muted-foreground">
         Escuchá, leé y decidí. Una palabra por pantalla: lo que apruebes queda publicado con tu nombre.
       </p>
@@ -296,7 +301,7 @@ function QuickValidatePage() {
 
       {!word ? (
         <div className="mt-10 rounded-3xl border border-dashed border-border p-10 text-center">
-          <div className="text-5xl" aria-hidden>🎉</div>
+          <img src={jaiFesteja} alt="Jai festeja" className="mx-auto h-32 w-auto object-contain" />
           <h2 className="mt-3 font-display text-xl font-bold text-foreground">¡No queda nada por validar!</h2>
           <p className="mt-1 text-sm text-muted-foreground">Gracias. Cuando haya palabras nuevas van a aparecer acá.</p>
         </div>
@@ -330,7 +335,7 @@ function QuickValidatePage() {
             <div className="flex flex-wrap gap-2">
               {word.lesson ? (
                 <Badge className="bg-primary/15 text-primary hover:bg-primary/15">
-                  📘 Lección {word.lesson.n} · {word.lesson.title}
+                  <BookOpen className="mr-1 h-3.5 w-3.5" aria-hidden /> Lección {word.lesson.n} · {word.lesson.title}
                 </Badge>
               ) : (
                 <Badge variant="outline">Fuera de las lecciones</Badge>
@@ -427,19 +432,19 @@ function QuickValidatePage() {
   );
 }
 
-const GUIDE_STEPS: { emoji: string; title: string; text: string }[] = [
+const GUIDE_STEPS: { img: string; title: string; text: string }[] = [
   {
-    emoji: "👂",
+    img: jaiBienvenida,
     title: "Escuchá y leé",
     text: "Aparece una palabra por pantalla, en el orden de las lecciones que ven los alumnos. Tocá el parlante para escucharla.",
   },
   {
-    emoji: "✅",
+    img: jaiProfe,
     title: "Hacete las cuatro preguntas",
     text: "¿Está bien escrita? ¿El significado es correcto? ¿El audio suena bien? ¿Sirve para enseñar? Si las cuatro son sí, tocá «Está bien».",
   },
   {
-    emoji: "⚠️",
+    img: jaiPiensa,
     title: "Si algo no está bien, avisá",
     text: "Tocá «Error» y contá qué viste. Si dudás, «Saltar» la deja para después. Si te equivocaste, «Deshacer» la vuelve atrás.",
   },
@@ -452,7 +457,7 @@ function Walkthrough({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center" role="dialog" aria-label="Cómo se usa">
       <div className="w-full max-w-md rounded-t-3xl bg-card p-6 text-center shadow-lift sm:rounded-3xl">
-        <div className="text-5xl" aria-hidden>{step.emoji}</div>
+        <img src={step.img} alt="" className="mx-auto h-28 w-auto object-contain" />
         <p className="mt-2 text-xs font-semibold uppercase tracking-[0.15em] text-primary">
           Paso {i + 1} de {GUIDE_STEPS.length}
         </p>

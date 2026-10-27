@@ -252,7 +252,7 @@ function NotebookPage() {
                         <p>
                           {x.nextLesson
                             ? `Va por la Lección ${x.nextLesson.n}${x.nextLesson.title ? ` («${x.nextLesson.title}»)` : ""}.`
-                            : "Terminó todas las lecciones del curso. 🎉"}
+                            : "Terminó todas las lecciones del curso."}
                         </p>
                         <p className="mt-1">
                           {x.struggles.length

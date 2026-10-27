@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Check, Loader2, SkipForward } from "lucide-react";
+import { Award, Check, ClipboardList, Loader2, RefreshCw, SkipForward, Smartphone, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,6 +23,8 @@ import { PENDING_EVENT } from "@/lib/gamification";
 import { PanelTools } from "@/components/pilot/panel-tools";
 import { DictateButton } from "@/components/pilot/dictate-button";
 import { warmPages } from "@/lib/offline-pack";
+import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
+import jaiFesteja from "@/assets/jai/jai-festeja.webp";
 import { staffStatusRefreshInterval } from "@/lib/staff-status-refresh";
 
 export const Route = createFileRoute("/_authenticated/practica/")({
@@ -105,7 +107,7 @@ function PracticeHome() {
       <Failures />
       {queued.size > 0 && (
         <p className="mt-4 rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm text-foreground">
-          📲 {queued.size} {queued.size === 1 ? "palabra guardada" : "palabras guardadas"} en tu celular. Se envían solas
+          <Smartphone className="mr-1 inline h-4 w-4 text-primary" aria-hidden />{queued.size} {queued.size === 1 ? "palabra guardada" : "palabras guardadas"} en tu celular. Se envían solas
           cuando vuelva la señal.
         </p>
       )}
@@ -121,20 +123,20 @@ function PracticeHome() {
         {d.mine.returned > 0 && (
           <Button asChild variant="outline" className="h-auto justify-start whitespace-normal border-amber-300 bg-amber-50 p-4 text-left text-amber-900">
             <Link to="/validacion" search={{ tab: "mias" }}>
-              ↩️ {d.mine.returned} {d.mine.returned === 1 ? "propuesta devuelta" : "propuestas devueltas"} para corregir
+              <Undo2 className="mr-2 h-4 w-4 shrink-0" aria-hidden />{d.mine.returned} {d.mine.returned === 1 ? "propuesta devuelta" : "propuestas devueltas"} para corregir
             </Link>
           </Button>
         )}
         <Button asChild variant="outline" className="h-auto justify-start whitespace-normal p-4 text-left">
           <Link to="/validacion" search={{ tab: "revisar" }}>
-            🔁 Revisar propuestas de otros ({d.toReview})
+            <RefreshCw className="mr-2 h-4 w-4 shrink-0 text-primary" aria-hidden />Revisar propuestas de otros ({d.toReview})
           </Link>
         </Button>
         <Button asChild variant="outline" className="h-auto justify-start whitespace-normal p-4 text-left">
-          <Link to="/practica/registro">📋 Mi registro de práctica</Link>
+          <Link to="/practica/registro"><ClipboardList className="mr-2 h-4 w-4 shrink-0 text-primary" aria-hidden />Mi registro de práctica</Link>
         </Button>
         <Button asChild variant="outline" className="h-auto justify-start whitespace-normal p-4 text-left">
-          <Link to="/docente/constancia">🏅 Mi constancia</Link>
+          <Link to="/docente/constancia"><Award className="mr-2 h-4 w-4 shrink-0 text-primary" aria-hidden />Mi constancia</Link>
         </Button>
       </div>
 
@@ -145,7 +147,7 @@ function PracticeHome() {
       </p>
       {left === 0 ? (
         <div className="mt-4 rounded-2xl border border-dashed border-border p-8 text-center">
-          <div className="text-4xl" aria-hidden>🌙</div>
+          <img src={jaiAplaude} alt="" className="mx-auto h-24 w-auto object-contain" />
           <p className="mt-2 font-semibold text-foreground">Llegaste a las {d.dailyLimit} de hoy. ¡Muy bien!</p>
           <p className="text-sm text-muted-foreground">Mañana podés seguir. Mientras, podés revisar propuestas de otros.</p>
         </div>
@@ -288,7 +290,7 @@ function VerifyCards({ left, queued }: { left: number; queued: Set<string> }) {
   if (!word) {
     return (
       <div className="mt-4 rounded-2xl border border-dashed border-border p-8 text-center">
-        <div className="text-4xl" aria-hidden>🎉</div>
+        <img src={jaiFesteja} alt="" className="mx-auto h-24 w-auto object-contain" />
         <p className="mt-2 font-semibold text-foreground">No quedan palabras para verificar.</p>
       </div>
     );
