@@ -5,15 +5,15 @@ import { EXTRA } from "./i18n-extra";
  * Idioma de la interfaz (ES/PT/EN). Solo traduce botones y textos de sistema;
  * nunca contenido en guaraní (eso lo validan los docentes).
  */
-export type AppLang = "es" | "pt" | "en" | "de" | "fr";
-export const APP_LANGS: AppLang[] = ["es", "pt", "en", "de", "fr"];
+export type AppLang = "es" | "pt" | "en" | "de" | "fr" | "zh";
+export const APP_LANGS: AppLang[] = ["es", "pt", "en", "de", "fr", "zh"];
 /** Idiomas con traducción preliminar, pendiente de revisión por un hablante nativo. */
-export const PRELIMINARY_LANGS: AppLang[] = ["de", "fr"];
+export const PRELIMINARY_LANGS: AppLang[] = ["de", "fr", "zh"];
 const KEY = "jaikuaa_lang";
 const listeners = new Set<() => void>();
 
 export function isAppLang(v: unknown): v is AppLang {
-  return v === "es" || v === "pt" || v === "en" || v === "de" || v === "fr";
+  return v === "es" || v === "pt" || v === "en" || v === "de" || v === "fr" || v === "zh";
 }
 
 function read(): AppLang {
@@ -31,7 +31,7 @@ export function setAppLang(lang: AppLang) {
   } catch {
     // ignore
   }
-  if (typeof document !== "undefined") document.documentElement.lang = lang === "pt" ? "pt-BR" : lang;
+  if (typeof document !== "undefined") document.documentElement.lang = lang === "pt" ? "pt-BR" : lang === "zh" ? "zh-Hant-TW" : lang;
   listeners.forEach((l) => l());
 }
 
@@ -154,7 +154,7 @@ const DICT = {
 export type TKey = keyof typeof DICT;
 
 export function translate(lang: AppLang, key: TKey): string {
-  if (lang === "de" || lang === "fr") return EXTRA[lang][key];
+  if (lang === "de" || lang === "fr" || lang === "zh") return EXTRA[lang][key];
   return DICT[key][lang];
 }
 
