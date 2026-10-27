@@ -1,3 +1,4 @@
+import { useTX, type TXKey } from "@/lib/i18n-pages";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -38,6 +39,7 @@ function plain(s: string) {
 }
 
 function GlossaryPage() {
+  const tx = useTX();
   const listFn = useServerFn(listGlossary);
   const { data, isLoading, error } = useQuery({
     queryKey: ["glossary"],
@@ -60,15 +62,15 @@ function GlossaryPage() {
             <BrandLogo withWordmark={false} />
           </Link>
           <Button asChild variant="outline" size="sm">
-            <Link to="/dashboard">← Volver</Link>
+            <Link to="/dashboard">{tx("back")}</Link>
           </Button>
         </div>
       </header>
 
       <main className="flex-1 px-4 pb-28 pt-5 sm:px-6 sm:pt-10">
         <div className="mx-auto max-w-3xl">
-          <PageHero img={jaiProfe} imgAlt="Jai, el profe, con su libro" title="Glosario">
-            Las palabras publicadas, con su significado y su audio. Si ves algo raro, tocá la banderita.
+          <PageHero img={jaiProfe} imgAlt={tx("glJaiAlt")} title={tx("glTitle")}>
+            {tx("glIntro")}
           </PageHero>
 
           <div className="relative mt-6">
@@ -76,9 +78,9 @@ function GlossaryPage() {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscá en guaraní o en castellano"
+              placeholder={tx("glSearch")}
               className="pl-9"
-              aria-label="Buscar en el glosario"
+              aria-label={tx("glSearchLabel")}
               autoComplete="off"
               spellCheck={false}
             />
@@ -86,14 +88,14 @@ function GlossaryPage() {
 
           {isLoading && (
             <p className="mt-8 flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" /> Cargando…
+              <Loader2 className="h-4 w-4 animate-spin" /> {tx("loading")}
             </p>
           )}
           {error && (
             <p className="mt-8 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
               {error.name === "OfflineMissingError"
-                ? "Sin conexión: el glosario todavía no está descargado. Con señal, tocá «Descargar para usar sin internet» en tu panel."
-                : "No se pudo cargar el glosario. Probá de nuevo en un momento."}
+                ? tx("glOffline")
+                : tx("glError")}
             </p>
           )}
 
@@ -101,12 +103,12 @@ function GlossaryPage() {
             <>
               <p className="mt-4 text-xs text-muted-foreground">
                 {shown.length === items.length
-                  ? `${items.length.toLocaleString("es-PY")} palabras`
-                  : `${shown.length.toLocaleString("es-PY")} de ${items.length.toLocaleString("es-PY")} palabras`}
+                  ? tx("glCount", { n: items.length.toLocaleString("es-PY") })
+                  : tx("glCountOf", { a: shown.length.toLocaleString("es-PY"), n: items.length.toLocaleString("es-PY") })}
               </p>
               {shown.length === 0 ? (
                 <p className="mt-8 text-center text-sm text-muted-foreground">
-                  No encontramos esa palabra en el glosario.
+                  {tx("glNone")}
                 </p>
               ) : (
                 <ul className="mt-3 divide-y divide-border/60 overflow-hidden rounded-2xl border border-border/60 bg-card">
@@ -119,7 +121,7 @@ function GlossaryPage() {
                       </div>
                       {w.validated && (
                         <span className="hidden shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200 sm:inline-flex">
-                          Revisada por docente
+                          {tx("glReviewed")}
                         </span>
                       )}
                       <ReportErrorButton gn={w.gn} es={w.es} lugar="Glosario" />
