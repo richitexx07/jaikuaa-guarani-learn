@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEscolarTx } from "@/lib/i18n-escolar";
 import { useEffect, useState } from "react";
 import { Check, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,8 @@ function loadState(): Saved {
 
 function PlanSemanal() {
   useRecordVisit("semanal");
+  const t = useEscolarTx();
+  const dayIdx = (day: string) => WEEK.findIndex((w) => w.day === day);
   const [phase, setPhase] = useState<"setup" | "plan">("setup");
   const [grade, setGrade] = useState<Grade>("6° grado");
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
@@ -81,31 +84,31 @@ function PlanSemanal() {
 
   const feedback =
     doneCount === 0
-      ? "¡Arrancá hoy! Un día por vez 💪"
+      ? t("fb0")
       : doneCount < 3
-        ? "¡Buen comienzo! Seguí así 🌱"
+        ? t("fb1")
         : doneCount < 5
-          ? "¡Vas muy bien! Ya casi terminás la semana 🔥"
-          : "¡Completaste toda la semana! Sos un crack 🎉";
+          ? t("fb2")
+          : t("fb3");
 
   if (phase === "setup") {
     return (
       <div className="mx-auto max-w-2xl">
         <div className="text-center">
           <div className="inline-flex items-center justify-center rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
-            Plan Semanal <span aria-hidden className="ml-2">📅</span>
+            {t("plan")} <span aria-hidden className="ml-2">📅</span>
           </div>
           <h1 className="mt-4 font-display text-3xl font-bold text-foreground sm:text-4xl">
-            Organizá tu semana de Guaraní
+            {t("organize")}
           </h1>
           <p className="mt-3 text-base text-muted-foreground">
-            Un tema por día, de lunes a viernes. Vos elegís a qué hora estudiar.
+            {t("oneADay")}
           </p>
         </div>
 
         <div className="mt-8 rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
           <label className="block text-sm font-medium text-muted-foreground">
-            ¿De qué grado sos?
+            {t("whichGrade")}
           </label>
           <div className="mt-3 flex flex-wrap gap-2">
             {GRADES.map((g) => (
@@ -126,7 +129,7 @@ function PlanSemanal() {
             className="mt-6 w-full"
             onClick={() => setPhase("plan")}
           >
-            Ver mi plan de la semana →
+            {t("seePlan")}
           </Button>
         </div>
 
@@ -135,7 +138,7 @@ function PlanSemanal() {
             to="/guarani-escolar"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
-            ← Volver a Guaraní Escolar
+            {t("backEscolar")}
           </Link>
         </div>
       </div>
@@ -147,21 +150,21 @@ function PlanSemanal() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            <Calendar className="size-3.5" /> Plan Semanal · {grade}
+            <Calendar className="size-3.5" /> {t("plan")} · {grade}
           </div>
           <h1 className="mt-3 font-display text-2xl font-bold text-foreground sm:text-3xl">
-            Tu semana de Guaraní
+            {t("yourWeek")}
           </h1>
         </div>
         <Button variant="outline" size="sm" onClick={() => setPhase("setup")}>
-          Cambiar grado
+          {t("changeGrade")}
         </Button>
       </div>
 
       <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-5">
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-foreground">
-            Completaste {doneCount} de {totalDays} días
+            {t("doneDays", { a: doneCount, b: totalDays })}
           </p>
           <span className="text-sm font-semibold text-primary">{pct}%</span>
         </div>
@@ -195,36 +198,36 @@ function PlanSemanal() {
                   }`}
                   aria-hidden
                 >
-                  {isDone ? <Check className="size-5" /> : d.short}
+                  {isDone ? <Check className="size-5" /> : t(`s${dayIdx(d.day)}` as "s0")}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    {d.day}
+                    {t(`d${dayIdx(d.day)}` as "d0")}
                     {d.isReview && (
                       <span className="ml-2 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold text-accent">
-                        Repaso
+                        {t("review")}
                       </span>
                     )}
                   </p>
                   <p className="mt-0.5 font-display text-base font-semibold text-foreground">
-                    {topics.map((t) => `${t.emoji} ${t.title}`).join(" + ")}
+                    {topics.map((tp) => `${tp.emoji} ${tp.title}`).join(" + ")}
                   </p>
                 </div>
               </div>
 
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                {topics.map((t) => (
+                {topics.map((tp) => (
                   <Button
-                    key={t.slug}
+                    key={tp.slug}
                     asChild
                     variant={isDone ? "outline" : "cta"}
                     size="sm"
                   >
                     <Link
                       to="/guarani-escolar/tema/$topic"
-                      params={{ topic: t.slug }}
+                      params={{ topic: tp.slug }}
                     >
-                      {topics.length > 1 ? `Hacer ${t.title}` : "Hacer la lección"} →
+                      {topics.length > 1 ? t("doTopic", { a: tp.title }) : t("doLesson")} →
                     </Link>
                   </Button>
                 ))}
@@ -239,7 +242,7 @@ function PlanSemanal() {
                     })
                   }
                 >
-                  {isDone ? "Desmarcar" : "Marcar como completado ✅"}
+                  {isDone ? t("unmark") : t("mark")}
                 </Button>
               </div>
             </li>
@@ -252,7 +255,7 @@ function PlanSemanal() {
           to="/guarani-escolar"
           className="text-sm text-muted-foreground hover:text-foreground"
         >
-          ← Volver a Guaraní Escolar
+          {t("backEscolar")}
         </Link>
         {doneCount > 0 && (
           <Button
@@ -260,7 +263,7 @@ function PlanSemanal() {
             size="sm"
             onClick={() => setCompleted({})}
           >
-            Reiniciar semana
+            {t("resetWeek")}
           </Button>
         )}
       </div>
