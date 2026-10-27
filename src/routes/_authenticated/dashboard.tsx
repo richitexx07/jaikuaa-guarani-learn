@@ -449,7 +449,7 @@ function Dashboard() {
           </div>
 
           {/* 2. TRES BOTONES GIGANTES */}
-          <nav aria-label="Elegí qué hacer" className="mt-5 grid gap-3 sm:grid-cols-3">
+          <nav aria-label={t("dash.question")} className="mt-5 grid gap-3 sm:grid-cols-3">
             <BigAction to="/curso/$lang" img={bannerCurso} title={t("nav.learn")} desc={t("dash.learnDesc")} tone="primary" />
             <BigAction to="/juegos" img={coverKaraoke} rotate={JUEGOS_ROTAN} title={t("dash.play")} desc={t("dash.playDesc")} tone="accent" />
             <BigAction to="/juegos/palabra-del-dia" img={coverPalabra} title={t("dash.word")} desc={t("dash.wordDesc")} tone="card" />
@@ -520,55 +520,55 @@ function Dashboard() {
                 loading="lazy"
               />
               <p className="mb-4 text-sm text-muted-foreground">
-                Contenido pedagógico ordenado, con audio humano.
+                {t("d.learnIntro")}
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
-                <FreeCard to="/curso/guarani" img={bannerCurso} cover title="Curso de Guaraní" desc="10 lecciones con audio humano real. Empezá desde cero y sumá XP." accent="accent" />
-                <FreeCard to="/guarani-escolar" img={bannerEscolar} cover title="Guaraní Escolar" desc="Organizado según los grados escolares." accent="accent" inValidation />
-                <FreeCard to="/logros" img={medallaPrimerPaso} title="Mis logros" desc="Tus insignias, racha y avance." accent="primary" />
-                <FreeCard to="/embajadores" img={jaiEmbajador} title="Invitar a alguien" desc="¿Querés invitar a un amigo o familiar? Compartí tu enlace acá." accent="primary" />
-                <FreeCard to="/certificado" img={jaiGraduado} title="Certificado" desc="Terminá el Curso de Guaraní y descargá tu certificado." accent="primary" />
+                <FreeCard to="/curso/guarani" img={bannerCurso} cover title={t("d.course.t")} desc={t("d.course.d")} accent="accent" />
+                <FreeCard to="/guarani-escolar" img={bannerEscolar} cover title={t("d.school.t")} desc={t("d.school.d")} accent="accent" inValidation />
+                <FreeCard to="/logros" img={medallaPrimerPaso} title={t("d.ach.t")} desc={t("d.ach.d")} accent="primary" />
+                <FreeCard to="/embajadores" img={jaiEmbajador} title={t("d.invite.t")} desc={t("d.invite.d")} accent="primary" />
+                <FreeCard to="/certificado" img={jaiGraduado} title={t("d.cert.t")} desc={t("d.cert.d")} accent="primary" />
               </div>
             </TabsContent>
 
             <TabsContent value="jugar" className="mt-6">
               <p className="mb-4 text-sm text-muted-foreground">
-                Practicá lo aprendido jugando. Todo gratis.
+                {t("d.playIntro")}
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
-                <FreeCard to="/trivia" img={coverTrivia} cover title="Preguntados paraguayo" desc="Recorré el Sendero de Jai: gastronomía, mitos, deportes, música y más." accent="accent" inValidation />
-                <FreeCard to="/juegos" img={coverPenales} cover title="15 juegos" desc="Karaoke, cocina, penales, duelos, ventanilla, chacra y más." accent="accent" />
-                <FreeCard to="/ranking" img={jaiTrofeo} title="Ranking semanal" desc="Mirá quiénes estudiaron más esta semana en tu grupo." accent="primary" />
+                <FreeCard to="/trivia" img={coverTrivia} cover title={t("d.trivia.t")} desc={t("d.trivia.d")} accent="accent" inValidation />
+                <FreeCard to="/juegos" img={coverPenales} cover title={t("d.games.t")} desc={t("d.games.d")} accent="accent" />
+                <FreeCard to="/ranking" img={jaiTrofeo} title={t("d.rank.t")} desc={t("d.rank.d")} accent="primary" />
               </div>
               <div className="mt-6 rounded-2xl border border-dashed border-border bg-muted/40 p-4">
-                <p className="font-display font-bold text-foreground">Vienen más juegos</p>
+                <p className="font-display font-bold text-foreground">{t("d.more.t")}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  A medida que la comunidad vaya creciendo, iremos sumando más juegos en guaraní.
+                  {t("d.more.d")}
                 </p>
                 <Link to="/juegos" className="mt-2 inline-block text-sm font-semibold text-primary">
-                  Ver todos los juegos →
+                  {t("d.more.link")} →
                 </Link>
               </div>
             </TabsContent>
 
             <TabsContent value="herramientas" className="mt-6">
               <p className="mb-4 text-sm text-muted-foreground">
-                Apoyo y consulta.
+                {t("d.toolsIntro")}
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
-                <FreeCard to="/aula" img={jaiProfe} title="Mi aula" desc="Entrá con el código de tu docente y mirá tus tareas." accent="primary" />
-                <FreeCard to="/pronunciar" img={jaiBienvenida} title="Grabate y compará" desc="Escuchá a un hablante, grabate y compará las dos voces." accent="primary" />
-                <FreeCard to="/mostrador" img={jaiAtencion} title="Atendé en guaraní" desc="Modo mostrador: hacé escuchar frases grabadas por hablantes al atender." accent="primary" inValidation />
-                <FreeCard to="/teclado" icon={Keyboard} title="Teclado Guaraní" desc="Escribí con ã, g̃ y puso, y mandalo por WhatsApp." accent="primary" />
-                <FreeCard to="/glosario" img={triviaVocabulario} title="Glosario" desc="Las palabras publicadas, con su significado y su audio." accent="primary" />
-                <FreeCard to="/agro" img={jaiAgro} title="Jaikuaa Agro-Rural" desc="Guaraní técnico del campo: suelo, cultivos y ganado." accent="primary" />
+                <FreeCard to="/aula" img={jaiProfe} title={t("d.aula.t")} desc={t("d.aula.d")} accent="primary" />
+                <FreeCard to="/pronunciar" img={jaiBienvenida} title={t("d.pron.t")} desc={t("d.pron.d")} accent="primary" />
+                <FreeCard to="/mostrador" img={jaiAtencion} title={t("d.mostr.t")} desc={t("d.mostr.d")} accent="primary" inValidation />
+                <FreeCard to="/teclado" icon={Keyboard} title={t("d.kb.t")} desc={t("d.kb.d")} accent="primary" />
+                <FreeCard to="/glosario" img={triviaVocabulario} title={t("d.gloss.t")} desc={t("d.gloss.d")} accent="primary" />
+                <FreeCard to="/agro" img={jaiAgro} title="Jaikuaa Agro-Rural" desc={t("d.agro.d")} accent="primary" />
                 {AI_GUARANI_TOOLS_ENABLED && (
                   <>
                     <FreeCard to="/traductor" icon={Languages} title="Traductor" desc="Consulta rápida guaraní – español." accent="primary" experimental />
                     <FreeCard to="/tutor" icon={Sparkles} title="Tutor IA" desc="Conversá con un asistente para practicar." accent="primary" experimental />
                   </>
                 )}
-                <FreeCard to="/nhe-mbytepe" icon={MessagesSquare} title="Ñe'ẽ Mbytépe" desc="El guaraní que se habla en la calle." accent="primary" inValidation />
+                <FreeCard to="/nhe-mbytepe" icon={MessagesSquare} title="Ñe'ẽ Mbytépe" desc={t("d.street.d")} accent="primary" inValidation />
               </div>
             </TabsContent>
 
