@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import jaiImg from "@/assets/jai-anfitrion.webp";
+import { useTX } from "@/lib/i18n-pages";
 
 type Trick = "idle" | "flip" | "spin" | "wave" | "dash" | "dance";
 
@@ -7,6 +8,7 @@ const DUR: Record<Exclude<Trick, "idle">, number> = { flip: 1400, spin: 1300, wa
 
 /** Jai vivo, estilo dibujito: anticipación, saltos altos con estela, aterrizaje con polvo y piruetas variadas. */
 export function JaiLauncher({ launcherRef, onOpen }: { launcherRef: RefObject<HTMLButtonElement | null>; onOpen: () => void }) {
+  const tx = useTX();
   const [trick, setTrick] = useState<Trick>("idle");
   const [fx, setFx] = useState(0);
   const tiltRef = useRef<HTMLSpanElement>(null);
@@ -72,7 +74,7 @@ export function JaiLauncher({ launcherRef, onOpen }: { launcherRef: RefObject<HT
         busy.current = false;
         play("flip", onOpen);
       }}
-      aria-label="Abrir a Jai, tu compañero de Jaikuaa"
+      aria-label={tx("jaiOpen")}
       className="jai-enter group relative ml-auto block h-16 w-16 rounded-full [perspective:600px] focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-24 sm:w-24"
     >
       <span className="jai-halo absolute inset-x-2 bottom-1 top-6 rounded-full" aria-hidden />
