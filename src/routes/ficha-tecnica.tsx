@@ -95,6 +95,16 @@ const SECCIONES = [
       "Traductor y tutor automáticos apagados a propósito hasta contar con validación.",
     ],
   },
+  {
+    icon: Globe,
+    titulo: "Alcance internacional",
+    items: [
+      "Portadas propias en portugués (/pt) e inglés (/en), pensadas para inversores, diplomacia, turismo y extranjeros que viven o hacen negocios en Paraguay.",
+      "Selector de idioma ES / PT / EN en la cabecera de la portada.",
+      "Posicionamiento en buscadores por idioma: cada portada tiene su propio título, descripción y enlaces alternos (hreflang) para que Google muestre la versión correcta según el idioma de quien busca.",
+      "Base para el modelo comercial: el guaraní es gratis para paraguayos; el público internacional es el segmento pago.",
+    ],
+  },
 ] as const;
 
 const RESPALDOS = [
