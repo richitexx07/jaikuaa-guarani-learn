@@ -8,6 +8,7 @@ import { useGameFeedback } from "@/components/games/game-kit";
 import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
 import type { GameWord } from "@/lib/games.functions";
+import { useSDT } from "@/lib/i18n-sopa-duelo";
 import { LiveDuel, LiveDuelStart, type LiveRound } from "@/components/games/live-duel";
 import { ponerSalaEnLaUrl, salaDeLaUrl } from "@/lib/use-sala";
 
@@ -134,6 +135,7 @@ function liveRounds(pool: GameWord[]): LiveRound[] {
 
 function Board({ pool, onRematch, onRemote }: { pool: GameWord[]; onRematch: () => void; onRemote: (code: string, host: boolean) => void }) {
   const feedback = useGameFeedback();
+  const tt = useSDT();
   const used = useRef(new Set<string>());
   const [round, setRound] = useState<Round>(() => makeRound(pool, used.current));
   const [score, setScore] = useState<[number, number]>([0, 0]);
@@ -193,15 +195,14 @@ function Board({ pool, onRematch, onRemote }: { pool: GameWord[]; onRematch: () 
           <Rayo className="h-20 w-14" />
           <span className="font-display text-5xl font-bold sm:text-6xl">J2</span>
         </div>
-        <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">Duelo Cara a Cara</h1>
+        <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">{tt("duelTitle")}</h1>
         <div className="rounded-3xl bg-white p-5 text-left shadow-2xl" style={{ color: V.tinta }}>
-          <p className="font-display text-lg font-bold">Apoyen el celular sobre la mesa</p>
+          <p className="font-display text-lg font-bold">{tt("tablePhone")}</p>
           <p className="mt-2 text-sm leading-relaxed opacity-80">
-            Cada uno se sienta de un lado. Suena una palabra en guaraní: el primero que toca su traducción gana el punto.
-            Si te equivocás, quedás bloqueado un segundo. Gana quien llega a {TARGET}.
+            {tt("rules", { n: TARGET })}
           </p>
           <button type="button" className="mt-4 h-14 w-full rounded-2xl font-display text-xl font-bold text-white" style={{ background: V.tinta }} onClick={() => setStarted(true)}>
-            ¡Empezar duelo!
+            {tt("startDuel")}
           </button>
           <LiveDuelStart theme={{ mine: V.azul, rival: V.rojo, ink: V.tinta, accent: V.oro }} onStart={onRemote} />
         </div>
@@ -211,7 +212,7 @@ function Board({ pool, onRematch, onRemote }: { pool: GameWord[]; onRematch: () 
 
   if (finished) {
     const w = score[0] > score[1] ? 0 : 1;
-    const champ = w === 0 ? "Jugador 1" : "Jugador 2";
+    const champ = tt("player", { n: w + 1 });
     return (
       <div className="mx-auto max-w-md space-y-4 rounded-3xl p-6 text-center text-white shadow-2xl ring-4 ring-white" style={{ background: COLOR[w] }}>
         <svg viewBox="0 0 64 64" className="mx-auto h-20 w-20" aria-hidden>
@@ -220,13 +221,13 @@ function Board({ pool, onRematch, onRemote }: { pool: GameWord[]; onRematch: () 
           <rect x="28" y="40" width="8" height="10" fill={V.oro} />
           <rect x="20" y="50" width="24" height="6" rx="2" fill={V.oro} />
         </svg>
-        <p className="font-display text-3xl font-bold">¡{champ} ganó el duelo!</p>
+        <p className="font-display text-3xl font-bold">{tt("wonDuel", { n: champ })}</p>
         <p className="font-display text-6xl font-bold tabular-nums">{score[0]} — {score[1]}</p>
         {xp > 0 && <p className="font-bold" style={{ color: V.oro }}>+{xp} XP</p>}
-        <p className="text-xs opacity-80">El XP se suma a la cuenta con sesión iniciada (Jugador 1).</p>
+        <p className="text-xs opacity-80">{tt("xpNote")}</p>
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl bg-white px-6 font-bold" style={{ color: COLOR[w] }}><RotateCcw className="h-5 w-5" /> Revancha ya</button>
-          <ShareResult text={`¡Jugamos un Duelo Cara a Cara en guaraní en Jaikuaa y terminó ${score[0]} a ${score[1]}! ¿Te animás a desafiarme? 🇵🇾`} />
+          <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl bg-white px-6 font-bold" style={{ color: COLOR[w] }}><RotateCcw className="h-5 w-5" /> {tt("rematch")}</button>
+          <ShareResult text={tt("share", { a: score[0], b: score[1] })} />
         </div>
       </div>
     );
@@ -236,12 +237,12 @@ function Board({ pool, onRematch, onRemote }: { pool: GameWord[]; onRematch: () 
     <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col overflow-hidden" style={{ background: V.tinta }}>
       <PlayerHalf p={1} round={round} winner={winner} locked={locked[1]} wrong={wrongPick[1]} onPick={pick} rotated />
       <div className="relative flex shrink-0 items-center justify-between gap-2 bg-white px-2 py-2" style={{ color: V.tinta }}>
-        <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-black/5" onClick={onRematch} aria-label="Salir del duelo"><X /></button>
+        <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-black/5" onClick={onRematch} aria-label={tt("exit")}><X /></button>
         <span key={`a${score[0]}`} className="dv-punto font-display text-4xl font-bold tabular-nums" style={{ color: V.azul }}>{score[0]}</span>
         <Rayo className="h-10 w-7" />
         <span key={`b${score[1]}`} className="dv-punto rotate-180 font-display text-4xl font-bold tabular-nums" style={{ color: V.rojo }}>{score[1]}</span>
-        <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-black/5 disabled:opacity-30" onClick={() => say(round.word)} disabled={!round.word.hasAudio} aria-label="Escuchar otra vez"><Volume2 /></button>
-        <span className="sr-only" aria-live="polite">{score[0]} a {score[1]}</span>
+        <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-black/5 disabled:opacity-30" onClick={() => say(round.word)} disabled={!round.word.hasAudio} aria-label={tt("listen")}><Volume2 /></button>
+        <span className="sr-only" aria-live="polite">{tt("scoreSr", { a: score[0], b: score[1] })}</span>
       </div>
       <PlayerHalf p={0} round={round} winner={winner} locked={locked[0]} wrong={wrongPick[0]} onPick={pick} />
     </div>
@@ -252,17 +253,18 @@ function PlayerHalf({ p, round, winner, locked, wrong, onPick, rotated }: {
   p: 0 | 1; round: Round; winner: 0 | 1 | null; locked: boolean; wrong: string | null;
   onPick: (p: 0 | 1, o: string) => void; rotated?: boolean;
 }) {
+  const tt = useSDT();
   const won = winner === p;
   const lost = winner !== null && winner !== p;
   return (
     <section
-      aria-label={`Jugador ${p + 1}`}
+      aria-label={tt("player", { n: p + 1 })}
       className={`flex min-h-0 flex-1 flex-col justify-center gap-3 px-5 py-3 text-white transition-[filter] ${rotated ? "rotate-180" : ""} ${locked ? "dv-shake" : ""}`}
       style={{ background: COLOR[p], filter: lost ? "saturate(.4) brightness(.8)" : "none" }}
     >
       <div className="flex items-center justify-between text-sm font-semibold">
-        <span>Jugador {p + 1}</span>
-        <span className="rounded-full bg-black/20 px-3 py-0.5">{won ? "¡Punto!" : lost ? "Punto rival" : locked ? "Bloqueado…" : "¿Qué significa?"}</span>
+        <span>{tt("player", { n: p + 1 })}</span>
+        <span className="rounded-full bg-black/20 px-3 py-0.5">{won ? tt("point") : lost ? tt("rivalPoint") : locked ? tt("locked") : tt("meaning")}</span>
       </div>
       <div className="text-center font-display text-4xl font-bold">{round.word.gn}</div>
       <div className="grid gap-2">
