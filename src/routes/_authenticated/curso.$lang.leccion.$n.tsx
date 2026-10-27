@@ -1,3 +1,4 @@
+import { useTX, type TXKey } from "@/lib/i18n-pages";
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -50,61 +51,70 @@ export const Route = createFileRoute("/_authenticated/curso/$lang/leccion/$n")({
     if (!lesson) throw notFound();
     return { lang, lesson };
   },
-  notFoundComponent: () => (
+  notFoundComponent: () => <LessonNotFound />,
+  errorComponent: ({ error, reset }) => <LessonError error={error} reset={reset} />,
+  component: LessonPage,
+});
+
+function LessonNotFound() {
+  const tx = useTX();
+  return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 text-center">
       <div>
-        <h1 className="font-display text-2xl font-bold text-foreground">Lección no encontrada</h1>
+        <h1 className="font-display text-2xl font-bold text-foreground">{tx("lsNotFound")}</h1>
         <Button asChild variant="cta" className="mt-6">
-          <Link to="/dashboard">Volver al panel</Link>
+          <Link to="/dashboard">{tx("backPanelPlain")}</Link>
         </Button>
       </div>
     </div>
-  ),
-  errorComponent: ({ error, reset }) =>
-    error instanceof OfflineMissingError || (error as Error)?.name === "OfflineMissingError" ? (
+  );
+}
+
+function LessonError({ error, reset }: { error: unknown; reset: () => void }) {
+  const tx = useTX();
+  return error instanceof OfflineMissingError || (error as Error)?.name === "OfflineMissingError" ? (
       <div className="flex min-h-screen items-center justify-center bg-background px-4 text-center">
         <div className="max-w-md">
           <div className="text-5xl" aria-hidden>📶</div>
-          <h1 className="mt-3 font-display text-2xl font-bold">Sin conexión</h1>
+          <h1 className="mt-3 font-display text-2xl font-bold">{tx("offline")}</h1>
           <p className="mt-2 text-muted-foreground">
-            Esta lección todavía no está descargada en tu teléfono. Cuando tengas señal, tocá
-            «Descargar para usar sin internet» en tu panel y vas a poder hacerla en cualquier lugar.
+            {tx("lsOffline")}
           </p>
           <Button asChild variant="cta" className="mt-6">
-            <Link to="/dashboard">Ir al panel</Link>
+            <Link to="/dashboard">{tx("goPanel")}</Link>
           </Button>
         </div>
       </div>
     ) : (
       <div className="flex min-h-screen items-center justify-center bg-background px-4 text-center">
         <div>
-          <h1 className="font-display text-2xl font-bold">Ocurrió un error</h1>
+          <h1 className="font-display text-2xl font-bold">{tx("errorHappened")}</h1>
           <Button variant="cta" className="mt-4" onClick={() => reset()}>
-            Reintentar
+            {tx("retry")}
           </Button>
         </div>
       </div>
-    ),
-  component: LessonPage,
-});
+    );
+}
 
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import { ReportErrorButton } from "@/components/report-error-button";
 
 type Phase = "intro" | "vocab" | "choice" | "match" | "done";
 
-const STEPS: { id: Phase; label: string }[] = [
-  { id: "vocab", label: "Escuchar" },
-  { id: "choice", label: "Elegir" },
-  { id: "match", label: "Unir" },
-  { id: "done", label: "¡Listo!" },
+const STEPS: { id: Phase; label: TXKey }[] = [
+  { id: "vocab", label: "stListen" },
+  { id: "choice", label: "stChoose" },
+  { id: "match", label: "stMatch" },
+  { id: "done", label: "stDone" },
 ];
 
 /** Los cuatro pasos de la lección: se ve en qué paso vas y cuánto falta. */
 function LessonSteps({ phase }: { phase: Phase }) {
+  const tx = useTX();
   const at = STEPS.findIndex((s) => s.id === phase);
   return (
-    <ol className="mt-4 grid grid-cols-4 gap-1.5" aria-label="Pasos de la lección">
+    <ol className="mt-4 grid grid-cols-4 gap-1.5" aria-label={tx("lsSteps")}>
       {STEPS.map((s, i) => {
         const done = at > i;
         const now = at === i;
@@ -112,7 +122,7 @@ function LessonSteps({ phase }: { phase: Phase }) {
           <li key={s.id} className="min-w-0">
             <span className={`block h-2 rounded-full transition-colors ${done || now ? "bg-accent" : "bg-muted"}`} />
             <span className={`mt-1 block truncate text-center text-[11px] font-semibold ${now ? "text-accent" : done ? "text-foreground" : "text-muted-foreground"}`}>
-              {s.label}
+              {tx(s.label)}
             </span>
           </li>
         );
@@ -140,6 +150,7 @@ const LESSON_CSS = `
 `;
 
 function LessonPage() {
+  const tx = useTX();
   const { lang, lesson } = Route.useLoaderData() as unknown as {
     lang: NonNullable<ReturnType<typeof getLanguage>>;
     lesson: CourseLesson | null;
@@ -185,14 +196,14 @@ function LessonPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center">
         <h1 className="font-display text-2xl font-bold text-foreground">
-          Contenido próximamente
+          {tx("lsSoon")}
         </h1>
         <p className="mt-2 max-w-md text-muted-foreground">
-          Las lecciones de {lang.name} estarán disponibles muy pronto.
+          {tx("lsSoonInfo", { n: lang.name })}
         </p>
         <Button asChild variant="cta" className="mt-6">
           <Link to="/curso/$lang" params={{ lang: lang.slug }}>
-            Volver al curso
+            {tx("backCourse")}
           </Link>
         </Button>
       </div>
@@ -202,13 +213,13 @@ function LessonPage() {
   if (lesson.vocab.length === 0) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center">
-        <h1 className="font-display text-2xl font-bold text-foreground">En validación</h1>
+        <h1 className="font-display text-2xl font-bold text-foreground">{tx("csInValidation")}</h1>
         <p className="mt-2 max-w-md text-muted-foreground">
-          Las palabras de esta lección todavía están siendo revisadas por docentes.
+          {tx("lsValInfo")}
         </p>
         <Button asChild variant="cta" className="mt-6">
           <Link to="/curso/$lang" params={{ lang: lang.slug }}>
-            Volver al curso
+            {tx("backCourse")}
           </Link>
         </Button>
       </div>
@@ -233,7 +244,7 @@ function LessonPage() {
               navigate({ to: "/curso/$lang", params: { lang: lang.slug } })
             }
           >
-            ✕ Salir
+            {tx("exit")}
           </Button>
         </div>
       </header>
@@ -244,7 +255,7 @@ function LessonPage() {
         <div className="mx-auto max-w-2xl">
           <div className="mb-6">
             <div className="text-xs font-semibold uppercase tracking-wide text-accent">
-              Lección {lesson.n} · {lang.name}
+              {tx("lsHeader", { n: lesson.n, l: lang.name })}
             </div>
             <h1 className="mt-1 font-display text-3xl font-bold text-foreground sm:text-4xl">
               {lesson.title}
@@ -255,9 +266,9 @@ function LessonPage() {
 
           {resumed && phase !== "done" && (
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
-              <span className="text-foreground">↩︎ Seguís donde habías quedado.</span>
+              <span className="text-foreground">{tx("lsResumed")}</span>
               <button type="button" onClick={restart} className="font-semibold text-primary underline-offset-2 hover:underline">
-                Empezar de nuevo
+                {tx("lsRestart")}
               </button>
             </div>
           )}
@@ -301,16 +312,16 @@ function IntroStep({
   lesson: { vocab: VocabItem[] };
   onStart: () => void;
 }) {
+  const tx = useTX();
   return (
     <div className="flex flex-col items-center gap-4 rounded-3xl border border-border/60 bg-card p-6 text-center shadow-elegant sm:flex-row sm:text-left">
-      <img src={jaiProfe} alt="Jai, el profe, te acompaña en la lección" className="h-32 w-auto shrink-0 object-contain drop-shadow-lg sm:h-40" />
+      <img src={jaiProfe} alt={tx("lsJaiAlt")} className="h-32 w-auto shrink-0 object-contain drop-shadow-lg sm:h-40" />
       <div className="w-full">
       <p className="text-base text-foreground">
-        Vas a aprender <strong>{lesson.vocab.length}</strong> palabras en guaraní.
-        Primero las practicamos, después hacemos ejercicios.
+        {tx("lsIntro", { n: lesson.vocab.length })}
       </p>
       <Button variant="cta" size="lg" className="mt-6 w-full" onClick={onStart}>
-        Empezar lección
+        {tx("lsStart")}
       </Button>
       </div>
     </div>
@@ -324,9 +335,10 @@ function VocabStep({
   lesson: { n: number; vocab: VocabItem[] };
   onNext: () => void;
 }) {
+  const tx = useTX();
   return (
     <div>
-      <JaiSays ok={null}>Escuchá cada palabra con el parlante y repetila en voz alta.</JaiSays>
+      <JaiSays ok={null}>{tx("lsListenTip")}</JaiSays>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
         {lesson.vocab.map((v) => (
           <li
@@ -339,7 +351,7 @@ function VocabStep({
               <div className="text-sm text-muted-foreground">{v.es}</div>
               {v.validated && (
                 <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
-                  <Check className="h-3 w-3" aria-hidden /> Revisada por docente
+                  <Check className="h-3 w-3" aria-hidden /> {tx("glReviewed")}
                 </span>
               )}
             </div>
@@ -350,7 +362,7 @@ function VocabStep({
         ))}
       </ul>
       <Button variant="cta" size="lg" className="mt-6 w-full" onClick={onNext}>
-        Continuar a los ejercicios
+        {tx("lsToExercises")}
       </Button>
     </div>
   );
@@ -378,6 +390,7 @@ function ChoiceStep({
   initial?: ChoiceDraft;
   onChange?: (d: ChoiceDraft) => void;
 }) {
+  const tx = useTX();
   const questions = useMemo(() => {
     if (initial) {
       const byGn = new Map(lesson.vocab.map((v) => [v.gn, v]));
@@ -413,13 +426,13 @@ function ChoiceStep({
       <div className="lx-pop rounded-3xl border border-border/60 bg-card p-6 text-center shadow-elegant">
         <img src={correct >= Math.ceil(questions.length / 2) ? jaiAplaude : jaiAnimo} alt="" className="mx-auto h-28 w-auto object-contain" />
         <div className="mt-2 font-display text-2xl font-bold text-foreground">
-          ¡Buen trabajo!
+          {tx("lsGoodJob")}
         </div>
         <p className="mt-2 text-sm text-muted-foreground">
-          Acertaste {correct} de {questions.length}.
+          {tx("lsGot", { a: correct, b: questions.length })}
         </p>
         <Button variant="cta" size="lg" className="mt-6 w-full" onClick={onNext}>
-          Siguiente: unir las parejas
+          {tx("lsNextMatch")}
         </Button>
       </div>
     );
@@ -431,9 +444,9 @@ function ChoiceStep({
   return (
     <div>
       <div className="mb-3 flex items-center justify-between text-xs font-semibold text-muted-foreground">
-        <span>¿Qué significa?</span>
+        <span>{tx("lsMeaning")}</span>
         <span className="rounded-full bg-muted px-2.5 py-0.5">
-          {i + 1} de {questions.length}
+          {tx("csOf", { a: i + 1, b: questions.length })}
         </span>
       </div>
       <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-elegant sm:p-6">
@@ -476,7 +489,7 @@ function ChoiceStep({
         {picked && (
           <div className="mt-5 space-y-3">
             <JaiSays ok={isCorrect}>
-              {isCorrect ? "¡Muy bien! Esa es." : <>Casi. <strong>{q.item.gn}</strong> significa «{q.item.es}».</>}
+              {isCorrect ? tx("lsRight") : <>{tx("lsAlmost")} <strong>{q.item.gn}</strong> {tx("lsMeans")} «{q.item.es}».</>}
             </JaiSays>
             <Button
               variant="cta"
@@ -487,7 +500,7 @@ function ChoiceStep({
                 setI((x) => x + 1);
               }}
             >
-              Siguiente
+              {tx("next")}
             </Button>
           </div>
         )}
@@ -509,6 +522,7 @@ function MatchStep({
   initial?: MatchDraft;
   onChange?: (d: MatchDraft) => void;
 }) {
+  const tx = useTX();
   const pairs = useMemo(() => {
     if (initial) {
       const byGn = new Map(lesson.vocab.map((v) => [v.gn, v]));
@@ -557,14 +571,14 @@ function MatchStep({
   return (
     <div>
       <div className="mb-3 flex items-center justify-between text-xs font-semibold text-muted-foreground">
-        <span>Uní las parejas</span>
+        <span>{tx("lsMatchTitle")}</span>
         <span className="rounded-full bg-muted px-2.5 py-0.5">
-          {matched.size} de {pairs.length}
+          {tx("csOf", { a: matched.size, b: pairs.length })}
         </span>
       </div>
       <div className="mb-4">
         <JaiSays ok={done ? true : wrong ? false : null}>
-          {done ? "¡Todas unidas! Terminaste los ejercicios." : wrong ? "Esa no va. Probá con otra." : "Tocá una palabra en guaraní y después su significado en español."}
+          {done ? tx("lsMatchDone") : wrong ? tx("lsMatchWrong") : tx("lsMatchHow")}
         </JaiSays>
       </div>
       <div className="grid grid-cols-2 gap-2.5">
@@ -623,7 +637,7 @@ function MatchStep({
 
       {done && (
         <Button variant="cta" size="lg" className="mt-6 h-14 w-full text-base" onClick={onNext}>
-          Terminar la lección
+          {tx("lsFinish")}
         </Button>
       )}
     </div>
@@ -637,6 +651,7 @@ function DoneStep({
   lesson: { n: number; title: string; vocab: VocabItem[] };
   langSlug: string;
 }) {
+  const tx = useTX();
   const xp = 10 + lesson.vocab.length * 2;
   useRecordOnMount({
     xp,
@@ -647,12 +662,12 @@ function DoneStep({
   useEffect(() => { celebrate("big"); }, []);
   return (
     <div className="rounded-2xl border border-border/60 bg-card p-8 text-center shadow-lift animate-scale-in">
-      <img src={jaiFesteja} alt="Jai festeja con los brazos arriba" className="mx-auto h-44 w-auto object-contain drop-shadow-xl sm:h-52" />
+      <img src={jaiFesteja} alt={tx("lgJaiAlt")} className="mx-auto h-44 w-auto object-contain drop-shadow-xl sm:h-52" />
       <h2 className="mt-4 font-display text-3xl font-bold text-foreground">
-        ¡Lección completada!
+        {tx("lsCompleted")}
       </h2>
       <p className="mt-2 text-muted-foreground">
-        Terminaste “{lesson.title}”. ¡Aguyje!
+        {tx("lsFinished", { t: lesson.title })} ¡Aguyje!
       </p>
 
       <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2 font-display text-base font-bold text-accent-foreground shadow">
@@ -662,11 +677,11 @@ function DoneStep({
       <div className="mt-8 grid gap-2 sm:grid-cols-2">
         <Button asChild variant="outline" size="lg">
           <Link to="/curso/$lang" params={{ lang: langSlug }}>
-            Volver al curso
+            {tx("backCourse")}
           </Link>
         </Button>
         <Button asChild variant="cta" size="lg">
-          <Link to="/dashboard">Ir al panel</Link>
+          <Link to="/dashboard">{tx("goPanel")}</Link>
         </Button>
       </div>
     </div>
