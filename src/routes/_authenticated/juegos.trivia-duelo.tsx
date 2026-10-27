@@ -48,33 +48,36 @@ function TriviaDuel() {
   );
 }
 
-/* Estudio de concurso: azul noche, luces doradas y una ruleta de colores. */
+/* Estudio de concurso: azul noche, luces doradas y un pulsador de concurso (sin ruleta: hay chicos jugando). */
 const TV = { estudio: "#0B1F45", oro: "#F6C445", j1: "#0E7C86", j2: "#7A3FB0", tinta: "#0B1F45" };
 const JC = [TV.j1, TV.j2] as const;
-const GAJOS = ["#D52B1E", "#F6C445", "#1F8A5B", "#FFFFFF", "#0038A8", "#E9A23B", "#7FD3A8", "#E0457B"];
 
 const CSS = `
-.tv-spin { animation: tv-spin 24s linear infinite; transform-box: view-box; transform-origin: 0px 0px; }
-@keyframes tv-spin { to { transform: rotate(360deg) } }
+.tv-pulse { animation: tv-pulse 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes tv-pulse { 50% { transform: scale(1.06) } }
 .tv-bulbs span { animation: tv-bulb 1.2s steps(2) infinite; }
 .tv-bulbs span:nth-child(2n) { animation-delay: .6s; }
 @keyframes tv-bulb { 50% { opacity: .3 } }
 .tv-punto { animation: tv-punto .5s cubic-bezier(.2,1.5,.4,1) 1; }
 @keyframes tv-punto { from { transform: scale(1.8) } }
-@media (prefers-reduced-motion: reduce) { .tv-spin, .tv-bulbs span, .tv-punto { animation: none !important } }
+@media (prefers-reduced-motion: reduce) { .tv-pulse, .tv-bulbs span, .tv-punto { animation: none !important } }
 `;
 
-function Ruleta({ className = "", gira = true }: { className?: string; gira?: boolean }) {
+/** Pulsador de concurso: el botón que aprieta quien sabe la respuesta. */
+function Pulsador({ className = "", late = true }: { className?: string; late?: boolean }) {
   return (
-    <svg viewBox="-60 -66 120 126" className={className} aria-hidden>
-      <g className={gira ? "tv-spin" : ""}>
-        {GAJOS.map((c, i) => (
-          <path key={i} d={`M0 0 L${54 * Math.cos((i * Math.PI) / 4)} ${54 * Math.sin((i * Math.PI) / 4)} A54 54 0 0 1 ${54 * Math.cos(((i + 1) * Math.PI) / 4)} ${54 * Math.sin(((i + 1) * Math.PI) / 4)} Z`} fill={c} />
-        ))}
+    <svg viewBox="-60 -60 120 120" className={className} aria-hidden>
+      <ellipse cx="0" cy="40" rx="50" ry="12" fill="#081633" opacity=".55" />
+      <path d="M-46 18 Q-46 40 0 40 Q46 40 46 18 L46 8 Q46 -6 0 -6 Q-46 -6 -46 8 Z" fill="#F3E3B5" />
+      <ellipse cx="0" cy="8" rx="46" ry="14" fill="#E8D49A" />
+      <g className={late ? "tv-pulse" : ""}>
+        <path d="M-34 6 Q-34 -30 0 -30 Q34 -30 34 6 Q34 16 0 16 Q-34 16 -34 6 Z" fill="#D52B1E" />
+        <ellipse cx="0" cy="-14" rx="26" ry="10" fill="#FF6B5E" opacity=".75" />
+        <ellipse cx="-10" cy="-20" rx="8" ry="3.5" fill="#FFFFFF" opacity=".6" />
       </g>
-      <circle r="56" fill="none" stroke="#F3E3B5" strokeWidth="4" />
-      <circle r="12" fill={TV.estudio} stroke="#F3E3B5" strokeWidth="3" />
-      <path d="M-9 -66 H9 L0 -50Z" fill="#F3E3B5" />
+      {[[-50, -40], [48, -44], [-30, -54], [36, -24]].map(([x, y], i) => (
+        <path key={i} d={`M${x} ${y - 6} L${x + 2} ${y - 2} L${x + 6} ${y} L${x + 2} ${y + 2} L${x} ${y + 6} L${x - 2} ${y + 2} L${x - 6} ${y} L${x - 2} ${y - 2} Z`} fill="#F6C445" />
+      ))}
     </svg>
   );
 }
@@ -137,7 +140,7 @@ function Board({ onRematch }: { onRematch: () => void }) {
     return (
       <div className="mx-auto max-w-md space-y-5 text-center">
         <Focos />
-        <Ruleta className="mx-auto h-44 w-44 drop-shadow-2xl" />
+        <Pulsador className="mx-auto h-44 w-44 drop-shadow-2xl" />
         <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">Duelo de Trivia</h1>
         <p className="text-white/75">¿Quién sabe más del Paraguay?</p>
         <div className="rounded-3xl bg-white p-5 text-left shadow-2xl" style={{ color: TV.tinta }}>
@@ -186,7 +189,7 @@ function Board({ onRematch }: { onRematch: () => void }) {
           <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" onClick={onRematch} aria-label="Salir del duelo"><X /></button>
           <span key={`a${score[0]}`} className="tv-punto font-display text-4xl font-bold tabular-nums" style={{ color: "#5FE0E8" }}>{score[0]}</span>
           <div className="flex items-center gap-2">
-            <Ruleta className="h-10 w-10" gira={winner === null} />
+            <Pulsador className="h-10 w-10" late={winner === null} />
             <span className="max-w-[9rem] truncate text-xs font-semibold" style={{ color: TV.oro }}>{q.emoji} {q.cat}</span>
           </div>
           <span key={`b${score[1]}`} className="tv-punto rotate-180 font-display text-4xl font-bold tabular-nums" style={{ color: "#D3A6FF" }}>{score[1]}</span>

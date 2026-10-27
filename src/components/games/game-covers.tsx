@@ -178,13 +178,11 @@ const ART: Record<CoverId, ReactElement> = {
   "trivia-duelo": (
     <>
       <rect width="200" height="150" fill="#0E2A5C" />
-      <g transform="translate(100 82)">
-        {["#D52B1E", "#F6C445", "#1F8A5B", "#FFFFFF", "#0038A8", "#E9A23B", "#7FD3A8", "#E0457B"].map((c, i) => (
-          <path key={i} d={`M0 0 L${54 * Math.cos((i * Math.PI) / 4)} ${54 * Math.sin((i * Math.PI) / 4)} A54 54 0 0 1 ${54 * Math.cos(((i + 1) * Math.PI) / 4)} ${54 * Math.sin(((i + 1) * Math.PI) / 4)} Z`} fill={c} />
-        ))}
-        <circle r="56" fill="none" stroke="#F3E3B5" strokeWidth="4" />
-        <circle r="12" fill="#0E2A5C" stroke="#F3E3B5" strokeWidth="3" />
-        <path d="M-9 -66 H9 L0 -50Z" fill="#F3E3B5" />
+      <g transform="translate(100 86)">
+        <ellipse cx="0" cy="34" rx="48" ry="10" fill="#081633" opacity=".5" />
+        <path d="M-44 14 Q-44 34 0 34 Q44 34 44 14 L44 6 Q44 -6 0 -6 Q-44 -6 -44 6 Z" fill="#F3E3B5" />
+        <path d="M-32 4 Q-32 -30 0 -30 Q32 -30 32 4 Q32 13 0 13 Q-32 13 -32 4 Z" fill="#D52B1E" />
+        <ellipse cx="-9" cy="-19" rx="8" ry="3.5" fill="#FFFFFF" opacity=".6" />
       </g>
     </>
   ),

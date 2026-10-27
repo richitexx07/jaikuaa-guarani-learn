@@ -47,6 +47,10 @@ export const Route = createFileRoute("/_authenticated/guarani-escolar/tema/$topi
   component: TemaPage,
 });
 
+import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
+import jaiAnimo from "@/assets/jai/jai-animo.webp";
+import jaiPiensa from "@/assets/jai/jai-piensa.webp";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 
 type Phase = "learn" | "quiz" | "done";
@@ -220,13 +224,13 @@ function QuizStep({
   );
 }
 
-function feedback(score: number, total: number): { emoji: string; title: string; message: string } {
+function feedback(score: number, total: number): { img: string; title: string; message: string } {
   const ratio = score / total;
-  if (ratio === 1) return { emoji: "🏆", title: "¡Perfecto!", message: "Sos un crack del guaraní. ¡Iporãiterei!" };
-  if (ratio >= 0.8) return { emoji: "🎉", title: "¡Muy bien!", message: "Ya casi lo dominás. Seguí practicando." };
-  if (ratio >= 0.6) return { emoji: "💪", title: "¡Buen trabajo!", message: "Vas bien encaminado. Repasá las que fallaste." };
-  if (ratio >= 0.4) return { emoji: "📖", title: "¡A seguir!", message: "Con un poco más de práctica vas a mejorar." };
-  return { emoji: "🌱", title: "¡No te rindas!", message: "Volvé a leer el tema y probá de nuevo. ¡Vos podés!" };
+  if (ratio === 1) return { img: jaiFesteja, title: "¡Perfecto!", message: "Sos un crack del guaraní. ¡Iporãiterei!" };
+  if (ratio >= 0.8) return { img: jaiAplaude, title: "¡Muy bien!", message: "Ya casi lo dominás. Seguí practicando." };
+  if (ratio >= 0.6) return { img: jaiAnimo, title: "¡Buen trabajo!", message: "Vas bien encaminado. Repasá las que fallaste." };
+  if (ratio >= 0.4) return { img: jaiPiensa, title: "¡A seguir!", message: "Con un poco más de práctica vas a mejorar." };
+  return { img: jaiAnimo, title: "¡No te rindas!", message: "Volvé a leer el tema y probá de nuevo. ¡Vos podés!" };
 }
 
 function DoneStep({
@@ -247,7 +251,7 @@ function DoneStep({
   }, [score, total]);
   return (
     <div className="rounded-2xl border border-border/60 bg-card p-8 text-center shadow-lift animate-scale-in">
-      <div className="text-6xl" aria-hidden>{fb.emoji}</div>
+      <img src={fb.img} alt="" className="mx-auto h-40 w-auto object-contain drop-shadow-xl" />
 
       <h2 className="mt-4 font-display text-3xl font-bold text-foreground">
         {fb.title}

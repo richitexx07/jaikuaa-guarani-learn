@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { ESCOLAR_GRADES, loadEscolarGrade, saveEscolarGrade, type EscolarGrade } from "@/lib/guarani-tema";
 import { Button } from "@/components/ui/button";
 import bannerEscolar from "@/assets/banners/banner-escolar.webp";
+import jaiPiensa from "@/assets/jai/jai-piensa.webp";
+import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
+import jaiProfe from "@/assets/jai-profe.webp";
 
 export const Route = createFileRoute("/_authenticated/guarani-escolar/")({
   head: () => ({ meta: [{ title: "Guaraní Escolar | Jaikuaa" }, { name: "description", content: "Prepará tus pruebas de Guaraní: Modo Rescate, Plan Semanal y práctica por tema." }, { property: "og:title", content: "Guaraní Escolar | Jaikuaa" }, { property: "og:description", content: "Prepará tus pruebas de Guaraní paso a paso." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -15,21 +18,21 @@ type Grade = EscolarGrade;
 const PATHS = [
   {
     to: "/guarani-escolar/rescate",
-    emoji: "🚨",
+    img: jaiPiensa,
     title: "Modo Rescate",
     description: "Tenés prueba pronto y necesitás aprobar.",
     style: "border-accent/40 hover:border-accent hover:bg-accent/5",
   },
   {
     to: "/guarani-escolar/semanal",
-    emoji: "📅",
+    img: jaiProfe,
     title: "Plan Semanal",
     description: "Estudiá organizado durante la semana.",
     style: "border-primary/30 hover:border-primary hover:bg-primary/5",
   },
   {
     to: "/guarani-escolar/tema",
-    emoji: "📚",
+    img: jaiAplaude,
     title: "Práctica por Tema",
     description: "Reforzá un tema específico.",
     style: "border-primary/30 hover:border-primary hover:bg-primary/5",
@@ -92,9 +95,7 @@ function GuaraniEscolarEntry() {
             
             className={`group flex flex-row items-center gap-4 rounded-2xl border bg-card p-4 sm:flex-col sm:items-stretch sm:p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${path.style}`}
           >
-            <div className="text-4xl" aria-hidden>
-              {path.emoji}
-            </div>
+            <img src={path.img} alt="" className="h-20 w-20 shrink-0 object-contain sm:mx-auto sm:h-28 sm:w-28" loading="lazy" />
             <div className="flex-1">
             <h2 className="font-display sm:mt-4 text-xl font-semibold text-foreground">
               {path.title}
@@ -103,6 +104,7 @@ function GuaraniEscolarEntry() {
               {path.description}
             </p>
             </div>
+            <span className="text-2xl text-muted-foreground sm:hidden" aria-hidden>›</span>
             <span className="hidden sm:mt-5 sm:inline-flex h-9 items-center justify-center rounded-md bg-accent px-4 text-sm font-medium text-accent-foreground shadow transition group-hover:bg-accent/90 group-active:scale-95">
               Entrar →
             </span>

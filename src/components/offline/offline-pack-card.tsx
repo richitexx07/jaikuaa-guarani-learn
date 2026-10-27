@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Download, Loader2, RefreshCw } from "lucide-react";
+import { Download, Loader2, RefreshCw, WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { downloadPack, getPackMeta, refreshPackIfStale, type PackMeta, type PackProgress } from "@/lib/offline-pack";
 import { useConnection } from "./use-connection";
@@ -68,8 +68,11 @@ export function OfflinePackCard() {
       className="rounded-2xl border border-border bg-card p-4 shadow-elegant sm:p-5"
     >
       <div className="flex items-start gap-3">
-        <div className="text-3xl" aria-hidden>
-          {meta ? "✅" : "📥"}
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${meta ? "bg-emerald-100 text-emerald-700" : "bg-primary/10 text-primary"}`}
+          aria-hidden
+        >
+          {meta ? <WifiOff className="h-5 w-5" /> : <Download className="h-5 w-5" />}
         </div>
         <div className="min-w-0 flex-1">
           <h2 className="font-display text-lg font-bold text-foreground">

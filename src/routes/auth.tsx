@@ -13,6 +13,9 @@ import { SiteFooter, TrustBadges } from "@/components/site-footer";
 import { cleanRefCode, REF_STORAGE_KEY } from "@/lib/ambassador";
 import { createAfterLoginRedirect, peekAfterLogin } from "@/lib/after-login";
 import { EarlyAccessBadge } from "@/components/early-access-badge";
+import { NandutiDisc } from "@/components/nanduti-disc";
+import jaiSaluda from "@/assets/jai/jai-saluda.webp";
+import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -168,10 +171,17 @@ function AuthPage() {
           </Link>
         </div>
       </header>
-      <main className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
+      <main className="flex flex-1 justify-center px-4 pb-12 pt-6 sm:px-6 sm:pt-10">
         <div className="w-full max-w-md">
-          <EarlyAccessBadge className="mb-6" />
-          <div className="text-center">
+          <div className="relative mx-auto h-36 w-36 sm:h-40 sm:w-40">
+            <NandutiDisc className="absolute inset-0 h-full w-full text-primary" />
+            <img
+              src={isLogin ? jaiSaluda : jaiBienvenida}
+              alt={isLogin ? "Jai te saluda" : "Jai te da la bienvenida"}
+              className="relative h-full w-full object-contain drop-shadow-xl"
+            />
+          </div>
+          <div className="mt-2 text-center">
             <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               {isLogin ? "Iniciar sesión" : "Registrarse"}
             </h1>
@@ -179,6 +189,7 @@ function AuthPage() {
               {isLogin ? "Bienvenido de vuelta a Jaikuaa." : "Creá tu cuenta y empezá a aprender hoy."}
             </p>
           </div>
+          <EarlyAccessBadge className="mt-5" />
           {invitedToGame && (
             <div className="mt-6 rounded-2xl border-2 border-primary/30 bg-primary/10 p-4 text-center">
               <p className="font-display text-lg font-bold text-primary">¡Te desafiaron a un juego!</p>

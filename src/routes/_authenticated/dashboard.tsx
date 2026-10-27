@@ -3,7 +3,28 @@ import { ValidationBadge } from "@/components/validation-notice";
 import { DisplayToggles } from "@/components/display-toggles";
 import { AI_GUARANI_TOOLS_ENABLED } from "@/lib/features";
 import { BrandLogo } from "@/components/brand-logo";
-import { LogOut } from "lucide-react";
+import {
+  BookOpen,
+  CheckCircle2,
+  ChevronRight,
+  FlaskConical,
+  Gamepad2,
+  GraduationCap,
+  Keyboard,
+  Languages,
+  MessageCircleQuestion,
+  MessagesSquare,
+  Newspaper,
+  NotebookPen,
+  RefreshCw,
+  School,
+  Sparkles,
+  Stethoscope,
+  Wrench,
+  Zap,
+  LogOut,
+  type LucideIcon,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -33,6 +54,21 @@ import { AulaPendientes } from "@/components/aula/aula-pendientes";
 import jaiImg from "@/assets/jai/jai-saluda.webp";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import bannerAprender from "@/assets/banners/banner-aprender.webp";
+import bannerCurso from "@/assets/banners/banner-curso.webp";
+import bannerEscolar from "@/assets/banners/banner-escolar.webp";
+import coverKaraoke from "@/assets/covers/cover-karaoke.webp";
+import coverPalabra from "@/assets/covers/cover-palabra-del-dia.webp";
+import coverPenales from "@/assets/covers/cover-penales.webp";
+import coverTrivia from "@/assets/covers/cover-trivia-duelo.webp";
+import medallaPrimerPaso from "@/assets/medallas/medalla-primer-paso.webp";
+import jaiEmbajador from "@/assets/jai/jai-embajador.webp";
+import jaiGraduado from "@/assets/jai/jai-graduado.webp";
+import jaiTrofeo from "@/assets/jai/jai-trofeo.webp";
+import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
+import jaiProfe from "@/assets/jai-profe.webp";
+import jaiAtencion from "@/assets/jai-atencion-pro.webp";
+import jaiAgro from "@/assets/jai-agro.webp";
+import triviaVocabulario from "@/assets/trivia/trivia-vocabulario.webp";
 const jaiAsset = { url: jaiImg };
 
 function StaffShortcuts() {
@@ -49,47 +85,44 @@ function StaffShortcuts() {
       <p className="text-xs font-semibold uppercase tracking-[0.15em] text-primary">
         Docentes y validadores
       </p>
-      <Button asChild variant="cta" className="mt-3 h-auto min-h-14 w-full justify-start whitespace-normal py-3 text-left text-base">
-        <Link to="/docente">🧑‍🏫 Panel del docente</Link>
-      </Button>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <Button asChild variant="outline" className="h-12 w-full justify-start">
-          <Link to="/validar">⚡ Validación rápida</Link>
-        </Button>
-        <Button asChild variant="outline" className="h-12 w-full justify-start">
-          <Link to="/cuaderno">📒 Cuaderno digital del aula</Link>
-        </Button>
-        <Button asChild variant="outline" className="h-12 w-full justify-start">
-          <Link to="/mostrador/editar">🩺 Frases del mostrador</Link>
-        </Button>
-        <Button asChild variant="outline" className="h-12 w-full justify-start">
-          <Link to="/aula/docente">🏫 Mis aulas</Link>
-        </Button>
-        <Button asChild variant="outline" className="h-12 w-full justify-start">
-          <Link to="/admin/corpus">✅ Bandeja de validación</Link>
-        </Button>
-        <Button asChild variant="outline" className="h-12 w-full justify-start">
-          <Link to="/validacion">🔁 Circuito de validación</Link>
-        </Button>
+      <Link
+        to="/docente"
+        className="mt-3 flex min-h-16 items-center gap-3 overflow-hidden rounded-2xl bg-accent px-4 py-2 text-accent-foreground shadow-lift transition active:scale-[0.98]"
+      >
+        <img src={jaiProfe} alt="" className="-my-2 h-16 w-16 shrink-0 object-contain" />
+        <span className="min-w-0 flex-1 font-display text-lg font-bold leading-tight">Panel del docente</span>
+        <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
+      </Link>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        <StaffLink to="/validar" icon={Zap} label="Validación rápida" />
+        <StaffLink to="/cuaderno" icon={NotebookPen} label="Cuaderno digital del aula" />
+        <StaffLink to="/mostrador/editar" icon={Stethoscope} label="Frases del mostrador" />
+        <StaffLink to="/aula/docente" icon={School} label="Mis aulas" />
+        <StaffLink to="/admin/corpus" icon={CheckCircle2} label="Bandeja de validación" />
+        <StaffLink to="/validacion" icon={RefreshCw} label="Circuito de validación" />
         {/* Studio (motor de Alan): solo administradores lo ven. */}
-        {data.isAdmin && (
-          <Button asChild variant="outline" className="h-auto min-h-12 w-full justify-start whitespace-normal py-2 text-left">
-            <a href="/studio">🔬 Jaikuaa Studio · motor en desarrollo</a>
-          </Button>
-        )}
-        {data.isAdmin && (
-          <Button asChild variant="outline" className="h-12 w-full justify-start">
-            <Link to="/admin/noticias">📰 Noticias para aprobar</Link>
-          </Button>
-        )}
-        {data.isAdmin && (
-          <Button asChild variant="outline" className="h-12 w-full justify-start">
-            <Link to="/admin/jai">🐆 Qué le preguntan a Jai</Link>
-          </Button>
-        )}
+        {data.isAdmin && <StaffLink href="/studio" icon={FlaskConical} label="Jaikuaa Studio · motor en desarrollo" />}
+        {data.isAdmin && <StaffLink to="/admin/noticias" icon={Newspaper} label="Noticias para aprobar" />}
+        {data.isAdmin && <StaffLink to="/admin/jai" icon={MessageCircleQuestion} label="Qué le preguntan a Jai" />}
       </div>
     </section>
   );
+}
+
+/** Acceso del área docente: ícono, nombre y flecha; alto cómodo para el dedo en el celular. */
+function StaffLink({ to, href, icon: Icon, label }: { to?: string; href?: string; icon: LucideIcon; label: string }) {
+  const cls =
+    "flex min-h-12 items-center gap-3 rounded-xl border border-border/70 bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:border-primary/40 active:scale-[0.98]";
+  const inner = (
+    <>
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <Icon className="h-4 w-4" aria-hidden />
+      </span>
+      <span className="min-w-0 flex-1 leading-tight">{label}</span>
+      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+    </>
+  );
+  return href ? <a href={href} className={cls}>{inner}</a> : <Link to={to!} className={cls}>{inner}</Link>;
 }
 
 /**
@@ -134,7 +167,7 @@ function PilotCard() {
       <section className="mt-6 rounded-2xl border border-primary/30 bg-card p-5 shadow-elegant">
         <p className="text-xs font-semibold uppercase tracking-[0.15em] text-primary">Práctica supervisada</p>
         <Button asChild variant="cta" className="mt-3 h-auto min-h-14 w-full justify-start whitespace-normal py-3 text-left text-base">
-          <Link to="/practica">🎓 Panel de práctica</Link>
+          <Link to="/practica"><GraduationCap aria-hidden /> Panel de práctica</Link>
         </Button>
       </section>
     );
@@ -157,7 +190,7 @@ function PilotCard() {
   );
 }
 
-function BigAction({ to, emoji, title, desc, tone }: { to: "/curso/$lang" | "/juegos" | "/juegos/palabra-del-dia"; emoji: string; title: string; desc: string; tone: "primary" | "accent" | "card" }) {
+function BigAction({ to, img, title, desc, tone }: { to: "/curso/$lang" | "/juegos" | "/juegos/palabra-del-dia"; img: string; title: string; desc: string; tone: "primary" | "accent" | "card" }) {
   const cls =
     tone === "primary"
       ? "bg-primary text-primary-foreground"
@@ -168,14 +201,14 @@ function BigAction({ to, emoji, title, desc, tone }: { to: "/curso/$lang" | "/ju
     <Link
       to={to}
       params={to === "/curso/$lang" ? { lang: "guarani" } : undefined}
-      className={`flex min-h-[60px] items-center gap-3 rounded-2xl px-4 py-3 shadow-lift transition-transform active:scale-[0.98] sm:min-h-[72px] ${cls}`}
+      className={`flex min-h-[76px] items-center gap-3 overflow-hidden rounded-2xl p-2 pr-4 shadow-lift transition-transform active:scale-[0.98] sm:min-h-[88px] ${cls}`}
     >
-      <span className="text-3xl leading-none sm:text-4xl" aria-hidden>{emoji}</span>
+      <img src={img} alt="" className="h-[60px] w-[76px] shrink-0 rounded-xl object-cover sm:h-[72px] sm:w-[92px]" loading="lazy" />
       <span className="min-w-0 flex-1">
         <span className="block font-display text-lg font-bold leading-tight sm:text-xl">{title}</span>
-        <span className="block truncate text-xs opacity-90 sm:text-sm">{desc}</span>
+        <span className="block text-xs leading-snug opacity-90 sm:text-sm">{desc}</span>
       </span>
-      <span className="text-2xl font-bold" aria-hidden>›</span>
+      <ChevronRight className="h-6 w-6 shrink-0" aria-hidden />
     </Link>
   );
 }
@@ -345,9 +378,9 @@ function Dashboard() {
 
           {/* 2. TRES BOTONES GIGANTES */}
           <nav aria-label="Elegí qué hacer" className="mt-5 grid gap-3 sm:grid-cols-3">
-            <BigAction to="/curso/$lang" emoji="📚" title="Aprender" desc="Seguí tu curso con voces reales" tone="primary" />
-            <BigAction to="/juegos" emoji="🎮" title="Jugar" desc="13 juegos para aprender jugando" tone="accent" />
-            <BigAction to="/juegos/palabra-del-dia" emoji="⭐" title="Palabra del día" desc="Una palabra nueva, en 1 minuto" tone="card" />
+            <BigAction to="/curso/$lang" img={bannerCurso} title="Aprender" desc="Seguí tu curso con voces reales" tone="primary" />
+            <BigAction to="/juegos" img={coverKaraoke} title="Jugar" desc="13 juegos para aprender jugando" tone="accent" />
+            <BigAction to="/juegos/palabra-del-dia" img={coverPalabra} title="Palabra del día" desc="Una palabra nueva, en 1 minuto" tone="card" />
           </nav>
 
           {/* INVITAR — franja compacta con vida */}
@@ -392,17 +425,17 @@ function Dashboard() {
           {/* 4. TRES PILARES */}
           <Tabs defaultValue="aprender" className="mt-4">
             <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-2xl p-1 sm:grid-cols-4">
-              <TabsTrigger value="aprender" className="rounded-xl py-2.5 text-xs sm:text-sm">
-                📚 Aprender
+              <TabsTrigger value="aprender" className="min-h-11 rounded-xl py-2.5 text-sm">
+                <BookOpen className="mr-1.5 h-4 w-4" aria-hidden /> Aprender
               </TabsTrigger>
-              <TabsTrigger value="jugar" className="rounded-xl py-2.5 text-xs sm:text-sm">
-                🎮 Jugar
+              <TabsTrigger value="jugar" className="min-h-11 rounded-xl py-2.5 text-sm">
+                <Gamepad2 className="mr-1.5 h-4 w-4" aria-hidden /> Jugar
               </TabsTrigger>
-              <TabsTrigger value="herramientas" className="rounded-xl py-2.5 text-xs sm:text-sm">
-                🛠️ Herramientas
+              <TabsTrigger value="herramientas" className="min-h-11 rounded-xl py-2.5 text-sm">
+                <Wrench className="mr-1.5 h-4 w-4" aria-hidden /> Herramientas
               </TabsTrigger>
-              <TabsTrigger value="noticias" className="rounded-xl py-2.5 text-xs sm:text-sm">
-                📰 Noticias
+              <TabsTrigger value="noticias" className="min-h-11 rounded-xl py-2.5 text-sm">
+                <Newspaper className="mr-1.5 h-4 w-4" aria-hidden /> Noticias
               </TabsTrigger>
             </TabsList>
 
@@ -418,12 +451,12 @@ function Dashboard() {
               <p className="mb-4 text-sm text-muted-foreground">
                 Contenido pedagógico ordenado, con audio humano.
               </p>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FreeCard to="/curso/guarani" emoji="📚" title="Curso de Guaraní" desc="10 lecciones con audio humano real. Empezá desde cero y sumá XP." accent="accent" />
-                <FreeCard to="/guarani-escolar" emoji="🎒" title="Guaraní Escolar" desc="Organizado según los grados escolares." accent="accent" inValidation />
-                <FreeCard to="/logros" emoji="🏅" title="Mis logros" desc="Tus insignias, racha y avance." accent="primary" />
-                <FreeCard to="/embajadores" emoji="🤝" title="Invitar a alguien" desc="¿Querés invitar a un amigo o familiar? Compartí tu enlace acá." accent="primary" />
-                <FreeCard to="/certificado" emoji="📜" title="Certificado" desc="Terminá el Curso de Guaraní y descargá tu certificado." accent="primary" />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <FreeCard to="/curso/guarani" img={bannerCurso} cover title="Curso de Guaraní" desc="10 lecciones con audio humano real. Empezá desde cero y sumá XP." accent="accent" />
+                <FreeCard to="/guarani-escolar" img={bannerEscolar} cover title="Guaraní Escolar" desc="Organizado según los grados escolares." accent="accent" inValidation />
+                <FreeCard to="/logros" img={medallaPrimerPaso} title="Mis logros" desc="Tus insignias, racha y avance." accent="primary" />
+                <FreeCard to="/embajadores" img={jaiEmbajador} title="Invitar a alguien" desc="¿Querés invitar a un amigo o familiar? Compartí tu enlace acá." accent="primary" />
+                <FreeCard to="/certificado" img={jaiGraduado} title="Certificado" desc="Terminá el Curso de Guaraní y descargá tu certificado." accent="primary" />
               </div>
             </TabsContent>
 
@@ -431,10 +464,10 @@ function Dashboard() {
               <p className="mb-4 text-sm text-muted-foreground">
                 Practicá lo aprendido jugando. Todo gratis.
               </p>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FreeCard to="/trivia" emoji="🧠" title="Preguntados paraguayo" desc="Girá la ruleta: gastronomía, mitos, deportes, música y más." accent="accent" inValidation />
-                <FreeCard to="/juegos" emoji="⚽" title="Juegos de vocabulario" desc="Penales, Palabra del día, Ahorcado, Sopa de letras y Memoria." accent="accent" />
-                <FreeCard to="/ranking" emoji="🏆" title="Ranking semanal" desc="Mirá quiénes estudiaron más esta semana en tu grupo." accent="primary" />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <FreeCard to="/trivia" img={coverTrivia} cover title="Preguntados paraguayo" desc="Recorré el Sendero de Jai: gastronomía, mitos, deportes, música y más." accent="accent" inValidation />
+                <FreeCard to="/juegos" img={coverPenales} cover title="13 juegos" desc="Karaoke, cocina, penales, duelos, sopa de letras y más." accent="accent" />
+                <FreeCard to="/ranking" img={jaiTrofeo} title="Ranking semanal" desc="Mirá quiénes estudiaron más esta semana en tu grupo." accent="primary" />
               </div>
               <div className="mt-6 rounded-2xl border border-dashed border-border bg-muted/40 p-4">
                 <p className="font-display font-bold text-foreground">Vienen más juegos</p>
@@ -451,20 +484,20 @@ function Dashboard() {
               <p className="mb-4 text-sm text-muted-foreground">
                 Apoyo y consulta.
               </p>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FreeCard to="/aula" emoji="🏫" title="Mi aula" desc="Entrá con el código de tu docente y mirá tus tareas." accent="primary" />
-                <FreeCard to="/pronunciar" emoji="🎙️" title="Grabate y compará" desc="Escuchá a un hablante, grabate y compará las dos voces." accent="primary" />
-                <FreeCard to="/mostrador" emoji="🩺" title="Atendé en guaraní" desc="Modo mostrador: hacé escuchar frases grabadas por hablantes al atender." accent="primary" inValidation />
-                <FreeCard to="/teclado" emoji="⌨️" title="Teclado Guaraní" desc="Escribí con ã, g̃ y puso, y mandalo por WhatsApp." accent="primary" />
-                <FreeCard to="/glosario" emoji="📖" title="Glosario" desc="Las palabras publicadas, con su significado y su audio." accent="primary" />
-                <FreeCard to="/agro" emoji="🌾" title="Jaikuaa Agro-Rural" desc="Guaraní técnico del campo: suelo, cultivos y ganado." accent="primary" />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <FreeCard to="/aula" img={jaiProfe} title="Mi aula" desc="Entrá con el código de tu docente y mirá tus tareas." accent="primary" />
+                <FreeCard to="/pronunciar" img={jaiBienvenida} title="Grabate y compará" desc="Escuchá a un hablante, grabate y compará las dos voces." accent="primary" />
+                <FreeCard to="/mostrador" img={jaiAtencion} title="Atendé en guaraní" desc="Modo mostrador: hacé escuchar frases grabadas por hablantes al atender." accent="primary" inValidation />
+                <FreeCard to="/teclado" icon={Keyboard} title="Teclado Guaraní" desc="Escribí con ã, g̃ y puso, y mandalo por WhatsApp." accent="primary" />
+                <FreeCard to="/glosario" img={triviaVocabulario} title="Glosario" desc="Las palabras publicadas, con su significado y su audio." accent="primary" />
+                <FreeCard to="/agro" img={jaiAgro} title="Jaikuaa Agro-Rural" desc="Guaraní técnico del campo: suelo, cultivos y ganado." accent="primary" />
                 {AI_GUARANI_TOOLS_ENABLED && (
                   <>
-                    <FreeCard to="/traductor" emoji="🌐" title="Traductor" desc="Consulta rápida guaraní – español." accent="primary" experimental />
-                    <FreeCard to="/tutor" emoji="✨" title="Tutor IA" desc="Conversá con un asistente para practicar." accent="primary" experimental />
+                    <FreeCard to="/traductor" icon={Languages} title="Traductor" desc="Consulta rápida guaraní – español." accent="primary" experimental />
+                    <FreeCard to="/tutor" icon={Sparkles} title="Tutor IA" desc="Conversá con un asistente para practicar." accent="primary" experimental />
                   </>
                 )}
-                <FreeCard to="/nhe-mbytepe" emoji="🗣️" title="Ñe'ẽ Mbytépe" desc="El guaraní que se habla en la calle." accent="primary" inValidation />
+                <FreeCard to="/nhe-mbytepe" icon={MessagesSquare} title="Ñe'ẽ Mbytépe" desc="El guaraní que se habla en la calle." accent="primary" inValidation />
               </div>
             </TabsContent>
 
@@ -658,9 +691,15 @@ function Dashboard() {
   );
 }
 
+/**
+ * Acceso a una sección: en el celular es una fila (imagen, nombre, flecha) fácil de tocar;
+ * en pantallas anchas se reparte en dos columnas.
+ */
 function FreeCard({
   to,
-  emoji,
+  img,
+  cover,
+  icon: Icon,
   title,
   desc,
   accent,
@@ -668,7 +707,9 @@ function FreeCard({
   inValidation,
 }: {
   to: string;
-  emoji: string;
+  img?: string;
+  cover?: boolean;
+  icon?: LucideIcon;
   title: string;
   desc: string;
   accent: "primary" | "accent";
@@ -678,32 +719,36 @@ function FreeCard({
   const border =
     accent === "accent"
       ? "border-accent/40 hover:border-accent"
-      : "border-primary/30 hover:border-primary";
-  const link = accent === "accent" ? "text-accent" : "text-primary";
+      : "border-primary/20 hover:border-primary/60";
   return (
     <Link
       to={to}
-      className={`group relative flex flex-col gap-2 rounded-2xl border ${border} bg-card p-5 shadow-elegant card-hover hover:shadow-lift`}
+      className={`group flex min-h-[84px] items-center gap-3 rounded-2xl border ${border} bg-card p-3 pr-3 shadow-sm transition active:scale-[0.98] hover:shadow-md`}
     >
-      <div className="flex items-center justify-between">
-        <span className="text-2xl" aria-hidden>
-          {emoji}
+      {img ? (
+        <img
+          src={img}
+          alt=""
+          className={`h-16 w-16 shrink-0 rounded-xl ${cover ? "object-cover" : "bg-primary/5 object-contain p-1"}`}
+          loading="lazy"
+        />
+      ) : Icon ? (
+        <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Icon className="h-7 w-7" aria-hidden />
         </span>
-        {inValidation ? (
-          <ValidationBadge />
-        ) : experimental ? (
-          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
-            Experimental
-          </span>
-        ) : (
-          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
-            Gratis
-          </span>
-        )}
-      </div>
-      <div className="font-display text-lg font-bold text-foreground">{title}</div>
-      <p className="text-sm text-muted-foreground">{desc}</p>
-      <span className={`mt-1 text-sm font-medium ${link}`}>Abrir →</span>
+      ) : null}
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="font-display text-base font-bold leading-tight text-foreground">{title}</span>
+          {inValidation ? (
+            <ValidationBadge />
+          ) : experimental ? (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800">Experimental</span>
+          ) : null}
+        </span>
+        <span className="mt-0.5 block text-sm leading-snug text-muted-foreground">{desc}</span>
+      </span>
+      <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5" aria-hidden />
     </Link>
   );
 }

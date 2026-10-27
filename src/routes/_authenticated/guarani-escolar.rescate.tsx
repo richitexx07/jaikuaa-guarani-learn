@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { ESCOLAR_GRADES, loadEscolarGrade, saveEscolarGrade, temasFor, type QuizQuestion, type Tema } from "@/lib/guarani-tema";
 import { useRecordOnMount, useRecordVisit } from "@/lib/gamification";
 import { celebrate } from "@/lib/confetti";
+import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
+import jaiAnimo from "@/assets/jai/jai-animo.webp";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 
 
@@ -494,9 +497,11 @@ function DoneScreen({
   return (
     <div className="mx-auto max-w-2xl text-center">
       <div className={`rounded-3xl border-2 bg-gradient-to-br ${tone} p-8 shadow-sm`}>
-        <div className="text-6xl" aria-hidden>
-          {nota === 5 ? "🎉" : nota >= 3 ? "💪" : "🙌"}
-        </div>
+        <img
+          src={nota === 5 ? jaiFesteja : nota >= 3 ? jaiAplaude : jaiAnimo}
+          alt=""
+          className="mx-auto h-40 w-auto object-contain drop-shadow-xl"
+        />
         <h1 className="mt-4 font-display text-3xl font-bold text-foreground sm:text-4xl">
           Sacaste {score}/10
         </h1>

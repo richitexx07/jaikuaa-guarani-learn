@@ -84,13 +84,17 @@ export function Section({ title, intro, children }: { title: string; intro?: str
   );
 }
 
-export function InfoCard({ emoji, title, children, tag }: { emoji: string; title: string; children: ReactNode; tag?: string }) {
+export function InfoCard({ emoji, img, title, children, tag }: { emoji?: string; img?: string; title: string; children: ReactNode; tag?: string }) {
   return (
     <div className="flex flex-col gap-2 rounded-2xl border border-border/60 bg-card p-6 shadow-elegant">
       <div className="flex items-center justify-between">
-        <span className="text-2xl" aria-hidden>
-          {emoji}
-        </span>
+        {img ? (
+          <img src={img} alt="" className="h-16 w-16 object-contain" loading="lazy" />
+        ) : (
+          <span className="text-2xl" aria-hidden>
+            {emoji}
+          </span>
+        )}
         {tag && (
           <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-sky-800">
             {tag}

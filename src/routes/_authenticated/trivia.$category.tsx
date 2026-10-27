@@ -15,6 +15,7 @@ import { recordCompletion, useRecordVisit } from "@/lib/gamification";
 import { celebrate } from "@/lib/confetti";
 import { cn } from "@/lib/utils";
 import { TRIVIA_ART } from "@/lib/trivia-art";
+import { markSendero } from "@/lib/trivia-sendero";
 
 export const Route = createFileRoute("/_authenticated/trivia/$category")({
   head: ({ params }) => ({ meta: [{ title: `Jaikuaa — Trivia: ${params.category}` },
@@ -177,6 +178,7 @@ function TriviaQuiz() {
       if (!awardedRef.current) {
         awardedRef.current = true;
         recordCompletion({ xp: xpEarned, source: "trivia", sourceRef: category });
+        markSendero(category);
       }
       if (correctCount === total) celebrate("big");
       else if (correctCount >= 3) celebrate("small");

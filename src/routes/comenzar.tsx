@@ -4,8 +4,15 @@ import { Button } from "@/components/ui/button";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import { recordCompletion } from "@/lib/gamification";
 import { saveMotivation, markOnboardingDone, type Motivation } from "@/lib/onboarding";
-import jaiImg from "@/assets/jai-tradicional.png";
-const jaiAsset = { url: jaiImg };
+import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
+import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
+import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiSaluda from "@/assets/jai/jai-saluda.webp";
+import jaiPiensa from "@/assets/jai/jai-piensa.webp";
+import jaiTurismo from "@/assets/jai/jai-turismo.webp";
+import jaiProfe from "@/assets/jai-profe.webp";
+import jaiAtencion from "@/assets/jai-atencion-pro.webp";
+import { NandutiDisc } from "@/components/nanduti-disc";
 import { celebrate } from "@/lib/confetti";
 import { EarlyAccessBadge } from "@/components/early-access-badge";
 
@@ -26,12 +33,12 @@ export const Route = createFileRoute("/comenzar")({
   component: Onboarding,
 });
 
-const OPTIONS: { id: Motivation; icon: string; label: string }[] = [
-  { id: "trabajo", icon: "💼", label: "Para el trabajo" },
-  { id: "colegio", icon: "📚", label: "Para el colegio" },
-  { id: "familia", icon: "🏠", label: "Para mi familia" },
-  { id: "gusta", icon: "🌍", label: "Porque me gusta" },
-  { id: "probar", icon: "❓", label: "No sé, probemos" },
+const OPTIONS: { id: Motivation; img: string; label: string }[] = [
+  { id: "trabajo", img: jaiAtencion, label: "Para el trabajo" },
+  { id: "colegio", img: jaiProfe, label: "Para el colegio" },
+  { id: "familia", img: jaiSaluda, label: "Para mi familia" },
+  { id: "gusta", img: jaiTurismo, label: "Porque me gusta" },
+  { id: "probar", img: jaiPiensa, label: "No sé, probemos" },
 ];
 
 const REACTIONS: Record<Motivation, string> = {
@@ -48,29 +55,22 @@ const MINI_LESSON: { gn: string; es: string }[] = [
   { gn: "Aguyje", es: "Gracias" },
 ];
 
-function JaiCharacter({ size = 160 }: { size?: number }) {
+function JaiCharacter({ src = jaiBienvenida, size = 176, alt = "Jai, el jaguaréte de Jaikuaa" }: { src?: string; size?: number; alt?: string }) {
   return (
-    <img
-      src={jaiAsset.url}
-      alt="Jai, el jaguaréte de Jaikuaa"
-      width={size}
-      height={size}
-      style={{
-        width: size,
-        height: "auto",
-        objectFit: "contain",
-        backgroundColor: "transparent",
-      }}
-      draggable={false}
-      className="drop-shadow-md"
-    />
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <NandutiDisc className="absolute inset-0 h-full w-full text-primary" />
+      <img src={src} alt={alt} draggable={false} className="cz-jai relative h-full w-full object-contain drop-shadow-xl" />
+    </div>
   );
 }
 
+/** Avance en tres pasos: barritas que se van llenando. */
 function Progress({ step }: { step: 1 | 2 | 3 }) {
   return (
-    <div className="flex items-center justify-between text-xs text-muted-foreground">
-      <span>{step} de 3</span>
+    <div className="flex items-center gap-2" aria-label={`Paso ${step} de 3`}>
+      {[1, 2, 3].map((n) => (
+        <span key={n} className={`h-2 w-10 rounded-full transition-colors ${n <= step ? "bg-accent" : "bg-muted"}`} />
+      ))}
     </div>
   );
 }
@@ -120,7 +120,8 @@ function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-[#f4f6fa] px-4 py-6 sm:py-10">
+    <div className="min-h-screen bg-background px-4 pb-10 pt-5 sm:py-10">
+      <style>{`.cz-jai{animation:cz-in .6s cubic-bezier(.2,.8,.2,1) both}@keyframes cz-in{from{opacity:0;transform:translateY(16px) scale(.96)}}@media (prefers-reduced-motion: reduce){.cz-jai{animation:none}}`}</style>
       <div className="mx-auto flex w-full max-w-lg flex-col gap-6">
         <header className="flex items-center justify-between">
           <Progress step={step} />
@@ -129,23 +130,24 @@ function Onboarding() {
 
         {step === 1 && (
           <section className="flex flex-col items-center gap-6 text-center">
-            <EarlyAccessBadge />
-            <JaiCharacter />
+            <JaiCharacter size={150} />
             <h1 className="font-display text-2xl font-semibold leading-snug text-primary sm:text-3xl">
-              ¡Mba'éichapa! 🐆 Soy Jai, el jaguaréte de Jaikuaa.
+              ¡Mba'éichapa! Soy Jai, el jaguaréte de Jaikuaa.
               <br />
               <span className="text-foreground">¿Para qué querés aprender guaraní?</span>
             </h1>
+            <EarlyAccessBadge className="-mt-2" />
             <div className="flex w-full flex-col gap-3">
               {OPTIONS.map((o) => (
                 <button
                   key={o.id}
                   type="button"
                   onClick={() => pick(o.id)}
-                  className="flex w-full items-center gap-4 rounded-2xl border border-border bg-white px-5 py-4 text-left text-base font-medium text-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md active:scale-[0.99]"
+                  className="flex min-h-[68px] w-full items-center gap-4 rounded-2xl border border-border bg-card px-3 py-2 text-left text-base font-semibold text-foreground shadow-sm transition hover:border-primary/40 hover:shadow-md active:scale-[0.98]"
                 >
-                  <span className="text-2xl" aria-hidden>{o.icon}</span>
-                  <span>{o.label}</span>
+                  <img src={o.img} alt="" className="h-14 w-14 shrink-0 rounded-xl bg-primary/5 object-contain p-0.5" />
+                  <span className="flex-1">{o.label}</span>
+                  <span className="text-xl text-muted-foreground" aria-hidden>›</span>
                 </button>
               ))}
             </div>
@@ -154,20 +156,20 @@ function Onboarding() {
 
         {step === 2 && motivation && (
           <section className="flex flex-col items-center gap-6 text-center">
-            <JaiCharacter />
-            <p className="rounded-2xl bg-white px-6 py-5 font-display text-lg leading-relaxed text-foreground shadow-sm sm:text-xl">
+            <JaiCharacter src={jaiAplaude} alt="Jai aplaude" />
+            <p className="rounded-2xl bg-card px-6 py-5 font-display text-lg leading-relaxed text-foreground shadow-sm sm:text-xl">
               {REACTIONS[motivation]}
             </p>
             <Button variant="cta" size="lg" className="w-full" onClick={() => setStep(3)}>
-              ▶️ Empezar
+              Empezar
             </Button>
           </section>
         )}
 
         {step === 3 && !lessonDone && (
           <section className="flex flex-col items-center gap-6 text-center">
-            <JaiCharacter size={120} />
-            <div className="w-full rounded-2xl bg-white p-6 shadow-sm">
+            <JaiCharacter src={jaiProfe} size={128} alt="Jai, el profe" />
+            <div className="w-full rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
               <p className="mb-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 Palabra {lessonIdx + 1} de {MINI_LESSON.length}
               </p>
@@ -197,9 +199,9 @@ function Onboarding() {
 
         {step === 3 && lessonDone && (
           <section className="flex flex-col items-center gap-6 text-center">
-            <JaiCharacter />
+            <JaiCharacter src={jaiFesteja} alt="Jai festeja" />
             <p className="font-display text-2xl font-semibold leading-snug text-primary sm:text-3xl">
-              ¡Ganaste tu primera racha! 🐆
+              ¡Ganaste tu primera racha!
               <br />
               <span className="text-foreground">Volvé mañana para seguir.</span>
             </p>

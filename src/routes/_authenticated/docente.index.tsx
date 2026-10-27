@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Check, Copy, Loader2, X } from "lucide-react";
+import { AlertTriangle, Award, Check, Copy, GraduationCap, Hand, Loader2, NotebookPen, RefreshCw, Smartphone, X, Zap, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StaffRequestCard } from "@/components/pilot/staff-request-card";
@@ -143,7 +143,7 @@ function TeacherHome() {
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <Tile
           to="/validar"
-          emoji="⚡"
+          icon={Zap}
           title="Validar palabras"
           main={d.pending.words}
           unit={d.pending.words === 1 ? "palabra esperando" : "palabras esperando"}
@@ -153,7 +153,7 @@ function TeacherHome() {
         <Tile
           to="/validacion"
           search={{ tab: "errores" }}
-          emoji="⚠️"
+          icon={AlertTriangle}
           title="Avisos de error"
           main={d.pending.reports}
           unit={d.pending.reports === 1 ? "aviso abierto" : "avisos abiertos"}
@@ -162,7 +162,7 @@ function TeacherHome() {
         <Tile
           to="/validacion"
           search={{ tab: d.pending.toValidate ? "validar" : "revisar" }}
-          emoji="🔁"
+          icon={RefreshCw}
           title="Propuestas nuevas"
           main={d.pending.toValidate + d.pending.toReview}
           unit="en el circuito"
@@ -170,7 +170,7 @@ function TeacherHome() {
         />
         <Tile
           to="/cuaderno"
-          emoji="📒"
+          icon={NotebookPen}
           title="Mi grupo"
           main={d.cohort ? d.groupSize : null}
           unit={d.cohort ? (d.groupSize === 1 ? "alumno" : "alumnos") : ""}
@@ -182,7 +182,7 @@ function TeacherHome() {
 
       <section className="mt-8 rounded-2xl border border-border/60 bg-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="font-display text-lg font-bold text-foreground">🏅 Mi aporte</h2>
+          <h2 className="font-display text-lg font-bold text-foreground"><Award className="mr-2 inline h-5 w-5 text-primary" aria-hidden />Mi aporte</h2>
           <Button asChild variant="outline" size="sm">
             <Link to="/docente/constancia">Ver mi constancia</Link>
           </Button>
@@ -249,7 +249,7 @@ function StaffRequestsInbox({ count }: { count: number }) {
   return (
     <section className="mt-8 rounded-2xl border border-accent/40 bg-accent/5 p-5">
       <h2 className="font-display text-lg font-bold text-foreground">
-        🙋 Pedidos de acceso {count > 0 && <span className="text-accent">({count})</span>}
+        <Hand className="mr-2 inline h-5 w-5 text-primary" aria-hidden />Pedidos de acceso {count > 0 && <span className="text-accent">({count})</span>}
       </h2>
       {q.isLoading ? (
         <Loader2 className="mt-3 h-5 w-5 animate-spin text-primary" />
@@ -313,7 +313,7 @@ function PracticeStudents() {
   const list = q.data?.students ?? [];
   return (
     <section className="mt-6 rounded-2xl border border-border/60 bg-card p-5">
-      <h2 className="font-display text-lg font-bold text-foreground">🎓 Estudiantes en práctica</h2>
+      <h2 className="font-display text-lg font-bold text-foreground"><GraduationCap className="mr-2 inline h-5 w-5 text-primary" aria-hidden />Estudiantes en práctica</h2>
       {q.isLoading ? (
         <Loader2 className="mt-3 h-5 w-5 animate-spin text-primary" />
       ) : list.length === 0 ? (
@@ -348,7 +348,7 @@ function WeeklyReminder({ pending, inLessons, reports }: { pending: number; inLe
   const [copied, setCopied] = useState(false);
   return (
     <section className="mt-6 rounded-2xl border border-border/60 bg-card p-5">
-      <h2 className="font-display text-lg font-bold text-foreground">📲 Recordatorio para los docentes</h2>
+      <h2 className="font-display text-lg font-bold text-foreground"><Smartphone className="mr-2 inline h-5 w-5 text-primary" aria-hidden />Recordatorio para los docentes</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Texto listo con los números de hoy. Copialo y mandalo vos por WhatsApp al grupo de docentes (la plataforma no
         envía mensajes sola).
@@ -406,7 +406,7 @@ function Num({ n, label }: { n: number; label: string }) {
 function Tile({
   to,
   search,
-  emoji,
+  icon: Icon,
   title,
   main,
   unit,
@@ -415,7 +415,7 @@ function Tile({
 }: {
   to: "/validar" | "/validacion" | "/cuaderno";
   search?: { tab: "errores" | "validar" | "revisar" };
-  emoji: string;
+  icon: LucideIcon;
   title: string;
   main: number | null;
   unit: string;
@@ -431,8 +431,11 @@ function Tile({
       }`}
     >
       <div className="flex items-center gap-2">
-        <span className="text-2xl" aria-hidden>
-          {emoji}
+        <span
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${strong ? "bg-white/15" : "bg-primary/10 text-primary"}`}
+          aria-hidden
+        >
+          <Icon className="h-5 w-5" />
         </span>
         <span className={`font-display text-lg font-bold ${strong ? "" : "text-foreground"}`}>{title}</span>
       </div>
