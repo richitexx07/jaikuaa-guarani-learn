@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useJU } from "@/lib/i18n-juegos-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GameStage } from "@/components/games/game-stage";
 import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from "@/components/games/reto";
@@ -48,6 +49,7 @@ function Tembiu() {
   const partida = useRetoPartida("tembiu", { total: ROUNDS });
   const { seed, otra } = partida;
   const { idx, loading } = useJuegoTextos();
+  const tt = useJU();
   const ing = useMemo(() => applyTembiu(ING, idx), [idx]);
   return (
     <GameStage
@@ -57,7 +59,7 @@ function Tembiu() {
       background={`radial-gradient(80% 40% at 50% 100%, #C2552B 0%, transparent 70%), repeating-linear-gradient(0deg, transparent 0 34px, rgba(0,0,0,.08) 34px 36px), linear-gradient(180deg, ${T.adobe} 0%, ${T.barro} 55%, ${T.oscuro} 100%)`}
     >
       <ValidationNotice />
-      {loading ? <p className="py-16 text-center text-sm opacity-70">Preparando la cocina…</p> : <><RetoBanner partida={partida} className="mb-3" /><Kitchen key={seed} seed={seed} partida={partida} ing={ing} onAgain={otra} /></>}
+      {loading ? <p className="py-16 text-center text-sm opacity-70">{tt("tbLoading")}</p> : <><RetoBanner partida={partida} className="mb-3" /><Kitchen key={seed} seed={seed} partida={partida} ing={ing} onAgain={otra} /></>}
     </GameStage>
   );
 }
@@ -106,6 +108,7 @@ function Olla({ picked, hot, ing }: { picked: string[]; hot: boolean; ing: typeo
 
 function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: typeof ING; seed: number; partida: Partida }) {
   const feedback = useGameFeedback();
+  const tt = useJU();
   const dishes = useMemo(() => shufflerFor(seed)(DISHES).slice(0, ROUNDS), []);
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<string[]>([]);
@@ -135,9 +138,9 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
     return (
       <section className="space-y-5 pt-2 text-center">
         <div className="tb-card rounded-2xl p-6 shadow-2xl" style={{ background: T.papel, color: T.tinta }}>
-          <p className="text-sm font-semibold opacity-70">La mesa está servida</p>
-          <h2 className="mt-1 font-display text-3xl font-bold leading-tight">{score} de {ROUNDS} platos perfectos</h2>
-          <p className="mt-2 text-4xl tracking-widest" style={{ color: T.ocre }} aria-label={`${stars} de 3 estrellas`}>
+          <p className="text-sm font-semibold opacity-70">{tt("tbServed")}</p>
+          <h2 className="mt-1 font-display text-3xl font-bold leading-tight">{tt("tbPerfect", { s: score, n: ROUNDS })}</h2>
+          <p className="mt-2 text-4xl tracking-widest" style={{ color: T.ocre }} aria-label={tt("stars", { n: stars })}>
             {"★".repeat(stars)}<span className="opacity-25">{"★".repeat(3 - stars)}</span>
           </p>
           <ul className="mt-4 grid grid-cols-5 gap-2">
@@ -152,7 +155,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
         </div>
         <RetoFinal partida={partida} puntaje={score} />
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: T.ocre, color: T.tinta }}>Cocinar de nuevo</button>
+          <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: T.ocre, color: T.tinta }}>{tt("tbAgain")}</button>
         </div>
       </section>
     );
@@ -174,25 +177,25 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
   return (
     <section className="space-y-4 pt-1">
       <div className="flex items-center justify-between text-sm">
-        <div className="flex gap-1.5" aria-label={`Plato ${i + 1} de ${ROUNDS}`}>
+        <div className="flex gap-1.5" aria-label={tt("tbDish", { i: i + 1, n: ROUNDS })}>
           {Array.from({ length: ROUNDS }, (_, k) => (
             <span key={k} className="h-2.5 w-7 rounded-full" style={{ background: k < platos.length ? (platos[k]!.ok ? T.ocre : "rgba(255,255,255,.3)") : k === i ? T.papel : "rgba(0,0,0,.25)" }} />
           ))}
         </div>
-        <span className="text-white/80">Platos perfectos: <b className="text-white">{score}</b></span>
+        <span className="text-white/80">{tt("tbPerfectCount")} <b className="text-white">{score}</b></span>
       </div>
 
       <div className="grid items-center gap-2 sm:grid-cols-[1fr_1.1fr]">
         <div key={i} className="tb-card relative mx-auto w-full max-w-sm rounded-xl p-5 pt-6 shadow-2xl" style={{ background: T.papel, color: T.tinta }}>
           <span className="absolute left-1/2 top-0 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full shadow" style={{ background: T.rojo }} aria-hidden />
-          <p className="text-xs font-semibold opacity-60">Comanda · plato {i + 1} de {ROUNDS}</p>
+          <p className="text-xs font-semibold opacity-60">{tt("tbOrder", { i: i + 1, n: ROUNDS })}</p>
           <div className="mt-1 flex items-center gap-3">
             <span className="text-5xl" aria-hidden>{dish.emoji}</span>
             <h2 className="font-display text-3xl font-bold leading-none">{dish.name}</h2>
           </div>
           <p className="mt-2 text-sm opacity-80">{dish.info}</p>
           <div className="mt-3 border-t border-dashed pt-2 text-sm" style={{ borderColor: "#D8C6AA" }}>
-            Elegí sus <b>5 ingredientes</b>
+            {tt("tbChoose")} <b>{tt("tbFive")}</b>
           </div>
         </div>
         <div>
@@ -208,7 +211,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
 
       {checked && (
         <p className="rounded-2xl px-4 py-3 text-center font-display text-lg font-bold" style={{ background: good ? T.verde : "rgba(0,0,0,.35)" }} aria-live="polite">
-          {good ? "¡Qué rico! Plato perfecto." : "Le faltó algo: los ingredientes correctos quedaron marcados en verde."}
+          {good ? tt("tbGood") : tt("tbBad")}
         </p>
       )}
 
@@ -236,11 +239,11 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
       </div>
       {checked ? (
         <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold" style={{ background: T.ocre, color: T.tinta }} onClick={next}>
-          {i + 1 === ROUNDS ? "Ver la mesa servida" : "Siguiente plato"}
+          {i + 1 === ROUNDS ? tt("tbSeeTable") : tt("tbNext")}
         </button>
       ) : (
         <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold transition disabled:opacity-40" style={{ background: T.ocre, color: T.tinta }} disabled={picked.length !== 5} onClick={check}>
-          ¡A cocinar!
+          {tt("tbCook")}
         </button>
       )}
     </section>

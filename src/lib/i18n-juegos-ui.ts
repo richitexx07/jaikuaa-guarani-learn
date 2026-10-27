@@ -1,0 +1,115 @@
+import { useAppLang, type AppLang } from "./i18n";
+
+/**
+ * Textos de interfaz de los juegos temáticos en 6 idiomas (de/fr/zh preliminares, en validación).
+ * Solo la «cáscara»: nunca contiene guaraní, y los casos/historias siguen en castellano (Paso 2).
+ */
+type L = Record<AppLang, string>;
+const T = {
+  stars: { es: "{n} de 3 estrellas", pt: "{n} de 3 estrelas", en: "{n} of 3 stars", de: "{n} von 3 Sternen", fr: "{n} étoiles sur 3", zh: "{n} / 3 顆星" },
+  // Chacra
+  chTitle: { es: "Jai en la chacra", pt: "Jai na roça", en: "Jai on the farm", de: "Jai auf dem Hof", fr: "Jai à la ferme", zh: "Jai 在農場" },
+  chLoading: { es: "Cargando la camioneta…", pt: "Carregando a caminhonete…", en: "Loading the truck…", de: "Der Pick-up wird beladen…", fr: "Chargement de la camionnette…", zh: "正在裝載貨車…" },
+  chVisit: { es: "Visita {i} de {n}", pt: "Visita {i} de {n}", en: "Visit {i} of {n}", de: "Besuch {i} von {n}", fr: "Visite {i} sur {n}", zh: "第 {i} / {n} 次拜訪" },
+  chJaiAlt: { es: "Jai con sombrero y una canasta de maíz y mandioca", pt: "Jai de chapéu com uma cesta de milho e mandioca", en: "Jai in a hat with a basket of corn and cassava", de: "Jai mit Hut und einem Korb Mais und Maniok", fr: "Jai avec un chapeau et un panier de maïs et de manioc", zh: "戴帽子、提著玉米和木薯籃的 Jai" },
+  chDone: { es: "Terminó la recorrida", pt: "Fim da visita", en: "Round finished", de: "Rundgang beendet", fr: "Tournée terminée", zh: "巡訪結束" },
+  chHelped: { es: "Ayudaste a {s} de {n} productores", pt: "Você ajudou {s} de {n} produtores", en: "You helped {s} of {n} farmers", de: "Du hast {s} von {n} Bauern geholfen", fr: "Vous avez aidé {s} producteurs sur {n}", zh: "你幫助了 {n} 位農民中的 {s} 位" },
+  chAgain: { es: "Otra recorrida", pt: "Outra visita", en: "Another round", de: "Neuer Rundgang", fr: "Une autre tournée", zh: "再巡訪一次" },
+  chRight: { es: "¡Bien! Entendiste al productor.", pt: "Muito bem! Você entendeu o produtor.", en: "Nice! You understood the farmer.", de: "Gut! Du hast den Bauern verstanden.", fr: "Bien ! Vous avez compris le producteur.", zh: "很好！你聽懂了農民的話。" },
+  notThisTime: { es: "Esta vez no.", pt: "Desta vez não.", en: "Not this time.", de: "Diesmal nicht.", fr: "Pas cette fois.", zh: "這次沒答對。" },
+  chTip: { es: "Consejo del técnico:", pt: "Dica do técnico:", en: "Technician's tip:", de: "Tipp vom Techniker:", fr: "Conseil du technicien :", zh: "技術員建議：" },
+  chFinish: { es: "Terminar la recorrida", pt: "Terminar a visita", en: "Finish the round", de: "Rundgang beenden", fr: "Terminer la tournée", zh: "結束巡訪" },
+  chNext: { es: "Ir al próximo productor", pt: "Ir ao próximo produtor", en: "Go to the next farmer", de: "Zum nächsten Bauern", fr: "Producteur suivant", zh: "前往下一位農民" },
+  // Tekojoja
+  tjLoading: { es: "Preparando el juzgado…", pt: "Preparando o juizado…", en: "Preparing the court…", de: "Das Gericht wird vorbereitet…", fr: "Préparation du tribunal…", zh: "正在準備法庭…" },
+  tjHeader: { es: "Juzgado de Paz · Jaikuaa", pt: "Juizado de Paz · Jaikuaa", en: "Justice of the Peace · Jaikuaa", de: "Friedensgericht · Jaikuaa", fr: "Justice de paix · Jaikuaa", zh: "治安法庭 · Jaikuaa" },
+  tjResolution: { es: "Resolución", pt: "Resolução", en: "Ruling", de: "Beschluss", fr: "Décision", zh: "裁決書" },
+  tjResText: { es: "Visto el desempeño de la jornada, se resuelve que la persona a cargo del juzgado resolvió bien", pt: "Visto o desempenho do dia, resolve-se que a pessoa responsável pelo juizado resolveu bem", en: "Having reviewed the day's work, it is ruled that the person in charge of the court correctly resolved", de: "Nach Prüfung des Tages wird beschlossen, dass die zuständige Person richtig entschieden hat:", fr: "Vu le travail de la journée, il est décidé que la personne en charge du tribunal a bien résolu", zh: "經審視今日表現，裁定本庭負責人正確審理了" },
+  tjCases: { es: "{s} de {n} casos", pt: "{s} de {n} casos", en: "{s} of {n} cases", de: "{s} von {n} Fällen", fr: "{s} affaires sur {n}", zh: "{n} 件中的 {s} 件案件" },
+  tjJudge: { es: "Juez/a de paz", pt: "Juiz(a) de paz", en: "Justice of the peace", de: "Friedensrichter/in", fr: "Juge de paix", zh: "治安法官" },
+  tjNew: { es: "Nuevos casos", pt: "Novos casos", en: "New cases", de: "Neue Fälle", fr: "Nouvelles affaires", zh: "新案件" },
+  tjYouAre: { es: "Sos juez o jueza de paz", pt: "Você é juiz ou juíza de paz", en: "You are the justice of the peace", de: "Du bist Friedensrichter/in", fr: "Vous êtes juge de paix", zh: "你是治安法官" },
+  tjRead: { es: "Leé el caso y elegí de qué se trata.", pt: "Leia o caso e escolha do que se trata.", en: "Read the case and choose what it's about.", de: "Lies den Fall und wähle, worum es geht.", fr: "Lisez l'affaire et choisissez de quoi il s'agit.", zh: "閱讀案件並選出它屬於哪一類。" },
+  tjFile: { es: "Expediente N.º {n}/2026", pt: "Processo N.º {n}/2026", en: "Case file No. {n}/2026", de: "Akte Nr. {n}/2026", fr: "Dossier n° {n}/2026", zh: "案卷編號 {n}/2026" },
+  tjCaseOf: { es: "Caso {i} de {n} · {s} bien", pt: "Caso {i} de {n} · {s} certos", en: "Case {i} of {n} · {s} right", de: "Fall {i} von {n} · {s} richtig", fr: "Affaire {i} sur {n} · {s} justes", zh: "第 {i} / {n} 案 · 答對 {s}" },
+  tjOk: { es: "Bien resuelto", pt: "Bem resolvido", en: "Well ruled", de: "Gut entschieden", fr: "Bien jugé", zh: "判決正確" },
+  tjReview: { es: "A revisar", pt: "A revisar", en: "To review", de: "Zu prüfen", fr: "À revoir", zh: "待複查" },
+  tjTerm: { es: "Término en guaraní:", pt: "Termo em guarani:", en: "Guarani term:", de: "Begriff auf Guaraní:", fr: "Terme en guarani :", zh: "瓜拉尼語詞彙：" },
+  tjBySpecialists: { es: "Escrito por docentes especialistas.", pt: "Escrito por professores especialistas.", en: "Written by specialist teachers.", de: "Von Fachlehrkräften verfasst.", fr: "Rédigé par des enseignants spécialistes.", zh: "由專業教師撰寫。" },
+  tjPending: { es: "Término en guaraní: pendiente de carga y validación por especialistas en derecho.", pt: "Termo em guarani: pendente de cadastro e validação por especialistas em direito.", en: "Guarani term: pending upload and validation by legal specialists.", de: "Begriff auf Guaraní: wartet auf Eingabe und Prüfung durch Rechtsfachleute.", fr: "Terme en guarani : en attente de saisie et de validation par des spécialistes du droit.", zh: "瓜拉尼語詞彙：待法律專家輸入並審核。" },
+  tjSeeRuling: { es: "Ver la resolución", pt: "Ver a resolução", en: "See the ruling", de: "Beschluss ansehen", fr: "Voir la décision", zh: "查看裁決書" },
+  tjNext: { es: "Siguiente caso", pt: "Próximo caso", en: "Next case", de: "Nächster Fall", fr: "Affaire suivante", zh: "下一件案件" },
+  // Tembi'u
+  tbLoading: { es: "Preparando la cocina…", pt: "Preparando a cozinha…", en: "Getting the kitchen ready…", de: "Die Küche wird vorbereitet…", fr: "Préparation de la cuisine…", zh: "正在準備廚房…" },
+  tbServed: { es: "La mesa está servida", pt: "A mesa está servida", en: "Dinner is served", de: "Das Essen ist serviert", fr: "Le repas est servi", zh: "上菜了" },
+  tbPerfect: { es: "{s} de {n} platos perfectos", pt: "{s} de {n} pratos perfeitos", en: "{s} of {n} perfect dishes", de: "{s} von {n} perfekten Gerichten", fr: "{s} plats parfaits sur {n}", zh: "{n} 道菜中 {s} 道完美" },
+  tbAgain: { es: "Cocinar de nuevo", pt: "Cozinhar de novo", en: "Cook again", de: "Nochmal kochen", fr: "Cuisiner à nouveau", zh: "再煮一次" },
+  tbDish: { es: "Plato {i} de {n}", pt: "Prato {i} de {n}", en: "Dish {i} of {n}", de: "Gericht {i} von {n}", fr: "Plat {i} sur {n}", zh: "第 {i} / {n} 道菜" },
+  tbPerfectCount: { es: "Platos perfectos:", pt: "Pratos perfeitos:", en: "Perfect dishes:", de: "Perfekte Gerichte:", fr: "Plats parfaits :", zh: "完美料理：" },
+  tbOrder: { es: "Comanda · plato {i} de {n}", pt: "Pedido · prato {i} de {n}", en: "Order · dish {i} of {n}", de: "Bestellung · Gericht {i} von {n}", fr: "Commande · plat {i} sur {n}", zh: "點單 · 第 {i} / {n} 道菜" },
+  tbChoose: { es: "Elegí sus", pt: "Escolha os seus", en: "Choose its", de: "Wähle die", fr: "Choisissez ses", zh: "選出它的" },
+  tbFive: { es: "5 ingredientes", pt: "5 ingredientes", en: "5 ingredients", de: "5 Zutaten", fr: "5 ingrédients", zh: "5 種食材" },
+  tbGood: { es: "¡Qué rico! Plato perfecto.", pt: "Que delícia! Prato perfeito.", en: "Delicious! Perfect dish.", de: "Lecker! Perfektes Gericht.", fr: "Délicieux ! Plat parfait.", zh: "好吃！完美的一道菜。" },
+  tbBad: { es: "Le faltó algo: los ingredientes correctos quedaron marcados en verde.", pt: "Faltou algo: os ingredientes corretos ficaram marcados em verde.", en: "Something was missing: the right ingredients are marked in green.", de: "Da fehlte etwas: Die richtigen Zutaten sind grün markiert.", fr: "Il manquait quelque chose : les bons ingrédients sont en vert.", zh: "少了點什麼：正確的食材已用綠色標出。" },
+  tbSeeTable: { es: "Ver la mesa servida", pt: "Ver a mesa servida", en: "See the table", de: "Zum gedeckten Tisch", fr: "Voir la table servie", zh: "查看上桌的菜" },
+  tbNext: { es: "Siguiente plato", pt: "Próximo prato", en: "Next dish", de: "Nächstes Gericht", fr: "Plat suivant", zh: "下一道菜" },
+  tbCook: { es: "¡A cocinar!", pt: "Vamos cozinhar!", en: "Let's cook!", de: "Ab in den Topf!", fr: "En cuisine !", zh: "開煮！" },
+  // Ta'anga
+  tgLoading: { es: "Preparando el set…", pt: "Preparando o set…", en: "Setting up the set…", de: "Das Set wird aufgebaut…", fr: "Préparation du plateau…", zh: "正在佈置片場…" },
+  tgScene: { es: "Escena", pt: "Cena", en: "Scene", de: "Szene", fr: "Scène", zh: "場次" },
+  tgTake: { es: "Toma", pt: "Tomada", en: "Take", de: "Take", fr: "Prise", zh: "鏡次" },
+  tgDirects: { es: "Dirige", pt: "Direção", en: "Director", de: "Regie", fr: "Réalisation", zh: "導演" },
+  tgEnd: { es: "Fin", pt: "Fim", en: "The End", de: "Ende", fr: "Fin", zh: "劇終" },
+  tgShot: { es: "Rodaste {s} de {n} escenas perfectas", pt: "Você gravou {s} de {n} cenas perfeitas", en: "You shot {s} of {n} perfect scenes", de: "Du hast {s} von {n} Szenen perfekt gedreht", fr: "Vous avez tourné {s} scènes parfaites sur {n}", zh: "你完美拍攝了 {n} 場中的 {s} 場" },
+  tgCredits: { es: "Guion y dirección: Jai · Diálogos: vos", pt: "Roteiro e direção: Jai · Diálogos: você", en: "Written and directed by Jai · Dialogue: you", de: "Drehbuch und Regie: Jai · Dialoge: du", fr: "Scénario et réalisation : Jai · Dialogues : vous", zh: "編劇與導演：Jai · 對白：你" },
+  tgNew: { es: "Nuevo rodaje", pt: "Nova gravação", en: "New shoot", de: "Neuer Dreh", fr: "Nouveau tournage", zh: "重新開拍" },
+  tgCut: { es: "¡Corte! ¡Quedó perfecta!", pt: "Corta! Ficou perfeita!", en: "Cut! That's a wrap!", de: "Cut! Perfekt im Kasten!", fr: "Coupez ! C'est dans la boîte !", zh: "卡！完美！" },
+  tgLightsOut: { es: "¡Se nos fue la luz! Era", pt: "Acabou a luz! Era", en: "Lights out! It was", de: "Licht aus! Es war", fr: "Coupure de courant ! C'était", zh: "停電了！正確答案是" },
+  tgGoOn: { es: "Seguimos con la próxima escena.", pt: "Seguimos para a próxima cena.", en: "On to the next scene.", de: "Weiter zur nächsten Szene.", fr: "On passe à la scène suivante.", zh: "繼續下一場。" },
+  tgSeeCredits: { es: "Ver los créditos", pt: "Ver os créditos", en: "See the credits", de: "Abspann ansehen", fr: "Voir le générique", zh: "查看片尾名單" },
+  tgNext: { es: "Siguiente escena", pt: "Próxima cena", en: "Next scene", de: "Nächste Szene", fr: "Scène suivante", zh: "下一場" },
+  // Trivia
+  trTitle: { es: "Duelo de Trivia", pt: "Duelo de Trivia", en: "Trivia Duel", de: "Quiz-Duell", fr: "Duel de quiz", zh: "知識問答對決" },
+  trWho: { es: "¿Quién sabe más del Paraguay?", pt: "Quem sabe mais sobre o Paraguai?", en: "Who knows Paraguay best?", de: "Wer weiß mehr über Paraguay?", fr: "Qui connaît le mieux le Paraguay ?", zh: "誰最了解巴拉圭？" },
+  trRules: { es: "Gastronomía, mitos, deportes, música, historia y naturaleza del Paraguay. Cada uno tiene una sola chance por pregunta: el primero que acierta gana el punto. Si fallás, tu rival puede responder tranquilo. Gana quien llega a {n}.", pt: "Gastronomia, mitos, esportes, música, história e natureza do Paraguai. Cada um tem uma só chance por pergunta: quem acertar primeiro ganha o ponto. Se errar, seu rival pode responder com calma. Vence quem chegar a {n}.", en: "Paraguayan food, myths, sports, music, history and nature. One chance each per question: the first right answer wins the point. If you miss, your rival can answer calmly. First to {n} wins.", de: "Küche, Mythen, Sport, Musik, Geschichte und Natur Paraguays. Jeder hat pro Frage nur eine Chance: Wer zuerst richtig liegt, bekommt den Punkt. Liegst du falsch, kann dein Gegner in Ruhe antworten. Wer zuerst {n} hat, gewinnt.", fr: "Gastronomie, mythes, sports, musique, histoire et nature du Paraguay. Une seule chance par question : le premier qui trouve gagne le point. Si vous vous trompez, votre rival peut répondre tranquillement. Le premier à {n} gagne.", zh: "巴拉圭的美食、傳說、運動、音樂、歷史與自然。每題每人只有一次機會：先答對者得分。答錯的話，對手可以從容作答。先得 {n} 分者獲勝。" },
+  trWon: { es: "¡{n} ganó la trivia!", pt: "{n} venceu a trivia!", en: "{n} won the trivia!", de: "{n} hat das Quiz gewonnen!", fr: "{n} a gagné le quiz !", zh: "{n} 贏得問答！" },
+  trShare: { es: "¡Jugamos un Duelo de Trivia Paraguaya en Jaikuaa y terminó {a} a {b}! ¿Cuánto sabés del Paraguay? 🇵🇾", pt: "Jogamos um Duelo de Trivia Paraguaia no Jaikuaa e terminou {a} a {b}! Quanto você sabe do Paraguai? 🇵🇾", en: "We played a Paraguay Trivia Duel on Jaikuaa and it ended {a}–{b}! How much do you know about Paraguay? 🇵🇾", de: "Wir haben auf Jaikuaa ein Paraguay-Quiz-Duell gespielt: {a} zu {b}! Wie viel weißt du über Paraguay? 🇵🇾", fr: "On a joué un duel de quiz sur le Paraguay sur Jaikuaa : {a} à {b} ! Que sais-tu du Paraguay ? 🇵🇾", zh: "我們在 Jaikuaa 玩了巴拉圭知識問答對決，比分 {a} 比 {b}！你對巴拉圭了解多少？🇵🇾" },
+  trNobody: { es: "Nadie acertó", pt: "Ninguém acertou", en: "Nobody got it", de: "Niemand lag richtig", fr: "Personne n'a trouvé", zh: "沒人答對" },
+  trMissed: { es: "Fallaste, esperá…", pt: "Errou, espere…", en: "Missed, wait…", de: "Falsch, warte…", fr: "Raté, attendez…", zh: "答錯了，請稍候…" },
+  trQuick: { es: "¡Rápido!", pt: "Rápido!", en: "Quick!", de: "Schnell!", fr: "Vite !", zh: "快！" },
+  // Ventanilla
+  vtTitle: { es: "Ventanilla de Jai", pt: "Guichê do Jai", en: "Jai's Service Desk", de: "Jais Schalter", fr: "Le guichet de Jai", zh: "Jai 的服務窗口" },
+  vtPreview: { es: "Vista previa para docentes: lo que falta escribir aparece marcado.", pt: "Prévia para professores: o que falta escrever aparece marcado.", en: "Teacher preview: what's still to be written is marked.", de: "Vorschau für Lehrkräfte: Was noch fehlt, ist markiert.", fr: "Aperçu pour les enseignants : ce qui reste à écrire est signalé.", zh: "教師預覽：尚待撰寫的部分已標出。" },
+  vtJaiAlt: { es: "Jai con auriculares y una tablet, listo para atender", pt: "Jai com fones e um tablet, pronto para atender", en: "Jai with headphones and a tablet, ready to help", de: "Jai mit Kopfhörern und Tablet, bereit zu helfen", fr: "Jai avec un casque et une tablette, prêt à accueillir", zh: "戴耳機拿平板、準備服務的 Jai" },
+  vtSoon: { es: "La ventanilla abre muy pronto", pt: "O guichê abre muito em breve", en: "The desk opens very soon", de: "Der Schalter öffnet sehr bald", fr: "Le guichet ouvre très bientôt", zh: "窗口即將開放" },
+  vtSoonInfo: { es: "Los docentes están escribiendo y grabando en guaraní las frases para atender al público. Apenas estén listas, la fila empieza a moverse.", pt: "Os professores estão escrevendo e gravando em guarani as frases para atender o público. Assim que estiverem prontas, a fila começa a andar.", en: "Teachers are writing and recording the Guarani phrases for serving the public. As soon as they're ready, the line starts moving.", de: "Lehrkräfte schreiben und sprechen gerade die Guaraní-Sätze für den Kundendienst ein. Sobald sie fertig sind, geht es los.", fr: "Les enseignants écrivent et enregistrent en guarani les phrases d'accueil du public. Dès qu'elles seront prêtes, la file avancera.", zh: "教師們正在撰寫並錄製接待民眾用的瓜拉尼語句子。準備好後，隊伍就會開始前進。" },
+  vtToSay: { es: "frases para decir", pt: "frases para dizer", en: "phrases to say", de: "Sätze zum Sagen", fr: "phrases à dire", zh: "要說的句子" },
+  vtToUnderstand: { es: "frases para entender", pt: "frases para entender", en: "phrases to understand", de: "Sätze zum Verstehen", fr: "phrases à comprendre", zh: "要聽懂的句子" },
+  vtWrite: { es: "Escribir las frases ({n})", pt: "Escrever as frases ({n})", en: "Write the phrases ({n})", de: "Sätze schreiben ({n})", fr: "Écrire les phrases ({n})", zh: "撰寫句子（{n}）" },
+  vtTry: { es: "Probar el juego (vista previa)", pt: "Testar o jogo (prévia)", en: "Try the game (preview)", de: "Spiel testen (Vorschau)", fr: "Tester le jeu (aperçu)", zh: "試玩（預覽）" },
+  vtClosed: { es: "Se cerró la ventanilla", pt: "O guichê fechou", en: "The desk is closed", de: "Der Schalter ist geschlossen", fr: "Le guichet est fermé", zh: "窗口已關閉" },
+  vtServed: { es: "Atendiste bien a {s} de {n} personas", pt: "Você atendeu bem {s} de {n} pessoas", en: "You served {s} of {n} people well", de: "Du hast {s} von {n} Personen gut bedient", fr: "Vous avez bien servi {s} personnes sur {n}", zh: "你妥善服務了 {n} 人中的 {s} 人" },
+  vtAgain: { es: "Abrir otro turno", pt: "Abrir outro turno", en: "Open another shift", de: "Neue Schicht öffnen", fr: "Ouvrir un autre service", zh: "再開一班" },
+  vtTurn: { es: "Turno", pt: "Senha", en: "Ticket", de: "Nummer", fr: "Ticket", zh: "號碼" },
+  vtWaiting: { es: "{n} personas esperando", pt: "{n} pessoas esperando", en: "{n} people waiting", de: "{n} Personen warten", fr: "{n} personnes en attente", zh: "{n} 人在等候" },
+  vtWellServed: { es: "Bien atendidos", pt: "Bem atendidos", en: "Served well", de: "Gut bedient", fr: "Bien servis", zh: "服務良好" },
+  vtPatience: { es: "Paciencia: {n} segundos", pt: "Paciência: {n} segundos", en: "Patience: {n} seconds", de: "Geduld: {n} Sekunden", fr: "Patience : {n} secondes", zh: "耐心：{n} 秒" },
+  vtSays: { es: "Te dice:", pt: "Diz para você:", en: "They say:", de: "Sagt zu dir:", fr: "Vous dit :", zh: "對你說：" },
+  listen: { es: "Escuchar otra vez", pt: "Ouvir de novo", en: "Listen again", de: "Nochmal anhören", fr: "Réécouter", zh: "再聽一次" },
+  vtWhat: { es: "¿Qué te está diciendo?", pt: "O que está dizendo?", en: "What are they saying?", de: "Was sagt die Person?", fr: "Que vous dit-on ?", zh: "對方在說什麼？" },
+  vtWant: { es: "Querés decirle:", pt: "Você quer dizer:", en: "You want to say:", de: "Du willst sagen:", fr: "Vous voulez dire :", zh: "你想說：" },
+  vtHow: { es: "¿Cómo se lo decís en guaraní?", pt: "Como você diz isso em guarani?", en: "How do you say it in Guarani?", de: "Wie sagst du das auf Guaraní?", fr: "Comment le dire en guarani ?", zh: "用瓜拉尼語怎麼說？" },
+  vtTimeout: { es: "{n} se cansó de esperar y se fue.", pt: "{n} cansou de esperar e foi embora.", en: "{n} got tired of waiting and left.", de: "{n} hatte keine Geduld mehr und ist gegangen.", fr: "{n} en a eu assez d'attendre et est parti.", zh: "{n} 等得不耐煩，離開了。" },
+  vtOk: { es: "¡Bien atendido! {n} se va contento.", pt: "Bem atendido! {n} sai contente.", en: "Well served! {n} leaves happy.", de: "Gut bedient! {n} geht zufrieden.", fr: "Bien servi ! {n} repart content.", zh: "服務周到！{n} 開心地離開了。" },
+  vtAlmost: { es: "Casi. Mirá la respuesta en verde.", pt: "Quase. Veja a resposta em verde.", en: "Almost. See the answer in green.", de: "Fast. Die Antwort ist grün markiert.", fr: "Presque. La réponse est en vert.", zh: "差一點。請看綠色的答案。" },
+  vtMeans: { es: "Significa:", pt: "Significa:", en: "It means:", de: "Bedeutet:", fr: "Signifie :", zh: "意思是：" },
+  vtClose: { es: "Cerrar la ventanilla", pt: "Fechar o guichê", en: "Close the desk", de: "Schalter schließen", fr: "Fermer le guichet", zh: "關閉窗口" },
+  vtNext: { es: "¡Siguiente!", pt: "Próximo!", en: "Next!", de: "Der Nächste!", fr: "Suivant !", zh: "下一位！" },
+} satisfies Record<string, L>;
+
+export type JUKey = keyof typeof T;
+export function useJU() {
+  const lang = useAppLang();
+  return (k: JUKey, v?: Record<string, string | number>) =>
+    T[k][lang].replace(/\{(\w+)\}/g, (_, x) => String(v?.[x] ?? ""));
+}

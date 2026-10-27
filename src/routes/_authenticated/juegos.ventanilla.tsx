@@ -1,3 +1,4 @@
+import { useJU } from "@/lib/i18n-juegos-ui";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -58,12 +59,13 @@ function Ventanilla() {
   const urls = audioQ.data?.urls ?? {};
   useEffect(() => { if (audioQ.data?.urls) prefetchFrases(audioQ.data.urls); }, [audioQ.data?.urls]);
 
+  const tt = useJU();
   const listo = hayParaJugar(frases, vistaPrevia);
   const u = frasesUsables(frases, false);
 
   return (
     <GameStage
-      title="Ventanilla de Jai"
+      title={tt("vtTitle")}
       sponsorSlot="ventanilla"
       css={CSS}
       background={`repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 2px, transparent 2px 120px), linear-gradient(180deg, ${V.azul2} 0%, ${V.azul} 60%, #0B2440 100%)`}
@@ -75,7 +77,7 @@ function Ventanilla() {
         <Pronto decir={u.decir.length} escuchar={u.escuchar.length} total={frases.length} isStaff={!!q.data?.isStaff} onVistaPrevia={() => setVistaPrevia(true)} />
       ) : (
         <>
-          {vistaPrevia && <p className="mb-3 rounded-xl bg-[#FFB23E] p-2 text-center text-sm font-bold text-[#10233B]">Vista previa para docentes: lo que falta escribir aparece marcado.</p>}
+          {vistaPrevia && <p className="mb-3 rounded-xl bg-[#FFB23E] p-2 text-center text-sm font-bold text-[#10233B]">{tt("vtPreview")}</p>}
           {!vistaPrevia && <RetoBanner partida={partida} className="mb-3" />}
           <Turno key={`${seed}-${vistaPrevia}`} seed={seed} frases={frases} vistaPrevia={vistaPrevia} urls={urls} partida={partida} onAgain={otra} />
         </>
@@ -86,22 +88,23 @@ function Ventanilla() {
 
 /** Cuando todavía no hay suficientes frases escritas por los docentes. */
 function Pronto({ decir, escuchar, total, isStaff, onVistaPrevia }: { decir: number; escuchar: number; total: number; isStaff: boolean; onVistaPrevia: () => void }) {
+  const tt = useJU();
   return (
     <div className="mx-auto max-w-md space-y-4 text-center">
-      <img src={jaiAtencion} alt="Jai con auriculares y una tablet, listo para atender" className="mx-auto h-48 w-auto object-contain drop-shadow-2xl" />
+      <img src={jaiAtencion} alt={tt("vtJaiAlt")} className="mx-auto h-48 w-auto object-contain drop-shadow-2xl" />
       <div className="rounded-3xl p-5 shadow-2xl" style={{ background: V.papel, color: V.tinta }}>
-        <p className="font-display text-2xl font-bold">La ventanilla abre muy pronto</p>
+        <p className="font-display text-2xl font-bold">{tt("vtSoon")}</p>
         <p className="mt-2 text-sm leading-relaxed opacity-80">
-          Los docentes están escribiendo y grabando en guaraní las frases para atender al público. Apenas estén listas, la fila empieza a moverse.
+          {tt("vtSoonInfo")}
         </p>
         <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-          <div className="rounded-xl bg-[#EAF1F8] p-3"><p className="font-display text-2xl font-bold">{decir}<span className="text-base opacity-60">/{MIN_DECIR}</span></p><p className="opacity-70">frases para decir</p></div>
-          <div className="rounded-xl bg-[#EAF1F8] p-3"><p className="font-display text-2xl font-bold">{escuchar}<span className="text-base opacity-60">/{MIN_ESCUCHAR}</span></p><p className="opacity-70">frases para entender</p></div>
+          <div className="rounded-xl bg-[#EAF1F8] p-3"><p className="font-display text-2xl font-bold">{decir}<span className="text-base opacity-60">/{MIN_DECIR}</span></p><p className="opacity-70">{tt("vtToSay")}</p></div>
+          <div className="rounded-xl bg-[#EAF1F8] p-3"><p className="font-display text-2xl font-bold">{escuchar}<span className="text-base opacity-60">/{MIN_ESCUCHAR}</span></p><p className="opacity-70">{tt("vtToUnderstand")}</p></div>
         </div>
         {isStaff && (
           <div className="mt-4 grid gap-2">
-            <Link to="/mostrador/editar" search={{ rubro: "atencion" }} className="flex h-12 items-center justify-center rounded-2xl font-bold text-white" style={{ background: V.azul }}>Escribir las frases ({total})</Link>
-            <button type="button" onClick={onVistaPrevia} className="h-12 rounded-2xl font-bold ring-1 ring-black/15">Probar el juego (vista previa)</button>
+            <Link to="/mostrador/editar" search={{ rubro: "atencion" }} className="flex h-12 items-center justify-center rounded-2xl font-bold text-white" style={{ background: V.azul }}>{tt("vtWrite", { n: total })}</Link>
+            <button type="button" onClick={onVistaPrevia} className="h-12 rounded-2xl font-bold ring-1 ring-black/15">{tt("vtTry")}</button>
           </div>
         )}
       </div>
@@ -111,6 +114,7 @@ function Pronto({ decir, escuchar, total, isStaff, onVistaPrevia }: { decir: num
 
 function Turno({ seed, frases, vistaPrevia, urls, partida, onAgain }: { seed: number; frases: Frase[]; vistaPrevia: boolean; urls: Record<string, string>; partida: Partida; onAgain: () => void }) {
   const feedback = useGameFeedback();
+  const tt = useJU();
   const rondas = useMemo<RondaVentanilla[]>(() => armarTurnoVentanilla(frases, seed, vistaPrevia), []); // eslint-disable-line react-hooks/exhaustive-deps
   const [i, setI] = useState(0);
   const [pick, setPick] = useState<string | null>(null);
@@ -155,15 +159,15 @@ function Turno({ seed, frases, vistaPrevia, urls, partida, onAgain }: { seed: nu
       <section className="space-y-5 pt-1 text-center">
         <div className="vt-in rounded-3xl p-6 shadow-2xl" style={{ background: V.papel, color: V.tinta }}>
           <img src={jaiAtencion} alt="" className="mx-auto h-28 w-auto object-contain" />
-          <p className="mt-2 text-sm font-semibold opacity-70">Se cerró la ventanilla</p>
-          <h2 className="font-display text-3xl font-bold leading-tight">Atendiste bien a {score} de {rondas.length} personas</h2>
-          <p className="mt-2 text-4xl tracking-widest" style={{ color: "#E0A100" }} aria-label={`${stars} de 3 estrellas`}>
+          <p className="mt-2 text-sm font-semibold opacity-70">{tt("vtClosed")}</p>
+          <h2 className="font-display text-3xl font-bold leading-tight">{tt("vtServed", { s: score, n: rondas.length })}</h2>
+          <p className="mt-2 text-4xl tracking-widest" style={{ color: "#E0A100" }} aria-label={tt("stars", { n: stars })}>
             {"★".repeat(stars)}<span className="opacity-25">{"★".repeat(3 - stars)}</span>
           </p>
           {!vistaPrevia && <p className="mt-3 font-bold" style={{ color: V.verde }}>+{xp} XP</p>}
         </div>
         {!vistaPrevia && <RetoFinal partida={partida} puntaje={score} />}
-        <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold shadow-lg" style={{ background: V.turno, color: V.tinta }}>Abrir otro turno</button>
+        <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold shadow-lg" style={{ background: V.turno, color: V.tinta }}>{tt("vtAgain")}</button>
       </section>
     );
   }
@@ -186,16 +190,16 @@ function Turno({ seed, frases, vistaPrevia, urls, partida, onAgain }: { seed: nu
       {/* Pantalla de turnos y fila */}
       <div className="flex items-center justify-between gap-3 rounded-2xl bg-black/40 px-4 py-2 ring-1 ring-white/10">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">Turno</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">{tt("vtTurn")}</p>
           <p className="vt-led whitespace-nowrap font-display text-3xl font-bold" style={{ color: V.turno }}>A-{String(i + 1).padStart(2, "0")}</p>
         </div>
-        <div className="flex -space-x-2" aria-label={`${rondas.length - i - 1} personas esperando`}>
+        <div className="flex -space-x-2" aria-label={tt("vtWaiting", { n: rondas.length - i - 1 })}>
           {CLIENTES.slice(0, Math.max(0, Math.min(5, rondas.length - i - 1))).map((c, k) => (
             <span key={k} className="grid h-9 w-9 place-items-center rounded-full bg-white/90 text-lg ring-2 ring-[#123A63]" aria-hidden>{c.emoji}</span>
           ))}
         </div>
         <div className="text-right">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">Bien atendidos</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">{tt("vtWellServed")}</p>
           <p className="vt-led font-display text-3xl font-bold text-white">{score}</p>
         </div>
       </div>
@@ -205,7 +209,7 @@ function Turno({ seed, frases, vistaPrevia, urls, partida, onAgain }: { seed: nu
           <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[#EAF1F8] text-4xl" aria-hidden>{cliente.emoji}</span>
           <div className="min-w-0 flex-1">
             <p className="font-display text-xl font-bold">{cliente.nombre}</p>
-            <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#DCE6F1]" aria-label={`Paciencia: ${left} segundos`}>
+            <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#DCE6F1]" aria-label={tt("vtPatience", { n: left })}>
               <div className="h-full rounded-full transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%`, background: left <= 5 ? V.rojo : V.verde }} />
             </div>
           </div>
@@ -213,22 +217,22 @@ function Turno({ seed, frases, vistaPrevia, urls, partida, onAgain }: { seed: nu
         <div className="px-4 pb-4 pt-3">
           {r.tipo === "escuchar" ? (
             <>
-              <p className="text-xs font-semibold opacity-60">Te dice:</p>
+              <p className="text-xs font-semibold opacity-60">{tt("vtSays")}</p>
               <div className="mt-1 flex items-center gap-2 rounded-2xl bg-white p-4 shadow-inner">
                 <p lang="gn" className="min-w-0 flex-1 font-display text-2xl font-bold leading-snug">«{gnDe(r.frase)}»</p>
                 {r.frase.hasAudio && (
-                  <button type="button" aria-label="Escuchar otra vez" onClick={() => void playFrase(r.frase.id, urls[r.frase.id])} className="grid h-11 w-11 shrink-0 place-items-center rounded-full" style={{ background: V.azul, color: "#fff" }}>
+                  <button type="button" aria-label={tt("listen")} onClick={() => void playFrase(r.frase.id, urls[r.frase.id])} className="grid h-11 w-11 shrink-0 place-items-center rounded-full" style={{ background: V.azul, color: "#fff" }}>
                     <Volume2 className="h-5 w-5" />
                   </button>
                 )}
               </div>
-              <p className="mt-4 font-display text-lg font-bold">¿Qué te está diciendo?</p>
+              <p className="mt-4 font-display text-lg font-bold">{tt("vtWhat")}</p>
             </>
           ) : (
             <>
-              <p className="text-xs font-semibold opacity-60">Querés decirle:</p>
+              <p className="text-xs font-semibold opacity-60">{tt("vtWant")}</p>
               <p className="mt-1 rounded-2xl bg-white p-4 font-display text-2xl font-bold leading-snug shadow-inner">«{r.frase.es}»</p>
-              <p className="mt-4 font-display text-lg font-bold">¿Cómo se lo decís en guaraní?</p>
+              <p className="mt-4 font-display text-lg font-bold">{tt("vtHow")}</p>
             </>
           )}
         </div>
@@ -251,11 +255,11 @@ function Turno({ seed, frases, vistaPrevia, urls, partida, onAgain }: { seed: nu
       {pick && (
         <div className="vt-in space-y-3">
           <p className="rounded-2xl bg-white/10 p-3 text-center text-sm text-white">
-            {pick === "__tiempo__" ? `${cliente.nombre} se cansó de esperar y se fue.` : pick === correcta ? `¡Bien atendido! ${cliente.nombre} se va contento.` : "Casi. Mirá la respuesta en verde."}
-            {r.tipo === "escuchar" && <> Significa: <b>«{r.frase.es}»</b>.</>}
+            {pick === "__tiempo__" ? tt("vtTimeout", { n: cliente.nombre }) : pick === correcta ? tt("vtOk", { n: cliente.nombre }) : tt("vtAlmost")}
+            {r.tipo === "escuchar" && <> {tt("vtMeans")} <b>«{r.frase.es}»</b>.</>}
           </p>
           <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold shadow-lg" style={{ background: V.turno, color: V.tinta }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
-            {i + 1 === rondas.length ? "Cerrar la ventanilla" : "¡Siguiente!"}
+            {i + 1 === rondas.length ? tt("vtClose") : tt("vtNext")}
           </button>
         </div>
       )}

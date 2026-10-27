@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useJU } from "@/lib/i18n-juegos-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shuffle } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
@@ -58,6 +59,7 @@ function Taanga() {
   const partida = useRetoPartida("taanga", { total: ROUNDS });
   const { seed, otra } = partida;
   const { idx, loading } = useJuegoTextos();
+  const tt = useJU();
   const all = useMemo(() => applyTaanga(SCENES, idx), [idx]);
   return (
     <GameStage
@@ -67,13 +69,14 @@ function Taanga() {
       background={`radial-gradient(70% 45% at 85% 0%, rgba(244,192,78,.22) 0%, transparent 70%), ${F.carbon}`}
     >
       <ValidationNotice />
-      {loading ? <p className="py-16 text-center text-sm opacity-70">Preparando el set…</p> : <><RetoBanner partida={partida} className="mb-3" /><Set key={seed} seed={seed} partida={partida} all={all} onAgain={otra} /></>}
+      {loading ? <p className="py-16 text-center text-sm opacity-70">{tt("tgLoading")}</p> : <><RetoBanner partida={partida} className="mb-3" /><Set key={seed} seed={seed} partida={partida} all={all} onAgain={otra} /></>}
     </GameStage>
   );
 }
 
 /** La claqueta: el brazo se cierra cuando la toma sale bien. */
 function Claqueta({ escena, toma, lugar, cerrada }: { escena: number; toma: number; lugar: string; cerrada: boolean }) {
+  const tt = useJU();
   return (
     <div className={`relative mx-auto w-full sm:max-w-md ${cerrada ? "tg-clap" : ""}`}>
       <svg viewBox="0 -40 320 100" className="block w-full" aria-hidden>
@@ -89,9 +92,9 @@ function Claqueta({ escena, toma, lugar, cerrada }: { escena: number; toma: numb
         ))}
       </svg>
       <div className="grid grid-cols-3 border-x-4 border-b-4 text-center font-mono text-[11px] sm:text-xs" style={{ borderColor: F.tinta, background: F.tinta, color: F.papel }}>
-        <div className="border-r border-white/20 p-2"><span className="block opacity-60">Escena</span><b className="text-xl sm:text-2xl">{escena}</b></div>
-        <div className="border-r border-white/20 p-2"><span className="block opacity-60">Toma</span><b className="text-xl sm:text-2xl">{toma}</b></div>
-        <div className="p-2"><span className="block opacity-60">Dirige</span><b className="text-xl sm:text-2xl">Jai</b></div>
+        <div className="border-r border-white/20 p-2"><span className="block opacity-60">{tt("tgScene")}</span><b className="text-xl sm:text-2xl">{escena}</b></div>
+        <div className="border-r border-white/20 p-2"><span className="block opacity-60">{tt("tgTake")}</span><b className="text-xl sm:text-2xl">{toma}</b></div>
+        <div className="p-2"><span className="block opacity-60">{tt("tgDirects")}</span><b className="text-xl sm:text-2xl">Jai</b></div>
         <div className="col-span-3 border-t border-white/20 px-2 py-1.5 text-left text-xs sm:text-sm">{lugar}</div>
       </div>
     </div>
@@ -100,6 +103,7 @@ function Claqueta({ escena, toma, lugar, cerrada }: { escena: number; toma: numb
 
 function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[]; seed: number; partida: Partida }) {
   const feedback = useGameFeedback();
+  const tt = useJU();
   const scenes = useMemo(() => shufflerFor(seed)(all).slice(0, ROUNDS), []);
   const [i, setI] = useState(0);
   const [pick, setPick] = useState<string | null>(null);
@@ -133,9 +137,9 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
         <div className="overflow-hidden rounded-2xl ring-1 ring-white/10" style={{ background: "#000" }}>
           <div className="tg-frame h-4" style={{ background: F.panel }} />
           <div className="px-6 py-10">
-            <p className="font-display text-6xl font-bold tracking-tight" style={{ color: F.tungsteno }}>Fin</p>
-            <p className="mt-3 font-display text-2xl font-bold">Rodaste {score} de {ROUNDS} escenas perfectas</p>
-            <p className="mt-2 text-4xl tracking-widest" style={{ color: F.tungsteno }} aria-label={`${stars} de 3 estrellas`}>
+            <p className="font-display text-6xl font-bold tracking-tight" style={{ color: F.tungsteno }}>{tt("tgEnd")}</p>
+            <p className="mt-3 font-display text-2xl font-bold">{tt("tgShot", { s: score, n: ROUNDS })}</p>
+            <p className="mt-2 text-4xl tracking-widest" style={{ color: F.tungsteno }} aria-label={tt("stars", { n: stars })}>
               {"★".repeat(stars)}<span className="opacity-25">{"★".repeat(3 - stars)}</span>
             </p>
             <div className="mx-auto mt-5 flex max-w-xs justify-center gap-1.5">
@@ -143,14 +147,14 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
                 <span key={k} className="grid h-10 flex-1 place-items-center rounded-sm text-sm font-bold" style={{ background: ok ? F.tungsteno : "#3A3942", color: ok ? F.carbon : "#9A99A3" }}>{k + 1}</span>
               ))}
             </div>
-            <p className="mt-5 text-sm text-white/60">Guion y dirección: Jai · Diálogos: vos</p>
+            <p className="mt-5 text-sm text-white/60">{tt("tgCredits")}</p>
             <p className="mt-1 font-bold" style={{ color: F.tungsteno }}>+{xp} XP</p>
           </div>
           <div className="tg-frame h-4" style={{ background: F.panel }} />
         </div>
         <RetoFinal partida={partida} puntaje={score} />
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: F.tungsteno, color: F.carbon }}>Nuevo rodaje</button>
+          <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: F.tungsteno, color: F.carbon }}>{tt("tgNew")}</button>
         </div>
       </section>
     );
@@ -193,7 +197,7 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
             {scene.after}
           </p>
           {pick && right && (
-            <p className="tg-corte absolute inset-x-0 top-1/3 text-center font-display text-3xl font-bold sm:text-5xl" style={{ color: F.tungsteno, textShadow: "0 3px 12px rgba(0,0,0,.8)" }}>¡Corte! ¡Quedó perfecta!</p>
+            <p className="tg-corte absolute inset-x-0 top-1/3 text-center font-display text-3xl font-bold sm:text-5xl" style={{ color: F.tungsteno, textShadow: "0 3px 12px rgba(0,0,0,.8)" }}>{tt("tgCut")}</p>
           )}
         </div>
       </div>
@@ -205,7 +209,7 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
 
       {pick && !right && (
         <p className="rounded-xl bg-white/10 px-4 py-3 text-center" aria-live="polite">
-          💡 ¡Se nos fue la luz! Era <b style={{ color: F.tungsteno }}>«{scene.ok}»</b>. Seguimos con la próxima escena.
+          💡 {tt("tgLightsOut")} <b style={{ color: F.tungsteno }}>«{scene.ok}»</b>. {tt("tgGoOn")}
         </p>
       )}
 
@@ -233,7 +237,7 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
       </div>
       {pick && (
         <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold" style={{ background: F.tungsteno, color: F.carbon }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
-          {i + 1 === ROUNDS ? "Ver los créditos" : "Siguiente escena"}
+          {i + 1 === ROUNDS ? tt("tgSeeCredits") : tt("tgNext")}
         </button>
       )}
     </section>

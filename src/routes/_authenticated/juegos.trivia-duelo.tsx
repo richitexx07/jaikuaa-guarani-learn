@@ -1,3 +1,5 @@
+import { useJU } from "@/lib/i18n-juegos-ui";
+import { useSDT } from "@/lib/i18n-sopa-duelo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { RotateCcw, X } from "lucide-react";
@@ -38,6 +40,7 @@ function buildDeck(): Q[] {
 function TriviaDuel() {
   const [match, setMatch] = useState(0);
   const { idx: textos } = useJuegoTextos();
+  const tt = useJU();
   const [remote, setRemote] = useState<{ code: string; host: boolean } | null>(() => {
     const c = salaDeLaUrl();
     return c ? { code: c, host: false } : null;
@@ -47,7 +50,7 @@ function TriviaDuel() {
     <>
       <ValidationNotice />
       <GameStage
-        title="Duelo de Trivia"
+        title={tt("trTitle")}
         sponsorSlot="trivia-duelo"
         css={CSS}
         background={`radial-gradient(70% 45% at 50% 0%, #1F4A8F 0%, transparent 70%), ${TV.estudio}`}
@@ -59,7 +62,7 @@ function TriviaDuel() {
             code={remote.code}
             host={remote.host}
             path="/juegos/trivia-duelo"
-            title="Duelo de Trivia"
+            title={tt("trTitle")}
             target={TARGET}
             theme={theme}
             xpRef="trivia-duelo"
@@ -130,6 +133,8 @@ function Focos() {
 
 function Board({ onRematch, onRemote, theme }: { onRematch: () => void; onRemote: (code: string, host: boolean) => void; theme: { mine: string; rival: string; ink: string; accent: string } }) {
   const feedback = useGameFeedback();
+  const tt = useJU();
+  const sd = useSDT();
   const [deck] = useState(buildDeck);
   const { idx: textos } = useJuegoTextos();
   const [idx, setIdx] = useState(0);
@@ -180,16 +185,15 @@ function Board({ onRematch, onRemote, theme }: { onRematch: () => void; onRemote
       <div className="mx-auto max-w-md space-y-5 text-center">
         <Focos />
         <Pulsador className="mx-auto h-44 w-44 drop-shadow-2xl" />
-        <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">Duelo de Trivia</h1>
-        <p className="text-white/75">¿Quién sabe más del Paraguay?</p>
+        <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">{tt("trTitle")}</h1>
+        <p className="text-white/75">{tt("trWho")}</p>
         <div className="rounded-3xl bg-white p-5 text-left shadow-2xl" style={{ color: TV.tinta }}>
-          <p className="font-display text-lg font-bold">Apoyen el celular sobre la mesa</p>
+          <p className="font-display text-lg font-bold">{sd("tablePhone")}</p>
           <p className="mt-2 text-sm leading-relaxed opacity-80">
-            Gastronomía, mitos, deportes, música, historia y naturaleza del Paraguay. Cada uno tiene una sola chance por pregunta:
-            el primero que acierta gana el punto. Si fallás, tu rival puede responder tranquilo. Gana quien llega a {TARGET}.
+            {tt("trRules", { n: TARGET })}
           </p>
           <button type="button" className="mt-4 h-14 w-full rounded-2xl font-display text-xl font-bold" style={{ background: TV.oro, color: TV.tinta }} onClick={() => setStarted(true)}>
-            ¡Empezar duelo!
+            {sd("startDuel")}
           </button>
           <LiveDuelStart theme={theme} onStart={onRemote} />
         </div>
@@ -199,20 +203,20 @@ function Board({ onRematch, onRemote, theme }: { onRematch: () => void; onRemote
 
   if (finished) {
     const w = score[0] > score[1] ? 0 : 1;
-    const champ = w === 0 ? "Jugador 1" : "Jugador 2";
+    const champ = sd("player", { n: w + 1 });
     return (
       <div className="mx-auto max-w-md space-y-4 text-center">
         <Focos />
         <div className="space-y-3 rounded-3xl p-6 text-white shadow-2xl ring-4" style={{ background: JC[w], ["--tw-ring-color" as string]: TV.oro }}>
           <p className="text-5xl" aria-hidden>🏆</p>
-          <p className="font-display text-3xl font-bold">¡{champ} ganó la trivia!</p>
+          <p className="font-display text-3xl font-bold">{tt("trWon", { n: champ })}</p>
           <p className="font-display text-6xl font-bold tabular-nums">{score[0]} — {score[1]}</p>
           {xp > 0 && <p className="font-bold" style={{ color: TV.oro }}>+{xp} XP</p>}
-          <p className="text-xs opacity-80">El XP se suma a la cuenta con sesión iniciada (Jugador 1).</p>
+          <p className="text-xs opacity-80">{sd("xpNote")}</p>
         </div>
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl px-6 font-bold" style={{ background: TV.oro, color: TV.tinta }}><RotateCcw className="h-5 w-5" /> Revancha ya</button>
-          <ShareResult text={`¡Jugamos un Duelo de Trivia Paraguaya en Jaikuaa y terminó ${score[0]} a ${score[1]}! ¿Cuánto sabés del Paraguay? 🇵🇾`} />
+          <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl px-6 font-bold" style={{ background: TV.oro, color: TV.tinta }}><RotateCcw className="h-5 w-5" /> {sd("rematch")}</button>
+          <ShareResult text={tt("trShare", { a: score[0], b: score[1] })} />
         </div>
       </div>
     );
@@ -223,7 +227,7 @@ function Board({ onRematch, onRemote, theme }: { onRematch: () => void; onRemote
       <Half p={1} q={q} gn={q ? getTexto(textos, "trivia", claveTrivia(q.catId, q.n), "pregunta") : undefined} pick={picks[1]} winner={winner} onPick={pick} rotated />
       <div className="relative shrink-0 px-2 py-2 text-white" style={{ background: TV.estudio }}>
         <div className="flex items-center justify-between gap-2">
-          <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" onClick={onRematch} aria-label="Salir del duelo"><X /></button>
+          <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" onClick={onRematch} aria-label={sd("exit")}><X /></button>
           <span key={`a${score[0]}`} className="tv-punto font-display text-4xl font-bold tabular-nums" style={{ color: "#5FE0E8" }}>{score[0]}</span>
           <div className="flex items-center gap-2">
             <Pulsador className="h-10 w-10" late={winner === null} />
@@ -231,7 +235,7 @@ function Board({ onRematch, onRemote, theme }: { onRematch: () => void; onRemote
           </div>
           <span key={`b${score[1]}`} className="tv-punto rotate-180 font-display text-4xl font-bold tabular-nums" style={{ color: "#D3A6FF" }}>{score[1]}</span>
           <span className="h-10 w-10" aria-hidden />
-          <span className="sr-only" aria-live="polite">{score[0]} a {score[1]}</span>
+          <span className="sr-only" aria-live="polite">{sd("scoreSr", { a: score[0], b: score[1] })}</span>
         </div>
         {winner !== null && <p className="px-2 pb-1 pt-1 text-center text-xs text-white/90">{q.explanation}</p>}
       </div>
@@ -244,16 +248,18 @@ function Half({ p, q, gn, pick, winner, onPick, rotated }: {
   p: 0 | 1; q: Q; gn?: string; pick: number | null; winner: 0 | 1 | "none" | null;
   onPick: (p: 0 | 1, o: number) => void; rotated?: boolean;
 }) {
+  const tt = useJU();
+  const sd = useSDT();
   const won = winner === p;
-  const status = won ? "¡Punto!" : winner === "none" ? "Nadie acertó" : winner !== null ? "Punto rival" : pick !== null ? "Fallaste, esperá…" : "¡Rápido!";
+  const status = won ? sd("point") : winner === "none" ? tt("trNobody") : winner !== null ? sd("rivalPoint") : pick !== null ? tt("trMissed") : tt("trQuick");
   return (
     <section
-      aria-label={`Jugador ${p + 1}`}
+      aria-label={sd("player", { n: p + 1 })}
       className={`flex min-h-0 flex-1 flex-col justify-center gap-2.5 px-4 py-2 text-white ${rotated ? "rotate-180" : ""}`}
       style={{ background: JC[p], filter: winner !== null && !won ? "saturate(.5) brightness(.85)" : "none" }}
     >
       <div className="flex items-center justify-between text-sm font-semibold">
-        <span>Jugador {p + 1}</span>
+        <span>{sd("player", { n: p + 1 })}</span>
         <span className="rounded-full bg-black/20 px-3 py-0.5">{status}</span>
       </div>
       {gn && <div lang="gn" className="text-center font-display text-lg font-bold leading-snug sm:text-xl">{gn}</div>}
