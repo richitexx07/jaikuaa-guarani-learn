@@ -10,6 +10,7 @@ import { useGameFeedback } from "@/components/games/game-kit";
 import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
 import type { GameWord } from "@/lib/games.functions";
+import { useGT } from "@/lib/i18n-games";
 
 export const Route = createFileRoute("/_authenticated/juegos/memoria")({
   head: () => ({
@@ -168,17 +169,18 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
     }
   }
 
+  const { g } = useGT();
   const stars = attempts <= PAIRS + 2 ? 3 : attempts <= PAIRS + 6 ? 2 : 1;
   return (
     <div className="mm space-y-4">
       <div className="mx-auto flex max-w-xl items-center justify-between gap-3">
-        <div className="flex gap-1" aria-label={`Pares encontrados: ${matched.size} de ${PAIRS}`}>
+        <div className="flex gap-1" aria-label={g("pairsFound", { a: matched.size, b: PAIRS })}>
           {Array.from({ length: PAIRS }, (_, k) => (
             <Roseton key={k} color={HILOS[k % HILOS.length]} lleno={k < matched.size} className="h-7 w-7" />
           ))}
         </div>
         <p className="text-sm text-white/75">
-          Intentos: <span className="font-display text-lg font-bold text-white">{attempts}</span>
+          {g("attempts")} <span className="font-display text-lg font-bold text-white">{attempts}</span>
         </p>
       </div>
       <div className="mx-auto grid max-w-xl grid-cols-3 gap-2.5 sm:grid-cols-4 sm:gap-3">
@@ -192,7 +194,7 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
               onClick={() => flip(c)}
               data-shown={shown}
               data-matched={matched.has(c.pair)}
-              aria-label={shown ? c.text : "Carta oculta"}
+              aria-label={shown ? c.text : g("hiddenCard")}
               className="memory-card aspect-[3/4] w-full rounded-xl"
               style={{ ["--hilo" as string]: hilo }}
             >
@@ -206,7 +208,7 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
                 >
                   {c.kind === "gn" && <Volume2 className="h-4 w-4 opacity-50" aria-hidden />}
                   <span className={c.kind === "gn" ? "font-display text-base font-bold sm:text-xl" : "text-sm font-medium sm:text-base"}>{c.text}</span>
-                  <span className="text-[10px] font-semibold uppercase tracking-wide opacity-50">{c.kind === "gn" ? "Guaraní" : "Español"}</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wide opacity-50">{c.kind === "gn" ? "Guaraní" : g("spanishTag")}</span>
                 </span>
               </span>
             </button>
@@ -216,13 +218,13 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
       {done && (
         <div className="space-y-3 rounded-3xl p-6 text-center" style={{ background: M.papel, color: M.tinta }}>
           <Roseton color={M.rojo} className="mx-auto h-14 w-14" />
-          <p className="font-display text-2xl font-bold">¡Tejiste los {PAIRS} pares en {attempts} intentos!</p>
-          <p className="text-3xl tracking-widest" style={{ color: M.oro }} aria-label={`${stars} de 3 estrellas`}>
+          <p className="font-display text-2xl font-bold">{g("memoryDone", { p: PAIRS, a: attempts })}</p>
+          <p className="text-3xl tracking-widest" style={{ color: M.oro }} aria-label={g("stars", { n: stars })}>
             {"★".repeat(stars)}<span className="opacity-25">{"★".repeat(3 - stars)}</span>
           </p>
           <p className="font-bold" style={{ color: M.verde }}>+{xp} XP</p>
           <div className="flex flex-wrap justify-center gap-2">
-            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: M.tinta }}>Jugar de nuevo</button>
+            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: M.tinta }}>{g("playAgain")}</button>
           </div>
           <RetoFinal partida={partida} puntaje={attempts} extra={lesson === null ? undefined : String(lesson)} />
         </div>
