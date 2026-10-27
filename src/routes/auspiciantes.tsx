@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { usePubTx } from "@/lib/i18n-public";
 import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/site-footer";
 import { BarChart3, CalendarDays, CheckCircle2, GraduationCap, ReceiptText, Zap } from "lucide-react";
@@ -40,12 +41,13 @@ export const Route = createFileRoute("/auspiciantes")({
 
 /** Vista de ejemplo de cómo aparece la marca dentro de un juego. */
 function GameMock({ img, title, feminine }: { img: string; title: string; feminine?: boolean }) {
+  const t = usePubTx();
   return (
     <div className="overflow-hidden rounded-xl border border-border/60 bg-background text-center">
       <img src={img} alt="" className="aspect-[16/9] w-full object-cover" loading="lazy" />
       <div className="px-3 pt-2 font-display text-lg font-bold text-foreground">{title}</div>
       <p className="mt-1 px-3 pb-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-        {feminine ? "Presentada por" : "Presentado por"} <span className="font-bold text-accent">Tu marca</span>
+        {feminine ? t("auPresF") : t("auPresM")} <span className="font-bold text-accent">{t("auYour")}</span>
       </p>
     </div>
   );
@@ -62,76 +64,74 @@ function SlotCard({ title, children, mock }: { title: string; children: ReactNod
 }
 
 function AuspiciantesPage() {
+  const t = usePubTx();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <MarketingHeader />
       <main className="flex-1">
         <section className="px-4 pt-8 pb-10 sm:px-6 sm:pt-16">
           <div className="mx-auto max-w-3xl text-center">
-            <HeroJai src={jaiEmbajador} alt="Jai con un megáfono" />
+            <HeroJai src={jaiEmbajador} alt={t("auAlt")} />
             <span className="inline-flex rounded-full border border-accent/30 bg-accent/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent">
-              Para auspiciantes
+              {t("auBadge")}
             </span>
             <h1 className="mt-5 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              Tu marca, junto al guaraní
+              {t("auTitle")}
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              Jaikuaa es gratis para los paraguayos gracias a las empresas que lo acompañan. Sumá tu marca a una causa
-              de identidad nacional, en los espacios que la gente usa todos los días.
+              {t("auSub")}
             </p>
             <div className="mt-8">
-              <WhatsAppCta message={MSG}>Quiero ser auspiciante</WhatsAppCta>
+              <WhatsAppCta message={MSG}>{t("auCta")}</WhatsAppCta>
             </div>
           </div>
         </section>
 
-        <Section title="Por qué auspiciar Jaikuaa">
+        <Section title={t("auWhy")}>
           <div className="grid gap-5 sm:grid-cols-3">
-            <InfoCard emoji="🇵🇾" title="Identidad nacional">
-              Un proyecto declarado de Interés Nacional y Educativo por el Senado (Declaración N.° 547/2026) y de
-              interés lingüístico por la Secretaría de Políticas Lingüísticas (Resolución N.° 116/2026).
+            <InfoCard emoji="🇵🇾" title={t("auW1t")}>
+              {t("auW1")}
             </InfoCard>
-            <InfoCard icon={CalendarDays} title="Presencia diaria">
-              La Palabra del día y los juegos son lo que los usuarios abren todos los días. Tu marca acompaña ese hábito.
+            <InfoCard icon={CalendarDays} title={t("auW2t")}>
+              {t("auW2")}
             </InfoCard>
-            <InfoCard icon={GraduationCap} title="Asociación positiva">
-              Tu marca queda unida a la educación y al orgullo por nuestra lengua, no a una publicidad que interrumpe.
+            <InfoCard icon={GraduationCap} title={t("auW3t")}>
+              {t("auW3")}
             </InfoCard>
           </div>
         </Section>
 
-        <Section title="Espacios disponibles" intro="Así aparece tu marca dentro de la plataforma.">
+        <Section title={t("auSlots")} intro={t("auSlotsI")}>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <SlotCard title="Palabra del día" mock={<GameMock img={coverPalabra} title="Palabra del día" feminine />}>
-              Una palabra guaraní por día, con audio humano. El espacio más visitado de la plataforma.
+            <SlotCard title={t("auWord")} mock={<GameMock img={coverPalabra} title={t("auWord")} feminine />}>
+              {t("auWordT")}
             </SlotCard>
             <SlotCard
-              title="Juegos educativos"
+              title={t("auGames")}
               mock={
                 <div className="grid gap-2">
-                  <GameMock img={coverAhorcado} title="Ahorcado con chipas" />
-                  <GameMock img={coverSopa} title="Sopa de letras" />
+                  <GameMock img={coverAhorcado} title={t("auHang")} />
+                  <GameMock img={coverSopa} title={t("auSopa")} />
                 </div>
               }
             >
-              Un auspiciante por juego: Ahorcado, Sopa de letras, Memoria y Penales. Tu marca se ve durante toda la
-              partida.
+              {t("auGamesT")}
             </SlotCard>
             <SlotCard
-              title="Cartel LED del Penal"
+              title={t("auLed")}
               mock={
                 <div className="overflow-hidden rounded-lg bg-neutral-900 px-3 py-4 text-center font-mono text-sm font-bold tracking-widest text-amber-400">
-                  TU MARCA AQUÍ
+                  {t("auLedMock")}
                 </div>
               }
             >
-              El cartel del estadio del juego de Penales muestra el mensaje de tu marca en cada tiro.
+              {t("auLedT")}
             </SlotCard>
             <SlotCard
-              title="Muro de Auspiciantes Fundadores"
+              title={t("auWall")}
               mock={
                 <div className="flex flex-wrap justify-center gap-2 rounded-lg bg-background p-3">
-                  {["Tu marca", "Fundador", "Fundador"].map((n, i) => (
+                  {[t("auYour"), t("auFounder"), t("auFounder")].map((n, i) => (
                     <span key={i} className="rounded-lg border border-border/60 bg-card px-3 py-1.5 text-xs font-semibold">
                       {n}
                     </span>
@@ -139,40 +139,42 @@ function AuspiciantesPage() {
                 </div>
               }
             >
-              Las primeras empresas que acompañan el lanzamiento quedan en la portada de jaikuaa.com.
+              {t("auWallT")}
             </SlotCard>
-            <SlotCard title="Premios para quienes más aprenden" mock={<img src={jaiTrofeo} alt="" className="mx-auto h-28 w-auto object-contain" loading="lazy" />}>
-              Vales, descuentos o productos de tu marca para los usuarios más constantes. En preparación, conforme a
-              las autorizaciones que correspondan.
+            <SlotCard title={t("auPrize")} mock={<img src={jaiTrofeo} alt="" className="mx-auto h-28 w-auto object-contain" loading="lazy" />}>
+              {t("auPrizeT")}
             </SlotCard>
-            <SlotCard title="Capacitación de tu personal" mock={<img src={jaiProfe} alt="" className="mx-auto h-28 w-auto object-contain" loading="lazy" />}>
-              Guaraní para tu equipo de atención al cliente, con vocabulario de tu rubro revisado por docentes especialistas.
+            <SlotCard title={t("auTrain")} mock={<img src={jaiProfe} alt="" className="mx-auto h-28 w-auto object-contain" loading="lazy" />}>
+              {t("auTrainT")}
             </SlotCard>
           </div>
         </Section>
 
-        <Section title="Paquetes" intro="Pocos espacios, un solo auspiciante por rubro. Precios a convenir según el espacio.">
+        <Section title={t("auPacks")} intro={t("auPacksI")}>
           <div className="grid gap-5 lg:grid-cols-3">
             {[
               {
-                tag: "Exclusivo",
-                title: "Aliado Fundador",
-                items: ["Palabra del día", "Muro de Fundadores en la portada", "Mención en presentaciones institucionales", "Informe mensual"],
+                key: "Aliado Fundador",
+                tag: t("auP1tag"),
+                title: t("auP1"),
+                items: [t("auP1i0"), t("auP1i1"), t("auP1i2"), t("auMonthly")],
                 highlight: true,
               },
               {
-                tag: "Por juego",
-                title: "Titular de Juego",
-                items: ["Un juego a elección", "«Presentado por» en cada partida", "Cartel LED si elegís Penales", "Informe mensual"],
+                key: "Titular de Juego",
+                tag: t("auP2tag"),
+                title: t("auP2"),
+                items: [t("auP2i0"), t("auP2i1"), t("auP2i2"), t("auMonthly")],
               },
               {
-                tag: "Institucional",
-                title: "Amigo de la Cultura",
-                items: ["Mención en la página de aliados", "Uso del sello «Aliado de Jaikuaa» en tu comunicación", "Informe trimestral"],
+                key: "Amigo de la Cultura",
+                tag: t("auP3tag"),
+                title: t("auP3"),
+                items: [t("auP3i0"), t("auP3i1"), t("auP3i2")],
               },
             ].map((p) => (
               <div
-                key={p.title}
+                key={p.key}
                 className={`flex flex-col rounded-2xl border bg-card p-6 shadow-elegant ${p.highlight ? "border-accent ring-2 ring-accent/30" : "border-border/60"}`}
               >
                 <span className="self-start rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent">
@@ -185,45 +187,44 @@ function AuspiciantesPage() {
                   ))}
                 </ul>
                 <div className="mt-6">
-                  <WhatsAppCta message={`${MSG} Me interesa el paquete ${p.title}.`}>Consultar</WhatsAppCta>
+                  <WhatsAppCta message={`${MSG} Me interesa el paquete ${p.key}.`}>{t("auAsk")}</WhatsAppCta>
                 </div>
               </div>
             ))}
           </div>
         </Section>
 
-        <Section title="Resultados medibles">
+        <Section title={t("auRes")}>
           <div className="grid gap-5 sm:grid-cols-3">
-            <InfoCard icon={BarChart3} title="Vistas reales">
-              Contamos cada vez que tu marca se muestra, una vez por persona por día: sin cifras infladas.
+            <InfoCard icon={BarChart3} title={t("auR1t")}>
+              {t("auR1")}
             </InfoCard>
-            <InfoCard icon={ReceiptText} title="Informe imprimible">
-              Recibís un informe con vistas y personas alcanzadas por espacio, listo para tu área de marketing o RSE.
+            <InfoCard icon={ReceiptText} title={t("auR2t")}>
+              {t("auR2")}
             </InfoCard>
-            <InfoCard icon={Zap} title="Sin frenar la app">
-              Tu marca carga al instante, también con poca señal, porque es parte de la plataforma.
+            <InfoCard icon={Zap} title={t("auR3t")}>
+              {t("auR3")}
             </InfoCard>
           </div>
         </Section>
 
-        <Section title="Reglas claras">
+        <Section title={t("auRules")}>
           <ul className="mx-auto max-w-3xl space-y-3 text-muted-foreground">
-            <li>• Exclusividad por rubro: un solo banco, una sola telefonía, un solo supermercado.</li>
-            <li>• No aceptamos marcas de apuestas, alcohol ni tabaco: en Jaikuaa también aprenden estudiantes.</li>
-            <li>• Ninguna publicidad interrumpe una lección.</li>
-            <li>• Las marcas no intervienen en el contenido en guaraní: lo elaboran y validan especialistas en la lengua.</li>
+            <li>• {t("auRu1")}</li>
+            <li>• {t("auRu2")}</li>
+            <li>• {t("auRu3")}</li>
+            <li>• {t("auRu4")}</li>
           </ul>
         </Section>
 
         <section className="px-4 py-16 sm:px-6">
           <div className="mx-auto max-w-3xl rounded-2xl border border-border/60 bg-card p-8 text-center shadow-elegant sm:p-10">
-            <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">Programa Auspiciantes Fundadores</h2>
+            <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">{t("auProg")}</h2>
             <p className="mt-3 text-muted-foreground">
-              Un grupo reducido de empresas paraguayas que acompañan el lanzamiento de Jaikuaa. Conversemos sobre el
-              espacio que mejor se ajusta a tu marca.
+              {t("auProgT")}
             </p>
             <div className="mt-6">
-              <WhatsAppCta message={MSG}>Escribir por WhatsApp</WhatsAppCta>
+              <WhatsAppCta message={MSG}>{t("waWrite")}</WhatsAppCta>
             </div>
             <p className="mt-4 text-xs text-muted-foreground">Guaraní Global Tech E.A.S. — RUC 80174299-4</p>
           </div>

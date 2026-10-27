@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { usePubTx } from "@/lib/i18n-public";
 import { SiteFooter } from "@/components/site-footer";
 import { BarChart3, BookOpen, Handshake, KeyRound, MessagesSquare, Mic, Scale, Smartphone, WifiOff } from "lucide-react";
 import jaiAtencion from "@/assets/jai-atencion-pro.webp";
@@ -33,112 +34,107 @@ export const Route = createFileRoute("/instituciones")({
 });
 
 function InstitucionesPage() {
+  const t = usePubTx();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <MarketingHeader />
       <main className="flex-1">
         <section className="px-4 pt-8 pb-10 sm:px-6 sm:pt-16">
           <div className="mx-auto max-w-3xl text-center">
-            <HeroJai src={jaiAtencion} alt="Jai, de saco y corbata, listo para atender" />
+            <HeroJai src={jaiAtencion} alt={t("inAlt")} />
             <span className="inline-flex rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-              Para instituciones
+              {t("inBadge")}
             </span>
             <h1 className="mt-5 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              Que tu equipo atienda también en guaraní
+              {t("inTitle")}
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              Un plan piloto de 12 semanas, sin costo, para que funcionarios y técnicos fortalezcan su guaraní oral y
-              escrito con una herramienta hecha en Paraguay.
+              {t("inSub")}
             </p>
             <div className="mt-8">
-              <WhatsAppCta message={MSG}>Pedir un piloto por WhatsApp</WhatsAppCta>
+              <WhatsAppCta message={MSG}>{t("inCta")}</WhatsAppCta>
             </div>
           </div>
         </section>
 
-        <Section title="Por qué importa">
+        <Section title={t("inWhy")}>
           <div className="grid gap-5 sm:grid-cols-3">
-            <InfoCard icon={MessagesSquare} title="Es la lengua de la gente">
-              El 66,9 % de la población habla guaraní (Encuesta Permanente de Hogares Continua 2022, INE). Muchas
-              personas entienden mejor un trámite, una indicación o un aviso en su idioma.
+            <InfoCard icon={MessagesSquare} title={t("inW1t")}>
+              {t("inW1")}
             </InfoCard>
-            <InfoCard icon={Scale} title="Lo pide la ley">
-              La Ley N.° 4.251/10 de Lenguas establece que las dos lenguas oficiales tienen vigencia y uso en todas las
-              instituciones públicas (Art. 3).
+            <InfoCard icon={Scale} title={t("inW2t")}>
+              {t("inW2")}
             </InfoCard>
-            <InfoCard icon={Handshake} title="Mejor atención">
-              Un funcionario que se comunica bien en guaraní genera confianza y evita malentendidos con quienes atiende.
+            <InfoCard icon={Handshake} title={t("inW3t")}>
+              {t("inW3")}
             </InfoCard>
           </div>
         </Section>
 
-        <Section title="Qué incluye el piloto" intro="Sin costo para la institución durante las 12 semanas.">
+        <Section title={t("inInc")} intro={t("inIncI")}>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <InfoCard icon={KeyRound} title="Acceso con código propio">
-              Todos los participantes entran con el código de su institución, desde el celular o la computadora.
+            <InfoCard icon={KeyRound} title={t("inI1t")}>
+              {t("inI1")}
             </InfoCard>
-            <InfoCard icon={Mic} title="Lecciones con voz humana">
-              Contenido en revisión por docentes especialistas y audios grabados por hablantes paraguayos.
+            <InfoCard icon={Mic} title={t("inI2t")}>
+              {t("inI2")}
             </InfoCard>
-            <InfoCard icon={BookOpen} title="Vocabulario de tu área">
-              La institución aporta sus términos técnicos y los especialistas elaboran y validan su versión en guaraní
-              antes de publicarla: salud, agro, atención al público, jurídico y más.
+            <InfoCard icon={BookOpen} title={t("inI3t")}>
+              {t("inI3")}
             </InfoCard>
-            <InfoCard icon={BarChart3} title="Panel de seguimiento">
-              Quién participa, cuánto avanza cada persona, informe mensual e informe final de resultados.
+            <InfoCard icon={BarChart3} title={t("inI4t")}>
+              {t("inI4")}
             </InfoCard>
-            <InfoCard icon={Smartphone} title="App en el celular">
-              Jaikuaa se instala en la pantalla del teléfono y se abre como una aplicación.
+            <InfoCard icon={Smartphone} title={t("inI5t")}>
+              {t("inI5")}
             </InfoCard>
-            <InfoCard icon={WifiOff} title="Uso sin conexión">
-              Las lecciones y audios que ya abriste quedan guardados en el teléfono para estudiar donde no hay señal; el
-              avance se sincroniza al volver la conexión.
+            <InfoCard icon={WifiOff} title={t("inI6t")}>
+              {t("inI6")}
             </InfoCard>
           </div>
         </Section>
 
-        <Section title="Cómo funciona">
+        <Section title={t("inHow")}>
           <ol className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-4">
             {[
-              ["1", "Conversamos", "Definimos el grupo (sugerimos de 20 a 40 personas) y un referente de la institución."],
-              ["2", "Arrancamos", "Encuentro de inicio, registro de participantes y entrega del código de ingreso."],
-              ["3", "12 semanas", "Estudio a ritmo propio, vocabulario del área e informes de avance."],
-              ["4", "Resultados", "Informe final. Si funciona, el siguiente paso es un convenio de cooperación."],
-            ].map(([n, t, d]) => (
+              ["1", t("inS1t"), t("inS1")],
+              ["2", t("inS2t"), t("inS2")],
+              ["3", t("inS3t"), t("inS3")],
+              ["4", t("inS4t"), t("inS4")],
+            ].map(([n, st, d]) => (
               <li key={n} className="rounded-2xl border border-border/60 bg-card p-5 shadow-elegant">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent font-display font-bold text-accent-foreground">
                   {n}
                 </div>
-                <div className="mt-3 font-display font-bold text-foreground">{t}</div>
+                <div className="mt-3 font-display font-bold text-foreground">{st}</div>
                 <p className="mt-1 text-sm text-muted-foreground">{d}</p>
               </li>
             ))}
           </ol>
         </Section>
 
-        <Section title="Respaldo institucional">
+        <Section title={t("inBack")}>
           <BackingList />
         </Section>
 
-        <Section title="Con total transparencia">
+        <Section title={t("inTransp")}>
           <ul className="mx-auto max-w-3xl space-y-3 text-muted-foreground">
-            <li>• Jaikuaa no es un traductor automático ni reemplaza al docente: es una herramienta de apoyo.</li>
-            <li>• Ningún contenido en guaraní se publica sin la revisión de especialistas en la lengua.</li>
+            <li>• {t("inT1")}</li>
+            <li>• {t("inT2")}</li>
             <li>
-              • Cualquier adquisición futura de una institución pública se hace solo por los procedimientos de la Ley
-              N.° 7.021/2022 de Suministro y Contrataciones Públicas.
+              • {t("inT3")}
             </li>
           </ul>
         </Section>
 
         <section className="px-4 py-16 sm:px-6">
           <div className="mx-auto max-w-3xl rounded-2xl border border-border/60 bg-card p-8 text-center shadow-elegant sm:p-10">
-            <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">¿Empezamos?</h2>
+            <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">{t("inStart")}</h2>
             <p className="mt-3 text-muted-foreground">
-              Escribinos y coordinamos una demostración para tu institución.
+              {t("inStartT")}
             </p>
             <div className="mt-6">
-              <WhatsAppCta message={MSG}>Escribir por WhatsApp</WhatsAppCta>
+              <WhatsAppCta message={MSG}>{t("waWrite")}</WhatsAppCta>
             </div>
             <p className="mt-4 text-xs text-muted-foreground">Guaraní Global Tech E.A.S. — RUC 80174299-4</p>
           </div>
