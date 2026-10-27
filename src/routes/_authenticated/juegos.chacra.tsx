@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useJU } from "@/lib/i18n-juegos-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GameStage } from "@/components/games/game-stage";
 import { useGameFeedback } from "@/components/games/game-kit";
@@ -39,11 +40,12 @@ const CSS = `
 
 function Chacra() {
   const { idx, loading } = useJuegoTextos();
+  const tt = useJU();
   const partida = useRetoPartida("chacra", { total: VISITAS_POR_DIA });
   const { seed, otra } = partida;
   return (
     <GameStage
-      title="Jai en la chacra"
+      title={tt("chTitle")}
       sponsorSlot="chacra"
       css={CSS}
       ink={C.tinta}
@@ -51,7 +53,7 @@ function Chacra() {
     >
       <ValidationNotice />
       {loading ? (
-        <p className="py-16 text-center text-sm opacity-70">Cargando la camioneta…</p>
+        <p className="py-16 text-center text-sm opacity-70">{tt("chLoading")}</p>
       ) : (
         <>
           <RetoBanner partida={partida} className="mb-3" />
@@ -63,8 +65,9 @@ function Chacra() {
 }
 
 function Camino({ i, oks }: { i: number; oks: boolean[] }) {
+  const tt = useJU();
   return (
-    <div className="flex items-center gap-1" aria-label={`Visita ${Math.min(i + 1, VISITAS_POR_DIA)} de ${VISITAS_POR_DIA}`}>
+    <div className="flex items-center gap-1" aria-label={tt("chVisit", { i: Math.min(i + 1, VISITAS_POR_DIA), n: VISITAS_POR_DIA })}>
       {Array.from({ length: VISITAS_POR_DIA }, (_, k) => (
         <div key={k} className="flex flex-1 items-center gap-1">
           <span
@@ -87,6 +90,7 @@ function Camino({ i, oks }: { i: number; oks: boolean[] }) {
 
 function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: Partida; textos: ReturnType<typeof useJuegoTextos>["idx"]; onAgain: () => void }) {
   const feedback = useGameFeedback();
+  const tt = useJU();
   const visitas = useMemo<VisitaChacra[]>(() => armarVisitas(seed), [seed]);
   usePrefetchAudios(visitas.map((v) => v.caso.palabra), 10);
   const [i, setI] = useState(0);
@@ -109,10 +113,10 @@ function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: 
     return (
       <section className="space-y-5 pt-1 text-center">
         <div className="ch-in rounded-3xl p-6 shadow-2xl" style={{ background: C.papel, color: C.tinta }}>
-          <img src={jaiAgro} alt="Jai con sombrero y una canasta de maíz y mandioca" className="mx-auto h-32 w-auto object-contain" />
-          <p className="mt-2 text-sm font-semibold opacity-70">Terminó la recorrida</p>
-          <h2 className="font-display text-3xl font-bold leading-tight">Ayudaste a {score} de {VISITAS_POR_DIA} productores</h2>
-          <p className="mt-2 text-4xl tracking-widest" style={{ color: "#E0A100" }} aria-label={`${stars} de 3 estrellas`}>
+          <img src={jaiAgro} alt={tt("chJaiAlt")} className="mx-auto h-32 w-auto object-contain" />
+          <p className="mt-2 text-sm font-semibold opacity-70">{tt("chDone")}</p>
+          <h2 className="font-display text-3xl font-bold leading-tight">{tt("chHelped", { s: score, n: VISITAS_POR_DIA })}</h2>
+          <p className="mt-2 text-4xl tracking-widest" style={{ color: "#E0A100" }} aria-label={tt("stars", { n: stars })}>
             {"★".repeat(stars)}<span className="opacity-25">{"★".repeat(3 - stars)}</span>
           </p>
           <ul className="mt-4 space-y-1 text-left text-sm">
@@ -128,7 +132,7 @@ function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: 
           <p className="mt-3 font-bold" style={{ color: C.verde }}>+{xp} XP</p>
         </div>
         <RetoFinal partida={partida} puntaje={score} />
-        <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold text-white shadow-lg" style={{ background: C.tierra }}>Otra recorrida</button>
+        <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold text-white shadow-lg" style={{ background: C.tierra }}>{tt("chAgain")}</button>
       </section>
     );
   }
@@ -153,7 +157,7 @@ function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: 
         <div className="flex items-center gap-3 px-4 pt-4">
           <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl text-4xl" style={{ background: "#F3E3C3" }} aria-hidden>{v.caso.emoji}</span>
           <div className="min-w-0">
-            <p className="text-xs font-semibold opacity-60">Visita {i + 1} de {VISITAS_POR_DIA}</p>
+            <p className="text-xs font-semibold opacity-60">{tt("chVisit", { i: i + 1, n: VISITAS_POR_DIA })}</p>
             <p className="font-display text-xl font-bold">{v.caso.productor}</p>
           </div>
         </div>
@@ -184,13 +188,13 @@ function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: 
         <div className="ch-in space-y-3">
           <div className="rounded-2xl p-4 text-sm shadow-lg" style={{ background: C.papel, color: C.tinta }}>
             <p className="flex flex-wrap items-center gap-2 font-semibold">
-              {right ? "¡Bien! Entendiste al productor." : "Esta vez no."} <span lang="gn" className="font-display text-base font-bold">{v.caso.palabra}</span> = {v.es}
+              {right ? tt("chRight") : tt("notThisTime")} <span lang="gn" className="font-display text-base font-bold">{v.caso.palabra}</span> = {v.es}
               <SpeakerButton gn={v.caso.palabra} />
             </p>
-            <p className="mt-2"><b>Consejo del técnico:</b> {v.caso.consejo}</p>
+            <p className="mt-2"><b>{tt("chTip")}</b> {v.caso.consejo}</p>
           </div>
           <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold text-white shadow-lg" style={{ background: C.tierra }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
-            {i + 1 === VISITAS_POR_DIA ? "Terminar la recorrida" : "Ir al próximo productor"}
+            {i + 1 === VISITAS_POR_DIA ? tt("chFinish") : tt("chNext")}
           </button>
         </div>
       )}
