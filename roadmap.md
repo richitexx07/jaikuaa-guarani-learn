@@ -18,3 +18,5 @@
 - [ ] Studio: añadir únicamente el enlace Studio al menú existente cuando el montaje esté listo; ejecutar pruebas y verificar el flujo.
 - [x] Publicar 27/10: ficha técnica, blindajes (certificados, planillas, aulas) y traducciones subidos a www.jaikuaa.com; verificado con sesión real (Panel, Juegos, Cuaderno, Embajadores, Certificado y Ficha) sin errores de consola, y la protección de planillas presente en el script publicado. Escaneo nuevo: 6 avisos bajos, todos en tablas públicas de referencia.
 - [ ] Emoji suelto en el Panel (saludo con sol) y en Chacra (iconos): decidir con Richard si se sacan, porque la regla de la casa es cero emojis y la prueba solo detecta el banderín y la planta.
+- [x] Publicar 27/10 18:04: botón «Grabar / Reemplazar voz» en las 109 palabras de /validar, para que Ferreira y Aliente graben encima de la voz vieja. Verificado en www.jaikuaa.com (HTTP 200, título correcto) y en el script publicado validar-Q5mw2r6k.js.
+- [ ] Grabación oficial: que Ferreira y Aliente graben las 109 palabras de cero y reemplacen todos los audios actuales.
