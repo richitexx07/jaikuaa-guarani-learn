@@ -99,6 +99,11 @@ const de: Dict = {
   "d.gloss.d": "Die veröffentlichten Wörter mit Bedeutung und Audio.",
   "d.agro.d": "Fach-Guaraní für die Landwirtschaft: Boden, Anbau und Vieh.",
   "d.street.d": "Das Guaraní, das auf der Straße gesprochen wird.",
+  "ea.strong": "Wir sind noch nicht offiziell gestartet.",
+  "ea.rest": "Du kannst es schon jetzt kostenlos nutzen, und alles, was du ab heute lernst, bleibt gespeichert.",
+  "pl.strong": "Früher Zugang:",
+  "pl.rest": "Jaikuaa ist noch nicht offiziell gestartet. Die Wörter werden von Fachlehrkräften geprüft; wenn du einen Fehler siehst, sag uns Bescheid.",
+  "val.badge": "In Prüfung",
   "lang.preliminary": "Vorläufige Übersetzung, in Prüfung",
 };
 
@@ -195,6 +200,11 @@ const fr: Dict = {
   "d.gloss.d": "Les mots publiés, avec leur sens et leur audio.",
   "d.agro.d": "Guarani technique agricole : sol, cultures et bétail.",
   "d.street.d": "Le guarani qu'on parle dans la rue.",
+  "ea.strong": "Nous ne sommes pas encore officiellement lancés.",
+  "ea.rest": "Tu peux déjà l'utiliser gratuitement, et tout ce que tu apprends dès aujourd'hui est enregistré.",
+  "pl.strong": "Accès anticipé :",
+  "pl.rest": "Jaikuaa n'est pas encore officiellement lancé. Les mots sont en cours de révision par des enseignants spécialistes ; si tu vois une erreur, préviens-nous.",
+  "val.badge": "En validation",
   "lang.preliminary": "Traduction préliminaire, en cours de validation",
 };
 

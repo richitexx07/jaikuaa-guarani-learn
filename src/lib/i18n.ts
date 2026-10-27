@@ -143,6 +143,11 @@ const DICT = {
   "d.gloss.d": { es: "Las palabras publicadas, con su significado y su audio.", pt: "As palavras publicadas, com significado e áudio.", en: "Published words, with their meaning and audio." },
   "d.agro.d": { es: "Guaraní técnico del campo: suelo, cultivos y ganado.", pt: "Guarani técnico do campo: solo, cultivos e gado.", en: "Technical farm Guarani: soil, crops and livestock." },
   "d.street.d": { es: "El guaraní que se habla en la calle.", pt: "O guarani falado nas ruas.", en: "The Guarani spoken on the street." },
+  "ea.strong": { es: "Todavía no lanzamos oficialmente.", pt: "Ainda não lançamos oficialmente.", en: "We haven't officially launched yet." },
+  "ea.rest": { es: "Igual ya podés usarlo gratis, y lo que aprendas desde hoy queda guardado.", pt: "Mesmo assim você já pode usar grátis, e o que aprender a partir de hoje fica salvo.", en: "You can already use it for free, and everything you learn from today is saved." },
+  "pl.strong": { es: "Acceso anticipado:", pt: "Acesso antecipado:", en: "Early access:" },
+  "pl.rest": { es: "Jaikuaa todavía no se lanzó oficialmente. Las palabras están en revisión por docentes especialistas; si ves un error, avisanos.", pt: "O Jaikuaa ainda não foi lançado oficialmente. As palavras estão em revisão por professores especialistas; se vir um erro, avise-nos.", en: "Jaikuaa has not officially launched yet. Words are being reviewed by specialist teachers; if you spot a mistake, let us know." },
+  "val.badge": { es: "En validación", pt: "Em validação", en: "Under review" },
   "lang.preliminary": { es: "Traducción preliminar, en validación", pt: "Tradução preliminar, em validação", en: "Preliminary translation, under review" },
 } as const satisfies Record<string, Record<BaseLang, string>>;
 
