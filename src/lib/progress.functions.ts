@@ -28,6 +28,53 @@ function shiftDay(iso: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+/** Tiempo mínimo entre dos lecciones nuevas de guaraní (una lección real lleva más). */
+export const MIN_SECONDS_BETWEEN_NEW_LESSONS = 60;
+
+/**
+ * Regla del servidor para lecciones de guaraní (cuentan para el certificado):
+ * la lección debe existir publicada, se hacen en orden (la anterior ya hecha)
+ * y entre dos lecciones nuevas debe pasar un tiempo mínimo.
+ */
+export function checkLessonOrder(
+  n: number,
+  published: Set<number>,
+  done: { n: number; at: string }[],
+  now: number,
+): string | null {
+  if (!published.has(n)) return "Lección no válida";
+  const doneSet = new Set(done.map((d) => d.n));
+  if (doneSet.has(n)) return null; // repasar una lección ya hecha siempre se permite
+  const prev = [...published].filter((x) => x < n).sort((a, b) => b - a)[0];
+  if (prev !== undefined && !doneSet.has(prev)) return "Primero completá la lección anterior";
+  const last = done.map((d) => Date.parse(d.at)).filter(Number.isFinite).sort((a, b) => b - a)[0];
+  if (last !== undefined && now - last < MIN_SECONDS_BETWEEN_NEW_LESSONS * 1000) return "Demasiado rápido";
+  return null;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function assertGuaraniLessonAllowed(db: any, userId: string, sourceRef: string) {
+  const m = /^guarani:(\d{1,4})$/.exec(sourceRef);
+  if (!m) throw new Error("Lección no válida");
+  const n = Number(m[1]);
+  const [{ data: lessons }, { data: done }] = await Promise.all([
+    db.from("lessons").select("sort_order").eq("status", "published").limit(1000),
+    db
+      .from("xp_transactions")
+      .select("source_ref, created_at")
+      .eq("user_id", userId)
+      .eq("source", "lesson")
+      .like("source_ref", "guarani:%")
+      .limit(5000),
+  ]);
+  const published = new Set<number>((lessons ?? []).map((l: { sort_order: number }) => l.sort_order));
+  const rows = ((done ?? []) as { source_ref: string | null; created_at: string }[])
+    .map((d) => ({ n: Number(String(d.source_ref ?? "").split(":")[1]), at: d.created_at }))
+    .filter((d) => Number.isFinite(d.n));
+  const err = checkLessonOrder(n, published, rows, Date.now());
+  if (err) throw new Error(err);
+}
+
 export type ServerStats = {
   userId: string;
   xp: number;
@@ -92,6 +139,10 @@ export const recordActivity = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (data.source === "game" && !GAME_REFS.has(data.sourceRef)) throw new Error("Juego no válido");
+    const isGuarani = data.source === "lesson" && data.isGuaraniLesson;
+    if (isGuarani) {
+      await assertGuaraniLessonAllowed(supabaseAdmin, context.userId, data.sourceRef);
+    }
     const amount = Math.min(data.xp, XP_CAP[data.source] ?? 0);
     // Visitas: como máximo una por día por usuario (sync_id fijo por fecha).
     const syncId = data.source === "visit" ? `visit:${asuncionToday()}` : data.syncId;
