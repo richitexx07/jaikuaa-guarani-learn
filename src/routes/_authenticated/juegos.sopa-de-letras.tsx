@@ -2,9 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { SpeakerButton } from "@/components/audio/speaker-button";
-import { LessonFilter, NotEnough, shuffle, useGameWords, useIsWide } from "@/components/games/game-shell";
+import { LessonFilter, NotEnough, useGameWords, useIsWide } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
-import { ShareResult } from "@/components/games/share-result";
+import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
+import { mulberry32, orderedBy, seededShuffle, type Reto } from "@/lib/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ACHEGETY, displayLetter, splitAchegety } from "@/lib/achegety";
 import { playGuarani } from "@/lib/audio";
@@ -36,20 +37,23 @@ const FILLER = ACHEGETY.filter((t) => t !== "'");
 type Placed = { word: GameWord; cells: number[] };
 type Puzzle = { size: number; grid: string[]; placed: Placed[] };
 
-function build(pool: { word: GameWord; tokens: string[] }[], size: number): Puzzle | null {
+function build(pool: { word: GameWord; tokens: string[] }[], size: number, seed: number): Puzzle | null {
+  // Con la misma semilla sale la misma sopa (para los retos por WhatsApp).
+  const rnd = mulberry32(seed);
+  const sorted = orderedBy(pool, (x) => x.word.gn);
   for (let attempt = 0; attempt < 30; attempt++) {
     const grid: (string | null)[] = Array(size * size).fill(null);
     const placed: Placed[] = [];
     const used = new Set<string>();
-    for (const item of shuffle(pool)) {
+    for (const item of seededShuffle(sorted, rnd)) {
       if (placed.length === COUNT) break;
       const key = item.word.gn.trim().toLowerCase();
       if (used.has(key) || item.tokens.length > size || item.tokens.length < 2) continue;
       let ok = false;
       for (let tries = 0; tries < 60 && !ok; tries++) {
-        const horiz = Math.random() < 0.5;
-        const r = Math.floor(Math.random() * (horiz ? size : size - item.tokens.length + 1));
-        const c = Math.floor(Math.random() * (horiz ? size - item.tokens.length + 1 : size));
+        const horiz = rnd() < 0.5;
+        const r = Math.floor(rnd() * (horiz ? size : size - item.tokens.length + 1));
+        const c = Math.floor(rnd() * (horiz ? size - item.tokens.length + 1 : size));
         const cells = item.tokens.map((_, i) => (horiz ? r * size + c + i : (r + i) * size + c));
         if (cells.every((cell, i) => grid[cell] === null || grid[cell] === item.tokens[i])) {
           cells.forEach((cell, i) => (grid[cell] = item.tokens[i]!));
@@ -62,7 +66,7 @@ function build(pool: { word: GameWord; tokens: string[] }[], size: number): Puzz
     if (placed.length === COUNT) {
       return {
         size,
-        grid: grid.map((g) => g ?? FILLER[Math.floor(Math.random() * FILLER.length)]!),
+        grid: grid.map((g) => g ?? FILLER[Math.floor(rnd() * FILLER.length)]!),
         placed,
       };
     }
@@ -71,19 +75,20 @@ function build(pool: { word: GameWord; tokens: string[] }[], size: number): Puzz
 }
 
 function WordSearch() {
-  const [lesson, setLesson] = useState<number | null>(null);
+  const { reto, seed, otra } = useRetoPartida("sopa");
+  // En el reto viaja «lección:tamaño» para armar la misma sopa.
+  const [retoLeccion, retoSize] = (reto?.x ?? "").split(":");
+  const [lesson, setLesson] = useState<number | null>(() => (retoLeccion && /^\d+$/.test(retoLeccion) ? Number(retoLeccion) : null));
   const q = useGameWords(lesson);
   const wide = useIsWide();
-  const size = wide ? 10 : 8;
-  const [round, setRound] = useState(0);
+  const size = reto && (retoSize === "8" || retoSize === "10") ? Number(retoSize) : wide ? 10 : 8;
   const puzzle = useMemo(() => {
     const pool = (q.data?.words ?? [])
       .filter((w) => !/\s/.test(w.gn.trim()))
       .map((w) => ({ word: w, tokens: splitAchegety(w.gn.trim()) }))
       .filter((x): x is { word: GameWord; tokens: string[] } => !!x.tokens);
-    return build(pool, size);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q.data, size, round]);
+    return build(pool, size, seed);
+  }, [q.data, size, seed]);
 
   return (
     <GameStage
@@ -94,7 +99,7 @@ function WordSearch() {
       background={`linear-gradient(90deg, transparent 0 46px, rgba(213,43,30,.35) 46px 48px, transparent 48px), repeating-linear-gradient(0deg, transparent 0 27px, #C9DCF0 27px 28px), ${S.hoja}`}
     >
       <div className="sp-filter flex justify-center">
-        <LessonFilter value={lesson} onChange={setLesson} />
+        <LessonFilter value={lesson} onChange={(v) => { otra(); setLesson(v); }} />
       </div>
       <div className="mt-4">
         {q.isLoading ? (
@@ -102,7 +107,10 @@ function WordSearch() {
         ) : !puzzle ? (
           <NotEnough min={COUNT} />
         ) : (
-          <Board key={`${round}-${size}`} puzzle={puzzle} onNext={() => setRound((r) => r + 1)} />
+          <>
+            <RetoBanner reto={reto} className="mb-3" />
+            <Board key={`${seed}-${size}`} puzzle={puzzle} seed={seed} reto={reto} extra={`${lesson ?? ""}:${size}`} onNext={otra} />
+          </>
         )}
       </div>
     </GameStage>
@@ -124,7 +132,7 @@ const CSS = `
 @media (prefers-reduced-motion: reduce) { .sp-mark, .sp-jai { animation: none } .sp-cell { transition: none } }
 `;
 
-function Board({ puzzle, onNext }: { puzzle: Puzzle; onNext: () => void }) {
+function Board({ puzzle, seed, reto, extra, onNext }: { puzzle: Puzzle; seed: number; reto: Reto | null; extra: string; onNext: () => void }) {
   const feedback = useGameFeedback();
   const { size, grid, placed } = puzzle;
   const [start, setStart] = useState<number | null>(null);
@@ -132,6 +140,11 @@ function Board({ puzzle, onNext }: { puzzle: Puzzle; onNext: () => void }) {
   const [miss, setMiss] = useState<number[]>([]);
   const done = found.size === placed.length;
   const recorded = useRef(false);
+  const t0 = useRef(Date.now());
+  const [segundos, setSegundos] = useState(0);
+  useEffect(() => {
+    if (done) setSegundos(Math.max(1, Math.round((Date.now() - t0.current) / 1000)));
+  }, [done]);
 
   useEffect(() => {
     if (!done || recorded.current) return;
@@ -286,12 +299,13 @@ function Board({ puzzle, onNext }: { puzzle: Puzzle; onNext: () => void }) {
         <div className="space-y-3 rounded-3xl bg-white p-6 text-center shadow-lg ring-1 ring-[#C9DCF0]">
           <img src={jaiFesteja} alt="Jai festeja" className="mx-auto h-32 w-auto object-contain" />
           <p className="font-display text-3xl font-bold">¡Encontraste todas!</p>
+          {segundos > 0 && <p className="text-sm opacity-75">En {segundos} segundos</p>}
           <p className="text-3xl tracking-widest text-[#F2B544]" aria-label="3 de 3 estrellas">★★★</p>
           <p className="font-bold text-[#2F7A4A]">+{XP} XP</p>
           <div className="flex flex-wrap justify-center gap-2">
             <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: S.tinta }}>Otra sopa</button>
-            <ShareResult text="¡Encontré todas las palabras en guaraní de la Sopa de letras de Jaikuaa! ¿Te animás? 🇵🇾" />
           </div>
+          {segundos > 0 && <RetoFinal juego="sopa" seed={seed} puntaje={segundos} total={COUNT} reto={reto} extra={extra} menosEsMejor unidad="segundos" />}
         </div>
       )}
     </div>

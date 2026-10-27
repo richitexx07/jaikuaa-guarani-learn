@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shuffle } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
-import { ShareResult } from "@/components/games/share-result";
+import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
+import { shufflerFor } from "@/lib/reto";
+import type { Reto } from "@/lib/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
@@ -54,7 +56,7 @@ const CSS = `
 `;
 
 function Taanga() {
-  const [game, setGame] = useState(0);
+  const { reto, seed, otra } = useRetoPartida("taanga");
   const { idx, loading } = useJuegoTextos();
   const all = useMemo(() => applyTaanga(SCENES, idx), [idx]);
   return (
@@ -65,7 +67,7 @@ function Taanga() {
       background={`radial-gradient(70% 45% at 85% 0%, rgba(244,192,78,.22) 0%, transparent 70%), ${F.carbon}`}
     >
       <ValidationNotice />
-      {loading ? <p className="py-16 text-center text-sm opacity-70">Preparando el set…</p> : <Set key={game} all={all} onAgain={() => setGame((g) => g + 1)} />}
+      {loading ? <p className="py-16 text-center text-sm opacity-70">Preparando el set…</p> : <><RetoBanner reto={reto} className="mb-3" /><Set key={seed} seed={seed} reto={reto} all={all} onAgain={otra} /></>}
     </GameStage>
   );
 }
@@ -96,9 +98,9 @@ function Claqueta({ escena, toma, lugar, cerrada }: { escena: number; toma: numb
   );
 }
 
-function Set({ onAgain, all }: { onAgain: () => void; all: Scene[] }) {
+function Set({ onAgain, all, seed, reto }: { onAgain: () => void; all: Scene[]; seed: number; reto: Reto | null }) {
   const feedback = useGameFeedback();
-  const scenes = useMemo(() => shuffle(all).slice(0, ROUNDS), []);
+  const scenes = useMemo(() => shufflerFor(seed)(all).slice(0, ROUNDS), []);
   const [i, setI] = useState(0);
   const [pick, setPick] = useState<string | null>(null);
   const [score, setScore] = useState(0);
@@ -146,11 +148,9 @@ function Set({ onAgain, all }: { onAgain: () => void; all: Scene[] }) {
           </div>
           <div className="tg-frame h-4" style={{ background: F.panel }} />
         </div>
+        <RetoFinal juego="taanga" seed={seed} puntaje={score} total={ROUNDS} reto={reto} />
         <div className="flex flex-wrap justify-center gap-2">
           <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: F.tungsteno, color: F.carbon }}>Nuevo rodaje</button>
-          <div className="[&_a]:h-12 [&_a]:rounded-2xl [&_a]:border-white/30 [&_a]:bg-transparent [&_a]:text-white">
-            <ShareResult text={`¡Fui guionista en Ta'anga de Jaikuaa y rodé ${score} de ${ROUNDS} escenas en guaraní! 🇵🇾`} />
-          </div>
         </div>
       </section>
     );

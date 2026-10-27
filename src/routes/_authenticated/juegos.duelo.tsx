@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, RotateCcw, Volume2, X } from "lucide-react";
 import { LessonFilter, NotEnough, pickDistinct, shuffle, useGameWords } from "@/components/games/game-shell";
@@ -8,6 +8,8 @@ import { useGameFeedback } from "@/components/games/game-kit";
 import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
 import type { GameWord } from "@/lib/games.functions";
+import { LiveDuel, LiveDuelStart, type LiveRound } from "@/components/games/live-duel";
+import { salaDeLaUrl } from "@/lib/use-sala";
 
 export const Route = createFileRoute("/_authenticated/juegos/duelo")({
   head: () => ({
@@ -34,6 +36,10 @@ function Duel() {
   const [lesson, setLesson] = useState<number | null>(null);
   const q = useGameWords(lesson);
   const [match, setMatch] = useState(0);
+  const [remote, setRemote] = useState<{ code: string; host: boolean } | null>(() => {
+    const c = salaDeLaUrl();
+    return c ? { code: c, host: false } : null;
+  });
   const pool = useMemo(() => {
     const seen = new Set<string>();
     return pickDistinct(q.data?.words ?? [], 500).filter((w) => {
@@ -51,16 +57,34 @@ function Duel() {
       css={CSS}
       background={`linear-gradient(160deg, ${V.rojo} 0%, ${V.rojo} 48%, #FFFFFF 48%, #FFFFFF 52%, ${V.azul} 52%, ${V.azul} 100%)`}
     >
-      <div className="dv-filter flex justify-center">
-        <LessonFilter value={lesson} onChange={setLesson} />
-      </div>
+      {!remote && (
+        <div className="dv-filter flex justify-center">
+          <LessonFilter value={lesson} onChange={setLesson} />
+        </div>
+      )}
       <div className="mt-6">
-        {q.isLoading ? (
+        {remote ? (
+          <LiveDuel
+            ns="duelo"
+            code={remote.code}
+            host={remote.host}
+            path="/juegos/duelo"
+            title="Duelo Cara a Cara"
+            target={TARGET}
+            theme={{ mine: V.azul, rival: V.rojo, ink: V.tinta, accent: V.oro }}
+            xpRef="duelo"
+            buildRounds={() => liveRounds(pool)}
+            onExit={() => {
+              setRemote(null);
+              if (window.location.search.includes("sala=")) window.history.replaceState(window.history.state, "", "/juegos/duelo");
+            }}
+          />
+        ) : q.isLoading ? (
           <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
         ) : pool.length < MIN_WORDS ? (
           <NotEnough min={MIN_WORDS} />
         ) : (
-          <Board key={`${lesson}-${match}`} pool={pool} onRematch={() => setMatch((m) => m + 1)} />
+          <Board key={`${lesson}-${match}`} pool={pool} onRematch={() => setMatch((m) => m + 1)} onRemote={(code, host) => setRemote({ code, host })} />
         )}
       </div>
     </GameStage>
@@ -97,7 +121,17 @@ function makeRound(pool: GameWord[], used: Set<string>): Round {
   return { word, options: shuffle([word.es, ...distractors]) };
 }
 
-function Board({ pool, onRematch }: { pool: GameWord[]; onRematch: () => void }) {
+/** Preguntas para el duelo a distancia: las arma el anfitrión y las manda al otro celular. */
+function liveRounds(pool: GameWord[]): LiveRound[] {
+  const used = new Set<string>();
+  return Array.from({ length: TARGET * 2 + 6 }, () => {
+    const r = makeRound(pool, used);
+    used.add(r.word.gn);
+    return { prompt: r.word.gn, sub: "¿Qué significa?", options: r.options, answer: r.options.indexOf(r.word.es), audio: r.word.hasAudio ? r.word.gn : undefined };
+  });
+}
+
+function Board({ pool, onRematch, onRemote }: { pool: GameWord[]; onRematch: () => void; onRemote: (code: string, host: boolean) => void }) {
   const feedback = useGameFeedback();
   const used = useRef(new Set<string>());
   const [round, setRound] = useState<Round>(() => makeRound(pool, used.current));
@@ -168,9 +202,7 @@ function Board({ pool, onRematch }: { pool: GameWord[]; onRematch: () => void })
           <button type="button" className="mt-4 h-14 w-full rounded-2xl font-display text-xl font-bold text-white" style={{ background: V.tinta }} onClick={() => setStarted(true)}>
             ¡Empezar duelo!
           </button>
-          <Link to="/juegos/nee-rape" search={{ sala: undefined, sendero: "nemongeta" }} className="mt-2 flex h-12 w-full items-center justify-center rounded-2xl text-sm font-semibold ring-1 ring-[#101426]/20">
-            📲 Jugar a distancia (cada uno en su celular)
-          </Link>
+          <LiveDuelStart theme={{ mine: V.azul, rival: V.rojo, ink: V.tinta, accent: V.oro }} onStart={onRemote} />
         </div>
       </div>
     );

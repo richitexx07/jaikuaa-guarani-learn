@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { RotateCcw, X } from "lucide-react";
 import { shuffle } from "@/components/games/game-shell";
@@ -10,6 +10,8 @@ import { recordCompletion } from "@/lib/gamification";
 import { ROULETTE, TRIVIA, type TriviaCategoryId, type TriviaQuestion } from "@/lib/trivia";
 import { claveTrivia, getTexto } from "@/lib/juego-textos";
 import { useJuegoTextos } from "@/lib/use-juego-textos";
+import { LiveDuel, LiveDuelStart, type LiveRound } from "@/components/games/live-duel";
+import { salaDeLaUrl } from "@/lib/use-sala";
 
 export const Route = createFileRoute("/_authenticated/juegos/trivia-duelo")({
   head: () => ({
@@ -35,6 +37,12 @@ function buildDeck(): Q[] {
 
 function TriviaDuel() {
   const [match, setMatch] = useState(0);
+  const { idx: textos } = useJuegoTextos();
+  const [remote, setRemote] = useState<{ code: string; host: boolean } | null>(() => {
+    const c = salaDeLaUrl();
+    return c ? { code: c, host: false } : null;
+  });
+  const theme = { mine: TV.j1, rival: TV.j2, ink: TV.tinta, accent: TV.oro };
   return (
     <>
       <ValidationNotice />
@@ -44,7 +52,34 @@ function TriviaDuel() {
         css={CSS}
         background={`radial-gradient(70% 45% at 50% 0%, #1F4A8F 0%, transparent 70%), ${TV.estudio}`}
       >
-        <Board key={match} onRematch={() => setMatch((m) => m + 1)} />
+        {remote ? (
+          <LiveDuel
+            ns="trivia-duelo"
+            code={remote.code}
+            host={remote.host}
+            path="/juegos/trivia-duelo"
+            title="Duelo de Trivia"
+            target={TARGET}
+            theme={theme}
+            xpRef="trivia-duelo"
+            oneChance
+            buildRounds={(): LiveRound[] =>
+              buildDeck().slice(0, TARGET * 2 + 6).map((q) => ({
+                prompt: q.q,
+                pre: getTexto(textos, "trivia", claveTrivia(q.catId, q.n), "pregunta"),
+                sub: `${q.emoji} ${q.cat}`,
+                options: q.options,
+                answer: q.answer,
+              }))
+            }
+            onExit={() => {
+              setRemote(null);
+              if (window.location.search.includes("sala=")) window.history.replaceState(window.history.state, "", "/juegos/trivia-duelo");
+            }}
+          />
+        ) : (
+          <Board key={match} onRematch={() => setMatch((m) => m + 1)} onRemote={(code, host) => setRemote({ code, host })} theme={theme} />
+        )}
       </GameStage>
     </>
   );
@@ -92,7 +127,7 @@ function Focos() {
   );
 }
 
-function Board({ onRematch }: { onRematch: () => void }) {
+function Board({ onRematch, onRemote, theme }: { onRematch: () => void; onRemote: (code: string, host: boolean) => void; theme: { mine: string; rival: string; ink: string; accent: string } }) {
   const feedback = useGameFeedback();
   const [deck] = useState(buildDeck);
   const { idx: textos } = useJuegoTextos();
@@ -155,9 +190,7 @@ function Board({ onRematch }: { onRematch: () => void }) {
           <button type="button" className="mt-4 h-14 w-full rounded-2xl font-display text-xl font-bold" style={{ background: TV.oro, color: TV.tinta }} onClick={() => setStarted(true)}>
             ¡Empezar duelo!
           </button>
-          <Link to="/juegos/nee-rape" search={{ sala: undefined, sendero: "arandupy" }} className="mt-2 flex h-12 w-full items-center justify-center rounded-2xl text-sm font-semibold ring-1 ring-[#0B1F45]/20">
-            📲 Jugar a distancia (cada uno en su celular)
-          </Link>
+          <LiveDuelStart theme={theme} onStart={onRemote} />
         </div>
       </div>
     );

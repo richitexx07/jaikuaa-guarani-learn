@@ -2,9 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { SpeakerButton } from "@/components/audio/speaker-button";
-import { LessonFilter, NotEnough, pickDistinct, useGameWords } from "@/components/games/game-shell";
+import { LessonFilter, NotEnough, useGameWords } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
-import { ShareResult } from "@/components/games/share-result";
+import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
+import { leccionDeReto, orderedBy, shufflerFor, type Reto } from "@/lib/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ACHEGETY, displayLetter, splitAchegety } from "@/lib/achegety";
 import { playGuarani } from "@/lib/audio";
@@ -30,14 +31,14 @@ const XP_WIN = 15;
 const XP_LOSS = 5;
 
 function Hangman() {
-  const [lesson, setLesson] = useState<number | null>(null);
+  const { reto, seed, otra } = useRetoPartida("ahorcado");
+  const [lesson, setLesson] = useState<number | null>(() => leccionDeReto(reto));
   const q = useGameWords(lesson);
   const pool = useMemo(
     () => (q.data?.words ?? []).filter((w) => !/\s/.test(w.gn.trim()) && splitAchegety(w.gn.trim())),
     [q.data],
   );
-  const [round, setRound] = useState(0);
-  const word = useMemo<GameWord | null>(() => pickDistinct(pool, 1)[0] ?? null, [pool, round]);
+  const word = useMemo<GameWord | null>(() => shufflerFor(seed)(orderedBy(pool, (w) => w.gn))[0] ?? null, [pool, seed]);
 
   return (
     <GameStage
@@ -48,7 +49,7 @@ function Hangman() {
       background={`linear-gradient(180deg, #FBF1DC 0%, #F6E2BC 62%, ${A.madera} 62%, #6E3F18 100%)`}
     >
       <div className="ah-filter flex justify-center">
-        <LessonFilter value={lesson} onChange={setLesson} />
+        <LessonFilter value={lesson} onChange={(v) => { otra(); setLesson(v); }} />
       </div>
       <div className="mt-4">
         {q.isLoading ? (
@@ -56,7 +57,10 @@ function Hangman() {
         ) : !word ? (
           <NotEnough min={1} />
         ) : (
-          <Board key={`${word.gn}-${round}`} word={word} onNext={() => setRound((r) => r + 1)} />
+          <>
+            <RetoBanner reto={reto} className="mb-3" />
+            <Board key={`${word.gn}-${seed}`} word={word} seed={seed} reto={reto} lesson={lesson} onNext={otra} />
+          </>
         )}
       </div>
     </GameStage>
@@ -111,7 +115,7 @@ function Canasta({ quedan }: { quedan: number }) {
   );
 }
 
-function Board({ word, onNext }: { word: GameWord; onNext: () => void }) {
+function Board({ word, seed, reto, lesson, onNext }: { word: GameWord; seed: number; reto: Reto | null; lesson: number | null; onNext: () => void }) {
   const feedback = useGameFeedback();
   const tokens = useMemo(() => splitAchegety(word.gn.trim()) ?? [], [word]);
   const [guessed, setGuessed] = useState<Set<string>>(new Set());
@@ -170,8 +174,8 @@ function Board({ word, onNext }: { word: GameWord; onNext: () => void }) {
           <p className="font-bold" style={{ color: A.verde }}>+{won ? XP_WIN : XP_LOSS} XP</p>
           <div className="flex flex-wrap justify-center gap-2">
             <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: A.rojo }}>Otra palabra</button>
-            {won && <ShareResult text="¡Adiviné una palabra en guaraní en el Ahorcado con chipas de Jaikuaa! ¿Te animás? 🇵🇾" />}
           </div>
+          <RetoFinal juego="ahorcado" seed={seed} puntaje={won ? LIVES - wrong : 0} total={LIVES} reto={reto} extra={lesson === null ? undefined : String(lesson)} />
         </div>
       ) : (
         <div className="grid grid-cols-6 gap-1.5 rounded-3xl p-2 sm:grid-cols-9" style={{ background: "rgba(0,0,0,.18)" }}>

@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shuffle } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
-import { ShareResult } from "@/components/games/share-result";
+import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
+import { shufflerFor } from "@/lib/reto";
+import type { Reto } from "@/lib/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
@@ -55,7 +57,7 @@ function Mazo({ golpe }: { golpe: boolean }) {
 }
 
 function Tekojoja() {
-  const [game, setGame] = useState(0);
+  const { reto, seed, otra } = useRetoPartida("tekojoja");
   const { idx, loading } = useJuegoTextos();
   const all = useMemo(() => applyTekojoja(CASES, idx), [idx]);
   return (
@@ -66,14 +68,14 @@ function Tekojoja() {
       background={`repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 90px), linear-gradient(180deg, ${J.bordo} 0%, ${J.madera} 100%)`}
     >
       <ValidationNotice />
-      {loading ? <p className="py-16 text-center text-sm text-white/70">Preparando el juzgado…</p> : <Court key={game} all={all} onAgain={() => setGame((g) => g + 1)} />}
+      {loading ? <p className="py-16 text-center text-sm text-white/70">Preparando el juzgado…</p> : <><RetoBanner reto={reto} className="mb-3" /><Court key={seed} seed={seed} reto={reto} all={all} onAgain={otra} /></>}
     </GameStage>
   );
 }
 
-function Court({ onAgain, all }: { onAgain: () => void; all: CaseConGn[] }) {
+function Court({ onAgain, all, seed, reto }: { onAgain: () => void; all: CaseConGn[]; seed: number; reto: Reto | null }) {
   const feedback = useGameFeedback();
-  const cases = useMemo(() => shuffle(all).slice(0, ROUNDS), []);
+  const cases = useMemo(() => shufflerFor(seed)(all).slice(0, ROUNDS), []);
   const [i, setI] = useState(0);
   const [pick, setPick] = useState<string | null>(null);
   const [score, setScore] = useState(0);
@@ -106,11 +108,9 @@ function Court({ onAgain, all }: { onAgain: () => void; all: CaseConGn[] }) {
             <span className="tj-sello rotate-[-12deg] rounded-full border-4 px-3 py-2 text-xs font-bold uppercase" style={{ borderColor: J.verde, color: J.verde }}>+{xp} XP</span>
           </div>
         </div>
+        <RetoFinal juego="tekojoja" seed={seed} puntaje={score} total={ROUNDS} reto={reto} />
         <div className="flex flex-wrap justify-center gap-2">
           <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: J.oro, color: J.tinta }}>Nuevos casos</button>
-          <div className="[&_a]:h-12 [&_a]:rounded-2xl [&_a]:border-white/30 [&_a]:bg-transparent [&_a]:text-white">
-            <ShareResult text={`¡Resolví ${score} de ${ROUNDS} casos en el Juzgado de Paz de Jaikuaa! ¿Te animás? 🇵🇾`} />
-          </div>
         </div>
       </section>
     );

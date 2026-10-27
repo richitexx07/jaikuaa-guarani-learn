@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shuffle } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
-import { ShareResult } from "@/components/games/share-result";
+import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
+import type { Reto } from "@/lib/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
@@ -75,10 +76,11 @@ const CSS = `
 `;
 
 function Karaoke() {
-  const [song, setSong] = useState<Song | null>(null);
-  const [run, setRun] = useState(0);
+  const { reto, seed, otra } = useRetoPartida("karaoke");
+  const [songId, setSongId] = useState<string | null>(() => reto?.x ?? null);
   const { idx, loading } = useJuegoTextos();
   const songs = useMemo(() => applyKaraoke(SONGS, idx), [idx]);
+  const song = songs.find((s) => s.id === songId) ?? null;
   return (
     <GameStage
       title="Purahéi Karaoke"
@@ -90,9 +92,12 @@ function Karaoke() {
       {loading ? (
         <p className="py-16 text-center text-sm text-white/70">Afinando el arpa…</p>
       ) : !song ? (
-        <Setlist songs={songs} onPick={setSong} />
+        <Setlist songs={songs} onPick={(s) => setSongId(s.id)} />
       ) : (
-        <Stage key={`${song.id}-${run}`} song={song} onAgain={() => setRun((r) => r + 1)} onBack={() => setSong(null)} />
+        <>
+          <RetoBanner reto={reto?.x === song.id ? reto : null} className="mb-3" />
+          <Stage key={`${song.id}-${seed}`} song={song} seed={seed} reto={reto?.x === song.id ? reto : null} onAgain={otra} onBack={() => { otra(); setSongId(null); }} />
+        </>
       )}
     </GameStage>
   );
@@ -184,7 +189,7 @@ function Setlist({ songs, onPick }: { songs: Song[]; onPick: (s: Song) => void }
   );
 }
 
-function Stage({ song, onAgain, onBack }: { song: Song; onAgain: () => void; onBack: () => void }) {
+function Stage({ song, seed, reto, onAgain, onBack }: { song: Song; seed: number; reto: Reto | null; onAgain: () => void; onBack: () => void }) {
   const feedback = useGameFeedback();
   const beatSec = 60 / song.bpm;
   const lead = 4; // cuenta regresiva
@@ -264,9 +269,7 @@ function Stage({ song, onAgain, onBack }: { song: Song; onAgain: () => void; onB
           <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: K.oro, color: K.noche }}>Cantar de nuevo</button>
           <button type="button" onClick={onBack} className="h-12 rounded-2xl px-6 font-bold ring-1 ring-white/30">Otra canción</button>
         </div>
-        <div className="[&_a]:border-white/30 [&_a]:bg-transparent [&_a]:text-white">
-          <ShareResult text={`¡Canté «${song.title}» en guaraní en Purahéi Karaoke de Jaikuaa! ${perfect}/${song.lines.length} versos perfectos 🇵🇾`} />
-        </div>
+        <RetoFinal juego="karaoke" seed={seed} puntaje={points} total={song.lines.length * 5} reto={reto} extra={song.id} />
       </section>
     );
   }

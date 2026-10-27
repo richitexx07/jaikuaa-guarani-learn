@@ -40,7 +40,7 @@ const GAMES: Game[] = [
 const SHELVES: { title: string; bajada: string; items: CoverId[] }[] = [
   { title: "Cultura paraguaya", bajada: "Música, cocina, cine y fútbol", items: ["karaoke", "tembiu", "taanga", "penales"] },
   { title: "Guaraní para el trabajo", bajada: "Salud y justicia", items: ["consultorio", "tekojoja"] },
-  { title: "De a dos", bajada: "En el mismo celular o a distancia", items: ["nee-rape", "duelo", "trivia-duelo"] },
+  { title: "De a dos", bajada: "En el mismo celular o cada uno en el suyo", items: ["nee-rape", "duelo", "trivia-duelo"] },
   { title: "Clásicos rápidos", bajada: "Cinco minutos por día", items: ["palabra-del-dia", "ahorcado", "sopa-de-letras", "memoria"] },
 ];
 

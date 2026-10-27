@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { LessonFilter, NotEnough, pickDistinct, shuffle, useGameWords } from "@/components/games/game-shell";
+import { LessonFilter, NotEnough, useGameWords } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
 import { Volume2 } from "lucide-react";
-import { ShareResult } from "@/components/games/share-result";
+import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
+import { leccionDeReto, orderedBy, shufflerFor, type Reto } from "@/lib/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
@@ -27,20 +28,20 @@ export const Route = createFileRoute("/_authenticated/juegos/memoria")({
 const PAIRS = 6;
 
 function Memory() {
-  const [lesson, setLesson] = useState<number | null>(null);
+  const { reto, seed, otra } = useRetoPartida("memoria");
+  const [lesson, setLesson] = useState<number | null>(() => leccionDeReto(reto));
   const q = useGameWords(lesson);
-  const [round, setRound] = useState(0);
   const words = useMemo(() => {
     // Traducciones distintas para que cada par sea inequívoco.
     const seenEs = new Set<string>();
-    return pickDistinct(q.data?.words ?? [], 500).filter((w) => {
+    return shufflerFor(seed)(orderedBy(q.data?.words ?? [], (w) => w.gn)).filter((w) => {
       const k = w.es.trim().toLowerCase();
       if (seenEs.has(k)) return false;
       seenEs.add(k);
       return true;
     }).slice(0, PAIRS);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q.data, round]);
+  }, [q.data, seed]);
 
   return (
     <GameStage
@@ -52,7 +53,7 @@ function Memory() {
       <Encaje />
       <div className="relative">
         <div className="mm-filter flex justify-center">
-          <LessonFilter value={lesson} onChange={setLesson} />
+          <LessonFilter value={lesson} onChange={(v) => { otra(); setLesson(v); }} />
         </div>
       </div>
       <div className="relative mt-4">
@@ -61,7 +62,10 @@ function Memory() {
         ) : words.length < PAIRS ? (
           <NotEnough min={PAIRS} />
         ) : (
-          <Board key={round} words={words} onNext={() => setRound((r) => r + 1)} />
+          <>
+            <RetoBanner reto={reto} className="mb-3" />
+            <Board key={seed} words={words} seed={seed} reto={reto} lesson={lesson} onNext={otra} />
+          </>
         )}
       </div>
     </GameStage>
@@ -115,11 +119,11 @@ function Roseton({ color = M.oro, lleno = true, className = "" }: { color?: stri
 
 type Card = { id: number; pair: number; kind: "gn" | "es"; text: string; word: GameWord };
 
-function Board({ words, onNext }: { words: GameWord[]; onNext: () => void }) {
+function Board({ words, seed, reto, lesson, onNext }: { words: GameWord[]; seed: number; reto: Reto | null; lesson: number | null; onNext: () => void }) {
   const feedback = useGameFeedback();
   const cards = useMemo<Card[]>(
     () =>
-      shuffle(
+      shufflerFor(seed, 1)(
         words.flatMap((w, i) => [
           { id: i * 2, pair: i, kind: "gn" as const, text: w.gn, word: w },
           { id: i * 2 + 1, pair: i, kind: "es" as const, text: w.es, word: w },
@@ -216,8 +220,8 @@ function Board({ words, onNext }: { words: GameWord[]; onNext: () => void }) {
           <p className="font-bold" style={{ color: M.verde }}>+{xp} XP</p>
           <div className="flex flex-wrap justify-center gap-2">
             <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: M.tinta }}>Jugar de nuevo</button>
-            <ShareResult text={`¡Completé la Memoria en guaraní de Jaikuaa en ${attempts} intentos! ¿Podés hacerlo en menos? 🇵🇾`} />
           </div>
+          <RetoFinal juego="memoria" seed={seed} puntaje={attempts} total={PAIRS} reto={reto} extra={lesson === null ? undefined : String(lesson)} menosEsMejor unidad="intentos" />
         </div>
       )}
     </div>

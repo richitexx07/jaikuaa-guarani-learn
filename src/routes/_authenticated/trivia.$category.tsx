@@ -18,6 +18,7 @@ import { TRIVIA_ART } from "@/lib/trivia-art";
 import { markSendero } from "@/lib/trivia-sendero";
 import { claveTrivia, getTexto } from "@/lib/juego-textos";
 import { useJuegoTextos } from "@/lib/use-juego-textos";
+import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
 
 export const Route = createFileRoute("/_authenticated/trivia/$category")({
   head: ({ params }) => ({ meta: [{ title: `Jaikuaa — Trivia: ${params.category}` },
@@ -104,6 +105,8 @@ function TriviaQuiz() {
   const navigate = useNavigate();
 
   const [runKey, setRunKey] = useState(0);
+  const { reto, seed, otra } = useRetoPartida("trivia");
+  const retoAqui = reto?.x === category ? reto : null;
   const [idx, setIdx] = useState(0);
   const [phase, setPhase] = useState<Phase>("playing");
   const [selected, setSelected] = useState<number | null>(null);
@@ -272,6 +275,8 @@ function TriviaQuiz() {
                 </div>
               )}
 
+              {idx === 0 && <RetoBanner reto={retoAqui} className="mb-3" />}
+
               {/* Question card */}
               <div key={idx} className="rounded-2xl border border-border/60 bg-card p-5 shadow-elegant animate-fade-in sm:p-7">
                 {preguntaGn && (
@@ -362,15 +367,18 @@ function TriviaQuiz() {
               )}
             </>
           ) : (
+            <>
             <ResultsScreen
               category={cat.title}
               correct={correctCount}
               total={total}
               xp={xpEarned}
               bestStreak={bestStreak}
-              onReplay={reset}
+              onReplay={() => { otra(); reset(); }}
               onChoose={() => navigate({ to: "/trivia" })}
             />
+            <RetoFinal juego="trivia" seed={seed} puntaje={correctCount} total={total} reto={retoAqui} extra={category} className="mt-4" />
+            </>
           )}
         </div>
       </main>
