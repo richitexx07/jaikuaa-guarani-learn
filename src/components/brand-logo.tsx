@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/aranduka-logo.png.asset.json";
+import logoAsset from "@/assets/jaikuaa-logo.png.asset.json";
 import { cn } from "@/lib/utils";
 
 type BrandLogoProps = {
@@ -16,8 +16,7 @@ export function BrandLogo({ className = "", size = 36, withWordmark = true }: Br
         width={size}
         height={size}
         style={{ width: size, height: size }}
-        // En modo oscuro el jaguar (azul marino) se pierde sobre el fondo: le damos una base clara.
-        className="object-contain dark:rounded-lg dark:bg-white dark:p-0.5"
+        className="rounded-[22%] object-contain"
         draggable={false}
       />
       {withWordmark && <span className="text-xl tracking-tight">Jaikuaa</span>}

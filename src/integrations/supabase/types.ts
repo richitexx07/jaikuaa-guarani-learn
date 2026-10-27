@@ -74,6 +74,136 @@ export type Database = {
         }
         Relationships: []
       }
+      aula_docentes: {
+        Row: {
+          created_at: string
+          decidido_at: string | null
+          decidido_por: string | null
+          estado: string
+          institucion: string
+          nota: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decidido_at?: string | null
+          decidido_por?: string | null
+          estado?: string
+          institucion: string
+          nota?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decidido_at?: string | null
+          decidido_por?: string | null
+          estado?: string
+          institucion?: string
+          nota?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      aula_miembros: {
+        Row: {
+          aula_id: string
+          joined_at: string
+          user_id: string
+        }
+        Insert: {
+          aula_id: string
+          joined_at?: string
+          user_id: string
+        }
+        Update: {
+          aula_id?: string
+          joined_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aula_miembros_aula_id_fkey"
+            columns: ["aula_id"]
+            isOneToOne: false
+            referencedRelation: "aulas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      aula_tareas: {
+        Row: {
+          aula_id: string
+          created_at: string
+          created_by: string
+          fecha_limite: string | null
+          id: string
+          nota: string
+          ref: string
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          aula_id: string
+          created_at?: string
+          created_by: string
+          fecha_limite?: string | null
+          id?: string
+          nota?: string
+          ref: string
+          tipo: string
+          titulo: string
+        }
+        Update: {
+          aula_id?: string
+          created_at?: string
+          created_by?: string
+          fecha_limite?: string | null
+          id?: string
+          nota?: string
+          ref?: string
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aula_tareas_aula_id_fkey"
+            columns: ["aula_id"]
+            isOneToOne: false
+            referencedRelation: "aulas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      aulas: {
+        Row: {
+          activa: boolean
+          codigo: string
+          created_at: string
+          docente_id: string
+          id: string
+          institucion: string
+          nombre: string
+        }
+        Insert: {
+          activa?: boolean
+          codigo: string
+          created_at?: string
+          docente_id: string
+          id?: string
+          institucion?: string
+          nombre: string
+        }
+        Update: {
+          activa?: boolean
+          codigo?: string
+          created_at?: string
+          docente_id?: string
+          id?: string
+          institucion?: string
+          nombre?: string
+        }
+        Relationships: []
+      }
       certificates: {
         Row: {
           code: string
@@ -541,6 +671,39 @@ export type Database = {
         }
         Relationships: []
       }
+      juego_textos: {
+        Row: {
+          campo: string
+          clave: string
+          escrito_por: string | null
+          escrito_por_nombre: string | null
+          id: string
+          juego: string
+          texto: string
+          updated_at: string
+        }
+        Insert: {
+          campo: string
+          clave: string
+          escrito_por?: string | null
+          escrito_por_nombre?: string | null
+          id?: string
+          juego: string
+          texto: string
+          updated_at?: string
+        }
+        Update: {
+          campo?: string
+          clave?: string
+          escrito_por?: string | null
+          escrito_por_nombre?: string | null
+          id?: string
+          juego?: string
+          texto?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lesson_words: {
         Row: {
           created_at: string
@@ -702,6 +865,63 @@ export type Database = {
         }
         Relationships: []
       }
+      mostrador_frases: {
+        Row: {
+          audio_by: string | null
+          audio_path: string | null
+          created_at: string
+          es: string
+          gn: string | null
+          gn_at: string | null
+          gn_by: string | null
+          id: string
+          orden: number
+          rubro: string
+          situacion: string
+          status: string
+          tipo: string
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          audio_by?: string | null
+          audio_path?: string | null
+          created_at?: string
+          es: string
+          gn?: string | null
+          gn_at?: string | null
+          gn_by?: string | null
+          id?: string
+          orden?: number
+          rubro: string
+          situacion: string
+          status?: string
+          tipo?: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          audio_by?: string | null
+          audio_path?: string | null
+          created_at?: string
+          es?: string
+          gn?: string | null
+          gn_at?: string | null
+          gn_by?: string | null
+          id?: string
+          orden?: number
+          rubro?: string
+          situacion?: string
+          status?: string
+          tipo?: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: []
+      }
       noticias: {
         Row: {
           cargada_por: string
@@ -849,6 +1069,77 @@ export type Database = {
           referred_user_id?: string
           referrer_id?: string
           xp_awarded?: number
+        }
+        Relationships: []
+      }
+      reto_resultados: {
+        Row: {
+          created_at: string
+          nombre: string | null
+          puntaje: number
+          reto_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          nombre?: string | null
+          puntaje: number
+          reto_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          nombre?: string | null
+          puntaje?: number
+          reto_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reto_resultados_reto_id_fkey"
+            columns: ["reto_id"]
+            isOneToOne: false
+            referencedRelation: "retos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      retos: {
+        Row: {
+          creado_por: string | null
+          creado_por_nombre: string | null
+          created_at: string
+          extra: string | null
+          id: string
+          juego: string
+          menos_es_mejor: boolean
+          semilla: number
+          total: number
+          unidad: string | null
+        }
+        Insert: {
+          creado_por?: string | null
+          creado_por_nombre?: string | null
+          created_at?: string
+          extra?: string | null
+          id: string
+          juego: string
+          menos_es_mejor?: boolean
+          semilla: number
+          total?: number
+          unidad?: string | null
+        }
+        Update: {
+          creado_por?: string | null
+          creado_por_nombre?: string | null
+          created_at?: string
+          extra?: string | null
+          id?: string
+          juego?: string
+          menos_es_mejor?: boolean
+          semilla?: number
+          total?: number
+          unidad?: string | null
         }
         Relationships: []
       }
