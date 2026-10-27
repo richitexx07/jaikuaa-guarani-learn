@@ -29,7 +29,7 @@ export type IntlCopy = {
 const ICONS = [Briefcase, AudioLines, Clock];
 
 export function IntlLanding({ c }: { c: IntlCopy }) {
-  useEffect(() => { if (c.lang !== "zh") setAppLang(c.lang); }, [c.lang]);
+  useEffect(() => { if (c.lang === "pt" || c.lang === "en" || c.lang === "zh") setAppLang(c.lang); }, [c.lang]);
   return (
     <div lang={({ pt: "pt-BR", en: "en", zh: "zh-Hant-TW", de: "de", fr: "fr" } as const)[c.lang]} className="flex min-h-screen flex-col bg-background">
       <header className="w-full border-b border-border/50 bg-background">

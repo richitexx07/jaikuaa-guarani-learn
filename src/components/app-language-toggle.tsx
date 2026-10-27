@@ -24,7 +24,7 @@ export function AppLanguageToggle({ className = "" }: { className?: string }) {
               : "rounded-full px-2 py-0.5 text-muted-foreground hover:text-foreground"
           }
         >
-          {l.toUpperCase()}
+          {l === "zh" ? "中文" : l.toUpperCase()}
         </button>
       ))}
     </div>
