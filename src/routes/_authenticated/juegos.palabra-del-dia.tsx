@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2 } from "lucide-react";
 import { useGameFeedback } from "@/components/games/game-kit";
+import { useGT } from "@/lib/i18n-games";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import { GameStage } from "@/components/games/game-stage";
 import { answerWordOfDay, getWordOfDay, type WordOfDayPackItem } from "@/lib/games.functions";
@@ -108,6 +109,7 @@ async function loadWordOfDay(getFn: () => Promise<WotdView>): Promise<WotdView> 
 
 function WordOfDayContent() {
   const feedback = useGameFeedback();
+  const { g: tr } = useGT();
   const getFn = useServerFn(getWordOfDay);
   const answerFn = useServerFn(answerWordOfDay);
   const qc = useQueryClient();
@@ -170,8 +172,8 @@ function WordOfDayContent() {
       ) : !d.word ? (
         <p className="rounded-2xl bg-white/70 p-5 text-center text-sm">
           {d.missing
-            ? "Sin conexión: la Palabra del día de hoy no está descargada. Con señal, tocá «Descargar para usar sin internet» en tu panel."
-            : "Todavía no hay palabras con audio publicadas."}
+            ? tr("wotdOffline")
+            : tr("wotdNoAudio")}
         </p>
       ) : (
         <div className="space-y-5">
@@ -185,7 +187,7 @@ function WordOfDayContent() {
             <p className="font-display text-7xl font-bold leading-none" style={{ color: D.rojo }}>{fecha!.num}</p>
             <p className="text-sm opacity-70">{fecha!.mes}</p>
             <div className="mx-6 my-4 border-t border-dashed border-[#E8D9BC]" />
-            <p className="text-sm opacity-75">Escuchá la palabra de hoy y elegí qué significa</p>
+            <p className="text-sm opacity-75">{tr("wotdListen")}</p>
             <div className="dd-sol mx-auto mt-4 grid h-24 w-24 place-items-center rounded-full" style={{ background: `radial-gradient(circle at 35% 30%, #FFF1B8, ${D.sol})` }}>
               <SpeakerButton gn={d.word.gn} size="md" className="h-20 w-20 [&_svg]:h-10 [&_svg]:w-10" />
             </div>
@@ -202,7 +204,7 @@ function WordOfDayContent() {
               </span>
             )}
           </div>
-          <p className="text-center text-xs font-medium opacity-70">La misma palabra para todos hoy</p>
+          <p className="text-center text-xs font-medium opacity-70">{tr("wotdSame")}</p>
           <div className="mx-auto grid max-w-md gap-2 sm:grid-cols-2">
             {d.word.options.map((o) => {
               const isAnswer = played && o === played.answer;
@@ -228,14 +230,14 @@ function WordOfDayContent() {
           {played && (
             <div className="mx-auto max-w-md space-y-1 rounded-2xl bg-white/70 p-4 text-center">
               <p className="font-display text-xl font-bold">
-                {played.correct ? "¡Correcto!" : `Era: ${played.answer}`}
+                {played.correct ? tr("correct") : tr("itWas", { a: played.answer })}
               </p>
               {played.correct && <p className="font-bold" style={{ color: D.verde }}>+5 XP</p>}
               {d.offlineAnswer && (
-                <p className="text-xs opacity-70">Sin conexión: tu jugada quedó guardada y se envía cuando vuelva la señal.</p>
+                <p className="text-xs opacity-70">{tr("wotdSaved")}</p>
               )}
-              {played.correct && <div className="pt-1"><ShareResult text="¡Acerté la Palabra del día en guaraní de Jaikuaa! ¿Vos la sabés? 🇵🇾" /></div>}
-              <p className="text-sm opacity-70">Volvé mañana para una palabra nueva.</p>
+              {played.correct && <div className="pt-1"><ShareResult text={tr("wotdShare")} /></div>}
+              <p className="text-sm opacity-70">{tr("wotdTomorrow")}</p>
             </div>
           )}
         </div>
