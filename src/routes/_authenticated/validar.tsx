@@ -355,14 +355,22 @@ function QuickValidatePage() {
               </div>
             </div>
             {word.notes && <p className="mt-4 rounded-xl bg-muted/60 p-3 text-sm text-muted-foreground">{word.notes}</p>}
-            {!word.has_audio && !online && (
+            {!online && (
               <p className="mt-5 rounded-xl border border-dashed border-border p-3 text-sm text-muted-foreground">
-                Todavía no tiene audio. Para grabarlo hace falta señal.
+                {word.has_audio ? "Para grabar o reemplazar la voz hace falta señal." : "Todavía no tiene audio. Para grabarlo hace falta señal."}
               </p>
             )}
-            {!word.has_audio && online && (
-              <div className="mt-5 rounded-xl border border-dashed border-border p-3">
-                <p className="mb-2 text-sm text-muted-foreground">Todavía no tiene audio. Podés grabarlo ahora:</p>
+            {online && (
+              <div
+                className="mt-5 rounded-xl border border-dashed border-border p-3"
+                onPointerDown={(e) => e.stopPropagation()}
+                onPointerUp={(e) => e.stopPropagation()}
+              >
+                <p className="mb-2 text-sm text-muted-foreground">
+                  {word.has_audio
+                    ? "Grabar / Reemplazar voz: tu grabación reemplaza a la anterior."
+                    : "Todavía no tiene audio. Podés grabarlo ahora:"}
+                </p>
                 <WordAudioRecorder
                   wordId={word.id}
                   slug={word.audio_slug}
