@@ -13,8 +13,12 @@ import { GameKit, GameCompanion, GameSoundButton, LaceBackground } from './game-
 import { GameHelp } from './game-help';
 import { SponsorLine } from './sponsor-line';
 import type { SponsorSlot } from '@/lib/sponsor-slots';
+import { gameTitle, useGT } from '@/lib/i18n-games';
+import { useT } from '@/lib/i18n';
 
 export function GameShell({ title, emoji, children, sponsorSlot, companion = true }: { title: string; emoji: string; children: ReactNode; sponsorSlot?: SponsorSlot; companion?: boolean }) {
+  const { lang, g } = useGT();
+  const { t } = useT();
   return (
     <GameKit><div className="game-shell relative isolate flex min-h-screen flex-col bg-background">
       {title !== 'Penales' && <LaceBackground/>}
@@ -23,21 +27,21 @@ export function GameShell({ title, emoji, children, sponsorSlot, companion = tru
           <Link to="/dashboard" className="flex shrink-0 items-center gap-2 font-display text-xl font-bold text-primary">
             <BrandLogo />
           </Link>
-          <nav aria-label="Navegación principal" className="hidden items-center gap-1 md:flex">
-            {([["/dashboard","Aprender"],["/juegos","Juegos"],["/ranking","Ranking"],["/logros","Logros"]] as const).map(([to,label])=>(
+          <nav aria-label={t("nav.main")} className="hidden items-center gap-1 md:flex">
+            {([["/dashboard",t("nav.learn")],["/juegos",t("nav.games")],["/ranking",t("nav.ranking")],["/logros",t("nav.achievements")]] as const).map(([to,label])=>(
               <Link key={to} to={to} activeOptions={{exact:true}} className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-primary" activeProps={{className:"bg-primary/10 text-primary"}}>{label}</Link>
             ))}
           </nav>
           {title === 'Juegos'
-            ? <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary md:hidden">← Tablero</Link>
-            : <Link to="/juegos" className="text-sm font-medium text-muted-foreground hover:text-primary md:hidden">← Juegos</Link>}
+            ? <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary md:hidden">{g("backBoard")}</Link>
+            : <Link to="/juegos" className="text-sm font-medium text-muted-foreground hover:text-primary md:hidden">{g("back")}</Link>}
         </div>
       </header>
       <main className="relative flex-1 px-3 py-2 sm:px-6 sm:py-10">
         <div className={`mx-auto max-w-3xl ${title === 'Juegos' ? 'lg:max-w-6xl' : 'lg:max-w-4xl'}`}>
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:flex-col-reverse sm:items-stretch">
             <h1 className="min-w-0 truncate font-display text-xl font-bold tracking-normal text-foreground sm:text-center sm:text-4xl">
-              <span aria-hidden>{emoji}</span> {title}
+              <span aria-hidden>{emoji}</span> {gameTitle(title, lang)}
             </h1>
             <div className="flex shrink-0 justify-end gap-1 sm:mb-4 sm:gap-2"><GameHelp title={title}/><GameSoundButton/></div>
           </div>
@@ -59,18 +63,19 @@ export function LessonFilter({ value, onChange }: { value: number | null; onChan
     queryFn: () => withOfflineCache(K.lessons, () => fn(), { label: "El curso" }),
   });
   const lessons = (q.data?.lessons ?? []).filter((l) => l.publishedWords > 0);
+  const { g } = useGT();
   return (
     <label className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-      Palabras:
+      {g("words")}
       <select
         className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground"
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
       >
-        <option value="">Todas las palabras</option>
+        <option value="">{g("allWords")}</option>
         {lessons.map((l) => (
           <option key={l.n} value={l.n}>
-            Lección {l.n}: {l.title}
+            {g("lesson")} {l.n}: {l.title}
           </option>
         ))}
       </select>
@@ -130,10 +135,10 @@ export function useIsWide() {
 }
 
 export function NotEnough({ min }: { min: number }) {
+  const { g } = useGT();
   return (
     <p className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
-      No hay suficientes palabras publicadas para este juego (se necesitan {min}). Probá con "Todas las
-      palabras".
+      {g("notEnough", { n: min })}
     </p>
   );
 }

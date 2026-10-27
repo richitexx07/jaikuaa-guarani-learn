@@ -5,6 +5,7 @@ import { GameKit, GameSoundButton } from "./game-kit";
 import { GameHelp } from "./game-help";
 import { SponsorLine } from "./sponsor-line";
 import type { SponsorSlot } from "@/lib/sponsor-slots";
+import { useGT } from "@/lib/i18n-games";
 
 /**
  * Escenario de pantalla completa para los juegos con identidad visual propia
@@ -20,7 +21,7 @@ export function GameStage({
   children,
   wide = false,
   extra,
-  back = { to: "/juegos", label: "← Juegos" },
+  back,
 }: {
   title: string;
   background: string;
@@ -32,13 +33,15 @@ export function GameStage({
   extra?: ReactNode;
   back?: { to: "/juegos" | "/dashboard"; label: string };
 }) {
+  const { g } = useGT();
+  const b = back ?? { to: "/juegos" as const, label: g("back") };
   return (
     <GameKit>
       <div className="game-stage min-h-screen pb-28" style={{ background, color: ink, "--stage-ink": ink } as CSSProperties}>
         <style>{STAGE_CSS + (css ?? "")}</style>
         <header className={`mx-auto flex items-center justify-between gap-2 px-4 py-3 ${wide ? "max-w-6xl" : "max-w-3xl"}`}>
-          <Link to={back.to} className="rounded-md px-2 py-1 text-sm font-medium opacity-80 hover:opacity-100">
-            {back.label}
+          <Link to={b.to} className="rounded-md px-2 py-1 text-sm font-medium opacity-80 hover:opacity-100">
+            {b.label}
           </Link>
           <div className="game-stage-tools flex items-center gap-2">
             {extra}
@@ -62,6 +65,7 @@ export function GameStage({
 function FullscreenButton() {
   const [on, setOn] = useState(false);
   const [can, setCan] = useState(false);
+  const { g } = useGT();
   useEffect(() => {
     setCan(typeof document !== "undefined" && !!document.documentElement.requestFullscreen);
     const h = () => setOn(!!document.fullscreenElement);
@@ -73,8 +77,8 @@ function FullscreenButton() {
     <button
       type="button"
       className="hidden h-10 w-10 items-center justify-center rounded-md border sm:inline-flex"
-      title={on ? "Salir de pantalla completa" : "Pantalla completa"}
-      aria-label={on ? "Salir de pantalla completa" : "Pantalla completa"}
+      title={on ? g("exitFullscreen") : g("fullscreen")}
+      aria-label={on ? g("exitFullscreen") : g("fullscreen")}
       onClick={() => {
         if (document.fullscreenElement) void document.exitFullscreen();
         else void document.documentElement.requestFullscreen().catch(() => {});

@@ -4,6 +4,7 @@ import { COVER_TONE, type CoverId } from "@/components/games/game-covers";
 import { COVER_IMAGE } from "@/components/games/game-cover-images";
 import { useRecordVisit } from "@/lib/gamification";
 import jaiImg from "@/assets/jai-gamer.webp";
+import { GAME_DESC, SHELF_TEXT, gameTitle, useGT } from "@/lib/i18n-games";
 
 export const Route = createFileRoute("/_authenticated/juegos/")({
   head: () => ({
@@ -39,11 +40,11 @@ const GAMES: Game[] = [
   { id: "palabra-del-dia", to: "/juegos/palabra-del-dia", title: "Palabra del día", desc: "Escuchala y elegí su significado.", xp: "5 XP" },
 ];
 
-const SHELVES: { title: string; bajada: string; items: CoverId[] }[] = [
-  { title: "Cultura paraguaya", bajada: "Música, cocina, cine y fútbol", items: ["karaoke", "tembiu", "taanga", "penales"] },
-  { title: "Guaraní para el trabajo", bajada: "Salud, atención al público, campo y justicia", items: ["consultorio", "ventanilla", "chacra", "tekojoja"] },
-  { title: "De a dos", bajada: "En el mismo celular o cada uno en el suyo", items: ["nee-rape", "duelo", "trivia-duelo"] },
-  { title: "Clásicos rápidos", bajada: "Cinco minutos por día", items: ["palabra-del-dia", "ahorcado", "sopa-de-letras", "memoria"] },
+const SHELVES: { key: string; title: string; bajada: string; items: CoverId[] }[] = [
+  { key: "cultura", title: "Cultura paraguaya", bajada: "Música, cocina, cine y fútbol", items: ["karaoke", "tembiu", "taanga", "penales"] },
+  { key: "trabajo", title: "Guaraní para el trabajo", bajada: "Salud, atención al público, campo y justicia", items: ["consultorio", "ventanilla", "chacra", "tekojoja"] },
+  { key: "dos", title: "De a dos", bajada: "En el mismo celular o cada uno en el suyo", items: ["nee-rape", "duelo", "trivia-duelo"] },
+  { key: "clasicos", title: "Clásicos rápidos", bajada: "Cinco minutos por día", items: ["palabra-del-dia", "ahorcado", "sopa-de-letras", "memoria"] },
 ];
 
 const CSS = `
@@ -66,13 +67,14 @@ const byId = (id: CoverId) => GAMES.find((g) => g.id === id)!;
 function GamesHome() {
   useRecordVisit("juegos");
   const destacado = byId("consultorio");
+  const { lang, g } = useGT();
   return (
     <GameStage
       title="Juegos"
       background="radial-gradient(120% 60% at 50% 0%, #1E3A6B 0%, #0D1B33 55%, #0A1426 100%)"
       css={CSS}
       wide
-      back={{ to: "/dashboard", label: "← Tablero" }}
+      back={{ to: "/dashboard", label: g("backBoard") }}
     >
       {/* Marquesina */}
       <section className="relative pt-2 sm:pt-6">
@@ -84,9 +86,9 @@ function GamesHome() {
         <div className="mt-4 grid grid-cols-[auto_1fr] items-center gap-3 sm:gap-8">
           <img src={jaiImg} alt="Jai, el jaguarete" className="vit-jai h-28 w-28 object-contain drop-shadow-2xl sm:h-52 sm:w-52" />
           <div>
-            <h1 className="font-display text-5xl font-bold leading-none tracking-tight sm:text-7xl">Juegos</h1>
+            <h1 className="font-display text-5xl font-bold leading-none tracking-tight sm:text-7xl">{g("games")}</h1>
             <p className="mt-2 text-sm text-white/75 sm:mt-3 sm:text-lg">
-              {GAMES.length} juegos para aprender guaraní jugando, solo o de a dos.
+              {GAMES.length} {g("countSuffix")}
             </p>
           </div>
         </div>
@@ -108,18 +110,18 @@ function GamesHome() {
           />
         </div>
         <div className="flex flex-col justify-center gap-2 p-5 sm:gap-3 sm:p-8">
-          <span className="w-fit rounded-full bg-[#F6C445] px-3 py-1 text-xs font-bold text-[#3A1A05]">Nuevo</span>
-          <h2 className="font-display text-3xl font-bold leading-tight sm:text-4xl">{destacado.title}</h2>
-          <p className="text-white/80">{destacado.desc}</p>
-          <span className="mt-2 inline-flex h-12 w-fit items-center rounded-2xl bg-[#3DE0B0] px-6 font-bold text-[#062A2E]">Empezar el turno</span>
+          <span className="w-fit rounded-full bg-[#F6C445] px-3 py-1 text-xs font-bold text-[#3A1A05]">{g("nuevo")}</span>
+          <h2 className="font-display text-3xl font-bold leading-tight sm:text-4xl">{gameTitle(destacado.title, lang)}</h2>
+          <p className="text-white/80">{GAME_DESC[destacado.id]?.[lang] ?? destacado.desc}</p>
+          <span className="mt-2 inline-flex h-12 w-fit items-center rounded-2xl bg-[#3DE0B0] px-6 font-bold text-[#062A2E]">{g("startShift")}</span>
         </div>
       </Link>
 
       {SHELVES.map((s) => (
         <section key={s.title} className="mt-10">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 className="font-display text-2xl font-bold">{s.title}</h2>
-            <p className="text-sm text-white/60">{s.bajada}</p>
+            <h2 className="font-display text-2xl font-bold">{SHELF_TEXT[s.key]?.title[lang] ?? s.title}</h2>
+            <p className="text-sm text-white/60">{SHELF_TEXT[s.key]?.bajada[lang] ?? s.bajada}</p>
           </div>
           <div className="vit-row -mx-4 mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0">
             {s.items.map((id) => (
@@ -133,6 +135,7 @@ function GamesHome() {
 }
 
 function Cover({ g }: { g: Game }) {
+  const { lang, g: tr } = useGT();
   const tone = COVER_TONE[g.id];
   return (
     <Link
@@ -152,11 +155,11 @@ function Cover({ g }: { g: Game }) {
         />
       </div>
       {g.nuevo && g.id !== "consultorio" && (
-        <span className="absolute left-3 top-3 rounded-full bg-[#F6C445] px-2.5 py-0.5 text-[11px] font-bold text-[#3A1A05]">Nuevo</span>
+        <span className="absolute left-3 top-3 rounded-full bg-[#F6C445] px-2.5 py-0.5 text-[11px] font-bold text-[#3A1A05]">{tr("nuevo")}</span>
       )}
       <div className="flex flex-1 flex-col gap-1 p-4">
-        <h3 className="font-display text-lg font-bold leading-tight">{g.title}</h3>
-        <p className="line-clamp-2 text-sm opacity-80">{g.desc}</p>
+        <h3 className="font-display text-lg font-bold leading-tight">{gameTitle(g.title, lang)}</h3>
+        <p className="line-clamp-2 text-sm opacity-80">{GAME_DESC[g.id]?.[lang] ?? g.desc}</p>
         <p className="mt-auto pt-2 text-xs font-semibold opacity-70">{g.xp}</p>
       </div>
     </Link>
