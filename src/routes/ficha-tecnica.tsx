@@ -7,6 +7,7 @@ import {
   WifiOff,
   Cpu,
   Landmark,
+  Globe,
   Code2,
   Database,
   FlaskConical,
