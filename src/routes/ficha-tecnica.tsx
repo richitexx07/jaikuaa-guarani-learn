@@ -159,7 +159,7 @@ function FichaTecnica() {
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {METRICAS.map((m) => (
               <div key={m.label} className="rounded-xl border border-border bg-background p-4">
-                <m.icon className="h-5 w-5 text-secondary" aria-hidden />
+                <m.icon className="h-5 w-5 text-accent" aria-hidden />
                 <p className="mt-2 font-display text-2xl font-bold text-primary">{m.valor}</p>
                 <p className="text-xs text-muted-foreground">{m.label}</p>
               </div>
@@ -179,7 +179,7 @@ function FichaTecnica() {
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
                 {s.items.map((i) => (
                   <li key={i} className="flex gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" aria-hidden />
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
                     <span>{i}</span>
                   </li>
                 ))}
@@ -188,7 +188,7 @@ function FichaTecnica() {
           ))}
         </div>
 
-        <section className="mt-8 rounded-xl border-l-4 border-secondary bg-muted/50 p-5 print:break-inside-avoid">
+        <section className="mt-8 rounded-xl border-l-4 border-accent bg-muted/50 p-5 print:break-inside-avoid">
           <div className="flex items-center gap-2">
             <Landmark className="h-5 w-5 text-primary" aria-hidden />
             <h2 className="font-display text-lg font-bold">Respaldo institucional</h2>
