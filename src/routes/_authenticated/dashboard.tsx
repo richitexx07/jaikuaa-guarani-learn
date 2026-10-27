@@ -348,6 +348,7 @@ function writeCachedName(name: string) {
 type TeaserKey = "karaoke" | "vivo" | null;
 
 function Dashboard() {
+  const { t } = useT();
   const navigate = useNavigate();
   const [name, setName] = useState<string>(() => readCachedName());
   const [openTeaser, setOpenTeaser] = useState<TeaserKey>(null);
