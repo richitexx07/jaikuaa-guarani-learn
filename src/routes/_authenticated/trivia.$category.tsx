@@ -16,6 +16,8 @@ import { celebrate } from "@/lib/confetti";
 import { cn } from "@/lib/utils";
 import { TRIVIA_ART } from "@/lib/trivia-art";
 import { markSendero } from "@/lib/trivia-sendero";
+import { claveTrivia, getTexto } from "@/lib/juego-textos";
+import { useJuegoTextos } from "@/lib/use-juego-textos";
 
 export const Route = createFileRoute("/_authenticated/trivia/$category")({
   head: ({ params }) => ({ meta: [{ title: `Jaikuaa — Trivia: ${params.category}` },
@@ -119,6 +121,8 @@ function TriviaQuiz() {
 
   const total = cat.questions.length;
   const question = cat.questions[idx];
+  const { idx: textos } = useJuegoTextos();
+  const preguntaGn = getTexto(textos, "trivia", claveTrivia(category, idx), "pregunta");
   const answered = selected !== null || timedOut;
   const correctAnswerText = question.options[question.answer];
 
@@ -270,7 +274,12 @@ function TriviaQuiz() {
 
               {/* Question card */}
               <div key={idx} className="rounded-2xl border border-border/60 bg-card p-5 shadow-elegant animate-fade-in sm:p-7">
-                <h2 className="font-display text-xl font-bold leading-snug text-foreground sm:text-2xl">
+                {preguntaGn && (
+                  <p lang="gn" className="mb-2 font-display text-xl font-bold leading-snug text-primary sm:text-2xl">
+                    {preguntaGn}
+                  </p>
+                )}
+                <h2 className={preguntaGn ? "text-base font-medium leading-snug text-muted-foreground sm:text-lg" : "font-display text-xl font-bold leading-snug text-foreground sm:text-2xl"}>
                   {question.q}
                 </h2>
 

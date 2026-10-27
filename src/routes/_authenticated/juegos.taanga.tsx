@@ -6,6 +6,9 @@ import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
+import { SCENES, type Scene } from "@/lib/juegos-contenido";
+import { applyTaanga } from "@/lib/juego-textos";
+import { useJuegoTextos } from "@/lib/use-juego-textos";
 
 export const Route = createFileRoute("/_authenticated/juegos/taanga")({
   head: () => ({
@@ -21,17 +24,6 @@ export const Route = createFileRoute("/_authenticated/juegos/taanga")({
   component: Taanga,
 });
 
-// Frases básicas PENDIENTES de validación docente (se muestra ValidationNotice).
-type Scene = { place: string; who: string; es: string; before: string; after: string; ok: string; wrong: string[] };
-const SCENES: Scene[] = [
-  { place: "Mercado 4 · Día", who: "Doña Rosa", es: "Saluda a su clienta de siempre.", before: "¡", after: ", che amiga!", ok: "Mba'éichapa", wrong: ["Jajotopata", "Ndaipóri", "Aguyje"] },
-  { place: "Parada de colectivo · Noche", who: "Juan", es: "Agradece al chofer que lo esperó.", before: "¡", after: " ndéve, che ra'a!", ok: "Aguyje", wrong: ["Mba'éichapa", "Jaha", "Ajepa"] },
-  { place: "Chacra · Amanecer", who: "Abuelo", es: "Llama a su nieto para tomar tereré.", before: "Ejúna, ", after: ", ja'u tereré.", ok: "che memby", wrong: ["kesu", "y", "pira"] },
-  { place: "Cancha del barrio · Tarde", who: "Hinchada", es: "Invita al equipo a irse juntos.", before: "¡", after: ", ñande róga gotyo!", ok: "Jaha", wrong: ["Aguyje", "Mba'e", "Kesu"] },
-  { place: "Cocina · Mediodía", who: "Mamá", es: "Pregunta si quieren chipa.", before: "¿Pereipota ", after: "?", ok: "chipa", wrong: ["y", "kuarahy", "jagua"] },
-  { place: "Despedida · Puerto", who: "Ana", es: "Se despide hasta el próximo encuentro.", before: "¡", after: " ambuéve!", ok: "Jajotopata", wrong: ["Mba'éichapa", "Aguyje", "Jaha"] },
-  { place: "Escuela · Mañana", who: "Profe", es: "Responde que está bien.", before: "Iporã, ", after: ".", ok: "aguyje", wrong: ["kesu", "pira", "jaha"] },
-];
 const ROUNDS = 5;
 
 /* Paleta del set: carbón, luz de tungsteno, rojo de grabación y papel de guion. */
@@ -63,6 +55,8 @@ const CSS = `
 
 function Taanga() {
   const [game, setGame] = useState(0);
+  const { idx, loading } = useJuegoTextos();
+  const all = useMemo(() => applyTaanga(SCENES, idx), [idx]);
   return (
     <GameStage
       title="Ta'anga · Claqueta"
@@ -71,7 +65,7 @@ function Taanga() {
       background={`radial-gradient(70% 45% at 85% 0%, rgba(244,192,78,.22) 0%, transparent 70%), ${F.carbon}`}
     >
       <ValidationNotice />
-      <Set key={game} onAgain={() => setGame((g) => g + 1)} />
+      {loading ? <p className="py-16 text-center text-sm opacity-70">Preparando el set…</p> : <Set key={game} all={all} onAgain={() => setGame((g) => g + 1)} />}
     </GameStage>
   );
 }
@@ -102,9 +96,9 @@ function Claqueta({ escena, toma, lugar, cerrada }: { escena: number; toma: numb
   );
 }
 
-function Set({ onAgain }: { onAgain: () => void }) {
+function Set({ onAgain, all }: { onAgain: () => void; all: Scene[] }) {
   const feedback = useGameFeedback();
-  const scenes = useMemo(() => shuffle(SCENES).slice(0, ROUNDS), []);
+  const scenes = useMemo(() => shuffle(all).slice(0, ROUNDS), []);
   const [i, setI] = useState(0);
   const [pick, setPick] = useState<string | null>(null);
   const [score, setScore] = useState(0);

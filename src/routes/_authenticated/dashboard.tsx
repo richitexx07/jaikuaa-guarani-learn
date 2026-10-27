@@ -95,6 +95,7 @@ function StaffShortcuts() {
       </Link>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         <StaffLink to="/validar" icon={Zap} label="Validación rápida" />
+        <StaffLink to="/docente/juegos" icon={Gamepad2} label="Guaraní de los juegos" />
         <StaffLink to="/cuaderno" icon={NotebookPen} label="Cuaderno digital del aula" />
         <StaffLink to="/mostrador/editar" icon={Stethoscope} label="Frases del mostrador" />
         <StaffLink to="/aula/docente" icon={School} label="Mis aulas" />

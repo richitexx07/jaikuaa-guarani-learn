@@ -6,6 +6,9 @@ import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
+import { CASES } from "@/lib/juegos-contenido";
+import { applyTekojoja, type CaseConGn } from "@/lib/juego-textos";
+import { useJuegoTextos } from "@/lib/use-juego-textos";
 
 export const Route = createFileRoute("/_authenticated/juegos/tekojoja")({
   head: () => ({
@@ -21,19 +24,6 @@ export const Route = createFileRoute("/_authenticated/juegos/tekojoja")({
   component: Tekojoja,
 });
 
-// Casos redactados en castellano como borrador. Los términos en guaraní NO se inventan:
-// quedan vacíos hasta que la Facultad de Derecho (UNA) / ISL los carguen y validen en el corpus.
-type Case = { emoji: string; story: string; answer: string; wrong: string[]; why: string };
-const CASES: Case[] = [
-  { emoji: "🐄", story: "Las vacas de Don Ramón entran cada semana a la chacra de su vecina y le comen el maíz.", answer: "Daños y perjuicios", wrong: ["Divorcio", "Herencia"], why: "Quien es dueño de los animales responde por el daño que causan." },
-  { emoji: "🧱", story: "Dos vecinos discuten porque uno corrió el alambrado dos metros dentro del terreno del otro.", answer: "Conflicto de linderos", wrong: ["Contrato de alquiler", "Pensión alimentaria"], why: "Los límites se prueban con título, plano y mensura." },
-  { emoji: "👶", story: "Una madre pide que el padre de su hijo aporte dinero cada mes para su crianza.", answer: "Asistencia alimentaria", wrong: ["Desalojo", "Usucapión"], why: "Los padres deben asistir a sus hijos según sus posibilidades." },
-  { emoji: "🏠", story: "El inquilino no paga hace seis meses y el dueño quiere recuperar su casa.", answer: "Desalojo", wrong: ["Adopción", "Linderos"], why: "Se tramita ante el juez; nadie puede sacar a otro por la fuerza." },
-  { emoji: "🤝", story: "Dos vecinas peleadas se sientan con el juez de paz y firman un acuerdo para convivir en paz.", answer: "Conciliación", wrong: ["Condena", "Embargo"], why: "La conciliación evita un juicio largo." },
-  { emoji: "📜", story: "Un abuelo falleció y sus hijos deben repartir la casa y el terreno.", answer: "Sucesión", wrong: ["Desalojo", "Amparo"], why: "La sucesión define quiénes heredan y qué le toca a cada uno." },
-  { emoji: "🗣️", story: "Una persona que solo habla guaraní debe declarar ante un tribunal.", answer: "Derecho a intérprete", wrong: ["Embargo", "Fianza"], why: "Nadie puede ser juzgado en un idioma que no entiende." },
-  { emoji: "💰", story: "Juan prestó dinero con un pagaré firmado y el deudor no le devuelve.", answer: "Cobro de guaraníes", wrong: ["Adopción", "Linderos"], why: "El pagaré firmado sirve como prueba de la deuda." },
-];
 const ROUNDS = 5;
 
 /* Sala del juzgado: bordó y madera, carpeta de expediente y sellos dorados. */
@@ -66,6 +56,8 @@ function Mazo({ golpe }: { golpe: boolean }) {
 
 function Tekojoja() {
   const [game, setGame] = useState(0);
+  const { idx, loading } = useJuegoTextos();
+  const all = useMemo(() => applyTekojoja(CASES, idx), [idx]);
   return (
     <GameStage
       title="Tekojoja · Juzgado de Paz"
@@ -74,14 +66,14 @@ function Tekojoja() {
       background={`repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 90px), linear-gradient(180deg, ${J.bordo} 0%, ${J.madera} 100%)`}
     >
       <ValidationNotice />
-      <Court key={game} onAgain={() => setGame((g) => g + 1)} />
+      {loading ? <p className="py-16 text-center text-sm text-white/70">Preparando el juzgado…</p> : <Court key={game} all={all} onAgain={() => setGame((g) => g + 1)} />}
     </GameStage>
   );
 }
 
-function Court({ onAgain }: { onAgain: () => void }) {
+function Court({ onAgain, all }: { onAgain: () => void; all: CaseConGn[] }) {
   const feedback = useGameFeedback();
-  const cases = useMemo(() => shuffle(CASES).slice(0, ROUNDS), []);
+  const cases = useMemo(() => shuffle(all).slice(0, ROUNDS), []);
   const [i, setI] = useState(0);
   const [pick, setPick] = useState<string | null>(null);
   const [score, setScore] = useState(0);
@@ -151,7 +143,10 @@ function Court({ onAgain }: { onAgain: () => void }) {
           <div className="mt-3 rounded p-4" style={{ background: J.papel }}>
             <div className="flex gap-3">
               <span className="text-4xl" aria-hidden>{c.emoji}</span>
-              <p className="text-lg leading-relaxed">{c.story}</p>
+              <div className="min-w-0">
+                {c.storyGn && <p lang="gn" className="mb-2 font-display text-lg font-bold leading-relaxed">{c.storyGn}</p>}
+                <p className={c.storyGn ? "text-base leading-relaxed opacity-80" : "text-lg leading-relaxed"}>{c.story}</p>
+              </div>
             </div>
           </div>
           {pick && (
@@ -179,7 +174,14 @@ function Court({ onAgain }: { onAgain: () => void }) {
         <div className="space-y-3">
           <div className="rounded-2xl p-4 text-sm" style={{ background: "rgba(0,0,0,.25)" }}>
             <p>{c.why}</p>
-            <p className="mt-2 text-xs text-white/60">Término en guaraní: pendiente de carga y validación por especialistas en derecho.</p>
+            {c.answerGn ? (
+              <p className="mt-2">
+                Término en guaraní: <b lang="gn" className="font-display text-base" style={{ color: J.oro }}>{c.answerGn}</b>
+                <span className="mt-1 block text-xs text-white/60">Escrito por docentes especialistas.</span>
+              </p>
+            ) : (
+              <p className="mt-2 text-xs text-white/60">Término en guaraní: pendiente de carga y validación por especialistas en derecho.</p>
+            )}
           </div>
           <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold" style={{ background: J.oro, color: J.tinta }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
             {i + 1 === ROUNDS ? "Ver la resolución" : "Siguiente caso"}

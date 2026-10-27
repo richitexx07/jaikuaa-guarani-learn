@@ -6,6 +6,9 @@ import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
+import { SONGS, type Song } from "@/lib/juegos-contenido";
+import { applyKaraoke } from "@/lib/juego-textos";
+import { useJuegoTextos } from "@/lib/use-juego-textos";
 import { Mic, Square, Play } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/juegos/karaoke")({
@@ -21,43 +24,6 @@ export const Route = createFileRoute("/_authenticated/juegos/karaoke")({
   }),
   component: Karaoke,
 });
-
-// Versos de práctica originales de Jaikuaa, PENDIENTES de validación docente.
-// Cada palabra dura 1 tiempo; "gap" marca la palabra que el jugador completa.
-type Line = { words: string[]; es: string; gap: number; wrong: string[] };
-type Song = { id: string; title: string; style: string; bpm: number; chords: number[][]; lines: Line[] };
-const SONGS: Song[] = [
-  {
-    id: "mbaeichapa", title: "Mba'éichapa, che irũ", style: "Polca alegre", bpm: 104,
-    chords: [[196, 247, 294], [262, 330, 392], [294, 370, 440], [196, 247, 294]],
-    lines: [
-      { words: ["Mba'éichapa", "che", "irũ"], es: "¿Cómo estás, mi amigo?", gap: 2, wrong: ["róga", "mba'e"] },
-      { words: ["Iporã", "ko", "ára"], es: "Lindo es este día", gap: 2, wrong: ["pyhare", "ka'aru"] },
-      { words: ["Jajapo", "ñande", "tembiapo"], es: "Hagamos nuestro trabajo", gap: 1, wrong: ["che", "nde"] },
-      { words: ["Aguyje", "ndéve", "che", "irũ"], es: "Gracias a vos, mi amigo", gap: 0, wrong: ["Mba'e", "Ko'ẽ"] },
-    ],
-  },
-  {
-    id: "koe", title: "Ko'ẽ porã", style: "Guarania suave", bpm: 76,
-    chords: [[220, 262, 330], [175, 220, 262], [262, 330, 392], [196, 247, 294]],
-    lines: [
-      { words: ["Ko'ẽ", "porã", "che", "retã"], es: "Buen día, mi patria", gap: 3, wrong: ["róga", "sy"] },
-      { words: ["Kuarahy", "ohesape"], es: "El sol ilumina", gap: 0, wrong: ["Jasy", "Y"] },
-      { words: ["Ñe'ẽ", "porã", "ñañe'ẽ"], es: "Hablemos lindo", gap: 0, wrong: ["Ka'a", "Óga"] },
-      { words: ["Guaraní", "che", "korasõ"], es: "Guaraní, mi corazón", gap: 2, wrong: ["akã", "po"] },
-    ],
-  },
-  {
-    id: "terere", title: "Tereré jahupy", style: "Galopa", bpm: 116,
-    chords: [[262, 330, 392], [349, 440, 523], [392, 494, 587], [262, 330, 392]],
-    lines: [
-      { words: ["Ejú", "ejú", "che", "irũ"], es: "Vení, vení, mi amigo", gap: 0, wrong: ["Aha", "Eke"] },
-      { words: ["Jaha", "jaykue", "yvyra", "guýpe"], es: "Vamos a sentarnos bajo el árbol", gap: 2, wrong: ["óga", "yvága"] },
-      { words: ["Y", "ro'ysã", "ha", "pohã"], es: "Agua fresca y yuyos", gap: 1, wrong: ["haku", "porã"] },
-      { words: ["Javy'a", "ñande", "aty"], es: "Alegres en nuestra reunión", gap: 0, wrong: ["Jahupy", "Japyta"] },
-    ],
-  },
-];
 
 class Arpa {
   ctx: AudioContext | null = null;
@@ -111,6 +77,8 @@ const CSS = `
 function Karaoke() {
   const [song, setSong] = useState<Song | null>(null);
   const [run, setRun] = useState(0);
+  const { idx, loading } = useJuegoTextos();
+  const songs = useMemo(() => applyKaraoke(SONGS, idx), [idx]);
   return (
     <GameStage
       title="Purahéi Karaoke"
@@ -119,8 +87,10 @@ function Karaoke() {
       background={`radial-gradient(90% 55% at 50% 0%, #4A1F7A 0%, ${K.violeta} 45%, ${K.noche} 100%)`}
     >
       <ValidationNotice />
-      {!song ? (
-        <Setlist onPick={setSong} />
+      {loading ? (
+        <p className="py-16 text-center text-sm text-white/70">Afinando el arpa…</p>
+      ) : !song ? (
+        <Setlist songs={songs} onPick={setSong} />
       ) : (
         <Stage key={`${song.id}-${run}`} song={song} onAgain={() => setRun((r) => r + 1)} onBack={() => setSong(null)} />
       )}
@@ -170,7 +140,7 @@ function Reflectores({ beat }: { beat: number }) {
   );
 }
 
-function Setlist({ onPick }: { onPick: (s: Song) => void }) {
+function Setlist({ songs, onPick }: { songs: Song[]; onPick: (s: Song) => void }) {
   return (
     <section className="pt-2">
       <div className="relative overflow-hidden rounded-3xl ring-1 ring-white/10" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.45))" }}>
@@ -186,7 +156,7 @@ function Setlist({ onPick }: { onPick: (s: Song) => void }) {
       </div>
       <h2 className="mt-8 font-display text-xl font-bold">Elegí la canción</h2>
       <div className="mt-3 space-y-3">
-        {SONGS.map((s) => (
+        {songs.map((s) => (
           <button
             key={s.id}
             type="button"

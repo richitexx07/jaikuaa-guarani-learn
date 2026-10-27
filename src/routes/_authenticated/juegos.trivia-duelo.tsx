@@ -7,7 +7,9 @@ import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
-import { ROULETTE, TRIVIA, type TriviaQuestion } from "@/lib/trivia";
+import { ROULETTE, TRIVIA, type TriviaCategoryId, type TriviaQuestion } from "@/lib/trivia";
+import { claveTrivia, getTexto } from "@/lib/juego-textos";
+import { useJuegoTextos } from "@/lib/use-juego-textos";
 
 export const Route = createFileRoute("/_authenticated/juegos/trivia-duelo")({
   head: () => ({
@@ -25,10 +27,10 @@ export const Route = createFileRoute("/_authenticated/juegos/trivia-duelo")({
 
 const TARGET = 5;
 const NEXT_MS = 1800;
-type Q = TriviaQuestion & { cat: string; emoji: string };
+type Q = TriviaQuestion & { cat: string; emoji: string; catId: TriviaCategoryId; n: number };
 
 function buildDeck(): Q[] {
-  return shuffle(ROULETTE.flatMap((id) => TRIVIA[id].questions.map((q) => ({ ...q, cat: TRIVIA[id].title, emoji: TRIVIA[id].emoji }))));
+  return shuffle(ROULETTE.flatMap((id) => TRIVIA[id].questions.map((q, n) => ({ ...q, cat: TRIVIA[id].title, emoji: TRIVIA[id].emoji, catId: id, n }))));
 }
 
 function TriviaDuel() {
@@ -93,6 +95,7 @@ function Focos() {
 function Board({ onRematch }: { onRematch: () => void }) {
   const feedback = useGameFeedback();
   const [deck] = useState(buildDeck);
+  const { idx: textos } = useJuegoTextos();
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState<[number, number]>([0, 0]);
   // Respuesta de cada jugador en esta pregunta (índice o null)
@@ -183,7 +186,7 @@ function Board({ onRematch }: { onRematch: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col overflow-hidden" style={{ background: TV.estudio }}>
-      <Half p={1} q={q} pick={picks[1]} winner={winner} onPick={pick} rotated />
+      <Half p={1} q={q} gn={q ? getTexto(textos, "trivia", claveTrivia(q.catId, q.n), "pregunta") : undefined} pick={picks[1]} winner={winner} onPick={pick} rotated />
       <div className="relative shrink-0 px-2 py-2 text-white" style={{ background: TV.estudio }}>
         <div className="flex items-center justify-between gap-2">
           <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" onClick={onRematch} aria-label="Salir del duelo"><X /></button>
@@ -198,13 +201,13 @@ function Board({ onRematch }: { onRematch: () => void }) {
         </div>
         {winner !== null && <p className="px-2 pb-1 pt-1 text-center text-xs text-white/90">{q.explanation}</p>}
       </div>
-      <Half p={0} q={q} pick={picks[0]} winner={winner} onPick={pick} />
+      <Half p={0} q={q} gn={q ? getTexto(textos, "trivia", claveTrivia(q.catId, q.n), "pregunta") : undefined} pick={picks[0]} winner={winner} onPick={pick} />
     </div>
   );
 }
 
-function Half({ p, q, pick, winner, onPick, rotated }: {
-  p: 0 | 1; q: Q; pick: number | null; winner: 0 | 1 | "none" | null;
+function Half({ p, q, gn, pick, winner, onPick, rotated }: {
+  p: 0 | 1; q: Q; gn?: string; pick: number | null; winner: 0 | 1 | "none" | null;
   onPick: (p: 0 | 1, o: number) => void; rotated?: boolean;
 }) {
   const won = winner === p;
@@ -219,7 +222,8 @@ function Half({ p, q, pick, winner, onPick, rotated }: {
         <span>Jugador {p + 1}</span>
         <span className="rounded-full bg-black/20 px-3 py-0.5">{status}</span>
       </div>
-      <div className="text-center font-display text-lg font-bold leading-snug sm:text-xl">{q.q}</div>
+      {gn && <div lang="gn" className="text-center font-display text-lg font-bold leading-snug sm:text-xl">{gn}</div>}
+      <div className={gn ? "text-center text-sm leading-snug text-white/85" : "text-center font-display text-lg font-bold leading-snug sm:text-xl"}>{q.q}</div>
       <div className="grid grid-cols-2 gap-2">
         {q.options.map((o, i) => {
           const reveal = winner !== null && i === q.answer;

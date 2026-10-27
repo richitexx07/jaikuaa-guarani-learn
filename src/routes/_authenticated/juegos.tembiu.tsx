@@ -6,6 +6,9 @@ import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
+import { DISHES, ING, type Dish } from "@/lib/juegos-contenido";
+import { applyTembiu } from "@/lib/juego-textos";
+import { useJuegoTextos } from "@/lib/use-juego-textos";
 
 export const Route = createFileRoute("/_authenticated/juegos/tembiu")({
   head: () => ({
@@ -21,40 +24,6 @@ export const Route = createFileRoute("/_authenticated/juegos/tembiu")({
   component: Tembiu,
 });
 
-// Términos en guaraní PENDIENTES de validación docente (se muestra ValidationNotice).
-const ING: Record<string, { gn: string; es: string; emoji: string }> = {
-  avatiKui: { gn: "Avati ku'i", es: "Harina de maíz", emoji: "🌾" },
-  avatiKy: { gn: "Avati ky", es: "Choclo", emoji: "🌽" },
-  kesu: { gn: "Kesu", es: "Queso", emoji: "🧀" },
-  sevoi: { gn: "Sevói", es: "Cebolla", emoji: "🧅" },
-  kamby: { gn: "Kamby", es: "Leche", emoji: "🥛" },
-  rupia: { gn: "Ryguasu rupi'a", es: "Huevo", emoji: "🥚" },
-  aramiro: { gn: "Aramirõ", es: "Almidón", emoji: "🥣" },
-  nandy: { gn: "Ñandy", es: "Grasa", emoji: "🫙" },
-  juky: { gn: "Juky", es: "Sal", emoji: "🧂" },
-  ryguasu: { gn: "Ryguasu ro'o", es: "Gallina", emoji: "🐔" },
-  mandio: { gn: "Mandi'o", es: "Mandioca", emoji: "🍠" },
-  soo: { gn: "So'o", es: "Carne", emoji: "🥩" },
-  andai: { gn: "Andai", es: "Zapallo", emoji: "🎃" },
-  asuka: { gn: "Asuka", es: "Azúcar", emoji: "🍬" },
-  pira: { gn: "Pira", es: "Pescado", emoji: "🐟" },
-  kumanda: { gn: "Kumanda", es: "Poroto", emoji: "🫘" },
-  pakova: { gn: "Pakova", es: "Banana", emoji: "🍌" },
-  eira: { gn: "Eíra", es: "Miel", emoji: "🍯" },
-  y: { gn: "Y", es: "Agua", emoji: "💧" },
-  narã: { gn: "Narã", es: "Naranja", emoji: "🍊" },
-};
-type Dish = { name: string; emoji: string; info: string; ok: string[] };
-const DISHES: Dish[] = [
-  { name: "Sopa paraguaya", emoji: "🥮", info: "La única sopa sólida del mundo.", ok: ["avatiKui", "kesu", "sevoi", "kamby", "rupia"] },
-  { name: "Chipa guasu", emoji: "🌽", info: "Se hace con avati ky (choclo fresco).", ok: ["avatiKy", "kesu", "sevoi", "kamby", "rupia"] },
-  { name: "Mbeju", emoji: "🫓", info: "Torta de aramirõ dorada en la sartén.", ok: ["aramiro", "kesu", "nandy", "kamby", "juky"] },
-  { name: "Vori vori", emoji: "🍲", info: "Caldo con bolitas de avati ku'i y kesu.", ok: ["ryguasu", "avatiKui", "kesu", "sevoi", "juky"] },
-  { name: "Chipa", emoji: "🥯", info: "Infaltable en Semana Santa.", ok: ["aramiro", "kesu", "rupia", "nandy", "kamby"] },
-  { name: "Pastel mandi'o", emoji: "🥟", info: "Empanada de masa de mandi'o.", ok: ["mandio", "soo", "sevoi", "rupia", "avatiKui"] },
-  { name: "Kiveve", emoji: "🎃", info: "Crema dulce y salada de andai.", ok: ["andai", "avatiKui", "kesu", "kamby", "asuka"] },
-];
-const ALL = Object.keys(ING);
 const ROUNDS = 5;
 
 /* Paleta de la cocina: barro, adobe, papel de comanda, ocre del maíz y brasa de tatakua. */
@@ -77,6 +46,8 @@ const CSS = `
 
 function Tembiu() {
   const [game, setGame] = useState(0);
+  const { idx, loading } = useJuegoTextos();
+  const ing = useMemo(() => applyTembiu(ING, idx), [idx]);
   return (
     <GameStage
       title="Tembi'u Paraguái"
@@ -85,13 +56,13 @@ function Tembiu() {
       background={`radial-gradient(80% 40% at 50% 100%, #C2552B 0%, transparent 70%), repeating-linear-gradient(0deg, transparent 0 34px, rgba(0,0,0,.08) 34px 36px), linear-gradient(180deg, ${T.adobe} 0%, ${T.barro} 55%, ${T.oscuro} 100%)`}
     >
       <ValidationNotice />
-      <Kitchen key={game} onAgain={() => setGame((g) => g + 1)} />
+      {loading ? <p className="py-16 text-center text-sm opacity-70">Preparando la cocina…</p> : <Kitchen key={game} ing={ing} onAgain={() => setGame((g) => g + 1)} />}
     </GameStage>
   );
 }
 
 /** La olla de barro sobre la brasa. Los ingredientes elegidos caen adentro. */
-function Olla({ picked, hot }: { picked: string[]; hot: boolean }) {
+function Olla({ picked, hot, ing }: { picked: string[]; hot: boolean; ing: typeof ING }) {
   return (
     <div className="relative mx-auto w-64 sm:w-80">
       <svg viewBox="0 0 260 200" className="w-full" aria-hidden>
@@ -125,14 +96,14 @@ function Olla({ picked, hot }: { picked: string[]; hot: boolean }) {
       </svg>
       <div className="pointer-events-none absolute inset-x-12 top-[22%] flex h-12 items-end justify-center gap-1 text-3xl sm:text-4xl">
         {picked.map((k) => (
-          <span key={k} className="tb-drop drop-shadow">{ING[k].emoji}</span>
+          <span key={k} className="tb-drop drop-shadow">{ing[k]?.emoji}</span>
         ))}
       </div>
     </div>
   );
 }
 
-function Kitchen({ onAgain }: { onAgain: () => void }) {
+function Kitchen({ onAgain, ing }: { onAgain: () => void; ing: typeof ING }) {
   const feedback = useGameFeedback();
   const dishes = useMemo(() => shuffle(DISHES).slice(0, ROUNDS), []);
   const [i, setI] = useState(0);
@@ -143,9 +114,9 @@ function Kitchen({ onAgain }: { onAgain: () => void }) {
   const dish = dishes[i];
   const options = useMemo(() => {
     if (!dish) return [];
-    const wrong = shuffle(ALL.filter((x) => !dish.ok.includes(x))).slice(0, 4);
+    const wrong = shuffle(Object.keys(ing).filter((x) => !dish.ok.includes(x))).slice(0, 4);
     return shuffle([...dish.ok, ...wrong]);
-  }, [dish]);
+  }, [dish, ing]);
   const done = i >= ROUNDS;
   const xp = Math.min(20, score * 4);
   const recorded = useRef(false);
@@ -225,7 +196,7 @@ function Kitchen({ onAgain }: { onAgain: () => void }) {
           </div>
         </div>
         <div>
-          <Olla picked={picked} hot={picked.length > 0} />
+          <Olla picked={picked} ing={ing} hot={picked.length > 0} />
           <div className="mt-1 flex items-center justify-center gap-2">
             {Array.from({ length: 5 }, (_, k) => (
               <span key={k} className="h-3 w-3 rounded-full ring-2 ring-white/50" style={{ background: k < picked.length ? T.ocre : "transparent" }} />
@@ -255,9 +226,9 @@ function Kitchen({ onAgain }: { onAgain: () => void }) {
               className="tb-pick relative flex min-h-28 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-center"
               style={{ background: T.papel, color: T.tinta, boxShadow: `0 0 0 4px ${ring}, 0 8px 18px -10px rgba(0,0,0,.6)`, opacity: checked && !right && !on ? 0.45 : 1 }}
             >
-              <span className="grid h-12 w-12 place-items-center rounded-full text-3xl" style={{ background: "#F3DFC0" }} aria-hidden>{ING[x].emoji}</span>
-              <b className="text-sm leading-tight sm:text-base">{ING[x].gn}</b>
-              <span className="text-[11px] leading-tight opacity-70">{ING[x].es}</span>
+              <span className="grid h-12 w-12 place-items-center rounded-full text-3xl" style={{ background: "#F3DFC0" }} aria-hidden>{ing[x]?.emoji}</span>
+              <b className="text-sm leading-tight sm:text-base">{ing[x]?.gn}</b>
+              <span className="text-[11px] leading-tight opacity-70">{ing[x]?.es}</span>
               {on && !checked && <span className="absolute right-2 top-2 grid h-5 w-5 place-items-center rounded-full text-xs font-bold" style={{ background: T.ocre }}>✓</span>}
             </button>
           );

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { AlertTriangle, Award, Check, Copy, GraduationCap, Hand, Loader2, NotebookPen, RefreshCw, Smartphone, X, Zap, type LucideIcon } from "lucide-react";
+import { AlertTriangle, Award, Check, Copy, Gamepad2, GraduationCap, Hand, Loader2, NotebookPen, RefreshCw, Smartphone, X, Zap, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StaffRequestCard } from "@/components/pilot/staff-request-card";
@@ -96,7 +96,7 @@ function useWarmOffline() {
   useEffect(() => {
     if (!navigator.onLine) return;
     const t = setTimeout(() => {
-      void warmPages(["/docente", "/validar", "/docente/constancia", "/cuaderno"]);
+      void warmPages(["/docente", "/validar", "/docente/juegos", "/docente/constancia", "/cuaderno"]);
       void qc.prefetchQuery({
         queryKey: ["quick-validate"],
         queryFn: () => withOfflineCache("validation-queue", () => listFn()),
@@ -149,6 +149,14 @@ function TeacherHome() {
           unit={d.pending.words === 1 ? "palabra esperando" : "palabras esperando"}
           sub={d.pending.wordsInLessons ? `${d.pending.wordsInLessons} son de las lecciones` : "Una por pantalla, con audio"}
           strong
+        />
+        <Tile
+          to="/docente/juegos"
+          icon={Gamepad2}
+          title="Guaraní de los juegos"
+          main={null}
+          unit=""
+          sub="Preguntados, Karaoke, Tembi'u, Ta'anga y Tekojoja. Lo que guardás aparece en el juego."
         />
         <Tile
           to="/validacion"
@@ -413,7 +421,7 @@ function Tile({
   sub,
   strong = false,
 }: {
-  to: "/validar" | "/validacion" | "/cuaderno";
+  to: "/validar" | "/validacion" | "/cuaderno" | "/docente/juegos";
   search?: { tab: "errores" | "validar" | "revisar" };
   icon: LucideIcon;
   title: string;
