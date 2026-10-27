@@ -11,7 +11,7 @@ import { ROULETTE, TRIVIA, type TriviaCategoryId, type TriviaQuestion } from "@/
 import { claveTrivia, getTexto } from "@/lib/juego-textos";
 import { useJuegoTextos } from "@/lib/use-juego-textos";
 import { LiveDuel, LiveDuelStart, type LiveRound } from "@/components/games/live-duel";
-import { salaDeLaUrl } from "@/lib/use-sala";
+import { ponerSalaEnLaUrl, salaDeLaUrl } from "@/lib/use-sala";
 
 export const Route = createFileRoute("/_authenticated/juegos/trivia-duelo")({
   head: () => ({
@@ -54,6 +54,7 @@ function TriviaDuel() {
       >
         {remote ? (
           <LiveDuel
+            key={remote.code}
             ns="trivia-duelo"
             code={remote.code}
             host={remote.host}
@@ -74,11 +75,11 @@ function TriviaDuel() {
             }
             onExit={() => {
               setRemote(null);
-              if (window.location.search.includes("sala=")) window.history.replaceState(window.history.state, "", "/juegos/trivia-duelo");
+              ponerSalaEnLaUrl(null);
             }}
           />
         ) : (
-          <Board key={match} onRematch={() => setMatch((m) => m + 1)} onRemote={(code, host) => setRemote({ code, host })} theme={theme} />
+          <Board key={match} onRematch={() => setMatch((m) => m + 1)} onRemote={(code, host) => { ponerSalaEnLaUrl(code); setRemote({ code, host }); }} theme={theme} />
         )}
       </GameStage>
     </>

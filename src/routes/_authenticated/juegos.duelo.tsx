@@ -9,7 +9,7 @@ import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
 import type { GameWord } from "@/lib/games.functions";
 import { LiveDuel, LiveDuelStart, type LiveRound } from "@/components/games/live-duel";
-import { salaDeLaUrl } from "@/lib/use-sala";
+import { ponerSalaEnLaUrl, salaDeLaUrl } from "@/lib/use-sala";
 
 export const Route = createFileRoute("/_authenticated/juegos/duelo")({
   head: () => ({
@@ -65,6 +65,7 @@ function Duel() {
       <div className="mt-6">
         {remote ? (
           <LiveDuel
+            key={remote.code}
             ns="duelo"
             code={remote.code}
             host={remote.host}
@@ -76,7 +77,7 @@ function Duel() {
             buildRounds={() => liveRounds(pool)}
             onExit={() => {
               setRemote(null);
-              if (window.location.search.includes("sala=")) window.history.replaceState(window.history.state, "", "/juegos/duelo");
+              ponerSalaEnLaUrl(null);
             }}
           />
         ) : q.isLoading ? (
@@ -84,7 +85,7 @@ function Duel() {
         ) : pool.length < MIN_WORDS ? (
           <NotEnough min={MIN_WORDS} />
         ) : (
-          <Board key={`${lesson}-${match}`} pool={pool} onRematch={() => setMatch((m) => m + 1)} onRemote={(code, host) => setRemote({ code, host })} />
+          <Board key={`${lesson}-${match}`} pool={pool} onRematch={() => setMatch((m) => m + 1)} onRemote={(code, host) => { ponerSalaEnLaUrl(code); setRemote({ code, host }); }} />
         )}
       </div>
     </GameStage>

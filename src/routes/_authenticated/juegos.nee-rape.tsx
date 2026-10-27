@@ -8,7 +8,7 @@ import { XpNote, shuffle, useGameWords } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
 import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
-import { supabase } from "@/integrations/supabase/client";
+import { useSala } from "@/lib/use-sala";
 import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
 import { ROULETTE, TRIVIA } from "@/lib/trivia";
@@ -226,71 +226,141 @@ function Solo({ sendero, pool, onExit }: { sendero: SenderoId; pool: GameWord[];
   );
 }
 
+type RemoteMatch = Match & { hostUid: string; guestUid: string };
+/** Cuánto se espera a un rival que salió de la app o perdió la señal (el reloj del duelo sigue). */
+const GRACE_MS = 10000;
+
 function Remote({ code, isHost, sendero, pool, onExit }: { code: string; isHost: boolean; sendero: SenderoId; pool: GameWord[]; onExit: () => void }) {
-  const [me, setMe] = useState<{ id: string; name: string } | null>(null);
-  const [rivalName, setRivalName] = useState<string | null>(null);
-  const [match, setMatch] = useState<Match | null>(null);
+  const [match, setMatch] = useState<RemoteMatch | null>(null);
   const [rival, setRival] = useState<Record<number, Answer>>({});
   const [reaction, setReaction] = useState<{ e: string; k: number } | null>(null);
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-  const hostRef = useRef(isHost);
-
-  useEffect(() => {
-    void supabase.auth.getUser().then(({ data }) => {
-      const u = data.user;
-      if (!u) return;
-      const full = (u.user_metadata?.full_name as string | undefined) ?? u.email?.split("@")[0] ?? "Jugador";
-      setMe({ id: u.id, name: full.split(" ")[0]!.slice(0, 16) });
-    });
-  }, []);
+  const [end, setEnd] = useState<null | "abandono" | "tarde">(null);
+  const [awaySince, setAwaySince] = useState<number | null>(null);
+  const [llena, setLlena] = useState(false);
+  const matchRef = useRef<RemoteMatch | null>(null);
+  const endRef = useRef<typeof end>(null);
+  endRef.current = end;
+  const salaRef = useRef<ReturnType<typeof useSala> | null>(null);
 
   const startMatch = useCallback(() => {
-    const ch = channelRef.current;
-    if (!ch || !hostRef.current) return;
+    const s = salaRef.current;
+    if (!s?.me || !s.rival.uid || !s.isHost) return;
     const rounds = buildRounds(sendero, pool);
-    ch.send({ type: "broadcast", event: "start", payload: { sendero, rounds, delay: COUNTDOWN_MS } });
+    const m: RemoteMatch = { sendero, rounds, startAt: Date.now() + COUNTDOWN_MS, hostUid: s.me.uid, guestUid: s.rival.uid };
+    s.send("start", { sendero, rounds, delay: COUNTDOWN_MS, hostUid: m.hostUid, guestUid: m.guestUid });
     setRival({});
-    setMatch({ sendero, rounds, startAt: Date.now() + COUNTDOWN_MS });
+    setEnd(null);
+    matchRef.current = m;
+    setMatch(m);
   }, [sendero, pool]);
 
-  useEffect(() => {
-    if (!me) return;
-    const ch = supabase.channel(`nee-rape:${code}`, { config: { presence: { key: me.id }, broadcast: { self: false } } });
-    channelRef.current = ch;
-    ch.on("presence", { event: "sync" }, () => {
-      const state = ch.presenceState<{ name: string; host: boolean }>();
-      const others = Object.entries(state).filter(([k]) => k !== me.id);
-      const other = others[0]?.[1]?.[0];
-      setRivalName(other?.name ?? null);
-      // Si nadie es anfitrión (por ejemplo, entré por enlace primero), el primero en llegar lo es.
-      if (other && !hostRef.current && !other.host) {
-        const keys = Object.keys(state).sort();
-        if (keys[0] === me.id) hostRef.current = true;
-      }
-    })
-      .on("broadcast", { event: "start" }, ({ payload }) => {
+  const meUid = salaRef.current?.me?.uid ?? null;
+  const rivalUid = match && meUid ? (match.hostUid === meUid ? match.guestUid : match.hostUid) : null;
+
+  const sala = useSala({
+    ns: "nee-rape",
+    code,
+    host: isHost,
+    events: ["start", "answer", "react", "rematch", "ended", "hello", "llena"],
+    rivalUid,
+    onEvent: (e, p, from) => {
+      if (e === "start" && Array.isArray(p.rounds)) {
+        const m: RemoteMatch = { sendero: p.sendero as SenderoId, rounds: p.rounds as Round[], startAt: Date.now() + Number(p.delay ?? COUNTDOWN_MS), hostUid: String(p.hostUid ?? ""), guestUid: String(p.guestUid ?? "") };
         setRival({});
-        setMatch({ sendero: payload.sendero, rounds: payload.rounds, startAt: Date.now() + payload.delay });
-      })
-      .on("broadcast", { event: "answer" }, ({ payload }) => setRival((r) => ({ ...r, [payload.round]: payload.answer })))
-      .on("broadcast", { event: "react" }, ({ payload }) => setReaction({ e: payload.e, k: Date.now() }))
-      .on("broadcast", { event: "rematch" }, () => { if (hostRef.current) startMatch(); })
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") void ch.track({ name: me.name, host: hostRef.current });
-      });
-    return () => { void supabase.removeChannel(ch); channelRef.current = null; };
-  }, [me, code, startMatch]);
+        setEnd(null);
+        matchRef.current = m;
+        setMatch(m);
+      } else if (e === "answer") setRival((r) => ({ ...r, [Number(p.round)]: p.answer as Answer }));
+      else if (e === "react") setReaction({ e: String(p.e), k: Date.now() });
+      else if (e === "rematch" && salaRef.current?.isHost) startMatch();
+      else if (e === "ended" && matchRef.current && !endRef.current) setEnd("tarde");
+      // El otro volvió a la app: si el duelo ya terminó por abandono, se lo avisamos.
+      else if (e === "hello" && endRef.current === "abandono") salaRef.current?.send("ended");
+      // Entró una tercera persona mientras dos juegan: se le avisa que la sala está llena.
+      else if (e === "hello" && matchRef.current && salaRef.current?.isHost) {
+        const m = matchRef.current;
+        if (from && from !== m.hostUid && from !== m.guestUid) salaRef.current.send("llena", { hostUid: m.hostUid, guestUid: m.guestUid });
+      } else if (e === "llena" && !matchRef.current) {
+        const me = salaRef.current?.me?.uid;
+        if (me && p.hostUid !== me && p.guestUid !== me) setLlena(true);
+      }
+    },
+  });
+  salaRef.current = sala;
+
+  const myUid = sala.me?.uid ?? null;
+  const fuera = llena || (!!match && !!myUid && match.hostUid !== myUid && match.guestUid !== myUid);
+
+  // Si entré y ya hay gente pero no arranca nada, pregunto (puede que la sala ya esté jugando).
+  useEffect(() => {
+    if (match || !sala.rival.present || sala.isHost) return;
+    const t = window.setTimeout(() => salaRef.current?.send("hello"), 2500);
+    return () => window.clearTimeout(t);
+  }, [match, sala.rival.present, sala.isHost]);
+  const enCurso = () => !!matchRef.current && !endRef.current && Date.now() < matchRef.current.startAt + ROUNDS * SLOT_MS;
+  const playing = !!match && !end && !fuera && Date.now() < match.startAt + ROUNDS * SLOT_MS;
+  const rivalGone = playing && (!sala.rival.present || sala.rival.away);
 
   // El anfitrión arranca apenas llega el rival.
   useEffect(() => {
-    if (rivalName && hostRef.current && !match) {
-      const t = window.setTimeout(startMatch, 600);
+    if (sala.rival.present && sala.isHost && !match && sala.conn === "online") {
+      const t = window.setTimeout(startMatch, 900);
       return () => window.clearTimeout(t);
     }
-  }, [rivalName, match, startMatch]);
+  }, [sala.rival.present, sala.isHost, match, sala.conn, startMatch]);
+
+  // Si el rival tocó Salir o cerró el juego: se termina por abandono.
+  useEffect(() => {
+    if (playing && sala.rival.bye && enCurso()) {
+      setEnd("abandono");
+      sala.send("ended");
+    }
+  }, [playing, sala.rival.bye]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Si salió de la app o perdió la señal: se lo espera unos segundos.
+  useEffect(() => {
+    if (rivalGone) setAwaySince((t) => t ?? Date.now());
+    else setAwaySince(null);
+  }, [rivalGone]);
+  useEffect(() => {
+    if (awaySince === null) return;
+    const t = window.setTimeout(() => {
+      if (!enCurso()) return;
+      setEnd("abandono");
+      sala.send("ended");
+    }, Math.max(0, awaySince + GRACE_MS - Date.now()));
+    return () => window.clearTimeout(t);
+  }, [awaySince]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Al volver a la app, pregunto si el duelo sigue.
+  useEffect(() => {
+    const on = () => { if (document.visibilityState === "visible" && matchRef.current) salaRef.current?.send("hello"); };
+    document.addEventListener("visibilitychange", on);
+    return () => document.removeEventListener("visibilitychange", on);
+  }, []);
+
+  function salir() {
+    sala.leave();
+    onExit();
+  }
 
   const link = typeof window !== "undefined" ? `${window.location.origin}/juegos/nee-rape?sala=${code}` : "";
   const invite = `¡Te desafío en Jaikuaa! A ver si me ganás.\nCódigo de sala: ${code}\nTocá acá para jugar:\n${link}`;
+  const myName = sala.me?.name ?? "Vos";
+  const lastRivalName = useRef<string | null>(null);
+  if (sala.rival.name) lastRivalName.current = sala.rival.name;
+  const rivalName = sala.rival.name ?? lastRivalName.current;
+
+  if (fuera) {
+    return (
+      <div className="space-y-4 rounded-3xl bg-card p-6 text-center shadow-xl">
+        <Users className="mx-auto h-10 w-10 text-muted-foreground" />
+        <p className="font-display text-2xl font-bold">Esta sala ya está llena</p>
+        <p className="text-sm text-muted-foreground">Ya hay dos personas jugando este desafío. Podés crear tu propia sala.</p>
+        <Button onClick={salir}>Volver</Button>
+      </div>
+    );
+  }
 
   if (!match) {
     return (
@@ -300,24 +370,24 @@ function Remote({ code, isHost, sendero, pool, onExit }: { code: string; isHost:
           <div className="relative flex items-center justify-center gap-4">
             <div className="flex flex-col items-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-foreground font-display text-2xl font-bold text-primary ring-4 ring-primary-foreground/30">
-                {(me?.name ?? "V").charAt(0).toUpperCase()}
+                {myName.charAt(0).toUpperCase()}
               </div>
-              <p className="mt-1 text-sm font-semibold">{me?.name ?? "Vos"}</p>
+              <p className="mt-1 text-sm font-semibold">{myName}</p>
             </div>
             <p className="font-display text-3xl font-black text-secondary motion-safe:animate-bounce">VS</p>
             <div className="flex flex-col items-center">
-              <div className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-dashed font-display text-2xl font-bold ${rivalName ? "border-secondary bg-secondary text-secondary-foreground" : "border-primary-foreground/50 motion-safe:animate-pulse"}`}>
-                {rivalName ? rivalName.charAt(0).toUpperCase() : "?"}
+              <div className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-dashed font-display text-2xl font-bold ${sala.rival.present ? "border-secondary bg-secondary text-secondary-foreground" : "border-primary-foreground/50 motion-safe:animate-pulse"}`}>
+                {sala.rival.present && rivalName ? rivalName.charAt(0).toUpperCase() : "?"}
               </div>
-              <p className="mt-1 text-sm font-semibold">{rivalName ?? "Tu amigo"}</p>
+              <p className="mt-1 text-sm font-semibold">{sala.rival.present ? rivalName : "Tu amigo"}</p>
             </div>
           </div>
           <div className="relative mt-5 flex items-center justify-center gap-2 text-sm">
-            {rivalName ? <><Users className="h-4 w-4" /> ¡{rivalName} entró! Arrancamos…</> : <><Loader2 className="h-4 w-4 animate-spin" /> Esperando que tu amigo abra el enlace</>}
+            {sala.conn === "offline" ? <>Sin conexión. Revisá tu internet.</> : sala.rival.present ? <><Users className="h-4 w-4" /> ¡{rivalName} entró! Arrancamos…</> : <><Loader2 className="h-4 w-4 animate-spin" /> Esperando que tu amigo abra el enlace</>}
           </div>
           <p className="relative mt-3 text-xs uppercase tracking-widest opacity-80">Sala <span className="font-display text-base font-bold tracking-[0.3em]">{code}</span></p>
         </div>
-        {!rivalName && (
+        {!sala.rival.present && (
           <div className="grid gap-3">
             <p className="text-sm font-semibold text-foreground">1. Mandale el desafío · 2. Cuando abra, arranca solo</p>
             <Button asChild size="lg" className="h-14 text-base shadow-lg">
@@ -328,11 +398,12 @@ function Remote({ code, isHost, sendero, pool, onExit }: { code: string; isHost:
             </Button>
           </div>
         )}
-        <Button variant="ghost" onClick={onExit}>Cancelar</Button>
+        <Button variant="ghost" onClick={salir}>Cancelar</Button>
       </div>
     );
   }
 
+  const awayLeft = awaySince === null ? 0 : Math.max(0, Math.ceil((awaySince + GRACE_MS - Date.now()) / 1000));
   return (
     <div className="relative">
       {reaction && (
@@ -340,16 +411,22 @@ function Remote({ code, isHost, sendero, pool, onExit }: { code: string; isHost:
           {reaction.e}
         </div>
       )}
+      {rivalGone && !end && (
+        <div className="mb-3 rounded-2xl border-2 border-secondary bg-secondary/10 p-3 text-center text-sm font-semibold text-foreground" role="status" aria-live="polite">
+          {sala.rival.away ? `${rivalName ?? "Tu rival"} salió de la app.` : `${rivalName ?? "Tu rival"} perdió la conexión.`} Si no vuelve en {awayLeft} s, ganás por abandono.
+        </div>
+      )}
       <Arena
         key={match.startAt}
         match={match}
-        names={[me?.name ?? "Vos", rivalName ?? "Rival"]}
+        names={[myName, rivalName ?? "Rival"]}
         rival={rival}
-        onAnswer={(round, answer) => channelRef.current?.send({ type: "broadcast", event: "answer", payload: { round, answer } })}
-        onReact={(e) => channelRef.current?.send({ type: "broadcast", event: "react", payload: { e } })}
-        onRematch={() => { if (hostRef.current) startMatch(); else channelRef.current?.send({ type: "broadcast", event: "rematch", payload: {} }); }}
-        onExit={onExit}
-        rivalLeft={!rivalName}
+        onAnswer={(round, answer) => sala.send("answer", { round, answer })}
+        onReact={(e) => sala.send("react", { e })}
+        onRematch={() => { if (sala.isHost) startMatch(); else sala.send("rematch"); }}
+        onExit={salir}
+        rivalLeft={!sala.rival.present || sala.rival.bye}
+        abandono={end}
       />
     </div>
   );
@@ -365,7 +442,7 @@ function useNow(active: boolean) {
   return now;
 }
 
-function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, rivalLeft }: {
+function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, rivalLeft, abandono = null }: {
   match: Match;
   names: [string, string];
   rival: Record<number, Answer>;
@@ -374,12 +451,14 @@ function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, riva
   onRematch: () => void;
   onExit: () => void;
   rivalLeft?: boolean;
+  /** El duelo terminó antes porque el rival se fue («abandono») o porque me fui yo («tarde»). */
+  abandono?: null | "abandono" | "tarde";
 }) {
   const feedback = useGameFeedback();
   const remote = Boolean(names[1]);
   const [mine, setMine] = useState<Record<number, Answer>>({});
   const elapsed = Date.now() - match.startAt;
-  const finished = elapsed >= ROUNDS * SLOT_MS;
+  const finished = !!abandono || elapsed >= ROUNDS * SLOT_MS;
   const now = useNow(!finished);
   const t = now - match.startAt;
   const idx = Math.min(ROUNDS - 1, Math.floor(Math.max(0, t) / SLOT_MS));
@@ -393,10 +472,11 @@ function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, riva
   const total = useCallback((a: Record<number, Answer>) => Object.values(a).reduce((s, x) => s + (x.correct ? pointsFor(x.ms) : 0), 0), []);
   const myScore = total(mine);
   const rivalScore = total(rival);
-  const done = t >= ROUNDS * SLOT_MS;
+  const done = !!abandono || t >= ROUNDS * SLOT_MS;
   const myCorrect = Object.values(mine).filter((a) => a.correct).length;
-  const won = !remote || myScore > rivalScore;
-  const xp = Math.min(20, myCorrect * 3 + (remote && myScore > rivalScore ? 5 : 0));
+  const won = !remote || abandono === "abandono" || (!abandono && myScore > rivalScore);
+  // Si el duelo terminó por abandono, se cuentan los aciertos sin el premio de ganar.
+  const xp = Math.min(20, myCorrect * 3 + (remote && !abandono && myScore > rivalScore ? 5 : 0));
 
   useEffect(() => {
     if (t >= 0 && !done && played.current !== idx) {
@@ -434,11 +514,13 @@ function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, riva
   }
 
   if (done) {
-    const tie = remote && myScore === rivalScore;
+    const tie = remote && !abandono && myScore === rivalScore;
     return (
       <div className="space-y-5 text-center">
         <p className="text-6xl" aria-hidden>{tie ? "🤝" : won ? "🏆" : "🥈"}</p>
-        <h2 className="font-display text-3xl font-bold">{!remote ? "¡Sendero completo!" : tie ? "¡Empate!" : won ? "¡Ganaste el duelo!" : `Ganó ${names[1]}`}</h2>
+        <h2 className="font-display text-3xl font-bold">{!remote ? "¡Sendero completo!" : abandono === "abandono" ? "¡Ganaste por abandono!" : abandono === "tarde" ? "El duelo terminó" : tie ? "¡Empate!" : won ? "¡Ganaste el duelo!" : `Ganó ${names[1]}`}</h2>
+        {abandono === "abandono" && <p className="text-sm text-muted-foreground">{names[1]} salió del duelo y no volvió.</p>}
+        {abandono === "tarde" && <p className="text-sm text-muted-foreground">Estuviste afuera mucho tiempo y {names[1]} ganó por abandono.</p>}
         <div className={`grid gap-3 ${remote ? "grid-cols-2" : "grid-cols-1"}`}>
           <ScoreCard name={names[0]} score={myScore} correct={myCorrect} highlight={won && !tie} />
           {remote && <ScoreCard name={names[1]} score={rivalScore} correct={Object.values(rival).filter((a) => a.correct).length} highlight={!won && !tie} />}
@@ -456,7 +538,7 @@ function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, riva
           </ul>
         </div>
         <div className="grid gap-3">
-          <Button size="lg" onClick={onRematch} disabled={rivalLeft}><RotateCcw className="mr-2 h-4 w-4" /> Revancha</Button>
+          {!abandono && <Button size="lg" onClick={onRematch} disabled={rivalLeft}><RotateCcw className="mr-2 h-4 w-4" /> Revancha</Button>}
           <ShareResult text={remote ? `${won ? "¡Gané" : "Jugué"} un duelo de Ñe'ẽ Rape (${sendero.es}) ${myScore}-${rivalScore} en Jaikuaa 🛤️ ¿Te animás?` : `Hice ${myCorrect}/${ROUNDS} en Ñe'ẽ Rape (${sendero.es}) en Jaikuaa 🛤️`} />
           <Button variant="ghost" onClick={onExit}>Elegir otro sendero</Button>
         </div>
@@ -532,7 +614,6 @@ function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, riva
           ))}
         </div>
       )}
-      {rivalLeft && <p className="text-center text-xs text-destructive">Tu rival se desconectó.</p>}
     </div>
   );
 }
