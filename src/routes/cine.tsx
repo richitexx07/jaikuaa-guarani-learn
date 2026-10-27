@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { usePubTx, type PubKey } from "@/lib/i18n-public";
 import { PrivateGate } from "@/components/private-gate";
 import { SiteFooter } from "@/components/site-footer";
 import { InfoCard, MarketingHeader, Section, WhatsAppCta } from "@/components/marketing/page-parts";
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/cine")({
 });
 
 function CinePage() {
+  const t = usePubTx();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <MarketingHeader />
@@ -37,87 +39,85 @@ function CinePage() {
         <section className="px-4 pt-16 pb-10 sm:px-6 sm:pt-24">
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-              🎬 Ta'anga Jaikuaa · Cine & Series
+              {t("ciBadge")}
             </span>
             <h1 className="mt-5 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              Tu historia, en guaraní,
+              {t("ciT1")}
               <br />
-              <span className="text-accent">en la pantalla grande</span>
+              <span className="text-accent">{t("ciT2")}</span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              La herramienta para guionistas, directores y productoras que crean en guaraní y jopara, y la vitrina
-              para mostrar el nuevo cine paraguayo al mundo.
+              {t("ciSub")}
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <WhatsAppCta message={MSG}>Quiero escribir mi guion</WhatsAppCta>
+              <WhatsAppCta message={MSG}>{t("ciCta")}</WhatsAppCta>
             </div>
           </div>
         </section>
 
-        <Section title="Para creadores" intro="Todo lo que necesitás para que tus diálogos en guaraní suenen verdaderos.">
+        <Section title={t("ciCreators")} intro={t("ciCreatorsI")}>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <InfoCard emoji="📝" title="Guion bilingüe" tag="Próximamente">
-              Formato profesional de escena, acción, personaje y diálogo, con castellano y guaraní lado a lado.
+            <InfoCard emoji="📝" title={t("ciA1t")} tag={t("soon")}>
+              {t("ciA1")}
             </InfoCard>
-            <InfoCard emoji="🧑‍🏫" title="Revisión humana">
-              Docentes de la lengua revisan tus diálogos antes del rodaje. Nada se da por bueno sin una persona.
+            <InfoCard emoji="🧑‍🏫" title={t("ciA2t")}>
+              {t("ciA2")}
             </InfoCard>
-            <InfoCard emoji="📚" title="Corpus validado">
-              Consultá palabras y frases ya validadas, con audio de voces paraguayas reales.
+            <InfoCard emoji="📚" title={t("ciA3t")}>
+              {t("ciA3")}
             </InfoCard>
-            <InfoCard emoji="📄" title="Exportación" tag="Próximamente">
-              Descargá tu guion listo para presentar a fondos, festivales y registro de obra.
+            <InfoCard emoji="📄" title={t("ciA4t")} tag={t("soon")}>
+              {t("ciA4")}
             </InfoCard>
           </div>
         </Section>
 
-        <Section title="Elegí el tono de tu historia">
+        <Section title={t("ciTone")}>
           <div className="grid gap-5 sm:grid-cols-3">
-            {REGISTROS.map((r) => (
+            {REGISTROS.map((r, i) => (
               <div key={r.name} className="flex flex-col gap-2 rounded-2xl border border-border/60 bg-card p-6 shadow-elegant">
                 <span className="text-3xl" aria-hidden>{r.emoji}</span>
-                <h3 className="font-display text-lg font-bold text-foreground">{r.name}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">{r.desc}</p>
+                <h3 className="font-display text-lg font-bold text-foreground">{t(`ciR.${i}` as PubKey)}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{t(`ciRD.${i}` as PubKey)}</p>
               </div>
             ))}
           </div>
         </Section>
 
-        <Section title="La vitrina del cine paraguayo" intro="Fichas de series, cortos y películas hechas en Paraguay, con enlaces oficiales para verlas.">
+        <Section title={t("ciShow")} intro={t("ciShowI")}>
           <div className="grid gap-5 sm:grid-cols-3">
-            <InfoCard emoji="🎞️" title="Estrenos y series">
-              Afiche, sinopsis, equipo y dónde verla. Cada producción se suma con autorización de sus autores.
+            <InfoCard emoji="🎞️" title={t("ciB1t")}>
+              {t("ciB1")}
             </InfoCard>
-            <InfoCard emoji="🎧" title="Aprender con escenas" tag="Próximamente">
-              Fragmentos cortos con subtítulos bilingües para practicar el oído con actores reales.
+            <InfoCard emoji="🎧" title={t("ciB2t")} tag={t("soon")}>
+              {t("ciB2")}
             </InfoCard>
-            <InfoCard emoji="🏆" title="Semillero de historias" tag="Próximamente">
-              Convocatorias de micro-guiones y monólogos en guaraní para nuevos talentos.
+            <InfoCard emoji="🏆" title={t("ciB3t")} tag={t("soon")}>
+              {t("ciB3")}
             </InfoCard>
           </div>
         </Section>
 
-        <Section title="¿Querés jugar primero?">
+        <Section title={t("ciPlay")}>
           <div className="mx-auto max-w-3xl rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
             <h3 className="font-display text-xl font-bold text-foreground">Ta'anga · Claqueta de Jai</h3>
             <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
-              Jai es el director. Vos completás el diálogo de cada escena hasta que grite «¡Corte! ¡Quedó perfecta!».
+              {t("ciPlayT")}
             </p>
             <Link to="/juegos/taanga" className="mt-6 inline-flex h-11 items-center rounded-md bg-primary px-6 text-sm font-semibold text-primary-foreground hover:opacity-90">
-              🎬 Jugar ahora
+              {t("ciPlayNow")}
             </Link>
           </div>
         </Section>
 
-        <Section title="Productoras y auspiciantes">
+        <Section title={t("ciProd")}>
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm text-muted-foreground">
-              Revisión lingüística para rodajes, presencia en la vitrina y auspicio de convocatorias. Escribinos y te
-              contamos las opciones.
+              {t("ciProdT")}
             </p>
             <div className="mt-6">
               <WhatsAppCta message="Hola, represento a una productora/marca y quiero conocer Ta'anga Jaikuaa.">
-                Hablar con Jaikuaa
+                {t("ciTalk")}
               </WhatsAppCta>
             </div>
           </div>

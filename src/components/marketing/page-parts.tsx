@@ -1,4 +1,6 @@
 import { useState, type ReactNode } from "react";
+import { usePubTx } from "@/lib/i18n-public";
+import { AppLanguageToggle } from "@/components/app-language-toggle";
 import { Link } from "@tanstack/react-router";
 import { Menu, MessageCircle, X } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
@@ -7,14 +9,15 @@ import { NandutiDisc } from "@/components/nanduti-disc";
 import { SUPPORT_WHATSAPP } from "@/lib/contact";
 
 const NAV_LINKS = [
-  { to: "/teclado", label: "Teclado" },
-  { to: "/turismo", label: "Turismo" },
-  { to: "/instituciones", label: "Instituciones" },
-  { to: "/auspiciantes", label: "Auspiciantes" },
+  { to: "/teclado", label: "navTeclado" },
+  { to: "/turismo", label: "navTurismo" },
+  { to: "/instituciones", label: "navInst" },
+  { to: "/auspiciantes", label: "navAusp" },
 ] as const;
 
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
+  const t = usePubTx();
   return (
     <header className="relative border-b border-border/50">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-3 px-4 sm:px-6">
@@ -24,14 +27,15 @@ export function MarketingHeader() {
         <nav className="hidden items-center gap-4 text-sm md:flex">
           {NAV_LINKS.map((l) => (
             <Link key={l.to} to={l.to} className="text-muted-foreground hover:text-foreground">
-              {l.label}
+              {t(l.label)}
             </Link>
           ))}
         </nav>
+        <AppLanguageToggle className="ml-auto md:ml-0" />
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Cerrar menú" : "Abrir menú"}
+          aria-label={open ? t("menuClose") : t("menuOpen")}
           aria-expanded={open}
           className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border text-foreground md:hidden"
         >
@@ -48,7 +52,7 @@ export function MarketingHeader() {
                   onClick={() => setOpen(false)}
                   className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
                 >
-                  {l.label}
+                  {t(l.label)}
                 </Link>
               </li>
             ))}
@@ -116,10 +120,11 @@ export function InfoCard({ emoji, img, icon: Icon, title, children, tag }: { emo
 // Solo respaldos públicos vigentes. El Ateneo se suma cuando sus docentes validen el contenido
 // (por ahora figura solo en la ficha de auspiciantes, con la frase del plan piloto).
 export function BackingList() {
+  const t = usePubTx();
   const items = [
-    ["Honorable Cámara de Senadores", "Declaración N.° 547/2026, de Interés Nacional y Educativo."],
-    ["Honorable Cámara de Diputados", "Declaración N.° 2001, de Interés Nacional y Educativo."],
-    ["Secretaría de Políticas Lingüísticas", "Resolución N.° 116/2026, de interés lingüístico."],
+    [t("bkSenado"), t("bkSenadoD")],
+    [t("bkDip"), t("bkDipD")],
+    [t("bkSpl"), t("bkSplD")],
   ];
   return (
     <ul className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-3">

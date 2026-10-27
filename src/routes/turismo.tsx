@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { usePubTx, type PubKey } from "@/lib/i18n-public";
 import { SiteFooter } from "@/components/site-footer";
 import { InfoCard, MarketingHeader, Section, WhatsAppCta } from "@/components/marketing/page-parts";
 import bannerTurismo from "@/assets/banners/banner-turismo.webp";
@@ -46,6 +47,7 @@ export const Route = createFileRoute("/turismo")({
 });
 
 function TurismoPage() {
+  const t = usePubTx();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <MarketingHeader />
@@ -53,74 +55,71 @@ function TurismoPage() {
         <section className="px-4 pt-6 pb-10 sm:px-6 sm:pt-10">
           <img
             src={bannerTurismo}
-            alt="Jai saluda con un mate en la mano, al atardecer, junto a un lago y una iglesia colonial"
+            alt={t("tuAlt")}
             className="mx-auto mb-10 aspect-[16/9] w-full max-w-5xl rounded-3xl object-cover shadow-elegant sm:aspect-[21/9]"
             width={1280}
             height={720}
           />
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-              Jai Turístico
+              {t("tuBadge")}
             </span>
             <h1 className="mt-5 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              Recorré Paraguay con Jai
+              {t("tuTitle")}
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              Nuestro jaguarete te guía por los lugares más hermosos del país: naturaleza, historia, cultura y
-              gastronomía, con el guaraní del viajero para vivirlo como un local.
+              {t("tuSub")}
             </p>
             <div className="mt-8">
-              <WhatsAppCta message={MSG}>Quiero recorrer Paraguay</WhatsAppCta>
+              <WhatsAppCta message={MSG}>{t("tuCta")}</WhatsAppCta>
             </div>
           </div>
         </section>
 
-        <Section title="Destinos de la ruta" intro="Una selección inicial de lugares emblemáticos. La ruta crece con cada aliado turístico.">
+        <Section title={t("tuDest")} intro={t("tuDestI")}>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {DESTINOS.map((d) => (
+            {DESTINOS.map((d, i) => (
               <article key={d.name} className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-elegant">
-                <img src={d.img} alt={`Jai visita ${d.name}`} className="aspect-[4/3] w-full object-cover" width={800} height={600} loading="lazy" decoding="async" />
+                <img src={d.img} alt={t("tuVisit", { a: d.name })} className="aspect-[4/3] w-full object-cover" width={800} height={600} loading="lazy" decoding="async" />
                 <div className="flex flex-col gap-1 p-5">
                   <span className="text-xs font-semibold text-primary">{d.zona}</span>
                   <h3 className="font-display text-lg font-bold leading-tight text-foreground">{d.name}</h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{d.desc}</p>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{t(`tuD.${i}` as PubKey)}</p>
                 </div>
               </article>
             ))}
           </div>
         </Section>
 
-        <Section title="El guaraní del viajero">
+        <Section title={t("tuTravel")}>
           <div className="grid gap-5 sm:grid-cols-3">
-            <InfoCard img={TRIVIA_ART.vocabulario} title="Frases para viajar">
-              Saludos, cómo preguntar direcciones, pedir comida y agradecer en guaraní, con audio de voces paraguayas.
+            <InfoCard img={TRIVIA_ART.vocabulario} title={t("tuC1t")}>
+              {t("tuC1")}
             </InfoCard>
-            <InfoCard img={TRIVIA_ART.gastronomia} title="Gastronomía con nombre propio">
-              Chipa, sopa paraguaya, mbeju, tereré: qué es cada plato y cómo se pide, revisado por docentes especialistas.
+            <InfoCard img={TRIVIA_ART.gastronomia} title={t("tuC2t")}>
+              {t("tuC2")}
             </InfoCard>
-            <InfoCard img={TRIVIA_ART.historia} title="Historia viva" tag="En validación">
-              El vocabulario cultural e histórico de cada destino se publica solo tras la revisión de docentes de la
-              lengua.
+            <InfoCard img={TRIVIA_ART.historia} title={t("tuC3t")} tag={t("inValidation")}>
+              {t("tuC3")}
             </InfoCard>
           </div>
         </Section>
 
-        <Section title="Para el sector turismo">
+        <Section title={t("tuSector")}>
           <div className="mx-auto max-w-3xl rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
             <img
               src={jaiTurismo}
-              alt="Jai, guía turístico, saluda con un mate"
+              alt={t("tuGuideAlt")}
               className="mx-auto -mt-2 mb-4 h-36 w-auto object-contain drop-shadow-lg sm:h-44"
               loading="lazy"
             />
-            <h3 className="font-display text-xl font-bold text-foreground">Hoteles, posadas, operadores y gastronomía</h3>
+            <h3 className="font-display text-xl font-bold text-foreground">{t("tuBiz")}</h3>
             <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
-              Sumá tu negocio a la Ruta de Jai: aparecés en el destino correspondiente, recibís consultas directas de
-              viajeros y accedés a un reporte mensual de interesados.
+              {t("tuBizT")}
             </p>
             <div className="mt-6">
               <WhatsAppCta message="Hola, tengo un negocio turístico y quiero sumarme a la Ruta de Jai.">
-                Sumar mi negocio a la ruta
+                {t("tuBizCta")}
               </WhatsAppCta>
             </div>
           </div>
