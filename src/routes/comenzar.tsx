@@ -43,13 +43,6 @@ const OPTIONS: { id: Motivation; img: string; label: string }[] = [
   { id: "probar", img: jaiPiensa, label: "No sé, probemos" },
 ];
 
-const REACTIONS: Record<Motivation, string> = {
-  trabajo: "¡Buenísimo! El guaraní abre puertas en Paraguay. Empezamos con 3 frases para la oficina.",
-  colegio: "¡Vamos a aprobar ese examen! Te enseño exactamente lo que te piden.",
-  familia: "Tu abuela va a sonreír cuando le digas 'Mba'éichapa'. Empezamos con 3 palabras de saludo.",
-  gusta: "Ya sos paraguayo completo. Solo falta despertar el ñe'ẽ que llevás dentro.",
-  probar: "Perfecto. 3 palabras, 2 minutos. Sin presión, sin examen, sin vergüenza.",
-};
 
 const MINI_LESSON: { gn: string; es: string }[] = [
   { gn: "Mba'éichapa", es: "¿Cómo estás?" },

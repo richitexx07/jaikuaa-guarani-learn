@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import jaiImg from "@/assets/jai-anfitrion.webp";
+import { useTX } from "@/lib/i18n-pages";
 
 type Trick = "idle" | "flip" | "spin" | "wave" | "dash" | "dance";
 
@@ -7,6 +8,7 @@ const DUR: Record<Exclude<Trick, "idle">, number> = { flip: 1400, spin: 1300, wa
 
 /** Jai vivo, estilo dibujito: anticipación, saltos altos con estela, aterrizaje con polvo y piruetas variadas. */
 export function JaiLauncher({ launcherRef, onOpen }: { launcherRef: RefObject<HTMLButtonElement | null>; onOpen: () => void }) {
+  const tx = useTX();
   const [trick, setTrick] = useState<Trick>("idle");
   const [fx, setFx] = useState(0);
   const tiltRef = useRef<HTMLSpanElement>(null);
