@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEscolarTx, type EscolarKey } from "@/lib/i18n-escolar";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ESCOLAR_GRADES, loadEscolarGrade, saveEscolarGrade, temasFor, type QuizQuestion, type Tema } from "@/lib/guarani-tema";
@@ -60,10 +61,10 @@ function notaFromScore(score: number, total: number): number {
   return 1;
 }
 
-function feedbackFor(nota: number): string {
-  if (nota === 5) return "¡Excelente! Estás listo/a para tu prueba 🎉";
-  if (nota >= 3) return "¡Vas bien! Repasá un poco más 💪";
-  return "Sigamos practicando, vos podés 🙌";
+function feedbackFor(nota: number, t: ReturnType<typeof useEscolarTx>): string {
+  if (nota === 5) return t("nota5");
+  if (nota >= 3) return t("nota3");
+  return t("nota1");
 }
 
 function ModoRescate() {
@@ -137,6 +138,7 @@ function ModoRescate() {
 }
 
 function UrgencyBadge({ when }: { when: When }) {
+  const t = useEscolarTx();
   const tone =
     when === "Hoy" || when === "Mañana"
       ? "bg-accent text-accent-foreground"
@@ -145,7 +147,7 @@ function UrgencyBadge({ when }: { when: When }) {
     <span
       className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${tone}`}
     >
-      🚨 Prueba: {when}
+      {t("testWhen", { a: t(`w.${when}` as EscolarKey) })}
     </span>
   );
 }
@@ -163,24 +165,25 @@ function SetupScreen({
   setGrade: (g: Grade) => void;
   onStart: () => void;
 }) {
+  const t = useEscolarTx();
   return (
     <div className="mx-auto max-w-2xl">
       <div className="text-center">
         <div className="inline-flex items-center justify-center rounded-full bg-accent/10 px-3 py-1 text-sm font-semibold text-accent">
-          Modo Rescate <span aria-hidden className="ml-2">🚨</span>
+          {t("rescue")} <span aria-hidden className="ml-2">🚨</span>
         </div>
         <h1 className="mt-4 font-display text-3xl font-bold text-foreground sm:text-4xl">
-          ¡Tranquilo/a! Vamos a prepararte para aprobar 💪
+          {t("calm")}
         </h1>
         <p className="mx-auto mt-3 max-w-lg text-base text-muted-foreground">
-          Contanos cuándo es tu prueba y armamos un repaso intensivo, enfocado en lo esencial.
+          {t("tellUs")}
         </p>
       </div>
 
       <div className="mt-8 space-y-6 rounded-2xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
         <div>
           <label className="block text-sm font-semibold text-foreground">
-            ¿Cuándo es tu prueba?
+            {t("whenTest")}
           </label>
           <div className="mt-3 flex flex-wrap gap-2">
             {WHENS.map((w) => (
@@ -191,14 +194,14 @@ function SetupScreen({
                 onClick={() => setWhen(w)}
                 aria-pressed={w === when}
               >
-                {w}
+                {t(`w.${w}` as EscolarKey)}
               </Button>
             ))}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-foreground">¿De qué grado?</label>
+          <label className="block text-sm font-semibold text-foreground">{t("whichGrade2")}</label>
           <div className="mt-3 flex flex-wrap gap-2">
             {GRADES.map((g) => (
               <Button
@@ -221,16 +224,16 @@ function SetupScreen({
           disabled={!when}
           onClick={onStart}
         >
-          Empezar el rescate →
+          {t("startRescue")}
         </Button>
         <p className="text-center text-xs text-muted-foreground">
-          Contenido adaptado para <span className="font-semibold text-foreground">{grade}</span>.
+          {t("adapted", { a: grade })}
         </p>
       </div>
 
       <div className="mt-6 text-center">
         <Button asChild variant="ghost" size="sm">
-          <Link to="/guarani-escolar">← Volver</Link>
+          <Link to="/guarani-escolar">{t("back")}</Link>
         </Button>
       </div>
     </div>
@@ -248,6 +251,7 @@ function PlanScreen({
   onStartReview: () => void;
   onSkipToExam: () => void;
 }) {
+  const t = useEscolarTx();
   return (
     <div className="mx-auto max-w-2xl">
       <div className="flex flex-wrap items-center justify-center gap-2">
@@ -257,27 +261,27 @@ function PlanScreen({
         </span>
       </div>
       <h1 className="mt-4 text-center font-display text-3xl font-bold text-foreground">
-        Este es tu plan de rescate
+        {t("yourPlan")}
       </h1>
       <p className="mx-auto mt-3 max-w-lg text-center text-base text-muted-foreground">
-        Vamos a repasar los 6 temas clave, uno por uno, y al final un simulacro de prueba de 10 preguntas.
+        {t("planSub")}
       </p>
 
       <ol className="mt-8 space-y-3">
-        {temasFor(grade).map((t, i) => (
+        {temasFor(grade).map((tm, i) => (
           <li
-            key={t.slug}
+            key={tm.slug}
             className="flex items-center gap-3 rounded-xl border border-border/60 bg-card p-4 shadow-sm"
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 font-display text-sm font-bold text-primary">
               {i + 1}
             </div>
             <div className="text-2xl" aria-hidden>
-              {t.emoji}
+              {tm.emoji}
             </div>
             <div className="flex-1">
-              <div className="font-semibold text-foreground">{t.title}</div>
-              <div className="text-xs text-muted-foreground">{t.subtitle}</div>
+              <div className="font-semibold text-foreground">{tm.title}</div>
+              <div className="text-xs text-muted-foreground">{tm.subtitle}</div>
             </div>
           </li>
         ))}
@@ -289,9 +293,9 @@ function PlanScreen({
             📝
           </div>
           <div className="flex-1">
-            <div className="font-semibold text-foreground">Simulacro de prueba</div>
+            <div className="font-semibold text-foreground">{t("mock")}</div>
             <div className="text-xs text-muted-foreground">
-              10 preguntas mezclando todos los temas
+              {t("mockSub")}
             </div>
           </div>
         </li>
@@ -299,10 +303,10 @@ function PlanScreen({
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Button variant="cta" size="lg" className="flex-1" onClick={onStartReview}>
-          Empezar repaso →
+          {t("startReview")}
         </Button>
         <Button variant="outline" size="lg" className="flex-1" onClick={onSkipToExam}>
-          Ir directo al simulacro
+          {t("directMock")}
         </Button>
       </div>
     </div>
@@ -323,6 +327,7 @@ function ReviewScreen({
   onSkipToExam: () => void;
 }) {
   const isLast = index === total - 1;
+  const t = useEscolarTx();
 
 
 
@@ -330,9 +335,9 @@ function ReviewScreen({
     <div className="mx-auto max-w-2xl">
       <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
         <span>
-          Tema {index + 1} de {total}
+          {t("topicN", { a: index + 1, b: total })}
         </span>
-        <span className="text-accent">🚨 Modo Rescate</span>
+        <span className="text-accent">🚨 {t("rescue")}</span>
       </div>
       <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
         <div
@@ -350,6 +355,7 @@ function ReviewScreen({
             {topic.title}
           </h1>
           <p className="text-sm text-muted-foreground">{topic.subtitle}</p>
+          {t("contentEs") && <p className="mt-1 text-xs text-muted-foreground">{t("contentEs")}</p>}
         </div>
       </div>
 
@@ -358,7 +364,7 @@ function ReviewScreen({
       </div>
 
       <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
-        Lo esencial para tu prueba
+        {t("essential")}
       </h2>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2">
         {topic.vocab.map((v) => (
@@ -378,10 +384,10 @@ function ReviewScreen({
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Button variant="cta" size="lg" className="flex-1" onClick={onNext}>
-          {isLast ? "Ir al simulacro →" : "Siguiente tema →"}
+          {isLast ? t("toMock") : t("nextTopic")}
         </Button>
         <Button variant="outline" size="lg" onClick={onSkipToExam}>
-          Saltar al simulacro
+          {t("skipMock")}
         </Button>
       </div>
     </div>
@@ -396,6 +402,7 @@ function ExamScreen({ onDone, temas }: { onDone: (score: number, total: number) 
 
   const q = questions[i];
   const isLast = i === questions.length - 1;
+  const t = useEscolarTx();
 
   function choose(opt: string) {
     if (picked) return;
@@ -416,9 +423,9 @@ function ExamScreen({ onDone, temas }: { onDone: (score: number, total: number) 
     <div className="mx-auto max-w-2xl">
       <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
         <span>
-          Pregunta {i + 1} de {questions.length}
+          {t("q", { a: i + 1, b: questions.length })}
         </span>
-        <span className="text-accent">📝 Simulacro</span>
+        <span className="text-accent">{t("mockTag")}</span>
       </div>
       <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
         <div
@@ -460,10 +467,10 @@ function ExamScreen({ onDone, temas }: { onDone: (score: number, total: number) 
         {picked && (
           <div className="mt-5 flex items-center justify-between">
             <span className="text-sm font-semibold text-foreground">
-              Puntaje: {score}/{i + 1}
+              {t("score", { a: score, b: i + 1 })}
             </span>
             <Button variant="cta" onClick={next}>
-              {isLast ? "Ver resultado →" : "Siguiente →"}
+              {isLast ? t("seeResult") : t("next")}
             </Button>
           </div>
         )}
@@ -481,7 +488,8 @@ function DoneScreen({
   nota: number;
   onRetry: () => void;
 }) {
-  const feedback = feedbackFor(nota);
+  const t = useEscolarTx();
+  const feedback = feedbackFor(nota, t);
   useRecordOnMount({ xp: 30 + score * 5, perfectExam: nota === 5, source: "exam", sourceRef: "rescate" });
   useEffect(() => {
     if (nota >= 3) celebrate(nota === 5 ? "big" : "small");
@@ -503,11 +511,11 @@ function DoneScreen({
           className="mx-auto h-40 w-auto object-contain drop-shadow-xl"
         />
         <h1 className="mt-4 font-display text-3xl font-bold text-foreground sm:text-4xl">
-          Sacaste {score}/10
+          {t("scored", { a: score, b: 10 })}
         </h1>
         <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-card px-5 py-2 shadow-sm">
           <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Nota
+            {t("grade")}
           </span>
           <span className="font-display text-3xl font-bold text-primary">{nota}</span>
           <span className="text-sm text-muted-foreground">/ 5</span>
@@ -517,13 +525,13 @@ function DoneScreen({
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
         <Button variant="cta" size="lg" onClick={onRetry}>
-          Rehacer simulacro
+          {t("redo")}
         </Button>
         <Button asChild variant="outline" size="lg">
-          <Link to="/guarani-escolar/tema">Repasar por tema</Link>
+          <Link to="/guarani-escolar/tema">{t("byTopic")}</Link>
         </Button>
         <Button asChild variant="ghost" size="lg">
-          <Link to="/guarani-escolar">← Volver</Link>
+          <Link to="/guarani-escolar">{t("back")}</Link>
         </Button>
       </div>
     </div>
