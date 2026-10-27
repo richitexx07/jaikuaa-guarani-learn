@@ -141,9 +141,6 @@ function AuspiciantesPage() {
             >
               {t("auWallT")}
             </SlotCard>
-            <SlotCard title={t("auPrize")} mock={<img src={jaiTrofeo} alt="" className="mx-auto h-28 w-auto object-contain" loading="lazy" />}>
-              {t("auPrizeT")}
-            </SlotCard>
             <SlotCard title={t("auTrain")} mock={<img src={jaiProfe} alt="" className="mx-auto h-28 w-auto object-contain" loading="lazy" />}>
               {t("auTrainT")}
             </SlotCard>
