@@ -36,6 +36,13 @@ export const GT = {
   },
   fullscreen: { es: "Pantalla completa", pt: "Tela cheia", en: "Full screen", de: "Vollbild", fr: "Plein écran", zh: "全螢幕" },
   exitFullscreen: { es: "Salir de pantalla completa", pt: "Sair da tela cheia", en: "Exit full screen", de: "Vollbild beenden", fr: "Quitter le plein écran", zh: "退出全螢幕" },
+  attempts: { es: "Intentos:", pt: "Tentativas:", en: "Attempts:", de: "Versuche:", fr: "Essais :", zh: "嘗試次數：" },
+  playAgain: { es: "Jugar de nuevo", pt: "Jogar de novo", en: "Play again", de: "Nochmal spielen", fr: "Rejouer", zh: "再玩一次" },
+  hiddenCard: { es: "Carta oculta", pt: "Carta oculta", en: "Hidden card", de: "Verdeckte Karte", fr: "Carte cachée", zh: "隱藏的卡片" },
+  spanishTag: { es: "Español", pt: "Espanhol", en: "Spanish", de: "Spanisch", fr: "Espagnol", zh: "西班牙語" },
+  pairsFound: { es: "Pares encontrados: {a} de {b}", pt: "Pares encontrados: {a} de {b}", en: "Pairs found: {a} of {b}", de: "Gefundene Paare: {a} von {b}", fr: "Paires trouvées : {a} sur {b}", zh: "已找到配對：{a} / {b}" },
+  memoryDone: { es: "¡Tejiste los {p} pares en {a} intentos!", pt: "Você formou os {p} pares em {a} tentativas!", en: "You matched all {p} pairs in {a} attempts!", de: "Du hast alle {p} Paare in {a} Versuchen gefunden!", fr: "Tu as trouvé les {p} paires en {a} essais !", zh: "你用 {a} 次嘗試完成了 {p} 組配對！" },
+  stars: { es: "{n} de 3 estrellas", pt: "{n} de 3 estrelas", en: "{n} of 3 stars", de: "{n} von 3 Sternen", fr: "{n} étoiles sur 3", zh: "3 顆星中的 {n} 顆" },
 } satisfies Record<string, L>;
 
 export type GKey = keyof typeof GT;
