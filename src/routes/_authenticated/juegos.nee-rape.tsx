@@ -1,3 +1,4 @@
+import { useJU, type JUKey } from "@/lib/i18n-juegos-ui";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, RotateCcw, Users, Volume2, Wifi } from "lucide-react";
@@ -97,6 +98,7 @@ function NeeRape() {
   const [isHost, setIsHost] = useState(false);
   const [joinCode, setJoinCode] = useState("");
   const words = useGameWords(null);
+  const tt = useJU();
   const pool = words.data?.words ?? [];
   const current = SENDEROS.find((s) => s.id === sendero)!;
   const enough = sendero === "arandupy" || new Set(pool.map((w) => w.gn)).size >= 8;
@@ -126,37 +128,37 @@ function NeeRape() {
                   <span className="text-2xl" aria-hidden>{s.emoji}</span>
                   <div>
                     <p className="font-display font-bold text-foreground">{s.gn}</p>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{s.es}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tt(`nrEs_${s.id}` as JUKey)}</p>
                   </div>
-                  {!s.ready && <span className="ml-auto rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold">Próximamente</span>}
+                  {!s.ready && <span className="ml-auto rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold">{tt("nrSoon")}</span>}
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{tt(`nrDesc_${s.id}` as JUKey)}</p>
               </button>
             ))}
           </div>
           {sendero === "arandupy" && (
-            <p className="rounded-lg bg-secondary/10 p-3 text-center text-xs text-muted-foreground">Preguntas de cultura en validación docente.</p>
+            <p className="rounded-lg bg-secondary/10 p-3 text-center text-xs text-muted-foreground">{tt("nrCultureVal")}</p>
           )}
           {words.isLoading ? (
             <div className="flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>
           ) : !enough ? (
-            <p className="text-center text-sm text-muted-foreground">Todavía no hay suficientes palabras publicadas para este sendero.</p>
+            <p className="text-center text-sm text-muted-foreground">{tt("nrNotEnough")}</p>
           ) : (
             <div className="grid gap-3">
               <Button size="lg" className="h-14 text-base" onClick={() => { setCode(newCode()); setIsHost(true); setMode("remote"); }}>
-                <Wifi className="mr-2 h-5 w-5" /> Desafiar a distancia
+                <Wifi className="mr-2 h-5 w-5" /> {tt("nrChallenge")}
               </Button>
-              <Button size="lg" variant="outline" onClick={() => setMode("solo")}>Practicar solo · {current.es}</Button>
+              <Button size="lg" variant="outline" onClick={() => setMode("solo")}>{tt("nrSolo")} · {tt(`nrEs_${current.id}` as JUKey)}</Button>
             </div>
           )}
           <div className="rounded-2xl border border-dashed border-border p-4">
-            <p className="text-sm font-semibold text-foreground">¿Te invitaron? Ingresá el código</p>
+            <p className="text-sm font-semibold text-foreground">{tt("nrInvited")}</p>
             <div className="mt-2 flex gap-2">
-              <Input value={joinCode} maxLength={4} placeholder="Ej. K7PM" className="uppercase tracking-[0.3em]" onChange={(e) => setJoinCode(e.target.value.toUpperCase())} />
-              <Button disabled={joinCode.length !== 4} onClick={() => { setCode(joinCode); setIsHost(false); setMode("remote"); }}>Unirme</Button>
+              <Input value={joinCode} maxLength={4} placeholder={tt("nrEg")} className="uppercase tracking-[0.3em]" onChange={(e) => setJoinCode(e.target.value.toUpperCase())} />
+              <Button disabled={joinCode.length !== 4} onClick={() => { setCode(joinCode); setIsHost(false); setMode("remote"); }}>{tt("nrJoin")}</Button>
             </div>
           </div>
-          <p className="text-center text-[11px] text-muted-foreground">Contenido basado en el vocabulario de Jaikuaa, en revisión por docentes especialistas.</p>
+          <p className="text-center text-[11px] text-muted-foreground">{tt("nrBased")}</p>
         </div>
       )}
       {mode === "solo" && <Solo sendero={sendero} pool={pool} onExit={() => setMode("menu")} />}
@@ -190,6 +192,7 @@ const CSS = `
 
 /** El camino de la palabra: dos celulares unidos por un sendero de puntos y una palabra que viaja. */
 function Sendero() {
+  const tt = useJU();
   return (
     <div className="relative overflow-hidden rounded-3xl ring-1 ring-white/10" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.3))" }}>
       <svg viewBox="0 0 400 150" className="mx-auto block max-h-44 w-full" aria-hidden>
@@ -205,19 +208,20 @@ function Sendero() {
       </svg>
       <div className="px-5 pb-5">
         <h1 className="font-display text-4xl font-bold leading-none tracking-tight">Ñe'ẽ Rape</h1>
-        <p className="mt-2 text-sm opacity-80">El camino de la palabra. Desafiá a un compañero: cada uno juega desde su celular.</p>
+        <p className="mt-2 text-sm opacity-80">{tt("nrIntro")}</p>
       </div>
     </div>
   );
 }
 
 function Solo({ sendero, pool, onExit }: { sendero: SenderoId; pool: GameWord[]; onExit: () => void }) {
+  const tt = useJU();
   const [match, setMatch] = useState<Match>(() => ({ sendero, rounds: buildRounds(sendero, pool), startAt: Date.now() + COUNTDOWN_MS }));
   return (
     <Arena
       key={match.startAt}
       match={match}
-      names={["Vos", ""]}
+      names={[tt("nrYou"), ""]}
       rival={{}}
       onAnswer={() => {}}
       onRematch={() => setMatch({ sendero, rounds: buildRounds(sendero, pool), startAt: Date.now() + COUNTDOWN_MS })}
@@ -231,6 +235,7 @@ type RemoteMatch = Match & { hostUid: string; guestUid: string };
 const GRACE_MS = 10000;
 
 function Remote({ code, isHost, sendero, pool, onExit }: { code: string; isHost: boolean; sendero: SenderoId; pool: GameWord[]; onExit: () => void }) {
+  const tt = useJU();
   const [match, setMatch] = useState<RemoteMatch | null>(null);
   const [rival, setRival] = useState<Record<number, Answer>>({});
   const [reaction, setReaction] = useState<{ e: string; k: number } | null>(null);
@@ -345,8 +350,8 @@ function Remote({ code, isHost, sendero, pool, onExit }: { code: string; isHost:
   }
 
   const link = typeof window !== "undefined" ? `${window.location.origin}/juegos/nee-rape?sala=${code}` : "";
-  const invite = `¡Te desafío en Jaikuaa! A ver si me ganás.\nCódigo de sala: ${code}\nTocá acá para jugar:\n${link}`;
-  const myName = sala.me?.name ?? "Vos";
+  const invite = tt("nrInvite", { c: code, l: link });
+  const myName = sala.me?.name ?? tt("nrYou");
   const lastRivalName = useRef<string | null>(null);
   if (sala.rival.name) lastRivalName.current = sala.rival.name;
   const rivalName = sala.rival.name ?? lastRivalName.current;
@@ -355,9 +360,9 @@ function Remote({ code, isHost, sendero, pool, onExit }: { code: string; isHost:
     return (
       <div className="space-y-4 rounded-3xl bg-card p-6 text-center shadow-xl">
         <Users className="mx-auto h-10 w-10 text-muted-foreground" />
-        <p className="font-display text-2xl font-bold">Esta sala ya está llena</p>
-        <p className="text-sm text-muted-foreground">Ya hay dos personas jugando este desafío. Podés crear tu propia sala.</p>
-        <Button onClick={salir}>Volver</Button>
+        <p className="font-display text-2xl font-bold">{tt("nrFull")}</p>
+        <p className="text-sm text-muted-foreground">{tt("nrFullInfo")}</p>
+        <Button onClick={salir}>{tt("nrBack")}</Button>
       </div>
     );
   }
@@ -379,23 +384,23 @@ function Remote({ code, isHost, sendero, pool, onExit }: { code: string; isHost:
               <div className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-dashed font-display text-2xl font-bold ${sala.rival.present ? "border-secondary bg-secondary text-secondary-foreground" : "border-primary-foreground/50 motion-safe:animate-pulse"}`}>
                 {sala.rival.present && rivalName ? rivalName.charAt(0).toUpperCase() : "?"}
               </div>
-              <p className="mt-1 text-sm font-semibold">{sala.rival.present ? rivalName : "Tu amigo"}</p>
+              <p className="mt-1 text-sm font-semibold">{sala.rival.present ? rivalName : tt("nrFriend")}</p>
             </div>
           </div>
           <div className="relative mt-5 flex items-center justify-center gap-2 text-sm">
-            {sala.conn === "offline" ? <>Sin conexión. Revisá tu internet.</> : sala.rival.present ? <><Users className="h-4 w-4" /> ¡{rivalName} entró! Arrancamos…</> : <><Loader2 className="h-4 w-4 animate-spin" /> Esperando que tu amigo abra el enlace</>}
+            {sala.conn === "offline" ? <>{tt("nrOffline")}</> : sala.rival.present ? <><Users className="h-4 w-4" /> {tt("nrEntered", { n: rivalName ?? "" })}</> : <><Loader2 className="h-4 w-4 animate-spin" /> {tt("nrWaiting")}</>}
           </div>
-          <p className="relative mt-3 text-xs uppercase tracking-widest opacity-80">Sala <span className="font-display text-base font-bold tracking-[0.3em]">{code}</span></p>
+          <p className="relative mt-3 text-xs uppercase tracking-widest opacity-80">{tt("nrRoom")} <span className="font-display text-base font-bold tracking-[0.3em]">{code}</span></p>
         </div>
         {!sala.rival.present && (
           <div className="grid gap-3">
-            <p className="text-sm font-semibold text-foreground">1. Mandale el desafío · 2. Cuando abra, arranca solo</p>
+            <p className="text-sm font-semibold text-foreground">{tt("nrSteps")}</p>
             <div className="rounded-2xl bg-white p-3 text-left text-[#13233F]">
               <Compartir url={link} texto={invite} titulo="Ñe'ẽ Rape" />
             </div>
           </div>
         )}
-        <Button variant="ghost" onClick={salir}>Cancelar</Button>
+        <Button variant="ghost" onClick={salir}>{tt("nrCancel")}</Button>
       </div>
     );
   }
@@ -410,7 +415,7 @@ function Remote({ code, isHost, sendero, pool, onExit }: { code: string; isHost:
       )}
       {rivalGone && !end && (
         <div className="mb-3 rounded-2xl border-2 border-secondary bg-secondary/10 p-3 text-center text-sm font-semibold text-foreground" role="status" aria-live="polite">
-          {sala.rival.away ? `${rivalName ?? "Tu rival"} salió de la app.` : `${rivalName ?? "Tu rival"} perdió la conexión.`} Si no vuelve en {awayLeft} s, ganás por abandono.
+          {sala.rival.away ? tt("nrLeftApp", { n: rivalName ?? tt("nrRival") }) : tt("nrLostConn", { n: rivalName ?? tt("nrRival") })} {tt("nrGrace", { s: awayLeft })}
         </div>
       )}
       <Arena
@@ -452,6 +457,7 @@ function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, riva
   abandono?: null | "abandono" | "tarde";
 }) {
   const feedback = useGameFeedback();
+  const tt = useJU();
   const remote = Boolean(names[1]);
   const [mine, setMine] = useState<Record<number, Answer>>({});
   const elapsed = Date.now() - match.startAt;
@@ -515,16 +521,16 @@ function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, riva
     return (
       <div className="space-y-5 text-center">
         <p className="text-6xl" aria-hidden>{tie ? "🤝" : won ? "🏆" : "🥈"}</p>
-        <h2 className="font-display text-3xl font-bold">{!remote ? "¡Sendero completo!" : abandono === "abandono" ? "¡Ganaste por abandono!" : abandono === "tarde" ? "El duelo terminó" : tie ? "¡Empate!" : won ? "¡Ganaste el duelo!" : `Ganó ${names[1]}`}</h2>
-        {abandono === "abandono" && <p className="text-sm text-muted-foreground">{names[1]} salió del duelo y no volvió.</p>}
-        {abandono === "tarde" && <p className="text-sm text-muted-foreground">Estuviste afuera mucho tiempo y {names[1]} ganó por abandono.</p>}
+        <h2 className="font-display text-3xl font-bold">{!remote ? tt("nrDone") : abandono === "abandono" ? tt("nrWonForfeit") : abandono === "tarde" ? tt("nrEnded") : tie ? tt("nrTie") : won ? tt("nrWon") : tt("nrWonBy", { n: names[1] })}</h2>
+        {abandono === "abandono" && <p className="text-sm text-muted-foreground">{tt("nrLeftNoBack", { n: names[1] })}</p>}
+        {abandono === "tarde" && <p className="text-sm text-muted-foreground">{tt("nrLate", { n: names[1] })}</p>}
         <div className={`grid gap-3 ${remote ? "grid-cols-2" : "grid-cols-1"}`}>
           <ScoreCard name={names[0]} score={myScore} correct={myCorrect} highlight={won && !tie} />
           {remote && <ScoreCard name={names[1]} score={rivalScore} correct={Object.values(rival).filter((a) => a.correct).length} highlight={!won && !tie} />}
         </div>
         <XpNote xp={xp} />
         <div className="rounded-2xl bg-muted/50 p-4 text-left text-sm">
-          <p className="font-semibold">Repaso</p>
+          <p className="font-semibold">{tt("nrReview")}</p>
           <ul className="mt-2 space-y-1">
             {match.rounds.map((r, i) => (
               <li key={i} className="flex gap-2">
@@ -535,15 +541,17 @@ function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, riva
           </ul>
         </div>
         <div className="grid gap-3">
-          {!abandono && <Button size="lg" onClick={onRematch} disabled={rivalLeft}><RotateCcw className="mr-2 h-4 w-4" /> Revancha</Button>}
-          <ShareResult text={remote ? `${won ? "¡Gané" : "Jugué"} un duelo de Ñe'ẽ Rape (${sendero.es}) ${myScore}-${rivalScore} en Jaikuaa 🛤️ ¿Te animás?` : `Hice ${myCorrect}/${ROUNDS} en Ñe'ẽ Rape (${sendero.es}) en Jaikuaa 🛤️`} />
-          <Button variant="ghost" onClick={onExit}>Elegir otro sendero</Button>
+          {!abandono && <Button size="lg" onClick={onRematch} disabled={rivalLeft}><RotateCcw className="mr-2 h-4 w-4" /> {tt("nrRematch")}</Button>}
+          <ShareResult text={remote ? tt("nrShareDuel", { w: won ? tt("nrIWon") : tt("nrIPlayed"), s: tt(`nrEs_${sendero.id}` as JUKey), a: myScore, b: rivalScore }) : tt("nrShareSolo", { c: myCorrect, n: ROUNDS, s: tt(`nrEs_${sendero.id}` as JUKey) })} />
+          <Button variant="ghost" onClick={onExit}>{tt("nrOther")}</Button>
         </div>
       </div>
     );
   }
 
   const my = mine[idx];
+  const showPrompt = (p: string) => { const m = /^¿Cómo se escribe «(.*)»\?$/.exec(p); return m ? tt("nrHowWrite", { w: m[1]! }) : p; };
+  const showTip = (x: string) => { const s = SENDEROS.find((z) => z.tip === x && (z.id === "achegety" || z.id === "nemongeta")); return s ? tt(`nrTip_${s.id}` as JUKey) : x; };
   const theirs = rival[idx];
   const pct = Math.max(0, 1 - inRound / ANSWER_MS) * 100;
   const secsLeft = Math.max(0, Math.ceil((ANSWER_MS - inRound) / 1000));
@@ -578,9 +586,9 @@ function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, riva
         )}
         {streak >= 2 && <span className="absolute left-4 top-3 rounded-full bg-secondary/15 px-2 py-0.5 text-xs font-bold text-secondary">🔥 x{streak}</span>}
         <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">{sendero.emoji} {sendero.gn}</p>
-        <p className={`mt-3 font-display font-bold text-foreground ${round.prompt.length > 40 ? "text-xl" : "text-3xl"}`}>{round.prompt}</p>
+        <p className={`mt-3 font-display font-bold text-foreground ${round.prompt.length > 40 ? "text-xl" : "text-3xl"}`}>{showPrompt(round.prompt)}</p>
         {round.audio && (
-          <Button variant="ghost" size="sm" className="mt-2" onClick={() => void playGuarani(round.audio!)}><Volume2 className="mr-1 h-4 w-4" /> Escuchar</Button>
+          <Button variant="ghost" size="sm" className="mt-2" onClick={() => void playGuarani(round.audio!)}><Volume2 className="mr-1 h-4 w-4" /> {tt("nrListen")}</Button>
         )}
       </div>
       <div className="grid gap-3">
@@ -601,13 +609,13 @@ function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, riva
         })}
       </div>
       {revealing && round.tip && (
-        <p className="rounded-xl bg-accent/40 p-3 text-center text-sm text-foreground animate-in fade-in">💡 {round.tip}</p>
+        <p className="rounded-xl bg-accent/40 p-3 text-center text-sm text-foreground animate-in fade-in">💡 {showTip(round.tip)}</p>
       )}
-      {!revealing && my && <p className="text-center text-sm text-muted-foreground">{remote && !theirs ? `Esperando a ${names[1]}…` : my.correct ? "¡Bien!" : "Ups…"}</p>}
+      {!revealing && my && <p className="text-center text-sm text-muted-foreground">{remote && !theirs ? tt("nrWaitFor", { n: names[1] }) : my.correct ? tt("nrGood") : tt("nrOops")}</p>}
       {remote && onReact && (
         <div className="flex justify-center gap-2 pt-1">
           {REACTIONS.map((e) => (
-            <button key={e} type="button" aria-label={`Reaccionar ${e}`} onClick={() => onReact(e)} className="h-10 w-10 rounded-full bg-muted text-xl transition active:scale-90">{e}</button>
+            <button key={e} type="button" aria-label={tt("nrReact", { e })} onClick={() => onReact(e)} className="h-10 w-10 rounded-full bg-muted text-xl transition active:scale-90">{e}</button>
           ))}
         </div>
       )}
@@ -616,11 +624,12 @@ function Arena({ match, names, rival, onAnswer, onReact, onRematch, onExit, riva
 }
 
 function ScoreCard({ name, score, correct, highlight }: { name: string; score: number; correct: number; highlight: boolean }) {
+  const tt = useJU();
   return (
     <div className={`rounded-2xl border-2 p-4 ${highlight ? "border-primary bg-primary/10" : "border-border"}`}>
       <p className="font-semibold">{name}</p>
       <p className="font-display text-3xl font-bold text-primary">{score}</p>
-      <p className="text-xs text-muted-foreground">{correct}/{ROUNDS} aciertos</p>
+      <p className="text-xs text-muted-foreground">{tt("nrHits", { c: correct, n: ROUNDS })}</p>
     </div>
   );
 }
