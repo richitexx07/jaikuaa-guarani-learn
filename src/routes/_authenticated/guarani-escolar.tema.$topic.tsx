@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEscolarTx } from "@/lib/i18n-escolar";
 import { useEffect, useMemo, useState } from "react";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,22 +29,28 @@ export const Route = createFileRoute("/_authenticated/guarani-escolar/tema/$topi
     if (!tema) throw notFound();
     return { tema };
   },
-  notFoundComponent: () => (
+  notFoundComponent: function NF() {
+    const t = useEscolarTx();
+    return (
     <div className="mx-auto max-w-2xl text-center">
-      <h1 className="font-display text-2xl font-bold">Tema no encontrado</h1>
+      <h1 className="font-display text-2xl font-bold">{t("notFound")}</h1>
       <Button asChild variant="cta" className="mt-6">
-        <Link to="/guarani-escolar/tema">Volver a los temas</Link>
+        <Link to="/guarani-escolar/tema">{t("backTopics")}</Link>
       </Button>
     </div>
-  ),
-  errorComponent: ({ reset }) => (
+    );
+  },
+  errorComponent: function EC({ reset }) {
+    const t = useEscolarTx();
+    return (
     <div className="mx-auto max-w-2xl text-center">
-      <h1 className="font-display text-2xl font-bold">Ocurrió un error</h1>
+      <h1 className="font-display text-2xl font-bold">{t("error")}</h1>
       <Button variant="cta" className="mt-4" onClick={() => reset()}>
-        Reintentar
+        {t("retry")}
       </Button>
     </div>
-  ),
+    );
+  },
   component: TemaPage,
 });
 
@@ -58,6 +65,7 @@ type Phase = "learn" | "quiz" | "done";
 function TemaPage() {
   const { tema } = Route.useLoaderData() as unknown as { tema: Tema };
   useRecordVisit(`tema:${tema.slug}`);
+  const t = useEscolarTx();
   const [phase, setPhase] = useState<Phase>("learn");
   const [score, setScore] = useState(0);
 
@@ -68,19 +76,20 @@ function TemaPage() {
           to={isAgro(tema.slug) ? "/agro" : "/guarani-escolar/tema"}
           className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary"
         >
-          {isAgro(tema.slug) ? "← Volver a Jaikuaa Agro-Rural" : "← Volver a los temas"}
+          {isAgro(tema.slug) ? t("backAgro") : t("backTopics")}
         </Link>
       </div>
 
       <div className="mb-6">
         <div className="text-xs font-semibold uppercase tracking-wide text-accent">
-          {isAgro(tema.slug) ? "Jaikuaa Agro-Rural · Ñemitỹ ha Ka'aguy" : "Práctica por Tema"}
+          {isAgro(tema.slug) ? "Jaikuaa Agro-Rural · Ñemitỹ ha Ka'aguy" : t("practice")}
         </div>
         <h1 className="mt-1 flex items-center gap-3 font-display text-3xl font-bold text-foreground sm:text-4xl">
           <span aria-hidden>{tema.emoji}</span>
           {tema.title}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">{tema.subtitle}</p>
+        {t("contentEs") && <p className="mt-2 text-xs text-muted-foreground">{t("contentEs")}</p>}
       </div>
 
       {phase === "learn" && (
@@ -102,12 +111,13 @@ function TemaPage() {
 
 function LearnStep({ tema, onNext }: { tema: Tema; onNext: () => void }) {
   usePrefetchAudios(tema.vocab.map((v) => v.gn), 10);
+  const t = useEscolarTx();
 
   return (
     <div className="space-y-6">
       <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
         <h2 className="font-display text-lg font-semibold text-primary">
-          ¿De qué se trata?
+          {t("about")}
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-foreground">
           {tema.explanation}
@@ -116,10 +126,10 @@ function LearnStep({ tema, onNext }: { tema: Tema; onNext: () => void }) {
 
       <section>
         <h2 className="font-display text-lg font-semibold text-foreground">
-          Vocabulario
+          {t("vocab")}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Tocá el 🔊 para escuchar cada palabra.
+          {t("tap")}
         </p>
         <ul className="mt-3 space-y-2">
           {tema.vocab.map((v) => (
@@ -140,7 +150,7 @@ function LearnStep({ tema, onNext }: { tema: Tema; onNext: () => void }) {
       </section>
 
       <Button variant="cta" size="lg" className="w-full" onClick={onNext}>
-        Empezar el quiz →
+        {t("startQuiz")}
       </Button>
     </div>
   );
@@ -154,6 +164,7 @@ function QuizStep({
   onDone: (score: number) => void;
 }) {
   const questions = useMemo(() => tema.quiz, [tema]);
+  const t = useEscolarTx();
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [correct, setCorrect] = useState(0);
@@ -164,8 +175,8 @@ function QuizStep({
   return (
     <div>
       <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
-        <span>Pregunta {i + 1} de {questions.length}</span>
-        <span>Aciertos: {correct}</span>
+        <span>{t("q", { a: i + 1, b: questions.length })}</span>
+        <span>{t("hits", { a: correct })}</span>
       </div>
       <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
         <p className="font-display text-lg font-semibold text-foreground">
@@ -216,7 +227,7 @@ function QuizStep({
               }
             }}
           >
-            {isCorrect ? "¡Correcto!" : "Continuar"} →
+            {isCorrect ? t("correct") : t("cont")} →
           </Button>
         )}
       </div>
@@ -224,13 +235,13 @@ function QuizStep({
   );
 }
 
-function feedback(score: number, total: number): { img: string; title: string; message: string } {
+function feedback(score: number, total: number, t: ReturnType<typeof useEscolarTx>): { img: string; title: string; message: string } {
   const ratio = score / total;
-  if (ratio === 1) return { img: jaiFesteja, title: "¡Perfecto!", message: "Sos un crack del guaraní. ¡Iporãiterei!" };
-  if (ratio >= 0.8) return { img: jaiAplaude, title: "¡Muy bien!", message: "Ya casi lo dominás. Seguí practicando." };
-  if (ratio >= 0.6) return { img: jaiAnimo, title: "¡Buen trabajo!", message: "Vas bien encaminado. Repasá las que fallaste." };
-  if (ratio >= 0.4) return { img: jaiPiensa, title: "¡A seguir!", message: "Con un poco más de práctica vas a mejorar." };
-  return { img: jaiAnimo, title: "¡No te rindas!", message: "Volvé a leer el tema y probá de nuevo. ¡Vos podés!" };
+  if (ratio === 1) return { img: jaiFesteja, title: t("f1t"), message: t("f1m") };
+  if (ratio >= 0.8) return { img: jaiAplaude, title: t("f2t"), message: t("f2m") };
+  if (ratio >= 0.6) return { img: jaiAnimo, title: t("f3t"), message: t("f3m") };
+  if (ratio >= 0.4) return { img: jaiPiensa, title: t("f4t"), message: t("f4m") };
+  return { img: jaiAnimo, title: t("f5t"), message: t("f5m") };
 }
 
 function DoneStep({
@@ -243,7 +254,8 @@ function DoneStep({
   onRetry: () => void;
 }) {
   const total = tema.quiz.length;
-  const fb = feedback(score, total);
+  const t = useEscolarTx();
+  const fb = feedback(score, total, t);
   const xp = 15 + score * 5;
   useRecordOnMount({ xp, perfectExam: score === total, source: "exam", sourceRef: `tema:${tema.slug}` });
   useEffect(() => {
@@ -257,19 +269,19 @@ function DoneStep({
         {fb.title}
       </h2>
       <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 font-display text-base font-bold text-primary-foreground shadow">
-        Sacaste {score}/{total}
+        {t("scored", { a: score, b: total })}
       </div>
       <p className="mx-auto mt-4 max-w-md text-muted-foreground">{fb.message}</p>
 
       <div className="mt-8 grid gap-2 sm:grid-cols-2">
         <Button variant="outline" size="lg" onClick={onRetry}>
-          Reintentar quiz
+          {t("retryQuiz")}
         </Button>
         <Button asChild variant="cta" size="lg">
           {isAgro(tema.slug) ? (
-            <Link to="/agro">Más temas del Agro →</Link>
+            <Link to="/agro">{t("moreAgro")}</Link>
           ) : (
-            <Link to="/guarani-escolar/tema">Otro tema →</Link>
+            <Link to="/guarani-escolar/tema">{t("otherTopic")}</Link>
           )}
         </Button>
       </div>
