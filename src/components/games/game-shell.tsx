@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { listCourseLessons } from "@/lib/lessons.functions";
 import { getGameWords, type GameWord } from "@/lib/games.functions";
 import { withOfflineCache } from "@/lib/offline-data";
+import { prefetchAudio } from "@/lib/audio";
 import { K } from "@/lib/offline-pack";
 import { GameKit, GameCompanion, GameSoundButton, LaceBackground } from './game-kit';
 import { GameHelp } from './game-help';
@@ -79,12 +80,19 @@ export function LessonFilter({ value, onChange }: { value: number | null; onChan
 
 export function useGameWords(lesson: number | null) {
   const fn = useServerFn(getGameWords);
-  return useQuery({
+  const q = useQuery({
     queryKey: ["game-words", lesson],
     queryFn: () =>
       withOfflineCache(K.gameWords(lesson), () => fn({ data: { lesson } }), { label: "Las palabras del juego" }),
     staleTime: 5 * 60_000,
   });
+  // Deja listos (y con volumen parejo) los audios de las palabras del juego antes de que suenen.
+  const words = q.data?.words;
+  useEffect(() => {
+    if (!words) return;
+    for (const w of words.filter((x) => x.hasAudio).slice(0, 24)) void prefetchAudio(w.gn);
+  }, [words]);
+  return q;
 }
 
 export function shuffle<T>(arr: T[]): T[] {

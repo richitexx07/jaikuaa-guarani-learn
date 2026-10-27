@@ -21,9 +21,13 @@ export async function toMp3Base64(blob: Blob): Promise<string> {
     const d = audio.getChannelData(c);
     for (let i = 0; i < len; i++) mono[i] += d[i] / audio.numberOfChannels;
   }
+  // Volumen parejo desde la grabación: si quedó baja, se sube (con limitador para no saturar).
+  const { amplify, gainFor } = await import("./audio-louder");
+  const g = gainFor(mono);
+  const level = g > 1 ? amplify(mono, g) : mono;
   const samples = new Int16Array(len);
   for (let i = 0; i < len; i++) {
-    const s = Math.max(-1, Math.min(1, mono[i]));
+    const s = Math.max(-1, Math.min(1, level[i]));
     samples[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
   }
   const enc = new Mp3Encoder(1, audio.sampleRate, 64);

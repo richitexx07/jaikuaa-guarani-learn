@@ -8,7 +8,7 @@ import { useGameWords } from "@/components/games/game-shell";
 import { recordCompletion } from "@/lib/gamification";
 import { playGuarani } from "@/lib/audio";
 import { getMostradorAudio, listMostrador } from "@/lib/mostrador.functions";
-import { playFrase } from "@/lib/mostrador-audio";
+import { playFrase, prefetchFrases } from "@/lib/mostrador-audio";
 import {
   armarTurno,
   enIdioma,
@@ -127,6 +127,7 @@ function Consultorio() {
     queryFn: () => audioFn({ data: { ids: ids.slice(0, 80) } }),
   });
   const urls = audioQ.data?.urls ?? {};
+  useEffect(() => { if (audioQ.data?.urls) prefetchFrases(audioQ.data.urls); }, [audioQ.data?.urls]);
   const cargando = cuerpoQ.isLoading || frasesQ.isLoading;
   const pocos = frases.length < 8;
 

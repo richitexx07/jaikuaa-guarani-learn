@@ -1,3 +1,5 @@
+import { louderBlob } from "./audio-louder";
+
 /**
  * Audio del Modo mostrador: enlaces firmados del servidor y copia en el teléfono para usar sin señal.
  * Nunca hay voz de máquina: si una frase no tiene grabación, no suena.
@@ -21,7 +23,7 @@ export async function offlineUrl(id: string): Promise<string | null> {
     const res = await cache.match(key(id));
     if (!res) return null;
     const blob = await res.blob();
-    return blob.size ? URL.createObjectURL(blob) : null;
+    return blob.size ? URL.createObjectURL(await louderBlob(blob)) : null;
   } catch {
     return null;
   }
@@ -63,12 +65,35 @@ export async function saveOffline(urls: Record<string, string>): Promise<number>
 
 let current: HTMLAudioElement | null = null;
 
+// Frases ya subidas de volumen en esta sesión (id → enlace local).
+const louder = new Map<string, string>();
+async function louderRemote(id: string, url: string): Promise<string | null> {
+  const have = louder.get(id);
+  if (have) return have;
+  try {
+    const r = await fetch(url, { mode: "cors", credentials: "omit" });
+    if (!r.ok) return null;
+    const blob = await r.blob();
+    if (!blob.size) return null;
+    const u = URL.createObjectURL(await louderBlob(blob));
+    louder.set(id, u);
+    return u;
+  } catch {
+    return null;
+  }
+}
+
 /** Hace sonar una frase: primero la copia del teléfono, si no el enlace del servidor. */
 export async function playFrase(id: string, remoteUrl: string | undefined): Promise<boolean> {
   current?.pause();
-  const local = await offlineUrl(id);
-  const src = local ?? remoteUrl;
+  const ready = louder.get(id);
+  const local = ready ? null : await offlineUrl(id);
+  const src = ready ?? local ?? remoteUrl;
   if (!src) return false;
+  // Sin esperar la descarga (así el toque habilita el sonido en iPhone); la versión más fuerte
+  // queda lista para la próxima vez.
+  if (local) louder.set(id, local);
+  else if (!ready && remoteUrl) void louderRemote(id, remoteUrl);
   const audio = new Audio(src);
   current = audio;
   try {
@@ -76,12 +101,15 @@ export async function playFrase(id: string, remoteUrl: string | undefined): Prom
     return true;
   } catch {
     return false;
-  } finally {
-    if (local) audio.addEventListener("ended", () => URL.revokeObjectURL(local), { once: true });
   }
 }
 
 export function stopFrase() {
   current?.pause();
   current = null;
+}
+
+/** Deja listas (y más fuertes) las frases de la pantalla, para que suenen bien desde el primer toque. */
+export function prefetchFrases(urls: Record<string, string>, max = 30) {
+  for (const [id, url] of Object.entries(urls).slice(0, max)) void louderRemote(id, url);
 }

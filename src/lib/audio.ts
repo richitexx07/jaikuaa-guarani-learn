@@ -12,6 +12,7 @@
 import { useEffect } from "react";
 import { getAudioSignedUrls } from "./audio.functions";
 import { slugify } from "./slug";
+import { louderBlob } from "./audio-louder";
 
 export { slugify };
 
@@ -177,8 +178,10 @@ function preloadBytes(slug: string, url: string): Promise<string | null> {
   const p = fetch(url, { mode: "cors", credentials: "omit" })
     .then(async (r) => {
       if (!r.ok) return null;
-      const blob = await r.blob();
-      if (!blob.size) return null;
+      const raw = await r.blob();
+      if (!raw.size) return null;
+      // Las grabaciones bajas se suben a un volumen parejo antes de guardarlas en memoria.
+      const blob = await louderBlob(raw);
       const objectUrl = URL.createObjectURL(blob);
       rememberBlob(slug, objectUrl);
       return objectUrl;

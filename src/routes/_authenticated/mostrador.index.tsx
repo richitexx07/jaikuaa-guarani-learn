@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { withOfflineCache } from "@/lib/offline-data";
 import { getMostradorAudio, listMostrador } from "@/lib/mostrador.functions";
 import { agruparPorSituacion, isRubro, RUBROS, type Frase, type RubroId } from "@/lib/mostrador";
-import { countOffline, playFrase, saveOffline, stopFrase } from "@/lib/mostrador-audio";
+import { countOffline, playFrase, prefetchFrases, saveOffline, stopFrase } from "@/lib/mostrador-audio";
 import jaiAtencion from "@/assets/jai-atencion-pro.webp";
 
 export const Route = createFileRoute("/_authenticated/mostrador/")({
@@ -52,6 +52,7 @@ function MostradorPage() {
     queryFn: () => audioFn({ data: { ids: ids.slice(0, 80) } }),
   });
   const urls = audio?.urls ?? {};
+  useEffect(() => { if (audio?.urls) prefetchFrases(audio.urls); }, [audio?.urls]);
 
   const [guardadas, setGuardadas] = useState(0);
   const [guardando, setGuardando] = useState(false);
