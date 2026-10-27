@@ -18,6 +18,7 @@ import { TRIVIA_ART } from "@/lib/trivia-art";
 import { markSendero } from "@/lib/trivia-sendero";
 import { claveTrivia, getTexto } from "@/lib/juego-textos";
 import { useJuegoTextos } from "@/lib/use-juego-textos";
+import { useTriviaTx } from "@/lib/i18n-trivia";
 import { RetoBanner, RetoFinal, useRetoPartida } from "@/components/games/reto";
 
 export const Route = createFileRoute("/_authenticated/trivia/$category")({
@@ -36,46 +37,6 @@ export const Route = createFileRoute("/_authenticated/trivia/$category")({
 });
 
 type Phase = "playing" | "done";
-
-// ── Rotating error messages (never repeat the same one twice in a row) ────────
-function buildErrorMessage(correctAnswer: string, index: number): string {
-  const templates = [
-    `¡Casi! La respuesta era **${correctAnswer}**.\n\nNo te preocupés, el guaraní ya está en vos. Solo hay que despertarlo. 🐆`,
-    `¡Uy, esa era difícil! Era **${correctAnswer}**.\n\nNadie nace sabiendo. Cada guaraní que aprendés es una raíz que recuperás. 💙`,
-    `¡Casi la tenés! Era **${correctAnswer}**.\n\nEl jaguaréte también tropieza, pero siempre se levanta. Seguí. 🐆`,
-    `El guaraní es como el mate: se aprende tomando. 🧉\n\nLa correcta era **${correctAnswer}**. ¡Otra más!`,
-    `¡No pasa nada! Era **${correctAnswer}**.\n\nEn Paraguay nadie te juzga por equivocarte. Acá se aprende junto. 💙`,
-    `Era **${correctAnswer}**.\n\nCada error es una palabra que ya no se te olvida. Tu ñe'ẽ crece. 🌱`,
-    `¡Casi! Era **${correctAnswer}**.\n\nVos no estás aprendiendo un idioma. Estás recuperando lo que siempre fue tuyo. 🐆`,
-    `Era **${correctAnswer}**.\n\nEl que nunca se equivoca, nunca aprende. Vos ya estás un paso adelante. 💪`,
-  ];
-  return templates[index % templates.length];
-}
-
-function buildSuccessMessage(
-  category: TriviaCategoryId,
-  answer: string,
-  explanation: string,
-): string {
-  switch (category) {
-    case "vocabulario":
-      return `¡Añete! **${answer}**.\n\n${explanation} Ahora podés decírselo a tu abuela. Ella va a sonreír. 🐆`;
-    case "mitos":
-      return `¡Sí! **${answer}**.\n\n${explanation} Tu historia vive. 🔥`;
-    case "cultura":
-      return `¡Exacto! **${answer}**.\n\n${explanation} Vos la seguís viva. 💙`;
-    default:
-      return `¡Muy bien! **${answer}**.\n\n${explanation} 🇵🇾`;
-  }
-}
-
-function streakLabel(n: number): string | null {
-  if (n === 2) return "¡Vas bien! 🔥";
-  if (n === 3) return "¡Racha x3! El jaguaréte está orgulloso. 🐆";
-  if (n === 4) return "¡Imparable! ¿Vos ya sabías guaraní en otra vida? ✨";
-  if (n >= 5) return "¡PERFECTO! El jaguaréte te nombra guerrero del Ñe'ẽ. 🐆⚔️";
-  return null;
-}
 
 // Simple markdown-lite: **bold** and newlines
 function renderCopy(text: string) {
@@ -102,6 +63,7 @@ function TriviaQuiz() {
   const { category } = Route.useLoaderData() as { category: TriviaCategoryId };
   useRecordVisit(`trivia:${category}`);
   const cat = TRIVIA[category];
+  const { tt, err, ok, streak: streakLabel, lang } = useTriviaTx();
   const navigate = useNavigate();
 
   const [runKey, setRunKey] = useState(0);
@@ -219,8 +181,8 @@ function TriviaQuiz() {
     timePct > 60 ? "bg-primary" : timePct > 30 ? "bg-amber-500" : "bg-destructive";
 
   const isCorrectAnswered = answered && selected === question.answer;
-  const errorCopy = buildErrorMessage(correctAnswerText, errorSeedRef.current + idx);
-  const successCopy = buildSuccessMessage(category, correctAnswerText, question.explanation);
+  const errorCopy = err(correctAnswerText, errorSeedRef.current + idx);
+  const successCopy = ok(category, correctAnswerText, question.explanation);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -231,7 +193,7 @@ function TriviaQuiz() {
             <BrandLogo />
           </Link>
           <Link to="/trivia" className="text-sm font-medium text-muted-foreground hover:text-primary">
-            Salir
+            {tt("exit")}
           </Link>
         </div>
       </header>
@@ -247,7 +209,7 @@ function TriviaQuiz() {
                   <span className="font-semibold text-foreground">{cat.title}</span>
                 </div>
                 <span className="text-sm font-medium text-muted-foreground">
-                  Pregunta {idx + 1} de {total}
+                  {tt("question", { a: idx + 1, b: total })}
                 </span>
               </div>
 
@@ -276,6 +238,7 @@ function TriviaQuiz() {
                 </div>
               )}
 
+              {idx === 0 && lang !== "es" && <p className="mb-3 text-center text-xs text-muted-foreground">{tt("content")}</p>}
               {idx === 0 && <RetoBanner partida={partida} extra={category} coincide={coincide} className="mb-3" />}
 
               {/* Question card */}
@@ -340,7 +303,7 @@ function TriviaQuiz() {
                         ? renderCopy(successCopy)
                         : timedOut && selected === null
                           ? renderCopy(
-                              `⏱️ Se acabó el tiempo, che.\n\n${errorCopy}`,
+                              `${tt("timeout")}\n\n${errorCopy}`,
                             )
                           : renderCopy(errorCopy)}
                     </div>
@@ -348,13 +311,13 @@ function TriviaQuiz() {
                     {streakBroken && (
                       <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm leading-relaxed text-foreground">
                         {renderCopy(
-                          "Se cortó la racha... 😔\n\nPero no importa, che. El guaraní no se aprende de una. Tu abuela tampoco la acertó todo el primer día.\n\n**Volvé mañana. El jaguaréte te espera.** 🐆",
+                          tt("broken"),
                         )}
                       </div>
                     )}
 
                     <Button onClick={handleNext} className="w-full" size="lg">
-                      {idx + 1 >= total ? "Ver resultado" : "¡Seguimos! →"}
+                      {idx + 1 >= total ? tt("result") : tt("next")}
                     </Button>
                   </div>
                 )}
@@ -363,7 +326,7 @@ function TriviaQuiz() {
               {/* Live streak */}
               {streak >= 2 && !answered && (
                 <div className="mt-3 text-center text-xs font-semibold text-accent">
-                  🔥 Racha actual: {streak}
+                  {tt("live", { a: streak })}
                 </div>
               )}
             </>
@@ -404,12 +367,13 @@ function ResultsScreen({
   onReplay: () => void;
   onChoose: () => void;
 }) {
+  const { tt } = useTriviaTx();
   const isPerfect = correct === total;
   const verdict = useMemo(() => {
     if (isPerfect) return "¡Iporãite!";
     if (correct >= 3) return "¡Iporã!";
-    return "¡Seguí practicando!";
-  }, [correct, total, isPerfect]);
+    return tt("keep");
+  }, [correct, total, isPerfect, tt]);
 
   return (
     <div className="rounded-2xl border border-border/60 bg-card p-8 text-center shadow-elegant animate-fade-in">
@@ -417,31 +381,29 @@ function ResultsScreen({
         {isPerfect ? "🐆" : "🏆"}
       </div>
       <h2 className="mt-3 font-display text-3xl font-bold text-foreground">
-        {correct} de {total} {verdict}
+        {tt("of", { a: correct, b: total })} {verdict}
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">{category}</p>
 
       {isPerfect && (
         <div className="mt-5 rounded-xl border border-accent/30 bg-accent/5 p-4 text-left text-sm leading-relaxed text-foreground">
           <p className="font-display text-lg font-bold text-accent">
-            ¡PERFECTO! 🐆🐆🐆
+            {tt("perfect")}
           </p>
-          <p className="mt-2">
-            El jaguaréte te nombra <strong>Guerrero del Ñe'ẽ</strong>.
-          </p>
+          <p className="mt-2" dangerouslySetInnerHTML={{ __html: tt("warrior") }} />
           <p className="mt-1">
-            Tu nombre queda grabado en las estrellas de Tupã.
+            {tt("stars")}
           </p>
         </div>
       )}
 
       <div className="mt-6 grid grid-cols-2 gap-3">
         <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-          <div className="text-xs font-semibold uppercase tracking-wide text-primary">XP ganado</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-primary">{tt("xp")}</div>
           <div className="mt-1 font-display text-2xl font-bold text-foreground">+{xp}</div>
         </div>
         <div className="rounded-xl border border-accent/20 bg-accent/5 p-4">
-          <div className="text-xs font-semibold uppercase tracking-wide text-accent">Mejor racha</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-accent">{tt("best")}</div>
           <div className="mt-1 font-display text-2xl font-bold text-foreground">
             {bestStreak} 🔥
           </div>
@@ -450,10 +412,10 @@ function ResultsScreen({
 
       <div className="mt-6 flex flex-col gap-2 sm:flex-row">
         <Button onClick={onReplay} className="flex-1" size="lg">
-          Jugar de nuevo
+          {tt("again")}
         </Button>
         <Button onClick={onChoose} variant="outline" className="flex-1" size="lg">
-          Elegir otra categoría
+          {tt("other")}
         </Button>
       </div>
     </div>
