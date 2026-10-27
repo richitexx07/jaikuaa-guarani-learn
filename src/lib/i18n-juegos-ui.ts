@@ -105,6 +105,26 @@ const T = {
   vtMeans: { es: "Significa:", pt: "Significa:", en: "It means:", de: "Bedeutet:", fr: "Signifie :", zh: "意思是：" },
   vtClose: { es: "Cerrar la ventanilla", pt: "Fechar o guichê", en: "Close the desk", de: "Schalter schließen", fr: "Fermer le guichet", zh: "關閉窗口" },
   vtNext: { es: "¡Siguiente!", pt: "Próximo!", en: "Next!", de: "Der Nächste!", fr: "Suivant !", zh: "下一位！" },
+  // Karaoke
+  kkLoading: { es: "Afinando el arpa…", pt: "Afinando a harpa…", en: "Tuning the harp…", de: "Die Harfe wird gestimmt…", fr: "Accordage de la harpe…", zh: "正在為豎琴調音…" },
+  kkIntro: { es: "La letra se ilumina al ritmo del arpa. Cuando aparece el hueco, tocá la palabra justa a tiempo.", pt: "A letra se ilumina no ritmo da harpa. Quando aparecer a lacuna, toque a palavra certa na hora.", en: "The lyrics light up to the beat of the harp. When the gap appears, tap the right word on time.", de: "Der Text leuchtet im Takt der Harfe. Wenn die Lücke kommt, tippe rechtzeitig das richtige Wort.", fr: "Les paroles s'illuminent au rythme de la harpe. Quand le trou apparaît, touchez le bon mot à temps.", zh: "歌詞隨豎琴節奏亮起。出現空格時，準時點選正確的詞。" },
+  kkChoose: { es: "Elegí la canción", pt: "Escolha a música", en: "Choose a song", de: "Wähle ein Lied", fr: "Choisissez la chanson", zh: "選一首歌" },
+  kkBpm: { es: "pulsos por minuto", pt: "batidas por minuto", en: "beats per minute", de: "Schläge pro Minute", fr: "battements par minute", zh: "每分鐘拍數" },
+  kkSang: { es: "¡Cantaste «{n}»!", pt: "Você cantou «{n}»!", en: "You sang «{n}»!", de: "Du hast «{n}» gesungen!", fr: "Vous avez chanté « {n} » !", zh: "你唱完了《{n}》！" },
+  kkLines: { es: "{p} de {n} versos perfectos · {s} puntos", pt: "{p} de {n} versos perfeitos · {s} pontos", en: "{p} of {n} perfect lines · {s} points", de: "{p} von {n} Versen perfekt · {s} Punkte", fr: "{p} vers parfaits sur {n} · {s} points", zh: "{n} 句中 {p} 句完美 · {s} 分" },
+  kkAgain: { es: "Cantar de nuevo", pt: "Cantar de novo", en: "Sing again", de: "Nochmal singen", fr: "Chanter encore", zh: "再唱一次" },
+  kkOther: { es: "Otra canción", pt: "Outra música", en: "Another song", de: "Anderes Lied", fr: "Une autre chanson", zh: "換一首歌" },
+  kkPts: { es: "pts", pt: "pts", en: "pts", de: "Pkt.", fr: "pts", zh: "分" },
+  kkReady: { es: "¿Listo para cantar?", pt: "Pronto para cantar?", en: "Ready to sing?", de: "Bereit zum Singen?", fr: "Prêt à chanter ?", zh: "準備好唱了嗎？" },
+  kkVerses: { es: "Versos: {h} de {n}", pt: "Versos: {h} de {n}", en: "Lines: {h} of {n}", de: "Verse: {h} von {n}", fr: "Vers : {h} sur {n}", zh: "歌句：{h} / {n}" },
+  kkSing: { es: "(Cantemos)", pt: "(Vamos cantar)", en: "(Let's sing)", de: "(Lasst uns singen)", fr: "(Chantons)", zh: "（一起唱）" },
+  kkTip: { es: "Tocá la palabra que falta justo cuando suena: más cerca del pulso, más puntos.", pt: "Toque a palavra que falta bem na hora: quanto mais perto da batida, mais pontos.", en: "Tap the missing word right as it plays: the closer to the beat, the more points.", de: "Tippe das fehlende Wort genau im Takt: je näher am Schlag, desto mehr Punkte.", fr: "Touchez le mot manquant au bon moment : plus vous êtes près du temps, plus vous gagnez de points.", zh: "在詞出現時點選缺少的詞：越接近節拍，分數越高。" },
+  kkRecTitle: { es: "Grabate y escuchate", pt: "Grave-se e escute-se", en: "Record and listen to yourself", de: "Nimm dich auf und hör dich an", fr: "Enregistrez-vous et écoutez-vous", zh: "錄下來聽聽自己" },
+  kkRecInfo: { es: "Leé la letra en voz alta. La grabación queda solo en tu celular.", pt: "Leia a letra em voz alta. A gravação fica só no seu celular.", en: "Read the lyrics aloud. The recording stays only on your phone.", de: "Lies den Text laut vor. Die Aufnahme bleibt nur auf deinem Handy.", fr: "Lisez les paroles à voix haute. L'enregistrement reste sur votre téléphone.", zh: "大聲朗讀歌詞。錄音只會保存在你的手機上。" },
+  kkStop: { es: "Detener", pt: "Parar", en: "Stop", de: "Stopp", fr: "Arrêter", zh: "停止" },
+  kkRecAgain: { es: "Grabar otra vez", pt: "Gravar de novo", en: "Record again", de: "Nochmal aufnehmen", fr: "Réenregistrer", zh: "重新錄音" },
+  kkRec: { es: "Grabar mi voz", pt: "Gravar minha voz", en: "Record my voice", de: "Meine Stimme aufnehmen", fr: "Enregistrer ma voix", zh: "錄下我的聲音" },
+  kkMic: { es: "Necesitamos permiso del micrófono para grabar.", pt: "Precisamos de permissão do microfone para gravar.", en: "We need microphone permission to record.", de: "Wir brauchen Zugriff auf das Mikrofon.", fr: "Nous avons besoin de l'accès au micro pour enregistrer.", zh: "需要麥克風權限才能錄音。" },
 } satisfies Record<string, L>;
 
 export type JUKey = keyof typeof T;
