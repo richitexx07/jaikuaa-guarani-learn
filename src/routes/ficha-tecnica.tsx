@@ -73,6 +73,7 @@ const SECCIONES = [
       "Doble firma humana: quien propone una palabra no puede ser quien la valida (control en servidor y restricción en la base).",
       "Certificados con código aleatorio, verificables en una página pública que muestra solo los datos impresos.",
       "Escaneos de seguridad antes de cada publicación. Juegos sin chat libre, pensados para menores.",
+      "Certificados: el servidor exige lecciones publicadas, hechas en orden y con un tope diario antes de contarlas. Planillas descargadas protegidas contra fórmulas. Docentes sin habilitación vigente pierden acceso a sus aulas.",
     ],
   },
   {
