@@ -33,13 +33,14 @@ const setOnline = (v: boolean) => {
 /* ------------------------- servidor simulado ------------------------- */
 const server = {
   calls: [] as Record<string, unknown>[],
-  fail: null as null | "network" | "reject" | "unauthorized",
+  fail: null as null | "network" | "reject" | "unauthorized" | "ratelimit",
   xp: 0,
 };
 function serverError() {
   if (server.fail === "network") throw new TypeError("Failed to fetch");
   if (server.fail === "reject") throw new Error("Juego no válido");
   if (server.fail === "unauthorized") throw new Error("Unauthorized: No authorization header provided");
+  if (server.fail === "ratelimit") throw new Error("Demasiadas actividades seguidas. Esperá unos minutos.");
 }
 const stats = () => ({
   userId: "u1",
