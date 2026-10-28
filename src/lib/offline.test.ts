@@ -33,13 +33,14 @@ const setOnline = (v: boolean) => {
 /* ------------------------- servidor simulado ------------------------- */
 const server = {
   calls: [] as Record<string, unknown>[],
-  fail: null as null | "network" | "reject" | "unauthorized",
+  fail: null as null | "network" | "reject" | "unauthorized" | "ratelimit",
   xp: 0,
 };
 function serverError() {
   if (server.fail === "network") throw new TypeError("Failed to fetch");
   if (server.fail === "reject") throw new Error("Juego no válido");
   if (server.fail === "unauthorized") throw new Error("Unauthorized: No authorization header provided");
+  if (server.fail === "ratelimit") throw new Error("Demasiadas actividades seguidas. Esperá unos minutos.");
 }
 const stats = () => ({
   userId: "u1",
@@ -223,6 +224,27 @@ describe("Avances hechos sin señal", () => {
       await settle();
     }
     expect(gam.pendingCount()).toBe(0);
+  });
+
+  it("el freno del servidor por muchas actividades no borra nada: se envía cuando pasa la ventana", async () => {
+    loginStored();
+    session.current = { user: { id: "u1" } };
+    const gam = await import("./gamification");
+    server.fail = "ratelimit";
+    gam.recordCompletion({ xp: 5, source: "game", sourceRef: "memoria" });
+    await settle();
+    // Muchos reintentos seguidos (más que el tope de rechazos): nada se descarta.
+    for (let i = 0; i < 12; i++) {
+      await gam.syncStats();
+      await settle();
+    }
+    expect(gam.pendingCount()).toBe(1);
+    // Cuando pasa la ventana del freno, el avance llega al servidor.
+    server.fail = null;
+    await gam.syncStats();
+    await settle();
+    expect(gam.pendingCount()).toBe(0);
+    expect(server.calls).toHaveLength(1);
   });
 
   it("con señal, se guarda primero y se envía enseguida", async () => {
