@@ -201,8 +201,12 @@ async function send(ev: PendingEvent): Promise<SendResult> {
     return "ok";
   } catch (e) {
     if (isNetworkError(e)) return "network";
+    const msg = String((e as Error)?.message ?? "");
     // Sesión vencida: se reintenta cuando se renueve, sin contarlo como rechazo.
-    if (/unauthori|jwt|token|session/i.test(String((e as Error)?.message ?? ""))) return "network";
+    if (/unauthori|jwt|token|session/i.test(msg)) return "network";
+    // Freno del servidor por muchas actividades seguidas: no es un rechazo del avance,
+    // se reintenta cuando pasa la ventana (10 min) sin gastar intentos ni borrar la cola.
+    if (/demasiadas actividades/i.test(msg)) return "network";
     return "rejected";
   }
 }
