@@ -226,6 +226,27 @@ describe("Avances hechos sin señal", () => {
     expect(gam.pendingCount()).toBe(0);
   });
 
+  it("el freno del servidor por muchas actividades no borra nada: se envía cuando pasa la ventana", async () => {
+    loginStored();
+    session.current = { user: { id: "u1" } };
+    const gam = await import("./gamification");
+    server.fail = "ratelimit";
+    gam.recordCompletion({ xp: 5, source: "game", sourceRef: "memoria" });
+    await settle();
+    // Muchos reintentos seguidos (más que el tope de rechazos): nada se descarta.
+    for (let i = 0; i < 12; i++) {
+      await gam.syncStats();
+      await settle();
+    }
+    expect(gam.pendingCount()).toBe(1);
+    // Cuando pasa la ventana del freno, el avance llega al servidor.
+    server.fail = null;
+    await gam.syncStats();
+    await settle();
+    expect(gam.pendingCount()).toBe(0);
+    expect(server.calls).toHaveLength(1);
+  });
+
   it("con señal, se guarda primero y se envía enseguida", async () => {
     loginStored();
     session.current = { user: { id: "u1" } };
