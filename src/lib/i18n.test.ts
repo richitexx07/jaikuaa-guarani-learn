@@ -26,6 +26,16 @@ describe("japonés, ruso y coreano en pantallas internas", () => {
   });
 });
 
+describe("hebreo, turco y suajili", () => {
+  it("traducen el ingreso y quedan marcados como preliminares", async () => {
+    const { PRELIMINARY_LANGS } = await import("./i18n");
+    for (const l of ["he", "tr", "sw"] as const) {
+      expect(translate(l, "auth.login")).not.toBe("Sign in");
+      expect(PRELIMINARY_LANGS).toContain(l);
+    }
+  });
+});
+
 describe("árabe, italiano, quechua e hindi", () => {
   it("traducen el ingreso y quedan marcados como preliminares", async () => {
     const { PRELIMINARY_LANGS } = await import("./i18n");

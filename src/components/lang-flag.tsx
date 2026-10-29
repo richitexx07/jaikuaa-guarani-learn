@@ -123,6 +123,36 @@ function Body({ lang }: { lang: UiLang }) {
           <path d="M9 15.5 Q15 18.5 21 15.5" stroke="#FFFFFF" strokeWidth={0.7} fill="none" />
         </>
       );
+    case "he": // Israel
+      return (
+        <>
+          <rect width={W} height={H} fill="#FFFFFF" />
+          <rect x={0} y={2} width={W} height={2.6} fill="#0038B8" />
+          <rect x={0} y={15.4} width={W} height={2.6} fill="#0038B8" />
+          <path d="M15 6.4 L18.1 11.8 L11.9 11.8 Z" fill="none" stroke="#0038B8" strokeWidth={0.7} />
+          <path d="M15 13.6 L11.9 8.2 L18.1 8.2 Z" fill="none" stroke="#0038B8" strokeWidth={0.7} />
+        </>
+      );
+    case "tr": // Turquía
+      return (
+        <>
+          <rect width={W} height={H} fill="#E30A17" />
+          <circle cx={11} cy={10} r={5} fill="#FFFFFF" />
+          <circle cx={12.3} cy={10} r={4} fill="#E30A17" />
+          <path d="M17.2 10 L20.9 8.8 L18.6 11.9 L18.6 8.1 L20.9 11.2 Z" fill="#FFFFFF" />
+        </>
+      );
+    case "sw": // Kenia (suajili, lengua de África Oriental)
+      return (
+        <>
+          <Stripes colors={["#000000", "#FFFFFF", "#BB0000", "#FFFFFF", "#006600"]} />
+          <rect x={0} y={5.6} width={W} height={8.8} fill="#BB0000" />
+          <rect x={0} y={4} width={W} height={1.6} fill="#FFFFFF" />
+          <rect x={0} y={14.4} width={W} height={1.6} fill="#FFFFFF" />
+          <ellipse cx={15} cy={10} rx={2.6} ry={6} fill="#000000" />
+          <ellipse cx={15} cy={10} rx={1.2} ry={4.4} fill="#BB0000" />
+        </>
+      );
     case "qu":
       return <Wiphala />;
     default:
