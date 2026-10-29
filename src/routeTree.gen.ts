@@ -21,6 +21,7 @@ import { Route as EnRouteImport } from './routes/en'
 import { Route as FichaAuspiciantesRouteImport } from './routes/ficha-auspiciantes'
 import { Route as FichaTecnicaRouteImport } from './routes/ficha-tecnica'
 import { Route as FrRouteImport } from './routes/fr'
+import { Route as HeRouteImport } from './routes/he'
 import { Route as HiRouteImport } from './routes/hi'
 import { Route as InstitucionesRouteImport } from './routes/instituciones'
 import { Route as InversionRouteImport } from './routes/inversion'
@@ -36,8 +37,10 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RespaldosRouteImport } from './routes/respaldos'
 import { Route as RuRouteImport } from './routes/ru'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as SwRouteImport } from './routes/sw'
 import { Route as TecladoRouteImport } from './routes/teclado'
 import { Route as TerminosRouteImport } from './routes/terminos'
+import { Route as TrRouteImport } from './routes/tr'
 import { Route as TurismoRouteImport } from './routes/turismo'
 import { Route as ZhRouteImport } from './routes/zh'
 import { Route as AuthenticatedAgroRouteImport } from './routes/_authenticated/agro'
@@ -162,6 +165,11 @@ const FrRoute = FrRouteImport.update({
   path: '/fr',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HeRoute = HeRouteImport.update({
+  id: '/he',
+  path: '/he',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HiRoute = HiRouteImport.update({
   id: '/hi',
   path: '/hi',
@@ -237,6 +245,11 @@ const SobreRoute = SobreRouteImport.update({
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SwRoute = SwRouteImport.update({
+  id: '/sw',
+  path: '/sw',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TecladoRoute = TecladoRouteImport.update({
   id: '/teclado',
   path: '/teclado',
@@ -245,6 +258,11 @@ const TecladoRoute = TecladoRouteImport.update({
 const TerminosRoute = TerminosRouteImport.update({
   id: '/terminos',
   path: '/terminos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrRoute = TrRouteImport.update({
+  id: '/tr',
+  path: '/tr',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TurismoRoute = TurismoRouteImport.update({
@@ -622,6 +640,7 @@ export interface FileRoutesByFullPath {
   '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/ficha-tecnica': typeof FichaTecnicaRoute
   '/fr': typeof FrRoute
+  '/he': typeof HeRoute
   '/hi': typeof HiRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
@@ -637,8 +656,10 @@ export interface FileRoutesByFullPath {
   '/respaldos': typeof RespaldosRoute
   '/ru': typeof RuRoute
   '/sobre': typeof SobreRoute
+  '/sw': typeof SwRoute
   '/teclado': typeof TecladoRoute
   '/terminos': typeof TerminosRoute
+  '/tr': typeof TrRoute
   '/turismo': typeof TurismoRoute
   '/zh': typeof ZhRoute
   '/agro': typeof AuthenticatedAgroRoute
@@ -716,6 +737,7 @@ export interface FileRoutesByTo {
   '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/ficha-tecnica': typeof FichaTecnicaRoute
   '/fr': typeof FrRoute
+  '/he': typeof HeRoute
   '/hi': typeof HiRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
@@ -731,8 +753,10 @@ export interface FileRoutesByTo {
   '/respaldos': typeof RespaldosRoute
   '/ru': typeof RuRoute
   '/sobre': typeof SobreRoute
+  '/sw': typeof SwRoute
   '/teclado': typeof TecladoRoute
   '/terminos': typeof TerminosRoute
+  '/tr': typeof TrRoute
   '/turismo': typeof TurismoRoute
   '/zh': typeof ZhRoute
   '/agro': typeof AuthenticatedAgroRoute
@@ -809,6 +833,7 @@ export interface FileRoutesById {
   '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/ficha-tecnica': typeof FichaTecnicaRoute
   '/fr': typeof FrRoute
+  '/he': typeof HeRoute
   '/hi': typeof HiRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
@@ -824,8 +849,10 @@ export interface FileRoutesById {
   '/respaldos': typeof RespaldosRoute
   '/ru': typeof RuRoute
   '/sobre': typeof SobreRoute
+  '/sw': typeof SwRoute
   '/teclado': typeof TecladoRoute
   '/terminos': typeof TerminosRoute
+  '/tr': typeof TrRoute
   '/turismo': typeof TurismoRoute
   '/zh': typeof ZhRoute
   '/_authenticated/agro': typeof AuthenticatedAgroRoute
@@ -905,6 +932,7 @@ export interface FileRouteTypes {
     | '/ficha-auspiciantes'
     | '/ficha-tecnica'
     | '/fr'
+    | '/he'
     | '/hi'
     | '/instituciones'
     | '/inversion'
@@ -920,8 +948,10 @@ export interface FileRouteTypes {
     | '/respaldos'
     | '/ru'
     | '/sobre'
+    | '/sw'
     | '/teclado'
     | '/terminos'
+    | '/tr'
     | '/turismo'
     | '/zh'
     | '/agro'
@@ -999,6 +1029,7 @@ export interface FileRouteTypes {
     | '/ficha-auspiciantes'
     | '/ficha-tecnica'
     | '/fr'
+    | '/he'
     | '/hi'
     | '/instituciones'
     | '/inversion'
@@ -1014,8 +1045,10 @@ export interface FileRouteTypes {
     | '/respaldos'
     | '/ru'
     | '/sobre'
+    | '/sw'
     | '/teclado'
     | '/terminos'
+    | '/tr'
     | '/turismo'
     | '/zh'
     | '/agro'
@@ -1091,6 +1124,7 @@ export interface FileRouteTypes {
     | '/ficha-auspiciantes'
     | '/ficha-tecnica'
     | '/fr'
+    | '/he'
     | '/hi'
     | '/instituciones'
     | '/inversion'
@@ -1106,8 +1140,10 @@ export interface FileRouteTypes {
     | '/respaldos'
     | '/ru'
     | '/sobre'
+    | '/sw'
     | '/teclado'
     | '/terminos'
+    | '/tr'
     | '/turismo'
     | '/zh'
     | '/_authenticated/agro'
@@ -1187,6 +1223,7 @@ export interface RootRouteChildren {
   FichaAuspiciantesRoute: typeof FichaAuspiciantesRoute
   FichaTecnicaRoute: typeof FichaTecnicaRoute
   FrRoute: typeof FrRoute
+  HeRoute: typeof HeRoute
   HiRoute: typeof HiRoute
   InstitucionesRoute: typeof InstitucionesRoute
   InversionRoute: typeof InversionRoute
@@ -1202,8 +1239,10 @@ export interface RootRouteChildren {
   RespaldosRoute: typeof RespaldosRoute
   RuRoute: typeof RuRoute
   SobreRoute: typeof SobreRoute
+  SwRoute: typeof SwRoute
   TecladoRoute: typeof TecladoRoute
   TerminosRoute: typeof TerminosRoute
+  TrRoute: typeof TrRoute
   TurismoRoute: typeof TurismoRoute
   ZhRoute: typeof ZhRoute
   ApiTutorRoute: typeof ApiTutorRoute
@@ -1296,6 +1335,13 @@ declare module '@tanstack/react-router' {
       path: '/fr'
       fullPath: '/fr'
       preLoaderRoute: typeof FrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/he': {
+      id: '/he'
+      path: '/he'
+      fullPath: '/he'
+      preLoaderRoute: typeof HeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hi': {
@@ -1403,6 +1449,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sw': {
+      id: '/sw'
+      path: '/sw'
+      fullPath: '/sw'
+      preLoaderRoute: typeof SwRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/teclado': {
       id: '/teclado'
       path: '/teclado'
@@ -1415,6 +1468,13 @@ declare module '@tanstack/react-router' {
       path: '/terminos'
       fullPath: '/terminos'
       preLoaderRoute: typeof TerminosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tr': {
+      id: '/tr'
+      path: '/tr'
+      fullPath: '/tr'
+      preLoaderRoute: typeof TrRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/turismo': {
@@ -2051,6 +2111,7 @@ const rootRouteChildren: RootRouteChildren = {
   FichaAuspiciantesRoute: FichaAuspiciantesRoute,
   FichaTecnicaRoute: FichaTecnicaRoute,
   FrRoute: FrRoute,
+  HeRoute: HeRoute,
   HiRoute: HiRoute,
   InstitucionesRoute: InstitucionesRoute,
   InversionRoute: InversionRoute,
@@ -2066,8 +2127,10 @@ const rootRouteChildren: RootRouteChildren = {
   RespaldosRoute: RespaldosRoute,
   RuRoute: RuRoute,
   SobreRoute: SobreRoute,
+  SwRoute: SwRoute,
   TecladoRoute: TecladoRoute,
   TerminosRoute: TerminosRoute,
+  TrRoute: TrRoute,
   TurismoRoute: TurismoRoute,
   ZhRoute: ZhRoute,
   ApiTutorRoute: ApiTutorRoute,
