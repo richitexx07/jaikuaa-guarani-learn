@@ -1,11 +1,12 @@
 import { useAppLang, type AppLang } from "./i18n";
+import { withOverlay, ROW_ORDER } from "./i18n-overlay";
 
 /**
  * Textos de interfaz de las pantallas internas en 6 idiomas: [es, pt, en, de, fr, zh].
  * de/fr/zh son preliminares (en validación). Nunca contiene guaraní.
  */
 type Row = readonly [string, string, string, string, string, string];
-const ORDER: AppLang[] = ["es", "pt", "en", "de", "fr", "zh"];
+const ORDER = ROW_ORDER as readonly string[];
 
 const T = {
   backPanel: ["← Volver al panel", "← Voltar ao painel", "← Back to dashboard", "← Zurück zum Bereich", "← Retour au tableau de bord", "← 返回主頁"],
@@ -245,3 +246,6 @@ export function useTX() {
   return (k: TXKey, v?: Record<string, string | number>) =>
     (T[k][i] ?? T[k][0]).replace(/\{(\w+)\}/g, (_, x) => String(v?.[x] ?? ""));
 }
+
+// ja/ru/ko (preliminares, en validación).
+withOverlay([T]);

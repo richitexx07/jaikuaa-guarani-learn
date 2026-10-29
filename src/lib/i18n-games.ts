@@ -1,4 +1,5 @@
 import { useAppLang, type AppLang } from "./i18n";
+import { withOverlay } from "./i18n-overlay";
 
 /**
  * Textos de interfaz de los juegos en los 6 idiomas (de/fr/zh: traducción
@@ -221,3 +222,6 @@ export const GAME_HELP: Record<string, Help> = {
     ],
   },
 };
+
+// ja/ru/ko (preliminares, en validación).
+withOverlay([GT, GAME_TITLES, GAME_DESC, SHELF_TEXT, GAME_HELP]);

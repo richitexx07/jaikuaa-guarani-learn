@@ -1,4 +1,5 @@
 import { useAppLang, type AppLang } from "./i18n";
+import { withOverlay } from "./i18n-overlay";
 
 /**
  * Textos de interfaz de los juegos temáticos en 6 idiomas (de/fr/zh preliminares, en validación).
@@ -192,3 +193,6 @@ export function useJU() {
   return (k: JUKey, v?: Record<string, string | number>) =>
     T[k][lang].replace(/\{(\w+)\}/g, (_, x) => String(v?.[x] ?? ""));
 }
+
+// ja/ru/ko (preliminares, en validación).
+withOverlay([T]);
