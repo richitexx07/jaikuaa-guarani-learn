@@ -17,9 +17,10 @@ const LANGS = [
   { code: "zh", label: "中文", name: "繁體中文", to: "/zh" },
   { code: "ja", label: "日本語", name: "日本語", to: "/ja" },
   { code: "ru", label: "RU", name: "Русский", to: "/ru" },
+  { code: "ko", label: "한국어", name: "한국어", to: "/ko" },
 ] as const;
 
-export function LanguageSwitcher({ current }: { current: "es" | "pt" | "en" | "zh" | "de" | "fr" | "ja" | "ru" }) {
+export function LanguageSwitcher({ current }: { current: "es" | "pt" | "en" | "zh" | "de" | "fr" | "ja" | "ru" | "ko" }) {
   const active = LANGS.find((l) => l.code === current) ?? LANGS[0];
   return (
     <DropdownMenu>

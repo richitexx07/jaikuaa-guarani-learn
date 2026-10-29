@@ -16,9 +16,10 @@ export const LANG_NAMES: Record<UiLang, string> = {
   zh: "繁體中文",
   ja: "日本語",
   ru: "Русский",
+  ko: "한국어",
 };
 
-export const langShort = (l: UiLang) => (l === "zh" ? "中文" : l === "ja" ? "日本語" : l.toUpperCase());
+export const langShort = (l: UiLang) => (l === "zh" ? "中文" : l === "ja" ? "日本語" : l === "ko" ? "한국어" : l.toUpperCase());
 
 /** Selector compacto: un solo botón que despliega los idiomas; recuerda la elección. */
 export function AppLanguageToggle({ className = "" }: { className?: string }) {
