@@ -5,7 +5,7 @@ import OVERLAY from "./i18n-overlay.json";
  * Las traducciones salen del texto en inglés (clave) y son preliminares, en validación.
  * Nunca contiene guaraní: los nombres en guaraní quedan tal cual.
  */
-export const OVERLAY_LANGS = ["ja", "ru", "ko"] as const;
+export const OVERLAY_LANGS = ["ja", "ru", "ko", "ar", "it", "qu", "hi"] as const;
 export type OverlayLang = (typeof OVERLAY_LANGS)[number];
 const OV = OVERLAY as Record<OverlayLang, Record<string, string>>;
 
@@ -50,7 +50,7 @@ function walk(v: unknown) {
 }
 
 /** Orden de columnas de las filas, con los tres idiomas agregados al final. */
-export const ROW_ORDER = ["es", "pt", "en", "de", "fr", "zh", "ja", "ru", "ko"] as const;
+export const ROW_ORDER = ["es", "pt", "en", "de", "fr", "zh", "ja", "ru", "ko", "ar", "it", "qu", "hi"] as const;
 
 /** Traduce un texto en inglés a ja/ru/ko (o lo deja en inglés si falta). */
 export function ovText(l: OverlayLang, en: string): string {
