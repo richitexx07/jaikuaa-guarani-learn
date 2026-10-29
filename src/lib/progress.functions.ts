@@ -217,18 +217,9 @@ export const migrateLocalProgress = createServerFn({ method: "POST" })
       })
       .parse(d),
   )
-  .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const today = asuncionToday();
-    const last = data.lastActiveDate && data.lastActiveDate <= today ? data.lastActiveDate : null;
-    const { error } = await supabaseAdmin.rpc("migrate_local_progress", {
-      _user_id: context.userId,
-      _xp: data.xp,
-      _streak: last ? data.streak : 0,
-      _last_date: last,
-      _badges: [...new Set(data.badges)],
-      _lessons: data.guaraniLessonsCompleted,
-    } as never);
-    if (error) throw new Error("No se pudo migrar el progreso");
+  .handler(async ({ context }) => {
+    // Seguridad: el progreso guardado en el dispositivo no se puede comprobar,
+    // así que el servidor NO acepta puntos, rachas ni medallas enviados por el
+    // navegador. Solo cuentan las actividades verificadas con recordActivity.
     return readStats(context.userId);
   });
