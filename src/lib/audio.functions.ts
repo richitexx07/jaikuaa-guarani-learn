@@ -10,10 +10,10 @@ const LIMIT_SIGNED_IN = 300; // por hora por usuario
 const LIMIT_ANON = 30; // por hora por IP
 
 function slugifyAudio(gn: string): string {
-  let x = gn.normalize("NFD").replace(/[̀-ͯ]/g, "");
+  let x = gn.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   x = x.toLowerCase();
   x = x.replace(/ñ/g, "n");
-  x = x.replace(/['’ʼ˹‘]/g, "");
+  x = x.replace(/['\u2019\u02BC\u02B9\u2018]/g, "");
   x = x.replace(/[^a-z0-9]+/g, "-");
   x = x.replace(/^-+|-+$/g, "");
   return x;
