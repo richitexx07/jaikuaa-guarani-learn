@@ -10,9 +10,9 @@ export type AppLang = "es" | "pt" | "en" | "de" | "fr" | "zh";
 export const APP_LANGS: AppLang[] = ["es", "pt", "en", "de", "fr", "zh"];
 /** Idiomas con traducción preliminar, pendiente de revisión por un hablante nativo. */
 /** Idiomas de la interfaz: ja/ru/ko cubren menús, pantallas internas y juegos. */
-export type UiLang = AppLang | "ja" | "ru" | "ko" | "ar" | "it" | "qu" | "hi";
-export const UI_LANGS: UiLang[] = ["es", "pt", "en", "de", "fr", "zh", "ja", "ru", "ko", "ar", "it", "qu", "hi"];
-export const PRELIMINARY_LANGS: UiLang[] = ["de", "fr", "zh", "ja", "ru", "ko", "ar", "it", "qu", "hi"];
+export type UiLang = AppLang | "ja" | "ru" | "ko" | "ar" | "it" | "qu" | "hi" | "he" | "tr" | "sw";
+export const UI_LANGS: UiLang[] = ["es", "pt", "en", "de", "fr", "zh", "ja", "ru", "ko", "ar", "it", "qu", "hi", "he", "tr", "sw"];
+export const PRELIMINARY_LANGS: UiLang[] = ["de", "fr", "zh", "ja", "ru", "ko", "ar", "it", "qu", "hi", "he", "tr", "sw"];
 const KEY = "jaikuaa_lang";
 const listeners = new Set<() => void>();
 
@@ -41,7 +41,7 @@ export function setAppLang(lang: UiLang) {
     // ignore
   }
   if (typeof document !== "undefined") document.documentElement.lang = lang === "pt" ? "pt-BR" : lang === "zh" ? "zh-Hant-TW" : lang;
-  if (typeof document !== "undefined") document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  if (typeof document !== "undefined") document.documentElement.dir = lang === "ar" || lang === "he" ? "rtl" : "ltr";
   listeners.forEach((l) => l());
 }
 
@@ -169,7 +169,7 @@ export type TKey = keyof typeof DICT;
 
 export function translate(lang: UiLang, key: TKey): string {
   if (lang === "de" || lang === "fr" || lang === "zh" || lang === "ja" || lang === "ru") return EXTRA[lang][key];
-  if (lang === "ko" || lang === "ar" || lang === "it" || lang === "qu" || lang === "hi") return ovText(lang, DICT[key].en);
+  if (lang === "ko" || lang === "ar" || lang === "it" || lang === "qu" || lang === "hi" || lang === "he" || lang === "tr" || lang === "sw") return ovText(lang, DICT[key].en);
   return DICT[key][lang];
 }
 

@@ -22,9 +22,12 @@ export const LANG_NAMES: Record<UiLang, string> = {
   it: "Italiano",
   qu: "Runasimi",
   hi: "हिन्दी",
+  he: "עברית",
+  tr: "Türkçe",
+  sw: "Kiswahili",
 };
 
-export const langShort = (l: UiLang) => (l === "zh" ? "中文" : l === "ja" ? "日本語" : l === "ko" ? "한국어" : l === "ar" ? "عربي" : l === "hi" ? "हिन्दी" : l.toUpperCase());
+export const langShort = (l: UiLang) => (l === "zh" ? "中文" : l === "ja" ? "日本語" : l === "ko" ? "한국어" : l === "ar" ? "عربي" : l === "hi" ? "हिन्दी" : l === "he" ? "עברית" : l.toUpperCase());
 
 /** Selector compacto: un solo botón que despliega los idiomas; recuerda la elección. */
 export function AppLanguageToggle({ className = "" }: { className?: string }) {

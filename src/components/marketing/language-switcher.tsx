@@ -23,9 +23,12 @@ const LANGS = [
   { code: "it", label: "IT", name: "Italiano", to: "/it" },
   { code: "qu", label: "QU", name: "Runasimi", to: "/qu" },
   { code: "hi", label: "हिन्दी", name: "हिन्दी", to: "/hi" },
+  { code: "he", label: "עב", name: "עברית", to: "/he" },
+  { code: "tr", label: "TR", name: "Türkçe", to: "/tr" },
+  { code: "sw", label: "SW", name: "Kiswahili", to: "/sw" },
 ] as const;
 
-export function LanguageSwitcher({ current }: { current: "es" | "pt" | "en" | "zh" | "de" | "fr" | "ja" | "ru" | "ko" | "ar" | "it" | "qu" | "hi" }) {
+export function LanguageSwitcher({ current }: { current: "es" | "pt" | "en" | "zh" | "de" | "fr" | "ja" | "ru" | "ko" | "ar" | "it" | "qu" | "hi" | "he" | "tr" | "sw" }) {
   const active = LANGS.find((l) => l.code === current) ?? LANGS[0];
   return (
     <DropdownMenu>
