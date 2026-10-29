@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Globe } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { UI_LANGS, PRELIMINARY_LANGS, setAppLang, useT, type UiLang } from "@/lib/i18n";
 import {
   DropdownMenu,
