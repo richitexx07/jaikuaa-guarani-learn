@@ -1,5 +1,5 @@
 import { Check, ChevronDown, Globe } from "lucide-react";
-import { APP_LANGS, PRELIMINARY_LANGS, setAppLang, useT, type AppLang } from "@/lib/i18n";
+import { UI_LANGS, PRELIMINARY_LANGS, setAppLang, useT, type UiLang } from "@/lib/i18n";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,16 +7,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export const LANG_NAMES: Record<AppLang, string> = {
+export const LANG_NAMES: Record<UiLang, string> = {
   es: "Español",
   pt: "Português",
   en: "English",
   de: "Deutsch",
   fr: "Français",
   zh: "繁體中文",
+  ja: "日本語",
+  ru: "Русский",
 };
 
-export const langShort = (l: AppLang) => (l === "zh" ? "中文" : l.toUpperCase());
+export const langShort = (l: UiLang) => (l === "zh" ? "中文" : l === "ja" ? "日本語" : l.toUpperCase());
 
 /** Selector compacto: un solo botón que despliega los idiomas; recuerda la elección. */
 export function AppLanguageToggle({ className = "" }: { className?: string }) {
@@ -33,7 +35,7 @@ export function AppLanguageToggle({ className = "" }: { className?: string }) {
           <ChevronDown className="h-3 w-3 text-muted-foreground" aria-hidden />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-[11rem]">
-          {APP_LANGS.map((l) => (
+          {UI_LANGS.map((l) => (
             <DropdownMenuItem key={l} onSelect={() => setAppLang(l)} className="flex items-center justify-between gap-3">
               <span>{LANG_NAMES[l]}</span>
               {l === lang && <Check className="h-4 w-4 text-primary" aria-hidden />}

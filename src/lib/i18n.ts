@@ -8,15 +8,23 @@ import { EXTRA } from "./i18n-extra";
 export type AppLang = "es" | "pt" | "en" | "de" | "fr" | "zh";
 export const APP_LANGS: AppLang[] = ["es", "pt", "en", "de", "fr", "zh"];
 /** Idiomas con traducción preliminar, pendiente de revisión por un hablante nativo. */
-export const PRELIMINARY_LANGS: AppLang[] = ["de", "fr", "zh"];
+/** Idiomas completos de la interfaz principal (ja/ru: menús y portada; juegos aún en inglés). */
+export type UiLang = AppLang | "ja" | "ru";
+export const UI_LANGS: UiLang[] = ["es", "pt", "en", "de", "fr", "zh", "ja", "ru"];
+export const PRELIMINARY_LANGS: UiLang[] = ["de", "fr", "zh", "ja", "ru"];
 const KEY = "jaikuaa_lang";
 const listeners = new Set<() => void>();
 
-export function isAppLang(v: unknown): v is AppLang {
-  return v === "es" || v === "pt" || v === "en" || v === "de" || v === "fr" || v === "zh";
+export function isAppLang(v: unknown): v is UiLang {
+  return typeof v === "string" && (UI_LANGS as string[]).includes(v);
 }
 
-function read(): AppLang {
+/** ja/ru usan textos en inglés en las pantallas que todavía no tienen su traducción. */
+export function contentLang(l: UiLang): AppLang {
+  return l === "ja" || l === "ru" ? "en" : l;
+}
+
+function read(): UiLang {
   try {
     const v = localStorage.getItem(KEY);
     return isAppLang(v) ? v : "es";
@@ -25,7 +33,7 @@ function read(): AppLang {
   }
 }
 
-export function setAppLang(lang: AppLang) {
+export function setAppLang(lang: UiLang) {
   try {
     localStorage.setItem(KEY, lang);
   } catch {
@@ -45,8 +53,12 @@ function subscribe(cb: () => void) {
   };
 }
 
-export function useAppLang(): AppLang {
+export function useUiLang(): UiLang {
   return useSyncExternalStore(subscribe, read, () => "es");
+}
+
+export function useAppLang(): AppLang {
+  return contentLang(useUiLang());
 }
 
 type BaseLang = "es" | "pt" | "en";
@@ -153,12 +165,12 @@ const DICT = {
 
 export type TKey = keyof typeof DICT;
 
-export function translate(lang: AppLang, key: TKey): string {
-  if (lang === "de" || lang === "fr" || lang === "zh") return EXTRA[lang][key];
+export function translate(lang: UiLang, key: TKey): string {
+  if (lang === "de" || lang === "fr" || lang === "zh" || lang === "ja" || lang === "ru") return EXTRA[lang][key];
   return DICT[key][lang];
 }
 
 export function useT() {
-  const lang = useAppLang();
+  const lang = useUiLang();
   return { lang, t: (key: TKey) => translate(lang, key) };
 }
