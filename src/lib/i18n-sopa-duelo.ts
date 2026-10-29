@@ -1,4 +1,5 @@
 import { useAppLang, type AppLang } from "./i18n";
+import { withOverlay } from "./i18n-overlay";
 
 /** Textos de Sopa de letras y Duelo en 6 idiomas (de/fr/zh preliminares, en validación). Nunca toca guaraní. */
 type L = Record<AppLang, string>;
@@ -37,3 +38,6 @@ export function useSDT() {
   return (k: SDKey, v?: Record<string, string | number>) =>
     T[k][lang].replace(/\{(\w+)\}/g, (_, x) => String(v?.[x] ?? ""));
 }
+
+// ja/ru/ko (preliminares, en validación).
+withOverlay([T]);

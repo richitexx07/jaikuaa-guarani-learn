@@ -1,4 +1,5 @@
 import { useAppLang, type AppLang } from "./i18n";
+import { withOverlay, ROW_ORDER } from "./i18n-overlay";
 
 /**
  * Textos de páginas públicas en 6 idiomas: [es, pt, en, de, fr, zh].
@@ -7,7 +8,7 @@ import { useAppLang, type AppLang } from "./i18n";
  * Nunca contiene guaraní nuevo.
  */
 type Row = readonly [string, string, string, string, string, string];
-const ORDER: AppLang[] = ["es", "pt", "en", "de", "fr", "zh"];
+const ORDER = ROW_ORDER as readonly string[];
 
 const T = {
   backHome: ["Volver al inicio", "Voltar ao início", "Back to home", "Zur Startseite", "Retour à l'accueil", "返回首頁"],
@@ -274,3 +275,6 @@ export function usePubTx() {
   return (k: PubKey, v?: Record<string, string | number>) =>
     (T[k][i] || T[k][0]).replace(/\{(\w+)\}/g, (_, x) => String(v?.[x] ?? ""));
 }
+
+// ja/ru/ko (preliminares, en validación).
+withOverlay([T]);

@@ -1,4 +1,5 @@
 import { useAppLang, type AppLang } from "./i18n";
+import { withOverlay } from "./i18n-overlay";
 
 /**
  * Textos de interfaz de Trivia en 6 idiomas. Las preguntas, opciones y
@@ -95,3 +96,6 @@ export function useTriviaTx() {
   const streak = (n: number) => (n >= 5 ? tt("s5") : n === 4 ? tt("s4") : n === 3 ? tt("s3") : n === 2 ? tt("s2") : null);
   return { tt, err, ok, streak, lang };
 }
+
+// ja/ru/ko (preliminares, en validación).
+withOverlay([ERR, T]);

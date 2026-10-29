@@ -1,4 +1,5 @@
 import { useAppLang, type AppLang } from "./i18n";
+import { withOverlay } from "./i18n-overlay";
 import type { Outcome } from "@/components/games/penalties/physics";
 
 /** Textos de Penales en 6 idiomas (de/fr/zh preliminares, en validación). Nunca toca guaraní. */
@@ -79,3 +80,6 @@ export function usePT() {
     T[k][lang].replace(/\{(\w+)\}/g, (_, x) => String(v?.[x] ?? ""));
   return { p, msg: (o: Outcome) => MSG[o][lang], label: (o: Outcome) => LABEL[o][lang] };
 }
+
+// ja/ru/ko (preliminares, en validación).
+withOverlay([T, MSG, LABEL]);

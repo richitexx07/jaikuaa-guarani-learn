@@ -101,7 +101,7 @@ const SECCIONES = [
     icon: Globe,
     titulo: "Alcance internacional",
     items: [
-      "Portadas propias en ocho idiomas: castellano, portugués (/pt), inglés (/en), alemán (/de), francés (/fr), chino tradicional (/zh), japonés (/ja) y ruso (/ru), pensadas para inversores, diplomacia, turismo y extranjeros que viven o hacen negocios en Paraguay.",
+      "Portadas propias en nueve idiomas: castellano, portugués (/pt), inglés (/en), alemán (/de), francés (/fr), chino tradicional (/zh), japonés (/ja), ruso (/ru) y coreano (/ko), pensadas para inversores, diplomacia, turismo y extranjeros que viven o hacen negocios en Paraguay.",
       "Selector de idioma en la portada, en el ingreso y dentro de la app: se puede cambiar en cualquier momento y la elección queda recordada en el dispositivo.",
       "Interfaz completa en los seis idiomas: ingreso, panel, curso y lecciones, logros, ranking, glosario, certificado, embajadores, trivia, agro, guaraní escolar, páginas públicas y los 16 juegos (reglas, botones y resultados).",
       "El contenido en guaraní no se traduce automáticamente: significados, preguntas y notas culturales siguen en castellano con el aviso «En validación» hasta que lo revisen especialistas. Alemán, francés y chino son traducciones preliminares, pendientes de revisión nativa.",

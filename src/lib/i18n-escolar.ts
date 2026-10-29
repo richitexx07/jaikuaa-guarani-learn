@@ -1,4 +1,5 @@
 import { useAppLang, type AppLang } from "./i18n";
+import { withOverlay, ROW_ORDER } from "./i18n-overlay";
 
 /**
  * Interfaz de Guaraní Escolar (temas, Plan Semanal, Modo Rescate) en 6 idiomas.
@@ -6,7 +7,7 @@ import { useAppLang, type AppLang } from "./i18n";
  * hasta su validación. de/fr/zh preliminares. Nunca contiene guaraní nuevo.
  */
 type L = readonly [string, string, string, string, string, string];
-const ORDER: AppLang[] = ["es", "pt", "en", "de", "fr", "zh"];
+const ORDER = ROW_ORDER as readonly string[];
 
 const T = {
   notFound: ["Tema no encontrado", "Tema não encontrado", "Topic not found", "Thema nicht gefunden", "Thème introuvable", "找不到主題"],
@@ -113,3 +114,6 @@ export function useEscolarTx() {
   return (k: EscolarKey, v?: Record<string, string | number>) =>
     (T[k][i] || T[k][0]).replace(/\{(\w+)\}/g, (_, x) => String(v?.[x] ?? ""));
 }
+
+// ja/ru/ko (preliminares, en validación).
+withOverlay([T]);

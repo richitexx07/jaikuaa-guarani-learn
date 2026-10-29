@@ -12,6 +12,16 @@ describe("japonés y ruso", () => {
     const { contentLang } = await import("./i18n");
     expect(translate("ja", "auth.login")).toBe("ログイン");
     expect(translate("ru", "auth.login")).toBe("Войти");
-    expect(contentLang("ru")).toBe("en");
+    expect(contentLang("ru")).toBe("ru");
+  });
+});
+describe("japonés, ruso y coreano en pantallas internas", () => {
+  it("el coreano traduce el ingreso y los juegos dejan de quedar en inglés", async () => {
+    expect(translate("ko", "auth.login")).not.toBe("Sign in");
+    const { GT } = await import("./i18n-games");
+    const g = GT.games as Record<string, string>;
+    expect(g.ru).not.toBe("Games");
+    expect(g.ja).not.toBe("Games");
+    expect(g.ko).not.toBe("Games");
   });
 });

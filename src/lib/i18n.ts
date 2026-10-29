@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { EXTRA } from "./i18n-extra";
+import { ovText } from "./i18n-overlay";
 
 /**
  * Idioma de la interfaz (ES/PT/EN). Solo traduce botones y textos de sistema;
@@ -8,10 +9,10 @@ import { EXTRA } from "./i18n-extra";
 export type AppLang = "es" | "pt" | "en" | "de" | "fr" | "zh";
 export const APP_LANGS: AppLang[] = ["es", "pt", "en", "de", "fr", "zh"];
 /** Idiomas con traducción preliminar, pendiente de revisión por un hablante nativo. */
-/** Idiomas completos de la interfaz principal (ja/ru: menús y portada; juegos aún en inglés). */
-export type UiLang = AppLang | "ja" | "ru";
-export const UI_LANGS: UiLang[] = ["es", "pt", "en", "de", "fr", "zh", "ja", "ru"];
-export const PRELIMINARY_LANGS: UiLang[] = ["de", "fr", "zh", "ja", "ru"];
+/** Idiomas de la interfaz: ja/ru/ko cubren menús, pantallas internas y juegos. */
+export type UiLang = AppLang | "ja" | "ru" | "ko";
+export const UI_LANGS: UiLang[] = ["es", "pt", "en", "de", "fr", "zh", "ja", "ru", "ko"];
+export const PRELIMINARY_LANGS: UiLang[] = ["de", "fr", "zh", "ja", "ru", "ko"];
 const KEY = "jaikuaa_lang";
 const listeners = new Set<() => void>();
 
@@ -19,9 +20,9 @@ export function isAppLang(v: unknown): v is UiLang {
   return typeof v === "string" && (UI_LANGS as string[]).includes(v);
 }
 
-/** ja/ru usan textos en inglés en las pantallas que todavía no tienen su traducción. */
+/** Idioma de los textos internos. ja/ru/ko existen en tiempo de ejecución gracias a withOverlay. */
 export function contentLang(l: UiLang): AppLang {
-  return l === "ja" || l === "ru" ? "en" : l;
+  return l as AppLang;
 }
 
 function read(): UiLang {
@@ -167,6 +168,7 @@ export type TKey = keyof typeof DICT;
 
 export function translate(lang: UiLang, key: TKey): string {
   if (lang === "de" || lang === "fr" || lang === "zh" || lang === "ja" || lang === "ru") return EXTRA[lang][key];
+  if (lang === "ko") return ovText("ko", DICT[key].en);
   return DICT[key][lang];
 }
 
