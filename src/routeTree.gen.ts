@@ -23,6 +23,7 @@ import { Route as FrRouteImport } from './routes/fr'
 import { Route as InstitucionesRouteImport } from './routes/instituciones'
 import { Route as InversionRouteImport } from './routes/inversion'
 import { Route as JaRouteImport } from './routes/ja'
+import { Route as KoRouteImport } from './routes/ko'
 import { Route as PilotoAteneoRouteImport } from './routes/piloto-ateneo'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as PtRouteImport } from './routes/pt'
@@ -165,6 +166,11 @@ const InversionRoute = InversionRouteImport.update({
 const JaRoute = JaRouteImport.update({
   id: '/ja',
   path: '/ja',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KoRoute = KoRouteImport.update({
+  id: '/ko',
+  path: '/ko',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PilotoAteneoRoute = PilotoAteneoRouteImport.update({
@@ -594,6 +600,7 @@ export interface FileRoutesByFullPath {
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
   '/ja': typeof JaRoute
+  '/ko': typeof KoRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
   '/privacidad': typeof PrivacidadRoute
   '/pt': typeof PtRoute
@@ -683,6 +690,7 @@ export interface FileRoutesByTo {
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
   '/ja': typeof JaRoute
+  '/ko': typeof KoRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
   '/privacidad': typeof PrivacidadRoute
   '/pt': typeof PtRoute
@@ -771,6 +779,7 @@ export interface FileRoutesById {
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
   '/ja': typeof JaRoute
+  '/ko': typeof KoRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
   '/privacidad': typeof PrivacidadRoute
   '/pt': typeof PtRoute
@@ -862,6 +871,7 @@ export interface FileRouteTypes {
     | '/instituciones'
     | '/inversion'
     | '/ja'
+    | '/ko'
     | '/piloto-ateneo'
     | '/privacidad'
     | '/pt'
@@ -951,6 +961,7 @@ export interface FileRouteTypes {
     | '/instituciones'
     | '/inversion'
     | '/ja'
+    | '/ko'
     | '/piloto-ateneo'
     | '/privacidad'
     | '/pt'
@@ -1038,6 +1049,7 @@ export interface FileRouteTypes {
     | '/instituciones'
     | '/inversion'
     | '/ja'
+    | '/ko'
     | '/piloto-ateneo'
     | '/privacidad'
     | '/pt'
@@ -1129,6 +1141,7 @@ export interface RootRouteChildren {
   InstitucionesRoute: typeof InstitucionesRoute
   InversionRoute: typeof InversionRoute
   JaRoute: typeof JaRoute
+  KoRoute: typeof KoRoute
   PilotoAteneoRoute: typeof PilotoAteneoRoute
   PrivacidadRoute: typeof PrivacidadRoute
   PtRoute: typeof PtRoute
@@ -1245,6 +1258,13 @@ declare module '@tanstack/react-router' {
       path: '/ja'
       fullPath: '/ja'
       preLoaderRoute: typeof JaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ko': {
+      id: '/ko'
+      path: '/ko'
+      fullPath: '/ko'
+      preLoaderRoute: typeof KoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/piloto-ateneo': {
@@ -1953,6 +1973,7 @@ const rootRouteChildren: RootRouteChildren = {
   InstitucionesRoute: InstitucionesRoute,
   InversionRoute: InversionRoute,
   JaRoute: JaRoute,
+  KoRoute: KoRoute,
   PilotoAteneoRoute: PilotoAteneoRoute,
   PrivacidadRoute: PrivacidadRoute,
   PtRoute: PtRoute,
