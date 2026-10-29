@@ -142,15 +142,17 @@ function Body({ lang }: { lang: UiLang }) {
           <path d="M17.2 10 L20.9 8.8 L18.6 11.9 L18.6 8.1 L20.9 11.2 Z" fill="#FFFFFF" />
         </>
       );
-    case "sw": // Kenia (suajili, lengua de África Oriental)
+    case "sw": // Neutral regional (inspirado en la Comunidad del África Oriental), sin elegir un país
       return (
         <>
-          <Stripes colors={["#000000", "#FFFFFF", "#BB0000", "#FFFFFF", "#006600"]} />
-          <rect x={0} y={5.6} width={W} height={8.8} fill="#BB0000" />
-          <rect x={0} y={4} width={W} height={1.6} fill="#FFFFFF" />
-          <rect x={0} y={14.4} width={W} height={1.6} fill="#FFFFFF" />
-          <ellipse cx={15} cy={10} rx={2.6} ry={6} fill="#000000" />
-          <ellipse cx={15} cy={10} rx={1.2} ry={4.4} fill="#BB0000" />
+          <rect width={W} height={H} fill="#3C9BD6" />
+          <rect x={0} y={11} width={W} height={1.2} fill="#FFFFFF" />
+          <rect x={0} y={12.2} width={W} height={1.2} fill="#F9D616" />
+          <rect x={0} y={13.4} width={W} height={1.6} fill="#000000" />
+          <rect x={0} y={15} width={W} height={1.2} fill="#F9D616" />
+          <rect x={0} y={16.2} width={W} height={1.2} fill="#1EB53A" />
+          <circle cx={15} cy={6} r={3.2} fill="#FFFFFF" />
+          <circle cx={15} cy={6} r={2} fill="#1EB53A" />
         </>
       );
     case "qu":
