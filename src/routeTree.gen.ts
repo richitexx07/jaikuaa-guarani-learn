@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as ArRouteImport } from './routes/ar'
 import { Route as AuspiciantesRouteImport } from './routes/auspiciantes'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CineRouteImport } from './routes/cine'
@@ -20,13 +21,16 @@ import { Route as EnRouteImport } from './routes/en'
 import { Route as FichaAuspiciantesRouteImport } from './routes/ficha-auspiciantes'
 import { Route as FichaTecnicaRouteImport } from './routes/ficha-tecnica'
 import { Route as FrRouteImport } from './routes/fr'
+import { Route as HiRouteImport } from './routes/hi'
 import { Route as InstitucionesRouteImport } from './routes/instituciones'
 import { Route as InversionRouteImport } from './routes/inversion'
+import { Route as ItRouteImport } from './routes/it'
 import { Route as JaRouteImport } from './routes/ja'
 import { Route as KoRouteImport } from './routes/ko'
 import { Route as PilotoAteneoRouteImport } from './routes/piloto-ateneo'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as PtRouteImport } from './routes/pt'
+import { Route as QuRouteImport } from './routes/qu'
 import { Route as RecuperarRouteImport } from './routes/recuperar'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RespaldosRouteImport } from './routes/respaldos'
@@ -108,6 +112,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArRoute = ArRouteImport.update({
+  id: '/ar',
+  path: '/ar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuspiciantesRoute = AuspiciantesRouteImport.update({
   id: '/auspiciantes',
   path: '/auspiciantes',
@@ -153,6 +162,11 @@ const FrRoute = FrRouteImport.update({
   path: '/fr',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HiRoute = HiRouteImport.update({
+  id: '/hi',
+  path: '/hi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InstitucionesRoute = InstitucionesRouteImport.update({
   id: '/instituciones',
   path: '/instituciones',
@@ -161,6 +175,11 @@ const InstitucionesRoute = InstitucionesRouteImport.update({
 const InversionRoute = InversionRouteImport.update({
   id: '/inversion',
   path: '/inversion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ItRoute = ItRouteImport.update({
+  id: '/it',
+  path: '/it',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JaRoute = JaRouteImport.update({
@@ -186,6 +205,11 @@ const PrivacidadRoute = PrivacidadRouteImport.update({
 const PtRoute = PtRouteImport.update({
   id: '/pt',
   path: '/pt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuRoute = QuRouteImport.update({
+  id: '/qu',
+  path: '/qu',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecuperarRoute = RecuperarRouteImport.update({
@@ -588,6 +612,7 @@ const AuthenticatedCursoLangLeccionNRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ar': typeof ArRoute
   '/auspiciantes': typeof AuspiciantesRoute
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
@@ -597,13 +622,16 @@ export interface FileRoutesByFullPath {
   '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/ficha-tecnica': typeof FichaTecnicaRoute
   '/fr': typeof FrRoute
+  '/hi': typeof HiRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
+  '/it': typeof ItRoute
   '/ja': typeof JaRoute
   '/ko': typeof KoRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
   '/privacidad': typeof PrivacidadRoute
   '/pt': typeof PtRoute
+  '/qu': typeof QuRoute
   '/recuperar': typeof RecuperarRoute
   '/reset-password': typeof ResetPasswordRoute
   '/respaldos': typeof RespaldosRoute
@@ -678,6 +706,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ar': typeof ArRoute
   '/auspiciantes': typeof AuspiciantesRoute
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
@@ -687,13 +716,16 @@ export interface FileRoutesByTo {
   '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/ficha-tecnica': typeof FichaTecnicaRoute
   '/fr': typeof FrRoute
+  '/hi': typeof HiRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
+  '/it': typeof ItRoute
   '/ja': typeof JaRoute
   '/ko': typeof KoRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
   '/privacidad': typeof PrivacidadRoute
   '/pt': typeof PtRoute
+  '/qu': typeof QuRoute
   '/recuperar': typeof RecuperarRoute
   '/reset-password': typeof ResetPasswordRoute
   '/respaldos': typeof RespaldosRoute
@@ -767,6 +799,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/ar': typeof ArRoute
   '/auspiciantes': typeof AuspiciantesRoute
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
@@ -776,13 +809,16 @@ export interface FileRoutesById {
   '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/ficha-tecnica': typeof FichaTecnicaRoute
   '/fr': typeof FrRoute
+  '/hi': typeof HiRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
+  '/it': typeof ItRoute
   '/ja': typeof JaRoute
   '/ko': typeof KoRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
   '/privacidad': typeof PrivacidadRoute
   '/pt': typeof PtRoute
+  '/qu': typeof QuRoute
   '/recuperar': typeof RecuperarRoute
   '/reset-password': typeof ResetPasswordRoute
   '/respaldos': typeof RespaldosRoute
@@ -859,6 +895,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ar'
     | '/auspiciantes'
     | '/auth'
     | '/cine'
@@ -868,13 +905,16 @@ export interface FileRouteTypes {
     | '/ficha-auspiciantes'
     | '/ficha-tecnica'
     | '/fr'
+    | '/hi'
     | '/instituciones'
     | '/inversion'
+    | '/it'
     | '/ja'
     | '/ko'
     | '/piloto-ateneo'
     | '/privacidad'
     | '/pt'
+    | '/qu'
     | '/recuperar'
     | '/reset-password'
     | '/respaldos'
@@ -949,6 +989,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ar'
     | '/auspiciantes'
     | '/auth'
     | '/cine'
@@ -958,13 +999,16 @@ export interface FileRouteTypes {
     | '/ficha-auspiciantes'
     | '/ficha-tecnica'
     | '/fr'
+    | '/hi'
     | '/instituciones'
     | '/inversion'
+    | '/it'
     | '/ja'
     | '/ko'
     | '/piloto-ateneo'
     | '/privacidad'
     | '/pt'
+    | '/qu'
     | '/recuperar'
     | '/reset-password'
     | '/respaldos'
@@ -1037,6 +1081,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/ar'
     | '/auspiciantes'
     | '/auth'
     | '/cine'
@@ -1046,13 +1091,16 @@ export interface FileRouteTypes {
     | '/ficha-auspiciantes'
     | '/ficha-tecnica'
     | '/fr'
+    | '/hi'
     | '/instituciones'
     | '/inversion'
+    | '/it'
     | '/ja'
     | '/ko'
     | '/piloto-ateneo'
     | '/privacidad'
     | '/pt'
+    | '/qu'
     | '/recuperar'
     | '/reset-password'
     | '/respaldos'
@@ -1129,6 +1177,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ArRoute: typeof ArRoute
   AuspiciantesRoute: typeof AuspiciantesRoute
   AuthRoute: typeof AuthRoute
   CineRoute: typeof CineRoute
@@ -1138,13 +1187,16 @@ export interface RootRouteChildren {
   FichaAuspiciantesRoute: typeof FichaAuspiciantesRoute
   FichaTecnicaRoute: typeof FichaTecnicaRoute
   FrRoute: typeof FrRoute
+  HiRoute: typeof HiRoute
   InstitucionesRoute: typeof InstitucionesRoute
   InversionRoute: typeof InversionRoute
+  ItRoute: typeof ItRoute
   JaRoute: typeof JaRoute
   KoRoute: typeof KoRoute
   PilotoAteneoRoute: typeof PilotoAteneoRoute
   PrivacidadRoute: typeof PrivacidadRoute
   PtRoute: typeof PtRoute
+  QuRoute: typeof QuRoute
   RecuperarRoute: typeof RecuperarRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RespaldosRoute: typeof RespaldosRoute
@@ -1174,6 +1226,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ar': {
+      id: '/ar'
+      path: '/ar'
+      fullPath: '/ar'
+      preLoaderRoute: typeof ArRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auspiciantes': {
@@ -1239,6 +1298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FrRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hi': {
+      id: '/hi'
+      path: '/hi'
+      fullPath: '/hi'
+      preLoaderRoute: typeof HiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/instituciones': {
       id: '/instituciones'
       path: '/instituciones'
@@ -1251,6 +1317,13 @@ declare module '@tanstack/react-router' {
       path: '/inversion'
       fullPath: '/inversion'
       preLoaderRoute: typeof InversionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/it': {
+      id: '/it'
+      path: '/it'
+      fullPath: '/it'
+      preLoaderRoute: typeof ItRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ja': {
@@ -1286,6 +1359,13 @@ declare module '@tanstack/react-router' {
       path: '/pt'
       fullPath: '/pt'
       preLoaderRoute: typeof PtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qu': {
+      id: '/qu'
+      path: '/qu'
+      fullPath: '/qu'
+      preLoaderRoute: typeof QuRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recuperar': {
@@ -1961,6 +2041,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ArRoute: ArRoute,
   AuspiciantesRoute: AuspiciantesRoute,
   AuthRoute: AuthRoute,
   CineRoute: CineRoute,
@@ -1970,13 +2051,16 @@ const rootRouteChildren: RootRouteChildren = {
   FichaAuspiciantesRoute: FichaAuspiciantesRoute,
   FichaTecnicaRoute: FichaTecnicaRoute,
   FrRoute: FrRoute,
+  HiRoute: HiRoute,
   InstitucionesRoute: InstitucionesRoute,
   InversionRoute: InversionRoute,
+  ItRoute: ItRoute,
   JaRoute: JaRoute,
   KoRoute: KoRoute,
   PilotoAteneoRoute: PilotoAteneoRoute,
   PrivacidadRoute: PrivacidadRoute,
   PtRoute: PtRoute,
+  QuRoute: QuRoute,
   RecuperarRoute: RecuperarRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RespaldosRoute: RespaldosRoute,

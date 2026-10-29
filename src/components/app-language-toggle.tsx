@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Globe } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { UI_LANGS, PRELIMINARY_LANGS, setAppLang, useT, type UiLang } from "@/lib/i18n";
 import {
   DropdownMenu,
@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LANG_FLAGS } from "@/lib/lang-flags";
 
 export const LANG_NAMES: Record<UiLang, string> = {
   es: "Español",
@@ -17,9 +18,13 @@ export const LANG_NAMES: Record<UiLang, string> = {
   ja: "日本語",
   ru: "Русский",
   ko: "한국어",
+  ar: "العربية",
+  it: "Italiano",
+  qu: "Runasimi",
+  hi: "हिन्दी",
 };
 
-export const langShort = (l: UiLang) => (l === "zh" ? "中文" : l === "ja" ? "日本語" : l === "ko" ? "한국어" : l.toUpperCase());
+export const langShort = (l: UiLang) => (l === "zh" ? "中文" : l === "ja" ? "日本語" : l === "ko" ? "한국어" : l === "ar" ? "عربي" : l === "hi" ? "हिन्दी" : l.toUpperCase());
 
 /** Selector compacto: un solo botón que despliega los idiomas; recuerda la elección. */
 export function AppLanguageToggle({ className = "" }: { className?: string }) {
@@ -31,14 +36,14 @@ export function AppLanguageToggle({ className = "" }: { className?: string }) {
           aria-label={t("lang.label")}
           className={`flex items-center gap-1 rounded-full border border-border/60 bg-card px-2.5 py-1 text-xs font-semibold ${className}`}
         >
-          <Globe className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
+          <span aria-hidden>{LANG_FLAGS[lang]}</span>
           {langShort(lang)}
           <ChevronDown className="h-3 w-3 text-muted-foreground" aria-hidden />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-[11rem]">
           {UI_LANGS.map((l) => (
             <DropdownMenuItem key={l} onSelect={() => setAppLang(l)} className="flex items-center justify-between gap-3">
-              <span>{LANG_NAMES[l]}</span>
+              <span className="flex items-center gap-2"><span aria-hidden>{LANG_FLAGS[l]}</span>{LANG_NAMES[l]}</span>
               {l === lang && <Check className="h-4 w-4 text-primary" aria-hidden />}
             </DropdownMenuItem>
           ))}
