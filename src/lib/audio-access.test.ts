@@ -34,10 +34,12 @@ describe("acceso a las grabaciones", () => {
     ).toEqual(["mboehara-borrador", "kuatia"]);
   });
 
-  it("sin sesión no se filtra nada extra: solo las muestras públicas", () => {
-    const slugs = ["aguyje", "jagua", "che-vya", "propuesta-pendiente"];
+  it("con el corpus todavía vacío solo suenan las muestras públicas", () => {
     expect(
-      slugs.filter((s) => PUBLIC_SLUGS.has(s) || published.has(s)),
+      filterPlayableSlugs(["aguyje", "jagua", "che-vya", "propuesta-pendiente"], {
+        isStaff: false,
+        published: new Set<string>(),
+      }),
     ).toEqual(["aguyje", "che-vya"]);
   });
 });
