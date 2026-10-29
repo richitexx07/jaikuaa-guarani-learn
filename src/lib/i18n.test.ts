@@ -7,3 +7,11 @@ describe("idioma de la interfaz", () => {
     expect(translate("en", "auth.login")).toBe("Sign in");
   });
 });
+describe("japonés y ruso", () => {
+  it("traducen el ingreso y usan inglés en pantallas sin traducir", async () => {
+    const { contentLang } = await import("./i18n");
+    expect(translate("ja", "auth.login")).toBe("ログイン");
+    expect(translate("ru", "auth.login")).toBe("Войти");
+    expect(contentLang("ru")).toBe("en");
+  });
+});

@@ -22,12 +22,14 @@ import { Route as FichaTecnicaRouteImport } from './routes/ficha-tecnica'
 import { Route as FrRouteImport } from './routes/fr'
 import { Route as InstitucionesRouteImport } from './routes/instituciones'
 import { Route as InversionRouteImport } from './routes/inversion'
+import { Route as JaRouteImport } from './routes/ja'
 import { Route as PilotoAteneoRouteImport } from './routes/piloto-ateneo'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as PtRouteImport } from './routes/pt'
 import { Route as RecuperarRouteImport } from './routes/recuperar'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RespaldosRouteImport } from './routes/respaldos'
+import { Route as RuRouteImport } from './routes/ru'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as TecladoRouteImport } from './routes/teclado'
 import { Route as TerminosRouteImport } from './routes/terminos'
@@ -160,6 +162,11 @@ const InversionRoute = InversionRouteImport.update({
   path: '/inversion',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JaRoute = JaRouteImport.update({
+  id: '/ja',
+  path: '/ja',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PilotoAteneoRoute = PilotoAteneoRouteImport.update({
   id: '/piloto-ateneo',
   path: '/piloto-ateneo',
@@ -188,6 +195,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const RespaldosRoute = RespaldosRouteImport.update({
   id: '/respaldos',
   path: '/respaldos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RuRoute = RuRouteImport.update({
+  id: '/ru',
+  path: '/ru',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SobreRoute = SobreRouteImport.update({
@@ -581,12 +593,14 @@ export interface FileRoutesByFullPath {
   '/fr': typeof FrRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
+  '/ja': typeof JaRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
   '/privacidad': typeof PrivacidadRoute
   '/pt': typeof PtRoute
   '/recuperar': typeof RecuperarRoute
   '/reset-password': typeof ResetPasswordRoute
   '/respaldos': typeof RespaldosRoute
+  '/ru': typeof RuRoute
   '/sobre': typeof SobreRoute
   '/teclado': typeof TecladoRoute
   '/terminos': typeof TerminosRoute
@@ -668,12 +682,14 @@ export interface FileRoutesByTo {
   '/fr': typeof FrRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
+  '/ja': typeof JaRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
   '/privacidad': typeof PrivacidadRoute
   '/pt': typeof PtRoute
   '/recuperar': typeof RecuperarRoute
   '/reset-password': typeof ResetPasswordRoute
   '/respaldos': typeof RespaldosRoute
+  '/ru': typeof RuRoute
   '/sobre': typeof SobreRoute
   '/teclado': typeof TecladoRoute
   '/terminos': typeof TerminosRoute
@@ -754,12 +770,14 @@ export interface FileRoutesById {
   '/fr': typeof FrRoute
   '/instituciones': typeof InstitucionesRoute
   '/inversion': typeof InversionRoute
+  '/ja': typeof JaRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
   '/privacidad': typeof PrivacidadRoute
   '/pt': typeof PtRoute
   '/recuperar': typeof RecuperarRoute
   '/reset-password': typeof ResetPasswordRoute
   '/respaldos': typeof RespaldosRoute
+  '/ru': typeof RuRoute
   '/sobre': typeof SobreRoute
   '/teclado': typeof TecladoRoute
   '/terminos': typeof TerminosRoute
@@ -843,12 +861,14 @@ export interface FileRouteTypes {
     | '/fr'
     | '/instituciones'
     | '/inversion'
+    | '/ja'
     | '/piloto-ateneo'
     | '/privacidad'
     | '/pt'
     | '/recuperar'
     | '/reset-password'
     | '/respaldos'
+    | '/ru'
     | '/sobre'
     | '/teclado'
     | '/terminos'
@@ -930,12 +950,14 @@ export interface FileRouteTypes {
     | '/fr'
     | '/instituciones'
     | '/inversion'
+    | '/ja'
     | '/piloto-ateneo'
     | '/privacidad'
     | '/pt'
     | '/recuperar'
     | '/reset-password'
     | '/respaldos'
+    | '/ru'
     | '/sobre'
     | '/teclado'
     | '/terminos'
@@ -1015,12 +1037,14 @@ export interface FileRouteTypes {
     | '/fr'
     | '/instituciones'
     | '/inversion'
+    | '/ja'
     | '/piloto-ateneo'
     | '/privacidad'
     | '/pt'
     | '/recuperar'
     | '/reset-password'
     | '/respaldos'
+    | '/ru'
     | '/sobre'
     | '/teclado'
     | '/terminos'
@@ -1104,12 +1128,14 @@ export interface RootRouteChildren {
   FrRoute: typeof FrRoute
   InstitucionesRoute: typeof InstitucionesRoute
   InversionRoute: typeof InversionRoute
+  JaRoute: typeof JaRoute
   PilotoAteneoRoute: typeof PilotoAteneoRoute
   PrivacidadRoute: typeof PrivacidadRoute
   PtRoute: typeof PtRoute
   RecuperarRoute: typeof RecuperarRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RespaldosRoute: typeof RespaldosRoute
+  RuRoute: typeof RuRoute
   SobreRoute: typeof SobreRoute
   TecladoRoute: typeof TecladoRoute
   TerminosRoute: typeof TerminosRoute
@@ -1214,6 +1240,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InversionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ja': {
+      id: '/ja'
+      path: '/ja'
+      fullPath: '/ja'
+      preLoaderRoute: typeof JaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/piloto-ateneo': {
       id: '/piloto-ateneo'
       path: '/piloto-ateneo'
@@ -1254,6 +1287,13 @@ declare module '@tanstack/react-router' {
       path: '/respaldos'
       fullPath: '/respaldos'
       preLoaderRoute: typeof RespaldosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ru': {
+      id: '/ru'
+      path: '/ru'
+      fullPath: '/ru'
+      preLoaderRoute: typeof RuRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sobre': {
@@ -1912,12 +1952,14 @@ const rootRouteChildren: RootRouteChildren = {
   FrRoute: FrRoute,
   InstitucionesRoute: InstitucionesRoute,
   InversionRoute: InversionRoute,
+  JaRoute: JaRoute,
   PilotoAteneoRoute: PilotoAteneoRoute,
   PrivacidadRoute: PrivacidadRoute,
   PtRoute: PtRoute,
   RecuperarRoute: RecuperarRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RespaldosRoute: RespaldosRoute,
+  RuRoute: RuRoute,
   SobreRoute: SobreRoute,
   TecladoRoute: TecladoRoute,
   TerminosRoute: TerminosRoute,

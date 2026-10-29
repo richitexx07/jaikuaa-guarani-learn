@@ -15,9 +15,11 @@ const LANGS = [
   { code: "de", label: "DE", name: "Deutsch", to: "/de" },
   { code: "fr", label: "FR", name: "Français", to: "/fr" },
   { code: "zh", label: "中文", name: "繁體中文", to: "/zh" },
+  { code: "ja", label: "日本語", name: "日本語", to: "/ja" },
+  { code: "ru", label: "RU", name: "Русский", to: "/ru" },
 ] as const;
 
-export function LanguageSwitcher({ current }: { current: "es" | "pt" | "en" | "zh" | "de" | "fr" }) {
+export function LanguageSwitcher({ current }: { current: "es" | "pt" | "en" | "zh" | "de" | "fr" | "ja" | "ru" }) {
   const active = LANGS.find((l) => l.code === current) ?? LANGS[0];
   return (
     <DropdownMenu>
