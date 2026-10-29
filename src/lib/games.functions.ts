@@ -132,7 +132,7 @@ export const answerWordOfDay = createServerFn({ method: "POST" })
       _source: "game",
       _source_ref: "palabra-del-dia",
       _sync_id: syncIdFor(day),
-      _metadata: { choice: data.choice, correct },
+      _metadata: { choice: data.choice, correct, verified: true },
       _perfect: false,
     } as never);
     if (error) throw new Error("No se pudo guardar la partida");
@@ -193,7 +193,7 @@ export const answerWordOfDayFor = createServerFn({ method: "POST" })
       _source: "game",
       _source_ref: "palabra-del-dia",
       _sync_id: syncIdFor(data.day),
-      _metadata: { choice: data.choice, correct, offline: true },
+      _metadata: { choice: data.choice, correct, offline: true, verified: true },
       _perfect: false,
     } as never);
     if (error) throw new Error("No se pudo guardar la partida");
