@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LANG_FLAGS } from "@/lib/lang-flags";
+import { LangFlag } from "@/components/lang-flag";
 
 export const LANG_NAMES: Record<UiLang, string> = {
   es: "Español",
@@ -36,14 +36,14 @@ export function AppLanguageToggle({ className = "" }: { className?: string }) {
           aria-label={t("lang.label")}
           className={`flex items-center gap-1 rounded-full border border-border/60 bg-card px-2.5 py-1 text-xs font-semibold ${className}`}
         >
-          <span aria-hidden>{LANG_FLAGS[lang]}</span>
+          <LangFlag lang={lang} />
           {langShort(lang)}
           <ChevronDown className="h-3 w-3 text-muted-foreground" aria-hidden />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-[11rem]">
           {UI_LANGS.map((l) => (
             <DropdownMenuItem key={l} onSelect={() => setAppLang(l)} className="flex items-center justify-between gap-3">
-              <span className="flex items-center gap-2"><span aria-hidden>{LANG_FLAGS[l]}</span>{LANG_NAMES[l]}</span>
+              <span className="flex items-center gap-2"><LangFlag lang={l} />{LANG_NAMES[l]}</span>
               {l === lang && <Check className="h-4 w-4 text-primary" aria-hidden />}
             </DropdownMenuItem>
           ))}

@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LANG_FLAGS } from "@/lib/lang-flags";
+import { LangFlag } from "@/components/lang-flag";
 
 const LANGS = [
   { code: "es", label: "ES", name: "Español", to: "/" },
@@ -33,7 +33,7 @@ export function LanguageSwitcher({ current }: { current: "es" | "pt" | "en" | "z
         aria-label="Idioma / Language"
         className="flex items-center gap-1 rounded-full border border-border/60 bg-card px-2.5 py-1 text-xs font-semibold"
       >
-        <span aria-hidden>{LANG_FLAGS[active.code]}</span>
+        <LangFlag lang={active.code} />
         {active.label}
         <ChevronDown className="h-3 w-3 text-muted-foreground" aria-hidden />
       </DropdownMenuTrigger>
@@ -46,7 +46,7 @@ export function LanguageSwitcher({ current }: { current: "es" | "pt" | "en" | "z
               aria-current={l.code === current ? "page" : undefined}
               className="flex items-center justify-between gap-3"
             >
-              <span className="flex items-center gap-2"><span aria-hidden>{LANG_FLAGS[l.code]}</span>{l.name}</span>
+              <span className="flex items-center gap-2"><LangFlag lang={l.code} />{l.name}</span>
               {l.code === current && <Check className="h-4 w-4 text-primary" aria-hidden />}
             </Link>
           </DropdownMenuItem>
