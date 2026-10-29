@@ -41,6 +41,7 @@ export function setAppLang(lang: UiLang) {
     // ignore
   }
   if (typeof document !== "undefined") document.documentElement.lang = lang === "pt" ? "pt-BR" : lang === "zh" ? "zh-Hant-TW" : lang;
+  if (typeof document !== "undefined") document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
   listeners.forEach((l) => l());
 }
 
