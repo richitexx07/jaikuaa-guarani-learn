@@ -28,6 +28,7 @@ export const Route = createFileRoute("/it")({
 // Traducción preliminar: pendiente de revisión por un hablante nativo.
 const COPY: IntlCopy = {
   "lang": "it",
+  "notice": "Traduzione preliminare · in revisione da parte di un madrelingua · Traducción preliminar, en revisión",
   "eyebrow": "Il guarani per professionisti",
   "title": "Padroneggia il guarani:",
   "titleAccent": "la lingua viva del Sud America.",

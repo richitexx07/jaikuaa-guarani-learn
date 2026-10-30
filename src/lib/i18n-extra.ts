@@ -105,6 +105,7 @@ const de: Dict = {
   "pl.rest": "Jaikuaa ist noch nicht offiziell gestartet. Die Wörter werden von Fachlehrkräften geprüft; wenn du einen Fehler siehst, sag uns Bescheid.",
   "val.badge": "In Prüfung",
   "lang.preliminary": "Vorläufige Übersetzung, in Prüfung",
+  "lang.help": "Sprechen Sie diese Sprache? Helfen Sie uns beim Prüfen",
 };
 
 const fr: Dict = {
@@ -205,7 +206,8 @@ const fr: Dict = {
   "pl.strong": "Accès anticipé :",
   "pl.rest": "Jaikuaa n'est pas encore officiellement lancé. Les mots sont en cours de révision par des enseignants spécialistes ; si tu vois une erreur, préviens-nous.",
   "val.badge": "En validation",
-  "lang.preliminary": "Traduction préliminaire, en cours de validation",
+  "lang.preliminary": "Traduction préliminaire, en cours de relecture",
+  "lang.help": "Vous parlez cette langue ? Aidez-nous à la relire",
 };
 
 /** Chino tradicional (Taiwán): preliminar, pendiente de hablante nativo. */
@@ -307,7 +309,8 @@ const zh: Dict = {
   "pl.strong": "搶先體驗：",
   "pl.rest": "Jaikuaa 尚未正式上線。詞語正由專業教師審核中；若發現錯誤，請告訴我們。",
   "val.badge": "審核中",
-  "lang.preliminary": "預覽版翻譯 · 審核中 · Traducción preliminar, en validación",
+  "lang.preliminary": "預覽版翻譯 · 審核中 · Traducción preliminar, en revisión",
+  "lang.help": "您會說這個語言嗎？歡迎協助我們審閱",
 };
 
 
@@ -410,7 +413,8 @@ const ja: Dict = {
   "pl.strong": "先行アクセス：",
   "pl.rest": "Jaikuaaはまだ正式リリース前です。言葉は専門の先生が確認中です。誤りを見つけたらお知らせください。",
   "val.badge": "確認中",
-  "lang.preliminary": "翻訳プレビュー版・確認中 · Traducción preliminar, en validación",
+  "lang.preliminary": "翻訳プレビュー版・確認中 · Traducción preliminar, en revisión",
+  "lang.help": "この言語を話せますか？確認にご協力ください",
 };
 
 // Traducción preliminar: pendiente de revisión por un hablante nativo.
@@ -512,7 +516,8 @@ const ru: Dict = {
   "pl.strong": "Ранний доступ:",
   "pl.rest": "Jaikuaa ещё официально не запущена. Слова проверяют преподаватели-специалисты; если заметите ошибку, сообщите нам.",
   "val.badge": "На проверке",
-  "lang.preliminary": "Предварительный перевод · на проверке · Traducción preliminar, en validación",
+  "lang.preliminary": "Предварительный перевод · на проверке · Traducción preliminar, en revisión",
+  "lang.help": "Вы говорите на этом языке? Помогите нам проверить перевод",
 };
 
 export const EXTRA = { de, fr, zh, ja, ru } as const;

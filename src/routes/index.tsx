@@ -100,7 +100,7 @@ function Hero() {
             Un ratito por día, desde el celular. Lecciones cortas, juegos y voces de paraguayos de verdad.
           </p>
           <p className="mt-3 text-sm font-medium text-primary/80">
-            Ya son 109 palabras grabadas por paraguayos, y seguimos grabando.
+            Ya son más de 100 palabras grabadas por paraguayos, y seguimos grabando.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">

@@ -29,7 +29,7 @@ export const Route = createFileRoute("/ko")({
 // Traducción preliminar: pendiente de revisión por un hablante nativo.
 const COPY: IntlCopy = {
   "lang": "ko",
-  "notice": "한국어 미리보기 · 원어민 검토 중 · Traducción preliminar, en validación",
+  "notice": "한국어 미리보기 · 원어민 검토 중 · Traducción preliminar, en revisión",
   "eyebrow": "전문가를 위한 과라니어",
   "title": "과라니어를 배우세요:",
   "titleAccent": "남미에서 지금도 살아 있는 언어.",

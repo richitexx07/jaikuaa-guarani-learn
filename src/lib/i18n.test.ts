@@ -45,3 +45,15 @@ describe("árabe, italiano, quechua e hindi", () => {
     }
   });
 });
+
+describe("idiomas en pausa", () => {
+  it("quechua y suajili no se ofrecen en el selector hasta la revisión nativa", async () => {
+    const { UI_LANGS, PAUSED_LANGS, isAppLang } = await import("./i18n");
+    for (const l of ["qu", "sw"] as const) {
+      expect(PAUSED_LANGS).toContain(l);
+      expect(UI_LANGS).not.toContain(l);
+      expect(isAppLang(l)).toBe(false);
+    }
+    expect(UI_LANGS).toHaveLength(14);
+  });
+});

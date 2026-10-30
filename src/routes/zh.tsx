@@ -29,7 +29,7 @@ export const Route = createFileRoute("/zh")({
 // Traducción preliminar: pendiente de revisión por un hablante nativo de chino tradicional.
 const COPY: IntlCopy = {
   lang: "zh",
-  notice: "繁體中文預覽版 · 審核中（由母語人士審閱）· Traducción preliminar, en validación",
+  notice: "繁體中文預覽版 · 審核中（由母語人士審閱）· Traducción preliminar, en revisión",
   eyebrow: "專業人士的瓜拉尼語",
   title: "掌握瓜拉尼語：",
   titleAccent: "南美洲的活語言。",

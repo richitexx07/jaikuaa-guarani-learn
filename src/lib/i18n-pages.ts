@@ -59,7 +59,7 @@ const T = {
   csOf: ["{a} de {b}", "{a} de {b}", "{a} of {b}", "{a} von {b}", "{a} sur {b}", "{a} / {b}"],
   csStartWith: ["Empezar con la Lección {n}", "Começar a Lição {n}", "Start Lesson {n}", "Lektion {n} starten", "Commencer la leçon {n}", "開始第 {n} 課"],
   csContinueWith: ["Continuar con la Lección {n}", "Continuar com a Lição {n}", "Continue with Lesson {n}", "Weiter mit Lektion {n}", "Continuer avec la leçon {n}", "繼續第 {n} 課"],
-  csInValidation: ["En validación", "Em validação", "Under validation", "In Prüfung", "En validation", "審核中"],
+  csInValidation: ["En revisión", "Em revisão", "Under review", "In Prüfung", "En cours de relecture", "審核中"],
   csDone: ["Completada · podés repasarla", "Concluída · pode revisar", "Completed · you can review it", "Abgeschlossen · du kannst sie wiederholen", "Terminée · vous pouvez la réviser", "已完成 · 可以複習"],
   csAvailable: ["Disponible", "Disponível", "Available", "Verfügbar", "Disponible", "可學習"],
   csLocked: ["Completá la anterior para abrirla", "Conclua a anterior para abrir", "Finish the previous one to unlock", "Schließe die vorherige ab, um sie zu öffnen", "Terminez la précédente pour l'ouvrir", "完成上一課即可解鎖"],
@@ -216,7 +216,7 @@ const T = {
   // Trivia, Agro, Guaraní Escolar
   trSub: ["Recorré el sendero y demostrá cuánto sabés del Paraguay.", "Percorra a trilha e mostre quanto você sabe do Paraguai.", "Walk the trail and show how much you know about Paraguay.", "Geh den Pfad und zeig, wie viel du über Paraguay weißt.", "Parcourez le sentier et montrez ce que vous savez du Paraguay.", "走上小徑，展現你對巴拉圭的了解。"],
   trAlt: ["Jai, presentador de un programa de preguntas, con dos pulsadores de concurso", "Jai, apresentador de um programa de perguntas, com dois botões de competição", "Jai hosting a quiz show with two buzzers", "Jai moderiert eine Quizshow mit zwei Buzzern", "Jai anime un jeu de questions avec deux buzzers", "Jai 主持問答節目，旁邊有兩個搶答鈕"],
-  inValidation: ["En proceso de validación", "Em processo de validação", "Under validation", "In Prüfung", "En cours de validation", "驗證中"],
+  inValidation: ["En revisión por docentes especialistas", "Em revisão por professores especialistas", "Under review by specialist teachers", "In Prüfung durch Fachlehrkräfte", "En cours de relecture par des enseignants spécialistes", "由專業教師審核中"],
   agAlt: ["Jai, productor del campo", "Jai, produtor do campo", "Jai, a farmer", "Jai als Landwirt", "Jai, agriculteur", "農夫 Jai"],
   agSub: ["Guaraní técnico para escuelas agrícolas y extensión rural. Funciona también sin internet.", "Guarani técnico para escolas agrícolas e extensão rural. Funciona também sem internet.", "Technical Guarani for agricultural schools and rural outreach. Also works offline.", "Fach-Guaraní für Landwirtschaftsschulen und ländliche Beratung. Funktioniert auch offline.", "Guarani technique pour écoles agricoles et vulgarisation rurale. Fonctionne aussi hors ligne.", "供農業學校與農村推廣使用的專業瓜拉尼語，離線也能用。"],
   agContent: ["Los temas y significados están en castellano mientras se valida su traducción.", "Os temas e significados estão em espanhol enquanto a tradução é validada.", "Topics and meanings are in Spanish while their translation is validated.", "Themen und Bedeutungen sind auf Spanisch, bis die Übersetzung geprüft ist.", "Les thèmes et significations sont en espagnol pendant la validation de leur traduction.", "主題與意思在翻譯驗證完成前以西班牙語顯示。"],

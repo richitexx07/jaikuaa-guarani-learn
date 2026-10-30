@@ -28,6 +28,7 @@ export const Route = createFileRoute("/tr")({
 // Traducción preliminar: pendiente de revisión por un hablante nativo.
 const COPY: IntlCopy = {
   "lang": "tr",
+  "notice": "Ön çeviri · anadili konuşan biri inceliyor · Traducción preliminar, en revisión",
   "eyebrow": "Profesyoneller için Guarani",
   "title": "Guarani dilinde uzmanlaşın:",
   "titleAccent": "Güney Amerika'nın yaşayan dili.",

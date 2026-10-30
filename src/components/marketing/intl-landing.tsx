@@ -41,8 +41,14 @@ export function IntlLanding({ c }: { c: IntlCopy }) {
         </div>
       </header>
       {c.notice && (
-        <div role="note" className="border-b border-border/50 bg-muted px-4 py-2 text-center text-xs font-medium text-muted-foreground">
-          {c.notice}
+        <div role="note" className="border-b border-amber-300/60 bg-amber-50 px-4 py-2.5 text-center text-sm font-medium text-amber-950">
+          {c.notice}{" · "}
+          <a
+            href={`mailto:contacto@jaikuaa.com?subject=${encodeURIComponent(`Revisión de traducción (${c.lang})`)}`}
+            className="font-semibold underline underline-offset-2"
+          >
+            contacto@jaikuaa.com
+          </a>
         </div>
       )}
 

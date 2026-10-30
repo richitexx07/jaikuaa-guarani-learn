@@ -53,7 +53,7 @@ export function AppLanguageToggle({ className = "" }: { className?: string }) {
         </DropdownMenuContent>
       </DropdownMenu>
       {PRELIMINARY_LANGS.includes(lang) && (
-        <span role="note" className="mt-0.5 text-[10px] font-medium text-muted-foreground">{t("lang.preliminary")}</span>
+        <span role="note" className="mt-0.5 rounded bg-amber-50 px-1.5 text-[11px] font-medium text-amber-900">{t("lang.preliminary")}</span>
       )}
     </div>
   );

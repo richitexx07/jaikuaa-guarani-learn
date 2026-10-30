@@ -11,7 +11,14 @@ export const APP_LANGS: AppLang[] = ["es", "pt", "en", "de", "fr", "zh"];
 /** Idiomas con traducción preliminar, pendiente de revisión por un hablante nativo. */
 /** Idiomas de la interfaz: ja/ru/ko cubren menús, pantallas internas y juegos. */
 export type UiLang = AppLang | "ja" | "ru" | "ko" | "ar" | "it" | "qu" | "hi" | "he" | "tr" | "sw";
-export const UI_LANGS: UiLang[] = ["es", "pt", "en", "de", "fr", "zh", "ja", "ru", "ko", "ar", "it", "qu", "hi", "he", "tr", "sw"];
+/**
+ * Quechua y suajili quedan en pausa hasta que los revise un hablante nativo:
+ * las traducciones siguen en el código, pero no se ofrecen en el selector.
+ * Jaikuaa no usa traducción automática para lenguas indígenas sin revisión humana.
+ */
+export const PAUSED_LANGS: UiLang[] = ["qu", "sw"];
+const ALL_LANGS: UiLang[] = ["es", "pt", "en", "de", "fr", "zh", "ja", "ru", "ko", "ar", "it", "qu", "hi", "he", "tr", "sw"];
+export const UI_LANGS: UiLang[] = ALL_LANGS.filter((l) => !PAUSED_LANGS.includes(l));
 export const PRELIMINARY_LANGS: UiLang[] = ["de", "fr", "zh", "ja", "ru", "ko", "ar", "it", "qu", "hi", "he", "tr", "sw"];
 const KEY = "jaikuaa_lang";
 const listeners = new Set<() => void>();
@@ -161,8 +168,9 @@ const DICT = {
   "ea.rest": { es: "Igual ya podés usarlo gratis, y lo que aprendas desde hoy queda guardado.", pt: "Mesmo assim você já pode usar grátis, e o que aprender a partir de hoje fica salvo.", en: "You can already use it for free, and everything you learn from today is saved." },
   "pl.strong": { es: "Acceso anticipado:", pt: "Acesso antecipado:", en: "Early access:" },
   "pl.rest": { es: "Jaikuaa todavía no se lanzó oficialmente. Las palabras están en revisión por docentes especialistas; si ves un error, avisanos.", pt: "O Jaikuaa ainda não foi lançado oficialmente. As palavras estão em revisão por professores especialistas; se vir um erro, avise-nos.", en: "Jaikuaa has not officially launched yet. Words are being reviewed by specialist teachers; if you spot a mistake, let us know." },
-  "val.badge": { es: "En validación", pt: "Em validação", en: "Under review" },
-  "lang.preliminary": { es: "Traducción preliminar, en validación", pt: "Tradução preliminar, em validação", en: "Preliminary translation, under review" },
+  "val.badge": { es: "En revisión", pt: "Em revisão", en: "Under review" },
+  "lang.preliminary": { es: "Traducción preliminar, en revisión", pt: "Tradução preliminar, em revisão", en: "Preliminary translation, under review" },
+  "lang.help": { es: "¿Hablás este idioma? Ayudanos a revisarla", pt: "Você fala este idioma? Ajude-nos a revisá-la", en: "Do you speak this language? Help us review it" },
 } as const satisfies Record<string, Record<BaseLang, string>>;
 
 export type TKey = keyof typeof DICT;

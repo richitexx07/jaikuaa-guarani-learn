@@ -30,7 +30,7 @@ export const Route = createFileRoute("/fr")({
 // Traduction préliminaire : doit être relue par un locuteur natif francophone.
 const COPY: IntlCopy = {
   lang: "fr",
-  notice: "Traduction préliminaire · en cours de relecture par un locuteur natif · Traducción preliminar, en validación",
+  notice: "Traduction préliminaire · en cours de relecture par un locuteur natif · Traducción preliminar, en revisión",
   eyebrow: "Le guarani pour ceux qui arrivent au Paraguay",
   title: "Apprenez le guarani,",
   titleAccent: "la langue vivante du Paraguay.",

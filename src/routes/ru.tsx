@@ -29,7 +29,7 @@ export const Route = createFileRoute("/ru")({
 // Traducción preliminar: pendiente de revisión por un hablante nativo.
 const COPY: IntlCopy = {
   "lang": "ru",
-  "notice": "Предварительная версия на русском · проверяется носителем языка · Traducción preliminar, en validación",
+  "notice": "Предварительная версия на русском · проверяется носителем языка · Traducción preliminar, en revisión",
   "eyebrow": "Гуарани для профессионалов",
   "title": "Освойте гуарани:",
   "titleAccent": "живой язык Южной Америки.",

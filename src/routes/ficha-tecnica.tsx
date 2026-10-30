@@ -41,14 +41,14 @@ export const Route = createFileRoute("/ficha-tecnica")({
   ),
 });
 
-/** Cifras medidas sobre el repositorio el 27/10/2026. Actualizar a mano al re-medir. */
+/** Cifras medidas sobre el repositorio y la base el 30/10/2026. Actualizar a mano al re-medir. */
 const METRICAS = [
-  { icon: Code2, valor: "54.500+", label: "líneas de TypeScript" },
-  { icon: RouteIcon, valor: "81", label: "pantallas y rutas" },
-  { icon: Database, valor: "30", label: "tablas con seguridad por fila" },
-  { icon: FlaskConical, valor: "506", label: "pruebas automáticas, todas OK" },
+  { icon: Code2, valor: "56.000+", label: "líneas de TypeScript" },
+  { icon: RouteIcon, valor: "94", label: "pantallas y rutas" },
+  { icon: Database, valor: "41", label: "tablas, todas con seguridad por fila" },
+  { icon: FlaskConical, valor: "529", label: "pruebas automáticas, todas OK" },
   { icon: Server, valor: "27", label: "módulos de funciones de servidor" },
-  { icon: GitBranch, valor: "967", label: "versiones registradas en Git" },
+  { icon: GitBranch, valor: "1.110", label: "versiones registradas en Git" },
 ] as const;
 
 const SECCIONES = [
@@ -56,7 +56,7 @@ const SECCIONES = [
     icon: Layers,
     titulo: "Stack tecnológico",
     items: [
-      "TanStack Start v1 sobre React 19 y Vite 7: renderizado en servidor e hidratación en el cliente, con rutas tipadas de punta a punta.",
+      "TanStack Start v1 sobre React 19 y Vite 8: renderizado en servidor e hidratación en el cliente, con rutas tipadas de punta a punta.",
       "TypeScript estricto en todo el código de la aplicación.",
       "Ejecución en el borde de red (Cloudflare Workers / workerd): sin servidores dedicados que mantener ni pagar en horas sin tráfico.",
       "Tailwind CSS v4 con tokens de diseño semánticos y componentes accesibles (Radix / shadcn).",
@@ -70,7 +70,7 @@ const SECCIONES = [
       "Seguridad por fila (RLS) activa en cada tabla: ninguna persona puede leer ni modificar datos de otra.",
       "Roles en una tabla separada y verificados en el servidor (has_role); nunca a partir de datos que el usuario pueda editar.",
       "Escrituras sensibles (validación, certificados, aulas, publicación) solo por funciones de servidor con verificación de sesión.",
-      "Doble firma humana: quien propone una palabra no puede ser quien la valida (control en servidor y restricción en la base).",
+      "Doble firma humana: quien propone una palabra no puede ser quien la aprueba (control en servidor y restricción en la base).",
       "Certificados con código aleatorio, verificables en una página pública que muestra solo los datos impresos.",
       "Escaneos de seguridad antes de cada publicación. Juegos sin chat libre, pensados para menores.",
       "Certificados: el servidor exige lecciones publicadas, hechas en orden y con un tope diario antes de contarlas. Planillas descargadas protegidas contra fórmulas. Docentes sin habilitación vigente pierden acceso a sus aulas.",
@@ -92,19 +92,20 @@ const SECCIONES = [
     items: [
       "Corpus único compartido entre grados (sin duplicados), organizado por grado escolar.",
       "Audio exclusivamente de grabaciones humanas; sin voces sintéticas.",
-      "Motor morfológico HFST (autómatas de estados finitos) desarrollado aparte por el CTO. En desarrollo, todavía no conectado.",
-      "Principio de diseño: el motor opina, los docentes deciden. Ningún contenido en guaraní se publica sin validación humana.",
-      "Traductor y tutor automáticos apagados a propósito hasta contar con validación.",
+      "Analizador morfológico propio en TypeScript, con reglas de la gramática oficial y pruebas automáticas: opina en el Laboratorio docente. La versión con transductores HFST (autómatas de estados finitos), del CTO, está en desarrollo y todavía no está conectada.",
+      "Principio de diseño: el motor opina, los docentes deciden. Ningún contenido en guaraní se publica sin revisión de docentes.",
+      "Traductor y tutor automáticos apagados a propósito: la inteligencia artificial no escribe guaraní.",
     ],
   },
   {
     icon: Globe,
     titulo: "Alcance internacional",
     items: [
-      "Portadas propias en nueve idiomas: castellano, portugués (/pt), inglés (/en), alemán (/de), francés (/fr), chino tradicional (/zh), japonés (/ja), ruso (/ru) y coreano (/ko), pensadas para inversores, diplomacia, turismo y extranjeros que viven o hacen negocios en Paraguay.",
+      "Portadas propias en catorce idiomas: castellano, portugués, inglés, alemán, francés, chino tradicional, japonés, ruso, coreano, árabe, italiano, hindi, hebreo y turco, pensadas para diplomacia, turismo, inversores y extranjeros que viven o hacen negocios en Paraguay.",
       "Selector de idioma en la portada, en el ingreso y dentro de la app: se puede cambiar en cualquier momento y la elección queda recordada en el dispositivo.",
-      "Interfaz completa en los seis idiomas: ingreso, panel, curso y lecciones, logros, ranking, glosario, certificado, embajadores, trivia, agro, guaraní escolar, páginas públicas y los 16 juegos (reglas, botones y resultados).",
-      "El contenido en guaraní no se traduce automáticamente: significados, preguntas y notas culturales siguen en castellano con el aviso «En validación» hasta que lo revisen especialistas. Alemán, francés y chino son traducciones preliminares, pendientes de revisión nativa.",
+      "Interfaz en los catorce idiomas: ingreso, panel, curso y lecciones, logros, ranking, glosario, certificado, embajadores, trivia, agro, guaraní escolar, páginas públicas y los 15 juegos (reglas, botones y resultados).",
+      "El contenido en guaraní no se traduce automáticamente: significados, preguntas y notas culturales siguen en castellano con el aviso «En revisión» hasta que lo revisen especialistas.",
+      "Salvo castellano, portugués e inglés, las traducciones de la interfaz son preliminares: muestran un aviso visible e invitan a hablantes nativos a revisarlas. Quechua y suajili están en pausa hasta esa revisión.",
       "Privacidad y Términos: el castellano es la versión oficial; en otros idiomas se muestra un aviso.",
       "Posicionamiento en buscadores por idioma: cada portada tiene su propio título, descripción y enlaces alternos (hreflang).",
       "Base para el modelo comercial: el guaraní es gratis para paraguayos; el público internacional es el segmento pago.",
@@ -115,7 +116,7 @@ const SECCIONES = [
     titulo: "Modelo de negocio",
     items: [
       "Guaraní básico gratis para todos los paraguayos. Pagan especializaciones, instituciones, auspiciantes y el público extranjero.",
-      "Público internacional: con la app en seis idiomas, cursos y certificados para extranjeros se vuelven el segmento pago principal. Cobro internacional: pendiente de integrar la pasarela de pagos.",
+      "Público internacional: con la app en catorce idiomas, cursos y certificados para extranjeros son el segmento pago. Cobro internacional: pendiente de integrar la pasarela de pagos.",
       "Instituciones y empresas: grupos, aulas y encargos de vocabulario por rubro (por ejemplo, agro), con revisión pagada a docentes especialistas.",
       "Auspiciantes: espacios nativos dentro de juegos y desafíos, con informe de impresiones. Sin sorteos ni premios hasta tener los permisos.",
       "Industrias culturales: asesoría lingüística para producciones audiovisuales, editoriales y turismo receptivo, junto con especialistas en la lengua.",
@@ -183,7 +184,7 @@ function FichaTecnica() {
 
         <section className="mt-8 print:break-inside-avoid">
           <h2 className="font-display text-lg font-bold">Métricas del repositorio</h2>
-          <p className="text-xs text-muted-foreground">Medidas sobre el código el 27/10/2026.</p>
+          <p className="text-xs text-muted-foreground">Medidas sobre el código y la base de datos el 30/10/2026.</p>
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {METRICAS.map((m) => (
               <div key={m.label} className="rounded-xl border border-border bg-background p-4">

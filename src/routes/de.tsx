@@ -30,7 +30,7 @@ export const Route = createFileRoute("/de")({
 // Vorläufige Übersetzung: muss von einer deutschen Muttersprachlerin / einem Muttersprachler geprüft werden.
 const COPY: IntlCopy = {
   lang: "de",
-  notice: "Vorläufige Übersetzung · wird von Muttersprachlern geprüft · Traducción preliminar, en validación",
+  notice: "Vorläufige Übersetzung · wird von Muttersprachlern geprüft · Traducción preliminar, en revisión",
   eyebrow: "Guaraní für Menschen, die in Paraguay ankommen",
   title: "Lernen Sie Guaraní,",
   titleAccent: "die lebendige Sprache Paraguays.",

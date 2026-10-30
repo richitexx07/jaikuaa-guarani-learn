@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Volume2, VolumeX } from "lucide-react";
+import { Clock, Loader2, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getHumanAudioUrl, prefetchAudio, playGuarani } from "@/lib/audio";
 import { openJai } from "@/lib/jai-events";
@@ -60,6 +60,8 @@ export function SpeakerButton({ gn, size = "sm", className }: Props) {
 
   const loading = url === undefined;
   const unavailable = failed || url === null;
+  // Palabra que todavía no tiene grabación humana (no es una falla): se avisa que viene en camino.
+  const pending = url === null && !failed;
 
   return (
     <Button
@@ -83,16 +85,25 @@ export function SpeakerButton({ gn, size = "sm", className }: Props) {
         // Si el audio falla dos veces seguidas, Jai aparece con la solución (volumen, modo silencio…).
         if (failsRef.current === 2) openJai("audio");
       }}
-      aria-label={`${unavailable ? "Reintentar audio de" : "Escuchar"} ${gn}`}
-      title={unavailable ? "No se pudo reproducir. Tocá para reintentar." : "Escuchar grabación humana"}
+      aria-label={pending ? `${gn}: grabación en camino` : `${unavailable ? "Reintentar audio de" : "Escuchar"} ${gn}`}
+      title={
+        pending
+          ? "Grabación en camino: esta palabra todavía no tiene voz humana grabada."
+          : unavailable
+            ? "No se pudo reproducir. Tocá para reintentar."
+            : "Escuchar grabación humana"
+      }
       className={cn(
         "inline-flex shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition hover:bg-primary/20 active:scale-95 disabled:opacity-50",
+        pending && "bg-muted text-muted-foreground hover:bg-muted",
         dims,
         className,
       )}
     >
       {playing || loading ? (
         <Loader2 className={cn(icon, "motion-safe:animate-spin")} />
+      ) : pending ? (
+        <Clock className={icon} />
       ) : unavailable ? (
         <VolumeX className={icon} />
       ) : (

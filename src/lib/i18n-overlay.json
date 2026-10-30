@@ -983,7 +983,13 @@
   "Jai's paw print": "Jaiの足跡",
   "Jai, Jaikuaa's jaguar, says hello": "Jaikuaaのジャガー、Jaiが挨拶しています",
   "Jai, a farmer": "農家のJai",
-  "Jai, a tour guide, waves with a mate": "ツアーガイドのJaiがマテ茶を持って手を振る"
+  "Jai, a tour guide, waves with a mate": "ツアーガイドのJaiがマテ茶を持って手を振る",
+  "Teacher-reviewed words": "教師が確認した単語",
+  "Look up words and phrases already reviewed by teachers, with audio from real Paraguayan voices.": "教師が確認済みの単語やフレーズを、パラグアイの人の本物の声で調べられます。",
+  "Brands do not influence Guarani content: it is prepared and reviewed by language specialists.": "ブランドはグアラニー語の内容に関与しません。内容は言語の専門家が作成し、確認しています。",
+  "Guarani term: pending upload and review by legal specialists.": "グアラニー語の用語: 法律の専門家によるアップロードおよび検証待ち。",
+  "Culture questions under teacher review.": "教師陣による確認中の文化に関する質問。",
+  "Under review by specialist teachers": "専門の教師が確認中"
  },
  "ru": {
   " until {d}": " до {d}",
@@ -1969,7 +1975,13 @@
   "🏛️ You run the service desk while the queue moves.": "🏛️ Ты работаешь за стойкой обслуживания, пока движется очередь.",
   "👂 Each farmer tells you their problem.": "👂 Каждый фермер рассказывает тебе о своей проблеме.",
   "👆 Choose its meaning from 4 options.": "👆 Выбери правильное значение из 4 вариантов.",
-  "👆 Choose the Guarani word you need to understand it.": "👆 Выбери слово на гуарани, необходимое для понимания."
+  "👆 Choose the Guarani word you need to understand it.": "👆 Выбери слово на гуарани, необходимое для понимания.",
+  "Teacher-reviewed words": "Слова, проверенные преподавателями",
+  "Look up words and phrases already reviewed by teachers, with audio from real Paraguayan voices.": "Ищите слова и фразы, уже проверенные преподавателями, с записями настоящих голосов парагвайцев.",
+  "Brands do not influence Guarani content: it is prepared and reviewed by language specialists.": "Бренды не влияют на содержание на гуарани: его готовят и проверяют специалисты по языку.",
+  "Guarani term: pending upload and review by legal specialists.": "Термин на гуарани: ожидает загрузки и проверки юристами.",
+  "Culture questions under teacher review.": "Вопросы о культуре проходят проверку преподавателями.",
+  "Under review by specialist teachers": "На проверке у преподавателей-специалистов"
  },
  "ko": {
   " until {d}": " {d}까지",
@@ -2955,7 +2967,14 @@
   "🏛️ You run the service desk while the queue moves.": "🏛️ 대기 줄이 줄어드는 동안 접수 창구를 운영하세요.",
   "👂 Each farmer tells you their problem.": "👂 농부들이 각자의 고민을 이야기합니다.",
   "👆 Choose its meaning from 4 options.": "👆 4개의 보기 중 올바른 뜻을 선택하세요.",
-  "👆 Choose the Guarani word you need to understand it.": "👆 이해하는 데 필요한 과라니어 단어를 선택하세요."
+  "👆 Choose the Guarani word you need to understand it.": "👆 이해하는 데 필요한 과라니어 단어를 선택하세요.",
+  "Do you speak this language? Help us review it": "이 언어를 하시나요? 검토를 도와주세요",
+  "Teacher-reviewed words": "교사가 검토한 단어",
+  "Look up words and phrases already reviewed by teachers, with audio from real Paraguayan voices.": "교사가 검토한 단어와 문장을 실제 파라과이 사람의 목소리로 찾아보세요.",
+  "Brands do not influence Guarani content: it is prepared and reviewed by language specialists.": "브랜드는 과라니어 콘텐츠에 관여하지 않습니다. 콘텐츠는 언어 전문가가 작성하고 검토합니다.",
+  "Guarani term: pending upload and review by legal specialists.": "과라니어 용어: 법률 전문가의 업로드 및 검증 대기 중.",
+  "Culture questions under teacher review.": "교사 검증을 거친 문화 문제.",
+  "Under review by specialist teachers": "전문 교사 검토 중"
  },
  "ar": {
   "Route destinations": "وجهات المسار",
@@ -3941,7 +3960,14 @@
   "🏛️ You run the service desk while the queue moves.": "🏛️ أنت تدير مكتب الخدمة بينما يتحرك الطابور.",
   "👂 Each farmer tells you their problem.": "👂 يخبرك كل مزارع بمشكلته.",
   "👆 Choose its meaning from 4 options.": "👆 اختر معناها من بين 4 خيارات.",
-  "👆 Choose the Guarani word you need to understand it.": "👆 اختر الكلمة الغوارانية التي تحتاج إليها لفهمها."
+  "👆 Choose the Guarani word you need to understand it.": "👆 اختر الكلمة الغوارانية التي تحتاج إليها لفهمها.",
+  "Do you speak this language? Help us review it": "هل تتحدث هذه اللغة؟ ساعدنا في مراجعتها",
+  "Teacher-reviewed words": "كلمات راجعها المعلمون",
+  "Look up words and phrases already reviewed by teachers, with audio from real Paraguayan voices.": "ابحث عن كلمات وعبارات راجعها المعلمون، بتسجيلات لأصوات باراغوايية حقيقية.",
+  "Brands do not influence Guarani content: it is prepared and reviewed by language specialists.": "لا تتدخل العلامات التجارية في المحتوى بلغة الغواراني: يعدّه ويراجعه مختصون في اللغة.",
+  "Guarani term: pending upload and review by legal specialists.": "المصطلح بـ Guarani: في انتظار الرفع والتحقق من قبل المتخصصين القانونيين.",
+  "Culture questions under teacher review.": "أسئلة ثقافية قيد الاعتماد من قِبل معلمين.",
+  "Under review by specialist teachers": "قيد المراجعة من قبل معلمين متخصصين"
  },
  "it": {
   "Jaikuaa Ambassadors": "Ambasciatori di Jaikuaa",
@@ -4927,7 +4953,14 @@
   "🏛️ You run the service desk while the queue moves.": "🏛️ Gestisci lo sportello mentre la fila avanza.",
   "👂 Each farmer tells you their problem.": "👂 Ogni agricoltore ti racconta il suo problema.",
   "👆 Choose its meaning from 4 options.": "👆 Scegli il suo significato tra 4 opzioni.",
-  "👆 Choose the Guarani word you need to understand it.": "👆 Scegli la parola in Guarani necessaria per capirlo."
+  "👆 Choose the Guarani word you need to understand it.": "👆 Scegli la parola in Guarani necessaria per capirlo.",
+  "Do you speak this language? Help us review it": "Parli questa lingua? Aiutaci a revisionarla",
+  "Teacher-reviewed words": "Parole riviste dai docenti",
+  "Look up words and phrases already reviewed by teachers, with audio from real Paraguayan voices.": "Consulta parole e frasi già riviste dai docenti, con l'audio di vere voci paraguaiane.",
+  "Brands do not influence Guarani content: it is prepared and reviewed by language specialists.": "I marchi non intervengono sui contenuti in guaraní: li preparano e li rivedono specialisti della lingua.",
+  "Guarani term: pending upload and review by legal specialists.": "Termine in Guarani: in attesa di caricamento e convalida da parte di esperti legali.",
+  "Culture questions under teacher review.": "Domande di cultura in fase di convalida da parte degli insegnanti.",
+  "Under review by specialist teachers": "In revisione da parte di docenti specializzati"
  },
  "qu": {
   "Download or print": "Uraykachiy utaq ch'ipachiy",
@@ -5913,7 +5946,14 @@
   "Your personal link": "Kikin t'inkiyki",
   "Your points don't expire.": "Puntuykikunaqa manam tukukunchu.",
   "Your points never expire.": "Puntuykikunaqa manapuni tukukunchu.",
-  "Your progress": "Ñawpariyniyki"
+  "Your progress": "Ñawpariyniyki",
+  "Do you speak this language? Help us review it": "Do you speak this language? Help us review it",
+  "Teacher-reviewed words": "Teacher-reviewed words",
+  "Look up words and phrases already reviewed by teachers, with audio from real Paraguayan voices.": "Look up words and phrases already reviewed by teachers, with audio from real Paraguayan voices.",
+  "Brands do not influence Guarani content: it is prepared and reviewed by language specialists.": "Brands do not influence Guarani content: it is prepared and reviewed by language specialists.",
+  "Guarani term: pending upload and review by legal specialists.": "Guarani simi: apachiy chanta kamachiy yachaqkunap chaninchaynin suyasqa.",
+  "Culture questions under teacher review.": "Kawsaymanta tapuykuna yachachiqkunap qhawasqan.",
+  "Under review by specialist teachers": "Under review by specialist teachers"
  },
  "hi": {
   " until {d}": " {d} तक",
@@ -6899,7 +6939,14 @@
   "🏛️ You run the service desk while the queue moves.": "🏛️ कतार आगे बढ़ने के दौरान आप सर्विस डेस्क संभालते हैं।",
   "👂 Each farmer tells you their problem.": "👂 प्रत्येक किसान आपको अपनी समस्या बताता है।",
   "👆 Choose its meaning from 4 options.": "👆 4 विकल्पों में से इसका अर्थ चुनें।",
-  "👆 Choose the Guarani word you need to understand it.": "👆 इसे समझने के लिए ज़रूरी Guarani शब्द चुनें।"
+  "👆 Choose the Guarani word you need to understand it.": "👆 इसे समझने के लिए ज़रूरी Guarani शब्द चुनें।",
+  "Do you speak this language? Help us review it": "क्या आप यह भाषा बोलते हैं? इसकी समीक्षा में हमारी मदद करें",
+  "Teacher-reviewed words": "शिक्षकों द्वारा जाँचे गए शब्द",
+  "Look up words and phrases already reviewed by teachers, with audio from real Paraguayan voices.": "शिक्षकों द्वारा जाँचे गए शब्द और वाक्यांश देखें, असली पराग्वे के लोगों की आवाज़ में।",
+  "Brands do not influence Guarani content: it is prepared and reviewed by language specialists.": "ब्रांड ग्वारानी सामग्री में दखल नहीं देते: इसे भाषा विशेषज्ञ तैयार करते और जाँचते हैं।",
+  "Guarani term: pending upload and review by legal specialists.": "Guarani शब्द: अपलोड और कानूनी विशेषज्ञों द्वारा सत्यापन लंबित है।",
+  "Culture questions under teacher review.": "शिक्षकों के सत्यापन के अंतर्गत संस्कृति संबंधी प्रश्न।",
+  "Under review by specialist teachers": "विशेषज्ञ शिक्षकों द्वारा समीक्षा जारी"
  },
  "he": {
   "Download or print": "הורדה או הדפסה",
@@ -7885,7 +7932,14 @@
   "Jai's paw print": "טביעת כף הרגל של Jai",
   "Jai, Jaikuaa's jaguar, says hello": "Jai, היגואר של Jaikuaa, אומר שלום",
   "Jai, a farmer": "Jai, חקלאי",
-  "Jai, a tour guide, waves with a mate": "Jai, מדריך טיולים, מנופף לשלום עם מאטה"
+  "Jai, a tour guide, waves with a mate": "Jai, מדריך טיולים, מנופף לשלום עם מאטה",
+  "Do you speak this language? Help us review it": "מדברים את השפה הזאת? עזרו לנו לבדוק את התרגום",
+  "Teacher-reviewed words": "מילים שנבדקו על ידי מורים",
+  "Look up words and phrases already reviewed by teachers, with audio from real Paraguayan voices.": "חפשו מילים וביטויים שכבר נבדקו על ידי מורים, עם הקלטות של קולות פרגוואיים אמיתיים.",
+  "Brands do not influence Guarani content: it is prepared and reviewed by language specialists.": "המותגים אינם מתערבים בתוכן בגוארני: מומחים לשפה מכינים ובודקים אותו.",
+  "Guarani term: pending upload and review by legal specialists.": "מונח ב-Guarani: ממתין להעלאה ולאימות על ידי מומחים משפטיים.",
+  "Culture questions under teacher review.": "שאלות תרבות באימות מורים.",
+  "Under review by specialist teachers": "בבדיקה של מורים מומחים"
  },
  "tr": {
   "Download or print": "İndir veya yazdır",
@@ -8871,7 +8925,14 @@
   "Jai's paw print": "Jai'nin pati izi",
   "Jai, Jaikuaa's jaguar, says hello": "Jaikuaa'nın jaguarı Jai merhaba diyor",
   "Jai, a farmer": "Jai, bir çiftçi",
-  "Jai, a tour guide, waves with a mate": "Tur rehberi Jai, elinde mate ile el sallıyor"
+  "Jai, a tour guide, waves with a mate": "Tur rehberi Jai, elinde mate ile el sallıyor",
+  "Do you speak this language? Help us review it": "Bu dili konuşuyor musunuz? Çeviriyi gözden geçirmemize yardım edin",
+  "Teacher-reviewed words": "Öğretmenlerin incelediği kelimeler",
+  "Look up words and phrases already reviewed by teachers, with audio from real Paraguayan voices.": "Öğretmenlerin incelediği kelime ve ifadelere gerçek Paraguaylıların sesiyle göz atın.",
+  "Brands do not influence Guarani content: it is prepared and reviewed by language specialists.": "Markalar Guarani içeriğe karışmaz: içeriği dil uzmanları hazırlar ve inceler.",
+  "Guarani term: pending upload and review by legal specialists.": "Guarani terimi: hukuk uzmanları tarafından yükleme ve doğrulama bekleniyor.",
+  "Culture questions under teacher review.": "Öğretmen onayı sürecindeki kültür soruları.",
+  "Under review by specialist teachers": "Uzman öğretmenler tarafından inceleniyor"
  },
  "sw": {
   "Download or print": "Pakua au chapisha",
@@ -9857,6 +9918,13 @@
   "Jai's paw print": "Alama ya unyayo wa Jai",
   "Jai, Jaikuaa's jaguar, says hello": "Jai, duma wa Jaikuaa, anasalimia",
   "Jai, a farmer": "Jai, mkulima",
-  "Jai, a tour guide, waves with a mate": "Jai, mwongoza watalii, anapunga mkono akiwa na mate"
+  "Jai, a tour guide, waves with a mate": "Jai, mwongoza watalii, anapunga mkono akiwa na mate",
+  "Do you speak this language? Help us review it": "Unazungumza lugha hii? Tusaidie kuipitia",
+  "Teacher-reviewed words": "Maneno yaliyopitiwa na walimu",
+  "Look up words and phrases already reviewed by teachers, with audio from real Paraguayan voices.": "Tafuta maneno na misemo iliyokwisha pitiwa na walimu, pamoja na sauti halisi za Waparagwai.",
+  "Brands do not influence Guarani content: it is prepared and reviewed by language specialists.": "Chapa hazihusiki na maudhui ya Kiguarani: huandaliwa na kupitiwa na wataalamu wa lugha.",
+  "Guarani term: pending upload and review by legal specialists.": "Neno la Guarani: linasubiri kupakiwa na kuthibitishwa na wataalamu wa sheria.",
+  "Culture questions under teacher review.": "Maswali ya utamaduni yanayohakikiwa na mwalimu.",
+  "Under review by specialist teachers": "Inakaguliwa na walimu wataalamu"
  }
 }

@@ -29,7 +29,7 @@ export const Route = createFileRoute("/ja")({
 // Traducción preliminar: pendiente de revisión por un hablante nativo.
 const COPY: IntlCopy = {
   "lang": "ja",
-  "notice": "日本語プレビュー版・ネイティブスピーカーによる確認中 · Traducción preliminar, en validación",
+  "notice": "日本語プレビュー版・ネイティブスピーカーによる確認中 · Traducción preliminar, en revisión",
   "eyebrow": "プロフェッショナルのためのグアラニー語",
   "title": "グアラニー語を身につけよう：",
   "titleAccent": "南米で今も生きる言語。",

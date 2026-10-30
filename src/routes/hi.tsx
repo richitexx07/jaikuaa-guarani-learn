@@ -28,6 +28,7 @@ export const Route = createFileRoute("/hi")({
 // Traducción preliminar: pendiente de revisión por un hablante nativo.
 const COPY: IntlCopy = {
   "lang": "hi",
+  "notice": "प्रारंभिक अनुवाद · मूल वक्ता द्वारा समीक्षा जारी · Traducción preliminar, en revisión",
   "eyebrow": "पेशेवरों के लिए Guarani",
   "title": "Guarani में महारत हासिल करें:",
   "titleAccent": "दक्षिण अमेरिका की जीवंत भाषा।",
