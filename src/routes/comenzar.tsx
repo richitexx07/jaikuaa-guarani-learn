@@ -6,7 +6,7 @@ import { recordCompletion } from "@/lib/gamification";
 import { saveMotivation, markOnboardingDone, type Motivation } from "@/lib/onboarding";
 import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
-import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
 import jaiSaluda from "@/assets/jai/jai-saluda.webp";
 import jaiPiensa from "@/assets/jai/jai-piensa.webp";
 import jaiTurismo from "@/assets/jai/jai-turismo.webp";

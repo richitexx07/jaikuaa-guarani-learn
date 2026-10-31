@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, X } from "lucide-react";
 import { celebrate } from "@/lib/confetti";
 import jaiProfe from "@/assets/jai-profe.webp";
-import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
 import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
 import jaiAnimo from "@/assets/jai/jai-animo.webp";
 import jaiPiensa from "@/assets/jai/jai-piensa.webp";

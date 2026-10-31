@@ -5,7 +5,7 @@ import { TRIVIA, TRIVIA_ORDER, type TriviaCategoryId } from "@/lib/trivia";
 import { TRIVIA_ART } from "@/lib/trivia-art";
 import { nextStop, readSendero } from "@/lib/trivia-sendero";
 import jaiTurismo from "@/assets/jai/jai-turismo.webp";
-import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
 
 const CSS = `
 .sendero-next { animation: sendero-glow 2.2s ease-in-out infinite; }

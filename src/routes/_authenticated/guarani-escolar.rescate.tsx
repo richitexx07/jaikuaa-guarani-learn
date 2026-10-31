@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ESCOLAR_GRADES, loadEscolarGrade, saveEscolarGrade, temasFor, type QuizQuestion, type Tema } from "@/lib/guarani-tema";
 import { useRecordOnMount, useRecordVisit } from "@/lib/gamification";
 import { celebrate } from "@/lib/confetti";
-import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
 import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
 import jaiAnimo from "@/assets/jai/jai-animo.webp";
 import { SpeakerButton } from "@/components/audio/speaker-button";

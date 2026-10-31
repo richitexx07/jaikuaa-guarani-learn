@@ -5,7 +5,7 @@ import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BADGES, useStats } from "@/lib/gamification";
 import { StatsBar } from "@/components/gamification/stats-bar";
-import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
 import medallaPrimerPaso from "@/assets/medallas/medalla-primer-paso.webp";
 import medallaGuaranihablante from "@/assets/medallas/medalla-guaranihablante.webp";
 import medallaEstrella from "@/assets/medallas/medalla-estudiante-estrella.webp";

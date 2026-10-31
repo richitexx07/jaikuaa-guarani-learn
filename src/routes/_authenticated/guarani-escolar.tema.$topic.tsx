@@ -54,7 +54,7 @@ export const Route = createFileRoute("/_authenticated/guarani-escolar/tema/$topi
   component: TemaPage,
 });
 
-import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
 import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
 import jaiAnimo from "@/assets/jai/jai-animo.webp";
 import jaiPiensa from "@/assets/jai/jai-piensa.webp";

@@ -16,7 +16,7 @@ import { OfflineMissingError, isNetworkError, withOfflineCache } from "@/lib/off
 import { queueReport, queueValidation, queuedValidationIds, unqueueValidation } from "@/lib/staff-offline";
 import { useConnection } from "@/components/offline/use-connection";
 import { DictateButton } from "@/components/pilot/dictate-button";
-import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
 import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 import jaiPiensa from "@/assets/jai/jai-piensa.webp";
 import jaiProfe from "@/assets/jai-profe.webp";

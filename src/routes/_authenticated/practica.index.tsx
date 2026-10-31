@@ -24,7 +24,7 @@ import { PanelTools } from "@/components/pilot/panel-tools";
 import { DictateButton } from "@/components/pilot/dictate-button";
 import { warmPages } from "@/lib/offline-pack";
 import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
-import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
 import { staffStatusRefreshInterval } from "@/lib/staff-status-refresh";
 
 export const Route = createFileRoute("/_authenticated/practica/")({

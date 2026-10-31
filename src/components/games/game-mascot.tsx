@@ -1,6 +1,6 @@
 import jaiPiensa from "@/assets/jai/jai-piensa.webp";
 import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
-import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
 import jaiAnimo from "@/assets/jai/jai-animo.webp";
 
 export type MascotMood = "idle" | "success" | "error" | "victory";

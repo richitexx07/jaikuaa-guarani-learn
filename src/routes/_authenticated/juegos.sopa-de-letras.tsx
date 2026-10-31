@@ -12,7 +12,7 @@ import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
 import jaiPiensa from "@/assets/jai/jai-piensa.webp";
 import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
-import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
 import type { GameWord } from "@/lib/games.functions";
 import { useSDT } from "@/lib/i18n-sopa-duelo";
 

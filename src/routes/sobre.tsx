@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Gamepad2, Gift, Home, Mic, type LucideIcon } from "lucide-react";
 import { HeroJai } from "@/components/marketing/page-parts";
 import jaiSaluda from "@/assets/jai/jai-saluda.webp";
-import jaiFesteja from "@/assets/jai/jai-festeja.webp";
+import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
 import { Mail } from "lucide-react";
 
 export const Route = createFileRoute("/sobre")({
