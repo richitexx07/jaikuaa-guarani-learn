@@ -221,7 +221,16 @@ function CorpusAdminContent({ isAdmin }: { isAdmin: boolean }) {
       </div>
       )}
 
-      <Tabs defaultValue={isAdmin ? "importar" : "palabras"} className="mt-8">
+      <Tabs
+        defaultValue={
+          isAdmin && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("tab") === "tablero"
+            ? "tablero"
+            : isAdmin
+              ? "importar"
+              : "palabras"
+        }
+        className="mt-8"
+      >
         <TabsList className="h-auto w-full flex-wrap">
           {isAdmin && (
             <TabsTrigger value="importar" className="flex-1">
