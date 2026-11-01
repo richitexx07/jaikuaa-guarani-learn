@@ -4,7 +4,8 @@ import { COVER_TONE, type CoverId } from "@/components/games/game-covers";
 import { COVER_IMAGE } from "@/components/games/game-cover-images";
 import { useRecordVisit } from "@/lib/gamification";
 import jaiImg from "@/assets/jai-gamer.webp";
-import { isGuestPath, useIsGuest } from "@/lib/guest";
+import { useState } from "react";
+import { authMode, isGuestPath, useIsGuest } from "@/lib/guest";
 import { GAME_DESC, SHELF_TEXT, gameTitle, useGT } from "@/lib/i18n-games";
 
 export const Route = createFileRoute("/_authenticated/juegos/")({
@@ -67,7 +68,8 @@ const byId = (id: CoverId) => GAMES.find((g) => g.id === id)!;
 
 function GamesHome() {
   useRecordVisit("juegos");
-  const destacado = byId("consultorio");
+  const guest = useIsGuest();
+  const destacado = byId(guest ? "penales" : "consultorio");
   const { lang, g } = useGT();
   return (
     <GameStage
@@ -104,17 +106,17 @@ function GamesHome() {
         <div className="overflow-hidden">
           <img
             src={COVER_IMAGE[destacado.id]}
-            alt="Jai, vestido de doctor, atiende a una paciente en el consultorio"
+            alt={guest ? "Jai en el arco de Penales" : "Jai, vestido de doctor, atiende a una paciente en el consultorio"}
             className="vit-art block aspect-[4/3] h-full w-full object-cover"
             width={800}
             height={600}
           />
         </div>
         <div className="flex flex-col justify-center gap-2 p-5 sm:gap-3 sm:p-8">
-          <span className="w-fit rounded-full bg-[#F6C445] px-3 py-1 text-xs font-bold text-[#3A1A05]">{g("nuevo")}</span>
+          <span className="w-fit rounded-full bg-[#F6C445] px-3 py-1 text-xs font-bold text-[#3A1A05]">{guest ? g("freePlay") : g("nuevo")}</span>
           <h2 className="font-display text-3xl font-bold leading-tight sm:text-4xl">{gameTitle(destacado.title, lang)}</h2>
           <p className="text-white/80">{GAME_DESC[destacado.id]?.[lang] ?? destacado.desc}</p>
-          <span className="mt-2 inline-flex h-12 w-fit items-center rounded-2xl bg-[#3DE0B0] px-6 font-bold text-[#062A2E]">{g("startShift")}</span>
+          <span className="mt-2 inline-flex h-12 w-fit items-center rounded-2xl bg-[#3DE0B0] px-6 font-bold text-[#062A2E]">{guest ? "Jugar ahora" : g("startShift")}</span>
         </div>
       </Link>
 
@@ -135,14 +137,33 @@ function GamesHome() {
   );
 }
 
+function LockedNotice({ title, onClose }: { title: string; onClose: () => void }) {
+  return (
+    <div role="dialog" aria-modal="true" aria-label="Este juego pide cuenta" className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 sm:items-center" onClick={onClose}>
+      <div className="w-full max-w-sm rounded-3xl bg-[#0D1B33] p-6 text-white ring-1 ring-white/15" onClick={(e) => e.stopPropagation()}>
+        <img src={jaiImg} alt="Jai, el jaguarete" className="mx-auto h-24 w-24 object-contain" />
+        <h2 className="mt-2 text-center font-display text-xl font-bold">«{title}» guarda tu progreso</h2>
+        <p className="mt-2 text-center text-sm text-white/80">Creá tu cuenta gratis para jugarlo. Mientras tanto, podés jugar sin cuenta a los juegos marcados como libres.</p>
+        <Link to="/auth" search={{ mode: authMode() }} className="mt-5 flex h-12 items-center justify-center rounded-2xl bg-[#3DE0B0] font-bold text-[#062A2E]">Crear mi cuenta gratis</Link>
+        <Link to="/juegos/penales" className="mt-2 flex h-12 items-center justify-center rounded-2xl bg-white/10 font-bold">Jugar Penales sin cuenta</Link>
+        <button type="button" onClick={onClose} className="mt-2 h-11 w-full rounded-2xl font-semibold text-white/70">Ver otros juegos</button>
+      </div>
+    </div>
+  );
+}
+
 function Cover({ g }: { g: Game }) {
   const { lang, g: tr } = useGT();
   const tone = COVER_TONE[g.id];
   const guest = useIsGuest();
   const free = isGuestPath(g.to);
+  const [locked, setLocked] = useState(false);
   return (
+    <>
+    {locked && <LockedNotice title={gameTitle(g.title, lang)} onClose={() => setLocked(false)} />}
     <Link
       to={g.to}
+      onClick={(e) => { if (guest && !free) { e.preventDefault(); setLocked(true); } }}
       className="vit-card relative flex w-[72%] shrink-0 snap-start flex-col overflow-hidden rounded-2xl ring-1 ring-white/10 sm:w-[44%] lg:w-auto"
       style={{ background: tone.bg, color: tone.ink }}
     >
@@ -169,5 +190,6 @@ function Cover({ g }: { g: Game }) {
         <p className="mt-auto pt-2 text-xs font-semibold opacity-70">{guest && !free ? tr("needsAccount") : g.xp}</p>
       </div>
     </Link>
+    </>
   );
 }

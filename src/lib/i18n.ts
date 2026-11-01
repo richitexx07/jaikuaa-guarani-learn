@@ -63,7 +63,7 @@ function subscribe(cb: () => void) {
 }
 
 export function useUiLang(): UiLang {
-  const lang = useSyncExternalStore(subscribe, read, () => "es");
+  const lang = useSyncExternalStore<UiLang>(subscribe, read, () => "es");
   // Idiomas extra (japonés, ruso…): sus traducciones se descargan recién cuando alguien los elige,
   // y al llegar la pantalla se vuelve a pintar.
   useSyncExternalStore(subscribeOverlay, overlayVersion, () => 0);
