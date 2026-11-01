@@ -86,6 +86,7 @@ import jaiProfe from "@/assets/jai-profe.webp";
 import jaiAtencion from "@/assets/jai-atencion-pro.webp";
 import jaiAgro from "@/assets/jai-agro.webp";
 import { useLastPlace } from "@/lib/last-place";
+import { shouldShowWelcome, welcomeSeen } from "@/lib/welcome";
 import triviaVocabulario from "@/assets/trivia/trivia-vocabulario.webp";
 const jaiAsset = { url: jaiImg };
 
@@ -396,6 +397,11 @@ function Dashboard() {
       const { data: userData } = await supabase.auth.getUser();
       const user = userData.user;
       if (!user || cancelled) return;
+      // Cuenta recién creada: primero «Tu primera palabra en 30 segundos» (una sola vez).
+      if (shouldShowWelcome(user.created_at, welcomeSeen())) {
+        void navigate({ to: "/bienvenida", replace: true });
+        return;
+      }
       const fromMeta =
         (user.user_metadata?.full_name as string | undefined) ??
         (user.user_metadata?.name as string | undefined);

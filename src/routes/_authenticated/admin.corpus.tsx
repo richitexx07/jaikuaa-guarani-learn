@@ -1579,6 +1579,8 @@ function DashboardPanel() {
             <StatCard label="Pendientes de validación" value={d.pendingValidation} />
           </div>
 
+          <FunnelCard f={d.funnel} />
+
           <SourcesCard sources={d.sources} />
 
           <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
@@ -1602,6 +1604,48 @@ function DashboardPanel() {
             </div>
           </div>
         </>
+      )}
+    </div>
+  );
+}
+
+/** Embudo: de los que se registraron en el período, cuántos hicieron algo, volvieron y siguieron. */
+function FunnelCard({ f }: { f: { registered: number; didSomething: number; cameBack: number; stayedWeek: number; weekEligible: number } }) {
+  const pct = (n: number, of: number) => (of > 0 ? Math.round((n / of) * 100) : 0);
+  const steps = [
+    { label: "Se registraron", n: f.registered, of: f.registered, note: "" },
+    { label: "Hicieron algo (jugaron o una lección)", n: f.didSomething, of: f.registered, note: "" },
+    { label: "Volvieron otro día", n: f.cameBack, of: f.registered, note: "" },
+    {
+      label: "Siguieron después de una semana",
+      n: f.stayedWeek,
+      of: f.weekEligible,
+      note: f.weekEligible < f.registered ? `de ${f.weekEligible} que ya cumplieron una semana` : "",
+    },
+  ];
+  return (
+    <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+      <div className="font-display font-semibold text-foreground">Embudo: ¿la gente se queda?</div>
+      <p className="mt-1 text-xs text-muted-foreground">De los que se registraron en el período elegido.</p>
+      {f.registered === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">Todavía no hay registros en el período.</p>
+      ) : (
+        <ul className="mt-3 space-y-2">
+          {steps.map((s) => (
+            <li key={s.label}>
+              <div className="flex items-baseline justify-between gap-2 text-sm">
+                <span className="font-medium">{s.label}</span>
+                <span className="tabular-nums">
+                  <b>{s.n}</b> <span className="text-muted-foreground">({pct(s.n, s.of)}%)</span>
+                </span>
+              </div>
+              <div className="mt-1 h-2.5 overflow-hidden rounded-full bg-muted">
+                <div className="h-full rounded-full bg-primary/80" style={{ width: `${pct(s.n, s.of)}%` }} />
+              </div>
+              {s.note && <p className="mt-0.5 text-[11px] text-muted-foreground">{s.note}</p>}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

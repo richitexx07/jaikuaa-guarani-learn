@@ -739,6 +739,33 @@ export const getPilotDashboard = createServerFn({ method: "POST" })
       };
     });
 
+    // Embudo de los que se registraron en el período: ¿hicieron algo?, ¿volvieron otro día?, ¿siguieron a la semana?
+    const cohortIds = profiles.filter((p) => inPeriod(pyDay(p.created_at)));
+    const byUser = new Map<string, { real: boolean; days: Set<string>; lastDay: string }>();
+    for (const x of txs) {
+      const u = byUser.get(x.user_id) ?? { real: false, days: new Set<string>(), lastDay: "" };
+      if (x.source !== "visit") u.real = true;
+      u.days.add(x.day);
+      if (x.day > u.lastDay) u.lastDay = x.day;
+      byUser.set(x.user_id, u);
+    }
+    const plusDays = (day: string, n: number) => {
+      const d = new Date(`${day}T12:00:00Z`);
+      d.setUTCDate(d.getUTCDate() + n);
+      return d.toISOString().slice(0, 10);
+    };
+    const funnel = {
+      registered: cohortIds.length,
+      didSomething: cohortIds.filter((p) => byUser.get(p.id)?.real).length,
+      cameBack: cohortIds.filter((p) => (byUser.get(p.id)?.days.size ?? 0) >= 2).length,
+      stayedWeek: cohortIds.filter((p) => {
+        const u = byUser.get(p.id);
+        return !!u && u.lastDay >= plusDays(pyDay(p.created_at), 7);
+      }).length,
+      // Los que todavía no cumplieron una semana no cuentan como «no siguieron».
+      weekEligible: cohortIds.filter((p) => plusDays(pyDay(p.created_at), 7) <= today).length,
+    };
+
     // De dónde llegaron los nuevos del período (?de=facebook, ?de=whatsapp…), anotado al crear la cuenta.
     const sourceOf = new Map<string, string>();
     try {
@@ -768,6 +795,7 @@ export const getPilotDashboard = createServerFn({ method: "POST" })
       startDay,
       today,
       sources,
+      funnel,
       registered: profiles.length,
       newUsers: profiles.filter((p) => inPeriod(pyDay(p.created_at))).length,
       activeUsers: new Set(ptx.map((x) => x.user_id)).size,

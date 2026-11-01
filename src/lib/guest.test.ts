@@ -33,3 +33,15 @@ describe("seguí donde quedaste", () => {
     expect(readPlace(Date.now() + 31 * 24 * 60 * 60 * 1000)).toBeNull();
   });
 });
+
+import { shouldShowWelcome } from "./welcome";
+
+describe("bienvenida para cuentas nuevas", () => {
+  const now = Date.parse("2026-11-01T12:00:00Z");
+  it("solo cuentas de menos de 2 días que no la vieron", () => {
+    expect(shouldShowWelcome("2026-11-01T11:00:00Z", false, now)).toBe(true);
+    expect(shouldShowWelcome("2026-11-01T11:00:00Z", true, now)).toBe(false);
+    expect(shouldShowWelcome("2026-10-20T11:00:00Z", false, now)).toBe(false);
+    expect(shouldShowWelcome(undefined, false, now)).toBe(false);
+  });
+});

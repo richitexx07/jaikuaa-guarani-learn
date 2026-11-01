@@ -1,7 +1,7 @@
 // Botón «Volver» global: dónde se oculta y a dónde lleva si no hay historial.
 // /embajadores ya tiene «Volver al panel» arriba; el flotante tapaba las reglas.
 // /ficha-auspiciantes es una hoja que se imprime: el flotante tapaba las tarjetas.
-const HIDDEN = new Set(["/", "/dashboard", "/auth", "/embajadores", "/ficha-auspiciantes"]);
+const HIDDEN = new Set(["/", "/dashboard", "/auth", "/embajadores", "/ficha-auspiciantes", "/bienvenida"]);
 
 export function showsBackButton(pathname: string): boolean {
   const p = pathname.replace(/\/+$/, "") || "/";

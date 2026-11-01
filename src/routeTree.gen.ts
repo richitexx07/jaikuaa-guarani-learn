@@ -44,6 +44,7 @@ import { Route as TrRouteImport } from './routes/tr'
 import { Route as TurismoRouteImport } from './routes/turismo'
 import { Route as ZhRouteImport } from './routes/zh'
 import { Route as AuthenticatedAgroRouteImport } from './routes/_authenticated/agro'
+import { Route as AuthenticatedBienvenidaRouteImport } from './routes/_authenticated/bienvenida'
 import { Route as AuthenticatedCertificadoRouteImport } from './routes/_authenticated/certificado'
 import { Route as AuthenticatedCuadernoRouteImport } from './routes/_authenticated/cuaderno'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -278,6 +279,11 @@ const ZhRoute = ZhRouteImport.update({
 const AuthenticatedAgroRoute = AuthenticatedAgroRouteImport.update({
   id: '/agro',
   path: '/agro',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBienvenidaRoute = AuthenticatedBienvenidaRouteImport.update({
+  id: '/bienvenida',
+  path: '/bienvenida',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCertificadoRoute =
@@ -663,6 +669,7 @@ export interface FileRoutesByFullPath {
   '/turismo': typeof TurismoRoute
   '/zh': typeof ZhRoute
   '/agro': typeof AuthenticatedAgroRoute
+  '/bienvenida': typeof AuthenticatedBienvenidaRoute
   '/certificado': typeof AuthenticatedCertificadoRoute
   '/cuaderno': typeof AuthenticatedCuadernoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -760,6 +767,7 @@ export interface FileRoutesByTo {
   '/turismo': typeof TurismoRoute
   '/zh': typeof ZhRoute
   '/agro': typeof AuthenticatedAgroRoute
+  '/bienvenida': typeof AuthenticatedBienvenidaRoute
   '/certificado': typeof AuthenticatedCertificadoRoute
   '/cuaderno': typeof AuthenticatedCuadernoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -856,6 +864,7 @@ export interface FileRoutesById {
   '/turismo': typeof TurismoRoute
   '/zh': typeof ZhRoute
   '/_authenticated/agro': typeof AuthenticatedAgroRoute
+  '/_authenticated/bienvenida': typeof AuthenticatedBienvenidaRoute
   '/_authenticated/certificado': typeof AuthenticatedCertificadoRoute
   '/_authenticated/cuaderno': typeof AuthenticatedCuadernoRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -955,6 +964,7 @@ export interface FileRouteTypes {
     | '/turismo'
     | '/zh'
     | '/agro'
+    | '/bienvenida'
     | '/certificado'
     | '/cuaderno'
     | '/dashboard'
@@ -1052,6 +1062,7 @@ export interface FileRouteTypes {
     | '/turismo'
     | '/zh'
     | '/agro'
+    | '/bienvenida'
     | '/certificado'
     | '/cuaderno'
     | '/dashboard'
@@ -1147,6 +1158,7 @@ export interface FileRouteTypes {
     | '/turismo'
     | '/zh'
     | '/_authenticated/agro'
+    | '/_authenticated/bienvenida'
     | '/_authenticated/certificado'
     | '/_authenticated/cuaderno'
     | '/_authenticated/dashboard'
@@ -1496,6 +1508,13 @@ declare module '@tanstack/react-router' {
       path: '/agro'
       fullPath: '/agro'
       preLoaderRoute: typeof AuthenticatedAgroRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/bienvenida': {
+      id: '/_authenticated/bienvenida'
+      path: '/bienvenida'
+      fullPath: '/bienvenida'
+      preLoaderRoute: typeof AuthenticatedBienvenidaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/certificado': {
@@ -1988,6 +2007,7 @@ const AuthenticatedCursoLangRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgroRoute: typeof AuthenticatedAgroRoute
+  AuthenticatedBienvenidaRoute: typeof AuthenticatedBienvenidaRoute
   AuthenticatedCertificadoRoute: typeof AuthenticatedCertificadoRoute
   AuthenticatedCuadernoRoute: typeof AuthenticatedCuadernoRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -2041,6 +2061,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgroRoute: AuthenticatedAgroRoute,
+  AuthenticatedBienvenidaRoute: AuthenticatedBienvenidaRoute,
   AuthenticatedCertificadoRoute: AuthenticatedCertificadoRoute,
   AuthenticatedCuadernoRoute: AuthenticatedCuadernoRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
