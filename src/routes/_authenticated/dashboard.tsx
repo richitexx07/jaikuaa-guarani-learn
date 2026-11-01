@@ -85,6 +85,7 @@ import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 import jaiProfe from "@/assets/jai-profe.webp";
 import jaiAtencion from "@/assets/jai-atencion-pro.webp";
 import jaiAgro from "@/assets/jai-agro.webp";
+import { useLastPlace } from "@/lib/last-place";
 import triviaVocabulario from "@/assets/trivia/trivia-vocabulario.webp";
 const jaiAsset = { url: jaiImg };
 
@@ -125,6 +126,27 @@ function StaffShortcuts() {
         {data.isAdmin && <StaffLink to="/admin/jai" icon={MessageCircleQuestion} label="Qué le preguntan a Jai" />}
       </div>
     </section>
+  );
+}
+
+/** «Seguí donde quedaste»: un toque para volver al último juego o lección. */
+function ResumeCard() {
+  const place = useLastPlace();
+  if (!place) return null;
+  return (
+    <a
+      href={place.href}
+      className="mt-5 flex min-h-16 items-center gap-3 rounded-2xl bg-primary px-4 py-3 text-primary-foreground shadow-lift transition active:scale-[0.98]"
+    >
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-foreground/15">
+        {place.kind === "lesson" ? <BookOpen className="h-5 w-5" aria-hidden /> : <Gamepad2 className="h-5 w-5" aria-hidden />}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-xs font-semibold opacity-80">Seguí donde quedaste</span>
+        <span className="block truncate font-display text-lg font-bold leading-tight">{place.title}</span>
+      </span>
+      <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
+    </a>
   );
 }
 
@@ -449,6 +471,8 @@ function Dashboard() {
               <p className="mt-1 text-base text-muted-foreground">{t("dash.question")}</p>
             </div>
           </div>
+
+          <ResumeCard />
 
           {/* 2. TRES BOTONES GIGANTES */}
           <nav aria-label={t("dash.question")} className="mt-5 grid gap-3 sm:grid-cols-3">

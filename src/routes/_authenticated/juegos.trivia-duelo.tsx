@@ -52,7 +52,7 @@ function TriviaDuel() {
     <>
       <ValidationNotice />
       <GameStage
-        title={tt("trTitle")}
+        title={tt("trTitle")} helpKey="Duelo de Trivia"
         sponsorSlot="trivia-duelo"
         css={CSS}
         background={`radial-gradient(70% 45% at 50% 0%, #1F4A8F 0%, transparent 70%), ${TV.estudio}`}

@@ -50,6 +50,8 @@ export const GT = {
   nChipas: { es: "Quedan {n} chipas", pt: "Restam {n} chipas", en: "{n} chipas left", de: "Noch {n} Chipas", fr: "Il reste {n} chipas", zh: "還剩 {n} 個 Chipa" },
   wellDone: { es: "¡Muy bien!", pt: "Muito bem!", en: "Well done!", de: "Sehr gut!", fr: "Très bien !", zh: "太棒了！" },
   outOfChipas: { es: "Se acabaron las chipas", pt: "Acabaram as chipas", en: "You ran out of chipas", de: "Keine Chipas mehr", fr: "Plus de chipas", zh: "Chipa 用完了" },
+  freePlay: { es: "Jugá sin cuenta", pt: "Jogue sem conta", en: "Play without an account", de: "Ohne Konto spielen", fr: "Jouez sans compte", zh: "免註冊遊玩" },
+  needsAccount: { es: "Con tu cuenta gratis", pt: "Com sua conta grátis", en: "With your free account", de: "Mit deinem kostenlosen Konto", fr: "Avec votre compte gratuit", zh: "需要免費帳號" },
   giveUp: { es: "Rendirme y ver la palabra", pt: "Desistir e ver a palavra", en: "Give up and see the word", de: "Aufgeben und das Wort sehen", fr: "Abandonner et voir le mot", zh: "放棄並看答案" },
   confirmGiveUp: { es: "¿Seguro? Sí, mostrarla", pt: "Tem certeza? Sim, mostrar", en: "Sure? Yes, show it", de: "Sicher? Ja, zeigen", fr: "Sûr ? Oui, le montrer", zh: "確定嗎？是，顯示" },
   gaveUpTitle: { es: "Esta era la palabra", pt: "Esta era a palavra", en: "This was the word", de: "Das war das Wort", fr: "Voici le mot", zh: "答案是這個詞" },
@@ -145,12 +147,57 @@ const s = (es: string, pt: string, en: string, de: string, fr: string, zh: strin
 
 /** Instrucciones de «¿Cómo se juega?» (clave = título en castellano). */
 export const GAME_HELP: Record<string, Help> = {
+  "Purahéi Karaoke": {
+    xp: s("Hasta 20 XP según tus aciertos", "Até 20 XP conforme seus acertos", "Up to 20 XP based on your answers", "Bis zu 20 XP je nach Treffern", "Jusqu'à 20 XP selon vos bonnes réponses", "依答對數最多得 20 XP"),
+    steps: [
+      s("🎵 Elegí una canción y escuchá el arpa.", "🎵 Escolha uma canção e ouça a harpa.", "🎵 Pick a song and listen to the harp.", "🎵 Wähle ein Lied und hör der Harfe zu.", "🎵 Choisissez une chanson et écoutez la harpe.", "🎵 選一首歌，聆聽豎琴。"),
+      s("🎤 Seguí la letra y completá el verso que falta a tiempo.", "🎤 Acompanhe a letra e complete o verso que falta a tempo.", "🎤 Follow the lyrics and fill in the missing line in time.", "🎤 Folge dem Text und ergänze rechtzeitig die fehlende Zeile.", "🎤 Suivez les paroles et complétez le vers manquant à temps.", "🎤 跟著歌詞，及時補上缺少的那一句。"),
+      s("📼 Si querés, grabate cantando y escuchate.", "📼 Se quiser, grave-se cantando e ouça.", "📼 If you like, record yourself singing and listen back.", "📼 Wenn du willst, nimm dich beim Singen auf und hör es dir an.", "📼 Si vous voulez, enregistrez-vous en chantant et réécoutez-vous.", "📼 想的話，錄下自己唱歌再聽聽看。"),
+    ],
+  },
+  "Ñe'ẽ Rape": {
+    xp: s("3 XP por respuesta correcta · 5 XP más si ganás (máx. 20)", "3 XP por resposta certa · mais 5 XP se ganhar (máx. 20)", "3 XP per correct answer · 5 more XP if you win (max. 20)", "3 XP pro richtiger Antwort · 5 XP extra bei Sieg (max. 20)", "3 XP par bonne réponse · 5 XP de plus si vous gagnez (max. 20)", "每答對得 3 XP · 獲勝再加 5 XP（最多 20）"),
+    steps: [
+      s("📲 Creá una sala y mandá el código por WhatsApp a tu compañero.", "📲 Crie uma sala e mande o código pelo WhatsApp ao seu colega.", "📲 Create a room and send the code to your friend on WhatsApp.", "📲 Erstelle einen Raum und schick den Code per WhatsApp.", "📲 Créez une salle et envoyez le code par WhatsApp à votre ami.", "📲 建立房間，用 WhatsApp 把代碼傳給朋友。"),
+      s("🧭 Elegí el sendero: ortografía, vocabulario, cultura o dichos.", "🧭 Escolha a trilha: ortografia, vocabulário, cultura ou ditados.", "🧭 Choose the path: spelling, vocabulary, culture or sayings.", "🧭 Wähle den Pfad: Rechtschreibung, Wortschatz, Kultur oder Sprichwörter.", "🧭 Choisissez le parcours : orthographe, vocabulaire, culture ou dictons.", "🧭 選擇路線：拼寫、詞彙、文化或俗語。"),
+      s("⏱️ Los dos responden las mismas preguntas con el mismo reloj, cada uno en su celular.", "⏱️ Os dois respondem às mesmas perguntas com o mesmo relógio, cada um no seu celular.", "⏱️ You both answer the same questions on the same clock, each on your own phone.", "⏱️ Beide beantworten dieselben Fragen mit derselben Uhr, jeder am eigenen Handy.", "⏱️ Vous répondez tous les deux aux mêmes questions, même chrono, chacun sur son téléphone.", "⏱️ 兩人用各自的手機，在同樣的時間內回答同樣的問題。"),
+    ],
+  },
+  "Ta'anga · Claqueta": {
+    xp: s("4 XP por escena bien resuelta (máx. 20)", "4 XP por cena resolvida (máx. 20)", "4 XP per scene solved (max. 20)", "4 XP pro gelöster Szene (max. 20)", "4 XP par scène réussie (max. 20)", "每完成一場戲得 4 XP（最多 20）"),
+    steps: [
+      s("🎬 Jai dirige: leé qué pasa en la escena.", "🎬 Jai dirige: leia o que acontece na cena.", "🎬 Jai directs: read what happens in the scene.", "🎬 Jai führt Regie: Lies, was in der Szene passiert.", "🎬 Jai réalise : lisez ce qui se passe dans la scène.", "🎬 Jai 當導演：先看看這場戲發生了什麼。"),
+      s("✍️ Completá el diálogo en guaraní que le falta a la escena.", "✍️ Complete o diálogo em guarani que falta na cena.", "✍️ Complete the scene's missing Guarani dialogue.", "✍️ Ergänze den fehlenden Guaraní-Dialog der Szene.", "✍️ Complétez le dialogue en guarani qui manque à la scène.", "✍️ 補上這場戲缺少的瓜拉尼語對白。"),
+      s("⭐ Cada escena bien resuelta suma puntos.", "⭐ Cada cena bem resolvida soma pontos.", "⭐ Each scene you solve adds points.", "⭐ Jede gelöste Szene bringt Punkte.", "⭐ Chaque scène réussie rapporte des points.", "⭐ 每完成一場戲就加分。"),
+    ],
+  },
+  "Tekojoja · Juzgado de Paz": {
+    xp: s("4 XP por caso bien resuelto (máx. 20)", "4 XP por caso resolvido (máx. 20)", "4 XP per case solved (max. 20)", "4 XP pro gelöstem Fall (max. 20)", "4 XP par affaire résolue (max. 20)", "每解決一個案件得 4 XP（最多 20）"),
+    steps: [
+      s("⚖️ Leé el caso que llega al Juzgado de Paz.", "⚖️ Leia o caso que chega ao Juizado de Paz.", "⚖️ Read the case that reaches the Justice of the Peace.", "⚖️ Lies den Fall, der beim Friedensgericht ankommt.", "⚖️ Lisez l'affaire qui arrive au tribunal de paix.", "⚖️ 閱讀送到治安法庭的案件。"),
+      s("📚 Elegí el término jurídico que corresponde.", "📚 Escolha o termo jurídico correto.", "📚 Choose the right legal term.", "📚 Wähle den passenden Rechtsbegriff.", "📚 Choisissez le bon terme juridique.", "📚 選出正確的法律用語。"),
+      s("ℹ️ El contenido está en revisión por especialistas.", "ℹ️ O conteúdo está em revisão por especialistas.", "ℹ️ The content is being reviewed by specialists.", "ℹ️ Der Inhalt wird von Fachleuten geprüft.", "ℹ️ Le contenu est en cours de révision par des spécialistes.", "ℹ️ 內容正由專家審閱中。"),
+    ],
+  },
+  "Tembi'u Paraguái": {
+    xp: s("4 XP por plato bien armado (máx. 20)", "4 XP por prato montado (máx. 20)", "4 XP per dish made right (max. 20)", "4 XP pro richtigem Gericht (max. 20)", "4 XP par plat réussi (max. 20)", "每做對一道菜得 4 XP（最多 20）"),
+    steps: [
+      s("🍲 Mirá qué plato típico hay que preparar.", "🍲 Veja qual prato típico preparar.", "🍲 See which typical dish to cook.", "🍲 Schau, welches typische Gericht zu kochen ist.", "🍲 Regardez quel plat typique préparer.", "🍲 看看要做哪一道傳統料理。"),
+      s("🧺 Tocá los ingredientes que lleva.", "🧺 Toque os ingredientes que ele leva.", "🧺 Tap the ingredients it needs.", "🧺 Tippe die Zutaten an, die hineingehören.", "🧺 Touchez les ingrédients qu'il contient.", "🧺 點選它需要的食材。"),
+      s("✅ Si acertás, el plato queda listo y suma puntos.", "✅ Se acertar, o prato fica pronto e soma pontos.", "✅ Get it right and the dish is ready, adding points.", "✅ Wenn es stimmt, ist das Gericht fertig und bringt Punkte.", "✅ Si c'est juste, le plat est prêt et rapporte des points.", "✅ 答對了，料理完成並加分。"),
+    ],
+  },
   "Ahorcado con chipas": {
     xp: s("15 XP al ganar · 5 XP al terminar sin chipas", "15 XP ao ganhar · 5 XP ao terminar sem chipas", "15 XP for winning · 5 XP if you run out of chipas", "15 XP beim Sieg · 5 XP ohne Chipas am Ende", "15 XP en gagnant · 5 XP sans chipas à la fin", "獲勝得 15 XP · chipa 用完得 5 XP"),
     steps: [
       s("💡 Adiviná la palabra en guaraní con la pista en español.", "💡 Adivinhe a palavra em guarani com a dica em espanhol.", "💡 Guess the Guarani word using the Spanish clue.", "💡 Errate das Guaraní-Wort mit dem spanischen Hinweis.", "💡 Devinez le mot guarani grâce à l'indice en espagnol.", "💡 根據西班牙語提示猜出瓜拉尼語詞彙。"),
       s("👆 Tocá las letras: ch, mb y nd van en una sola tecla.", "👆 Toque as letras: ch, mb e nd ficam numa só tecla.", "👆 Tap the letters: ch, mb and nd are a single key.", "👆 Tippe die Buchstaben: ch, mb und nd sind je eine Taste.", "👆 Touchez les lettres : ch, mb et nd sont une seule touche.", "👆 點選字母：ch、mb 和 nd 各是一個按鍵。"),
       s("🥯 Cada error se come una chipa. Tenés 6.", "🥯 Cada erro come uma chipa. Você tem 6.", "🥯 Each mistake eats a chipa. You have 6.", "🥯 Jeder Fehler isst eine Chipa. Du hast 6.", "🥯 Chaque erreur mange une chipa. Vous en avez 6.", "🥯 每答錯一次就吃掉一個 chipa。你有 6 個。"),
+      s("🏳️ ¿Trabado? Tocá «Rendirme y ver la palabra» para escucharla y aprenderla (sin XP).", "🏳️ Travou? Toque «Desistir e ver a palavra» para ouvi-la e aprender (sem XP).", "🏳️ Stuck? Tap «Give up and see the word» to hear it and learn it (no XP).", "🏳️ Festgefahren? Tippe «Aufgeben und das Wort sehen», um es zu hören und zu lernen (ohne XP).", "🏳️ Bloqué ? Touchez «Abandonner et voir le mot» pour l'écouter et l'apprendre (sans XP).", "🏳️ 卡住了？點「放棄並看答案」聽一聽、學起來（不加 XP）。"),
+      s("💡 ¿No la ves? «Pista» marca dónde empieza una palabra.", "💡 Não acha? «Dica» marca onde começa uma palavra.", "💡 Can't find it? «Hint» marks where a word starts.", "💡 Nicht gefunden? «Tipp» markiert, wo ein Wort beginnt.", "💡 Introuvable ? «Indice» marque le début d'un mot.", "💡 找不到？「提示」會標出一個詞的開頭。"),
+      s("⏸️ Botón de pausa: seguir, tablas de común acuerdo, rendirse o salir.", "⏸️ Botão de pausa: continuar, empate de comum acordo, desistir ou sair.", "⏸️ Pause button: keep playing, draw by agreement, resign or leave.", "⏸️ Pausetaste: weiterspielen, Remis, aufgeben oder verlassen.", "⏸️ Bouton pause : continuer, nul d'un commun accord, abandonner ou quitter.", "⏸️ 暫停鍵：繼續、雙方同意和局、認輸或離開。"),
+      s("⏸️ Botón de pausa: seguir, tablas de común acuerdo, rendirse o salir.", "⏸️ Botão de pausa: continuar, empate de comum acordo, desistir ou sair.", "⏸️ Pause button: keep playing, draw by agreement, resign or leave.", "⏸️ Pausetaste: weiterspielen, Remis, aufgeben oder verlassen.", "⏸️ Bouton pause : continuer, nul d'un commun accord, abandonner ou quitter.", "⏸️ 暫停鍵：繼續、雙方同意和局、認輸或離開。"),
+      s("⏸️ Botón de pausa: seguir, tablas de común acuerdo, rendirse o salir.", "⏸️ Botão de pausa: continuar, empate de comum acordo, desistir ou sair.", "⏸️ Pause button: keep playing, draw by agreement, resign or leave.", "⏸️ Pausetaste: weiterspielen, Remis, aufgeben oder verlassen.", "⏸️ Bouton pause : continuer, nul d'un commun accord, abandonner ou quitter.", "⏸️ 暫停鍵：繼續、雙方同意和局、認輸或離開。"),
     ],
   },
   "Sopa de letras": {

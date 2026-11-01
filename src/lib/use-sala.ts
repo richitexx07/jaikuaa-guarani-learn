@@ -78,7 +78,14 @@ export function useSala({
     }
     void supabase.auth.getUser().then(({ data }) => {
       const u = data.user;
-      if (!u) return;
+      if (!u) {
+        // Sin cuenta (llegó por una invitación): juega como «Invitado» con un número propio de este celular.
+        const gid = guestUid();
+        const m = { uid: gid, name: "Invitado", key: `${gid}:${tabId()}` };
+        meRef.current = m;
+        setMe(m);
+        return;
+      }
       const full = (u.user_metadata?.full_name as string | undefined) ?? u.email?.split("@")[0] ?? "Jugador";
       const m = { uid: u.id, name: full.trim().split(/\s+/)[0]!.slice(0, 16) || "Jugador", key: `${u.id}:${tabId()}` };
       meRef.current = m;
@@ -237,4 +244,18 @@ export function ponerSalaEnLaUrl(code: string | null) {
   if (code) u.searchParams.set("sala", code);
   else u.searchParams.delete("sala");
   window.history.replaceState(window.history.state, "", u.pathname + u.search + u.hash);
+}
+
+/** Número de invitado de este celular (no es una cuenta: solo para reconocerse en la sala). */
+function guestUid(): string {
+  const KEY = "jaikuaa:invitado-id";
+  try {
+    const v = localStorage.getItem(KEY);
+    if (v) return v;
+    const n = `invitado-${(crypto.randomUUID?.() ?? `${Date.now()}${Math.random()}`).replace(/[^a-z0-9]/gi, "").slice(0, 12)}`;
+    localStorage.setItem(KEY, n);
+    return n;
+  } catch {
+    return `invitado-${Math.random().toString(36).slice(2, 10)}`;
+  }
 }

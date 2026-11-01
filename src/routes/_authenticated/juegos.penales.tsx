@@ -25,6 +25,7 @@ import { demoLedText, useDemoBrand } from '@/lib/demo-brand';
 import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from '@/components/games/reto';
 import { leccionDeReto, orderedBy, shufflerFor } from '@/lib/reto';
 import { PauseButton, RefereeMenu, useEndTitle, type DuelEnd } from '@/components/games/duel-referee';
+import { useIsGuest } from '@/lib/guest';
 
 export const Route=createFileRoute('/_authenticated/juegos/penales')({
  head:()=>({meta:[{title:'Penales: Solo y Duelo | Jaikuaa'},{name:'description',content:'Palabras, estadio y una tanda de penales. Jugá solo o compartí un duelo en el mismo celular.'},{property:'og:title',content:'Penales: Solo y Duelo | Jaikuaa'},{property:'og:description',content:'Una tanda de penales con vocabulario publicado y audio de voces reales.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary'}]}),component:Penalties,
@@ -47,7 +48,7 @@ function PenaltiesContent(){
  const partida=useRetoPartida('penales',{total:5}),{reto,seed,otra}=partida;
  const [lesson,setLesson]=useState<number|null>(()=>leccionDeReto(reto)),q=useGameWords(lesson);
  useEffect(()=>{if(reto)setLesson(leccionDeReto(reto));},[reto?.id]);// eslint-disable-line react-hooks/exhaustive-deps
- const fn=useServerFn(getPenaltiesLed),led=useQuery({queryKey:['penales-led'],queryFn:()=>fn()});
+ const guest=useIsGuest(),fn=useServerFn(getPenaltiesLed),led=useQuery({queryKey:['penales-led'],enabled:!guest,queryFn:()=>fn()});
  const demo=useDemoBrand(),ledText=demo?demoLedText(demo):(led.data?.text??'JAIKUAA · TU MARCA AQUÍ');
  const [remote,setRemote]=useState<{code:string;host:boolean}|null>(()=>{const c=salaDeLaUrl();return c?{code:c,host:false}:null;}),[joinCode,setJoinCode]=useState('');
  const [mode,setMode]=useState<'solo'|'duel'|'remote'>('solo'),[names,setNames]=useState<[string,string]>(['','']),[started,setStarted]=useState(false),[round,setRound]=useState(0);

@@ -67,8 +67,10 @@ export const getAudioSignedUrl = createServerFn({ method: "POST" })
     const headers = getRequest()?.headers ?? new Headers();
     const user = await verifyBearer(headers).catch(() => null);
 
+    // Sin cuenta (jugando como invitado): solo muestras o palabras ya publicadas, con tope por IP.
     if (!user && !PUBLIC_SLUGS.has(slug)) {
-      return { signedUrl: null as string | null, denied: "auth" as const };
+      const published = await publishedSlugsFor([slug]).catch(() => new Set<string>());
+      if (!published.has(slug)) return { signedUrl: null as string | null, denied: "auth" as const };
     }
     const allowed = user
       ? await consumeRateLimit(`audio:user:${user.userId}`, LIMIT_SIGNED_IN, 3600)
@@ -122,7 +124,9 @@ export const getAudioSignedUrls = createServerFn({ method: "POST" })
     const slugs = [...new Set(data.gns.map(slugifyAudio).filter(Boolean))];
     let allowed: string[];
     if (!userId) {
-      allowed = slugs.filter((s) => PUBLIC_SLUGS.has(s));
+      // Invitados: las muestras y lo ya publicado (nunca borradores), con tope por IP.
+      const published = await publishedSlugsFor(slugs.filter((s) => !PUBLIC_SLUGS.has(s))).catch(() => new Set<string>());
+      allowed = filterPlayableSlugs(slugs, { isStaff: false, published });
     } else {
       // Si la consulta de estado falla, se niega el borrador: mejor silencio que filtrar.
       const staff = await isValidationStaff(userId).catch(() => false);

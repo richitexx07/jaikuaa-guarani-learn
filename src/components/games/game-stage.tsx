@@ -5,6 +5,7 @@ import { GameKit, GameSoundButton } from "./game-kit";
 import { GameHelp } from "./game-help";
 import { SponsorLine } from "./sponsor-line";
 import type { SponsorSlot } from "@/lib/sponsor-slots";
+import { useRememberPlace } from "@/lib/last-place";
 import { useGT } from "@/lib/i18n-games";
 
 /**
@@ -22,7 +23,10 @@ export function GameStage({
   wide = false,
   extra,
   back,
+  helpKey,
 }: {
+  /** Clave en castellano de «¿Cómo se juega?» cuando el título viene traducido. */
+  helpKey?: string;
   title: string;
   background: string;
   ink?: string;
@@ -35,6 +39,7 @@ export function GameStage({
 }) {
   const { g } = useGT();
   const b = back ?? { to: "/juegos" as const, label: g("back") };
+  useRememberPlace(helpKey ?? title, "game", title !== "Juegos");
   return (
     <GameKit>
       <div className="game-stage min-h-screen pb-28" style={{ background, color: ink, "--stage-ink": ink } as CSSProperties}>
@@ -45,7 +50,7 @@ export function GameStage({
           </Link>
           <div className="game-stage-tools flex items-center gap-2">
             {extra}
-            <GameHelp title={title} />
+            <GameHelp title={helpKey ?? title} />
             <GameSoundButton />
             <FullscreenButton />
           </div>

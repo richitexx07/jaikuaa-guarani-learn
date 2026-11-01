@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getSlotSponsor, recordSponsorImpression } from "@/lib/sponsors.functions";
 import type { SponsorSlot } from "@/lib/sponsor-slots";
 import { useDemoBrand } from "@/lib/demo-brand";
+import { useIsGuest } from "@/lib/guest";
 
 function todayPy() {
   return new Date().toLocaleDateString("en-CA", { timeZone: "America/Asuncion" });
@@ -13,7 +14,9 @@ function todayPy() {
 export function SponsorLine({ slot }: { slot: SponsorSlot }) {
   const fn = useServerFn(getSlotSponsor);
   const recordFn = useServerFn(recordSponsorImpression);
-  const q = useQuery({ queryKey: ["slot-sponsor", slot], queryFn: () => fn({ data: { slot } }), staleTime: 5 * 60_000 });
+  const guest = useIsGuest();
+  // Sin cuenta no se consulta ni se cuenta la impresión (el conteo es por persona registrada).
+  const q = useQuery({ queryKey: ["slot-sponsor", slot], enabled: !guest, queryFn: () => fn({ data: { slot } }), staleTime: 5 * 60_000 });
   const demo = useDemoBrand();
   const realName = q.data?.name ?? "";
   const name = demo && slot === "penales" ? demo.name : realName;

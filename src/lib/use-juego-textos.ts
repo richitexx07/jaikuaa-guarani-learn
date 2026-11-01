@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listJuegoTextos } from "@/lib/juego-textos.functions";
+import { listJuegoTextosGuest } from "@/lib/guest.functions";
+import { hasSessionNow } from "@/lib/guest";
 import { indexTextos } from "@/lib/juego-textos";
 import { withOfflineCache } from "@/lib/offline-data";
 
@@ -13,9 +15,10 @@ export const JUEGO_TEXTOS_KEY = ["juego-textos"] as const;
  */
 export function useJuegoTextos() {
   const fn = useServerFn(listJuegoTextos);
+  const guestFn = useServerFn(listJuegoTextosGuest);
   const q = useQuery({
     queryKey: JUEGO_TEXTOS_KEY,
-    queryFn: () => withOfflineCache("juego-textos", () => fn(), { label: "El guaraní de los juegos" }),
+    queryFn: () => withOfflineCache("juego-textos", async () => ((await hasSessionNow()) ? fn() : guestFn()), { label: "El guaraní de los juegos" }),
     staleTime: 2 * 60_000,
     retry: 1,
   });

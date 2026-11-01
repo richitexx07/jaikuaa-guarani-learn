@@ -257,5 +257,7 @@ export async function playGuarani(gn: string): Promise<boolean> {
     ok = await playSrc(url);
   }
   if (!ok) forget(slug);
+  // Primera voz que suena en este celular: aviso de volumen (una sola vez).
+  else void import("./volume-tip").then((m) => m.maybeVolumeTip()).catch(() => {});
   return ok;
 }

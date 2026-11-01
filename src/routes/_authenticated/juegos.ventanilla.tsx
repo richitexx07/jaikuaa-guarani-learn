@@ -65,7 +65,7 @@ function Ventanilla() {
 
   return (
     <GameStage
-      title={tt("vtTitle")}
+      title={tt("vtTitle")} helpKey="Ventanilla de Jai"
       sponsorSlot="ventanilla"
       css={CSS}
       background={`repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 2px, transparent 2px 120px), linear-gradient(180deg, ${V.azul2} 0%, ${V.azul} 60%, #0B2440 100%)`}

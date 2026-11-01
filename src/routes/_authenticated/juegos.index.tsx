@@ -4,6 +4,7 @@ import { COVER_TONE, type CoverId } from "@/components/games/game-covers";
 import { COVER_IMAGE } from "@/components/games/game-cover-images";
 import { useRecordVisit } from "@/lib/gamification";
 import jaiImg from "@/assets/jai-gamer.webp";
+import { isGuestPath, useIsGuest } from "@/lib/guest";
 import { GAME_DESC, SHELF_TEXT, gameTitle, useGT } from "@/lib/i18n-games";
 
 export const Route = createFileRoute("/_authenticated/juegos/")({
@@ -137,6 +138,8 @@ function GamesHome() {
 function Cover({ g }: { g: Game }) {
   const { lang, g: tr } = useGT();
   const tone = COVER_TONE[g.id];
+  const guest = useIsGuest();
+  const free = isGuestPath(g.to);
   return (
     <Link
       to={g.to}
@@ -157,10 +160,13 @@ function Cover({ g }: { g: Game }) {
       {g.nuevo && g.id !== "consultorio" && (
         <span className="absolute left-3 top-3 rounded-full bg-[#F6C445] px-2.5 py-0.5 text-[11px] font-bold text-[#3A1A05]">{tr("nuevo")}</span>
       )}
+      {guest && free && (
+        <span className="absolute right-3 top-3 rounded-full bg-[#3DE0B0] px-2.5 py-0.5 text-[11px] font-bold text-[#062A2E]">{tr("freePlay")}</span>
+      )}
       <div className="flex flex-1 flex-col gap-1 p-4">
         <h3 className="font-display text-lg font-bold leading-tight">{gameTitle(g.title, lang)}</h3>
         <p className="line-clamp-2 text-sm opacity-80">{GAME_DESC[g.id]?.[lang] ?? g.desc}</p>
-        <p className="mt-auto pt-2 text-xs font-semibold opacity-70">{g.xp}</p>
+        <p className="mt-auto pt-2 text-xs font-semibold opacity-70">{guest && !free ? tr("needsAccount") : g.xp}</p>
       </div>
     </Link>
   );

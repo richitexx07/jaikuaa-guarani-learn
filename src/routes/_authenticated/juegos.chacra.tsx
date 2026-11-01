@@ -45,7 +45,7 @@ function Chacra() {
   const { seed, otra } = partida;
   return (
     <GameStage
-      title={tt("chTitle")}
+      title={tt("chTitle")} helpKey="Jai en la chacra"
       sponsorSlot="chacra"
       css={CSS}
       ink={C.tinta}

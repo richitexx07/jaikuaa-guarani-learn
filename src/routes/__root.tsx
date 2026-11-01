@@ -23,6 +23,7 @@ import { registerOfflineSupport } from "@/lib/pwa";
 import { syncAllPending, totalPending } from "@/lib/offline-sync";
 import { pendingAnswersCount } from "@/lib/answer-log";
 import { captureSource, claimSource } from "@/lib/signup-source";
+import { markHadAccount } from "@/lib/guest";
 import jaiSorpresa from "@/assets/jai/jai-sorpresa.webp";
 
 function NotFoundComponent() {
@@ -185,6 +186,7 @@ function RootComponent() {
     void claimSource();
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN") {
+        markHadAccount();
         void redeemPendingPilotCode();
         void claimSource();
       }

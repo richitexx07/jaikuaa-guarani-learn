@@ -14,11 +14,15 @@ import { GameHelp } from './game-help';
 import { SponsorLine } from './sponsor-line';
 import type { SponsorSlot } from '@/lib/sponsor-slots';
 import { gameTitle, useGT } from '@/lib/i18n-games';
+import { getGameWordsGuest } from "@/lib/guest.functions";
+import { hasSessionNow, useIsGuest } from "@/lib/guest";
+import { useRememberPlace } from "@/lib/last-place";
 import { useT } from '@/lib/i18n';
 
 export function GameShell({ title, emoji, children, sponsorSlot, companion = true }: { title: string; emoji: string; children: ReactNode; sponsorSlot?: SponsorSlot; companion?: boolean }) {
   const { lang, g } = useGT();
   const { t } = useT();
+  useRememberPlace(title, "game", title !== "Juegos");
   return (
     <GameKit><div className="game-shell relative isolate flex min-h-screen flex-col bg-background">
       {title !== 'Penales' && <LaceBackground/>}
@@ -58,12 +62,16 @@ export function GameShell({ title, emoji, children, sponsorSlot, companion = tru
 /** Selector "Todas las palabras" o una lección publicada. */
 export function LessonFilter({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
   const fn = useServerFn(listCourseLessons);
+  const guest = useIsGuest();
   const q = useQuery({
     queryKey: ["course-lessons"],
+    enabled: !guest,
     queryFn: () => withOfflineCache(K.lessons, () => fn(), { label: "El curso" }),
   });
   const lessons = (q.data?.lessons ?? []).filter((l) => l.publishedWords > 0);
   const { g } = useGT();
+  // Sin cuenta se juega con todas las palabras (elegir lección es para quien sigue el curso).
+  if (guest) return null;
   return (
     <label className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
       {g("words")}
@@ -85,10 +93,15 @@ export function LessonFilter({ value, onChange }: { value: number | null; onChan
 
 export function useGameWords(lesson: number | null) {
   const fn = useServerFn(getGameWords);
+  const guestFn = useServerFn(getGameWordsGuest);
   const q = useQuery({
     queryKey: ["game-words", lesson],
     queryFn: () =>
-      withOfflineCache(K.gameWords(lesson), () => fn({ data: { lesson } }), { label: "Las palabras del juego" }),
+      withOfflineCache(
+        K.gameWords(lesson),
+        async () => ((await hasSessionNow()) ? fn({ data: { lesson } }) : guestFn({ data: { lesson } })),
+        { label: "Las palabras del juego" },
+      ),
     staleTime: 5 * 60_000,
   });
   // Deja listos (y con volumen parejo) los audios de las palabras del juego antes de que suenen.

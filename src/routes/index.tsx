@@ -111,6 +111,11 @@ function Hero() {
               <Link to="/auth" search={{ mode: "login" }}>Iniciar sesión</Link>
             </Button>
           </div>
+          <p className="mt-4 text-sm lg:text-left">
+            <Link to="/juegos" className="font-semibold text-primary underline underline-offset-4">
+              ¿Primero querés probar? Jugá sin registrarte
+            </Link>
+          </p>
           <p className="mx-auto mt-6 max-w-md text-xs text-muted-foreground lg:mx-0">
             No vendemos tus datos ni los compartimos con terceros para publicidad.
           </p>

@@ -5,6 +5,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { crearReto, guardarResultadoReto, verReto, type RetoGuardado, type RetoResultado } from "@/lib/reto.functions";
+import { useIsGuest } from "@/lib/guest";
+import { rememberAfterLogin } from "@/lib/after-login";
 import { decodeReto, newSeed, RETO_NOMBRE, RETO_RUTA, veredicto, type RetoJuego } from "@/lib/reto";
 
 const INK = "#13233F";
@@ -235,6 +237,10 @@ export function RetoBanner({ partida, extra, total, coincide = true, className =
   const [url, setUrl] = useState<string | null>(null);
   const [creando, setCreando] = useState(false);
   const r = coincide ? partida.reto : null;
+  const guest = useIsGuest();
+
+  // Sin cuenta no se arman retos (el reto guarda el nombre y el puntaje de cada uno).
+  if (guest) return null;
 
   if (partida.cargando) {
     return (
@@ -334,6 +340,7 @@ export function RetoFinal({
   className?: string;
 }) {
   const guardarFn = useServerFn(guardarResultadoReto);
+  const guest = useIsGuest();
   const r = coincide ? partida.reto : null;
   const [url, setUrl] = useState<string | null>(null);
   const [creando, setCreando] = useState(false);
@@ -355,6 +362,23 @@ export function RetoFinal({
 
   // Enlaces viejos: comparación contra quien retó.
   const v = r && !r.id && r.p !== undefined ? veredicto(puntaje, { p: r.p, m: r.m ? 1 : undefined }) : null;
+
+  if (guest) {
+    return (
+      <div className={`mx-auto w-full max-w-md space-y-3 rounded-3xl bg-white p-4 text-center shadow-xl ${className}`} style={{ color: INK }}>
+        <p className="font-display text-lg font-bold">¿Te gustó? Guardá tus puntos y retá a tus amigos</p>
+        <p className="text-sm opacity-75">Creá tu cuenta gratis en un toque, con Google o con tu correo. Los puntos que hiciste ahora se suman a tu cuenta.</p>
+        <a
+          href="/auth?mode=signup"
+          onClick={() => rememberAfterLogin(window.location.pathname)}
+          className="inline-flex h-12 items-center justify-center rounded-2xl px-6 font-bold text-white"
+          style={{ background: "#1E3A5F" }}
+        >
+          Crear mi cuenta gratis
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className={`mx-auto w-full max-w-md space-y-3 rounded-3xl bg-white p-4 text-left shadow-xl ${className}`} style={{ color: INK }}>

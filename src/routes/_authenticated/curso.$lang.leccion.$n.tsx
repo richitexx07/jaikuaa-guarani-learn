@@ -98,6 +98,7 @@ function LessonError({ error, reset }: { error: unknown; reset: () => void }) {
 }
 
 import { SpeakerButton } from "@/components/audio/speaker-button";
+import { useRememberPlace } from "@/lib/last-place";
 import { ReportErrorButton } from "@/components/report-error-button";
 
 type Phase = "intro" | "vocab" | "choice" | "match" | "done";
@@ -161,6 +162,7 @@ function LessonPage() {
   const [round, setRound] = useState(0);
   const draft = useRef<Omit<LessonDraft, "savedAt">>({ phase: "intro" });
   useRecordVisit(`${lang.slug ?? "curso"}:${lesson?.n ?? 0}`);
+  useRememberPlace(lesson ? `Lección ${lesson.n}: ${lesson.title}` : "", "lesson", !!lesson);
 
   // Si quedó una lección a medias en este teléfono, se sigue desde la misma pregunta.
   useEffect(() => {
