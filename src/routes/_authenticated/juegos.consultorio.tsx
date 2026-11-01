@@ -167,10 +167,12 @@ function Consultorio() {
     // El primer turno usa la semilla del reto (si vino uno); los siguientes, una nueva.
     const s = usada.current === seed ? otra() : seed;
     usada.current = s;
-    const rs = armarTurno(orderedBy(cuerpo, (w) => w.gn), orderedBy(frases, (f) => f.id), mulberry32(s));
+    const rnd = mulberry32(s);
+    const rs = armarTurno(orderedBy(cuerpo, (w) => w.gn), orderedBy(frases, (f) => f.id), rnd);
     if (rs.length === 0) return;
     setRondas(rs);
-    setPacientes(rs.map((_, k) => nuevoPaciente(k)));
+    // Con la misma semilla: en un reto, los dos jugadores ven los mismos pacientes.
+    setPacientes(rs.map((r, k) => nuevoPaciente(k, rnd, r)));
     setI(0);
     setVidas(VIDAS);
     setPuntos(0);
@@ -305,11 +307,11 @@ function Consultorio() {
                 />
               )}
               {ronda.tipo !== "cuerpo" && (
-                <Opciones ronda={ronda} idioma={idioma} resultado={resultado} onElegir={(id, ok) => responder(ok, id)} />
+                <Opciones ronda={ronda} idioma={idioma} femenino={pac.femenino} resultado={resultado} onElegir={(id, ok) => responder(ok, id)} />
               )}
             </Ficha>
             {resultado && (
-              <Veredicto ronda={ronda} resultado={resultado} idioma={idioma} onSeguir={siguiente} ultimo={vidas <= 0 || i + 1 >= rondas.length} />
+              <Veredicto ronda={ronda} resultado={resultado} idioma={idioma} femenino={pac.femenino} onSeguir={siguiente} ultimo={vidas <= 0 || i + 1 >= rondas.length} />
             )}
           </div>
         )}
@@ -549,7 +551,7 @@ function Ficha({
       ) : (
         <div className="mt-5 rounded-2xl border-2 border-dashed p-4" style={{ borderColor: "#9FB4B2" }}>
           <p className="text-sm opacity-70">{t("pedile", idioma)}</p>
-          <p className="mt-1 font-display text-xl font-bold">{enIdioma(ronda.frase.es, idioma)}</p>
+          <p className="mt-1 font-display text-xl font-bold">{enIdioma(ronda.frase.es, idioma, p.femenino)}</p>
         </div>
       )}
 
@@ -575,13 +577,14 @@ function CuerpoMapa({
 }) {
   const piel = "#E8B990";
   const zonas: { id: RegionId; shape: ReactNode; ring: ReactNode }[] = [
-    { id: "cabeza", shape: <ellipse cx="120" cy="40" rx="58" ry="24" />, ring: <ellipse cx="120" cy="40" rx="58" ry="24" /> },
-    { id: "ojo", shape: <><circle cx="96" cy="86" r="15" /><circle cx="144" cy="86" r="15" /></>, ring: <><circle cx="96" cy="86" r="15" /><circle cx="144" cy="86" r="15" /></> },
+    // La cabeza va primero (abajo): toda la cabeza se puede tocar, y ojos, nariz, boca y orejas quedan encima.
+    { id: "cabeza", shape: <circle cx="120" cy="92" r="70" />, ring: <ellipse cx="120" cy="40" rx="58" ry="24" /> },
+    { id: "ojo", shape: <><circle cx="96" cy="86" r="17" /><circle cx="144" cy="86" r="17" /></>, ring: <><circle cx="96" cy="86" r="17" /><circle cx="144" cy="86" r="17" /></> },
     { id: "oreja", shape: <><ellipse cx="50" cy="96" rx="15" ry="20" /><ellipse cx="190" cy="96" rx="15" ry="20" /></>, ring: <><ellipse cx="50" cy="96" rx="15" ry="20" /><ellipse cx="190" cy="96" rx="15" ry="20" /></> },
     { id: "nariz", shape: <circle cx="120" cy="108" r="12" />, ring: <circle cx="120" cy="108" r="12" /> },
     { id: "boca", shape: <ellipse cx="120" cy="134" rx="22" ry="11" />, ring: <ellipse cx="120" cy="134" rx="22" ry="11" /> },
-    { id: "corazon", shape: <circle cx="140" cy="198" r="18" />, ring: <circle cx="140" cy="198" r="18" /> },
-    { id: "panza", shape: <circle cx="120" cy="245" r="22" />, ring: <circle cx="120" cy="245" r="22" /> },
+    { id: "panza", shape: <ellipse cx="120" cy="250" rx="46" ry="30" />, ring: <circle cx="120" cy="245" r="22" /> },
+    { id: "corazon", shape: <circle cx="140" cy="198" r="22" />, ring: <circle cx="140" cy="198" r="18" /> },
     { id: "mano", shape: <><circle cx="46" cy="268" r="17" /><circle cx="194" cy="268" r="17" /></>, ring: <><circle cx="46" cy="268" r="17" /><circle cx="194" cy="268" r="17" /></> },
     { id: "pie", shape: <><ellipse cx="98" cy="350" rx="20" ry="11" /><ellipse cx="142" cy="350" rx="20" ry="11" /></>, ring: <><ellipse cx="98" cy="350" rx="20" ry="11" /><ellipse cx="142" cy="350" rx="20" ry="11" /></> },
   ];
@@ -650,11 +653,13 @@ function CuerpoMapa({
 function Opciones({
   ronda,
   idioma,
+  femenino,
   resultado,
   onElegir,
 }: {
   ronda: Extract<Ronda, { tipo: "sintoma" | "indicacion" }>;
   idioma: Idioma;
+  femenino: boolean;
   resultado: Resultado;
   onElegir: (id: string, ok: boolean) => void;
 }) {
@@ -674,7 +679,7 @@ function Opciones({
             }`}
             lang={ronda.tipo === "indicacion" ? "gn" : undefined}
           >
-            {ronda.tipo === "sintoma" ? enIdioma(o.es, idioma) : o.gn}
+            {ronda.tipo === "sintoma" ? enIdioma(o.es, idioma, femenino) : o.gn}
           </button>
         );
       })}
@@ -686,12 +691,14 @@ function Veredicto({
   ronda,
   resultado,
   idioma,
+  femenino,
   onSeguir,
   ultimo,
 }: {
   ronda: Ronda;
   resultado: NonNullable<Resultado>;
   idioma: Idioma;
+  femenino: boolean;
   onSeguir: () => void;
   ultimo: boolean;
 }) {
@@ -709,7 +716,7 @@ function Veredicto({
         <span className="font-bold" lang="gn">
           {gn}
         </span>{" "}
-        <span className="opacity-80">= {enIdioma(es, idioma)}</span>
+        <span className="opacity-80">= {enIdioma(es, idioma, femenino)}</span>
       </p>
       <button
         type="button"

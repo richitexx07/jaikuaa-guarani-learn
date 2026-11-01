@@ -84,10 +84,32 @@ function clave(es: string) {
 }
 const PT = new Map(PT_ORIGINAL.map(([es, pt]) => [clave(es), pt]));
 
+/** En portugués el trato cambia con el género del paciente: «o senhor» / «a senhora». */
+function aFemenino(pt: string): string {
+  return pt
+    .replace(/\bo senhor\b/g, "a senhora")
+    .replace(/\bO senhor\b/g, "A senhora")
+    .replace("Veio acompanhado?", "Veio acompanhada?")
+    .replace("Estou tonto.", "Estou tonta.");
+}
+
 /** Texto para mostrar en el idioma elegido (castellano si no hay traducción). */
-export function enIdioma(es: string, idioma: Idioma): string {
+export function enIdioma(es: string, idioma: Idioma, femenino = false): string {
   if (idioma === "es") return es;
-  return PT.get(clave(es)) ?? es;
+  const pt = PT.get(clave(es)) ?? es;
+  return femenino ? aFemenino(pt) : pt;
+}
+
+/**
+ * Lo que una frase exige del paciente, para que el turno no tenga incoherencias
+ * (por ejemplo, preguntarle a un hombre o a un chico si está embarazada).
+ */
+export function exigencias(es: string): { genero: "f" | "m" | null; edadMin: number; edadMax: number } {
+  const p = plano(es);
+  if (/\bembarazada\b/.test(p)) return { genero: "f", edadMin: 18, edadMax: 42 };
+  if (/\bmareada\b/.test(p)) return { genero: "f", edadMin: 16, edadMax: 85 };
+  if (/\bmareado\b/.test(p)) return { genero: "m", edadMin: 16, edadMax: 85 };
+  return { genero: null, edadMin: 16, edadMax: 85 };
 }
 
 export const TEXTO = {
@@ -171,10 +193,14 @@ export function armarTurno(
   };
   const usados = { cuerpo: 0, sintoma: 0, indicacion: 0 };
   const out: Ronda[] = [];
-  for (let i = 0; i < n; i++) {
-    const tipo = tipos[i % tipos.length]!;
+  // Ningún paciente se repite en un turno: si hay poco contenido publicado, el turno es más corto.
+  const total = Math.min(n, tipos.reduce((a, tp) => a + colas[tp].length, 0));
+  let j = 0;
+  while (out.length < total) {
+    const tipo = tipos[j++ % tipos.length]!;
     const cola = colas[tipo];
-    const k = usados[tipo]++ % cola.length;
+    if (usados[tipo] >= cola.length) continue;
+    const k = usados[tipo]++;
     if (tipo === "cuerpo") {
       out.push({ tipo, palabra: cola[k] as PalabraCuerpo });
     } else {
@@ -214,7 +240,11 @@ const NOMBRES = [
 
 export type Paciente = { nombre: string; femenino: boolean; edad: number; piel: number; pelo: number };
 
-export function paciente(i: number, rnd: () => number = Math.random): Paciente {
-  const p = NOMBRES[(i + Math.floor(rnd() * NOMBRES.length)) % NOMBRES.length]!;
-  return { nombre: p.n, femenino: p.f, edad: 8 + Math.floor(rnd() * 72), piel: Math.floor(rnd() * 4), pelo: Math.floor(rnd() * 4) };
+/** Un paciente coherente con lo que se le va a decir o preguntar en esa ronda. */
+export function paciente(i: number, rnd: () => number = Math.random, ronda?: Ronda): Paciente {
+  const ex = ronda && ronda.tipo !== "cuerpo" ? exigencias(ronda.frase.es) : { genero: null, edadMin: 6, edadMax: 85 };
+  const lista = ex.genero ? NOMBRES.filter((x) => x.f === (ex.genero === "f")) : NOMBRES;
+  const p = lista[(i + Math.floor(rnd() * lista.length)) % lista.length]!;
+  const edad = ex.edadMin + Math.floor(rnd() * (ex.edadMax - ex.edadMin + 1));
+  return { nombre: p.n, femenino: p.f, edad, piel: Math.floor(rnd() * 4), pelo: Math.floor(rnd() * 4) };
 }
