@@ -208,23 +208,22 @@ function MostradorPage() {
                       </button>
                       <div className="flex shrink-0 flex-col gap-2">
                         <Button
-                          size="icon"
                           variant="cta"
-                          className="h-12 w-12 rounded-full"
+                          className="h-12 gap-1.5 rounded-full px-4"
                           onClick={() => void escuchar(f)}
                           disabled={sonando === f.id}
                           aria-label={`Hacer escuchar: ${f.es}`}
                         >
-                          {sonando === f.id ? <Loader2 className="h-5 w-5 animate-spin" /> : <Volume2 className="h-5 w-5" />}
+                          {sonando === f.id ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> : <Volume2 className="h-5 w-5" aria-hidden />}
+                          Escuchar
                         </Button>
                         <Button
-                          size="icon"
                           variant="ghost"
-                          className="h-8 w-12"
+                          className="h-9 gap-1 px-3 text-xs"
                           onClick={() => setAbierta({ lista: g.frases, i })}
                           aria-label={`Mostrar en grande: ${f.es}`}
                         >
-                          <Maximize2 className="h-4 w-4" />
+                          <Maximize2 className="h-4 w-4" aria-hidden /> En grande
                         </Button>
                       </div>
                     </li>

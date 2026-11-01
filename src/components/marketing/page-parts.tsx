@@ -37,9 +37,10 @@ export function MarketingHeader() {
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? t("menuClose") : t("menuOpen")}
           aria-expanded={open}
-          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border text-foreground md:hidden"
+          className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-border px-3 text-sm font-semibold text-foreground md:hidden"
         >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {open ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
+          {open ? "Cerrar" : "Menú"}
         </button>
       </div>
       {open && (

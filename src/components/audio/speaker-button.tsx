@@ -13,7 +13,8 @@ type Props = {
 };
 
 export function SpeakerButton({ gn, size = "sm", className }: Props) {
-  const dims = size === "md" ? "h-9 w-9" : "h-8 w-8";
+  // Más grande para el dedo: es el botón más importante de la app (las voces reales).
+  const dims = size === "md" ? "h-11 w-11" : "h-10 w-10";
   const icon = size === "md" ? "h-5 w-5" : "h-4 w-4";
 
   const [url, setUrl] = useState<string | null | undefined>(undefined);
@@ -97,13 +98,18 @@ export function SpeakerButton({ gn, size = "sm", className }: Props) {
         "inline-flex shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition hover:bg-primary/20 active:scale-95 disabled:opacity-50",
         pending && "bg-muted text-muted-foreground hover:bg-muted",
         dims,
+        // Sin grabación todavía: se dice con palabras, no con un relojito.
+        pending && "w-auto gap-1 px-2.5 text-[11px] font-semibold",
         className,
       )}
     >
       {playing || loading ? (
         <Loader2 className={cn(icon, "motion-safe:animate-spin")} />
       ) : pending ? (
-        <Clock className={icon} />
+        <>
+          <Clock className="h-3.5 w-3.5" aria-hidden />
+          Voz pronto
+        </>
       ) : unavailable ? (
         <VolumeX className={icon} />
       ) : (

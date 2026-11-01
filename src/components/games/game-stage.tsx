@@ -81,7 +81,7 @@ function FullscreenButton() {
   return (
     <button
       type="button"
-      className="hidden h-10 w-10 items-center justify-center rounded-md border sm:inline-flex"
+      className="hidden h-10 items-center justify-center gap-1.5 rounded-md border px-3 text-sm font-semibold sm:inline-flex"
       title={on ? g("exitFullscreen") : g("fullscreen")}
       aria-label={on ? g("exitFullscreen") : g("fullscreen")}
       onClick={() => {
@@ -89,7 +89,8 @@ function FullscreenButton() {
         else void document.documentElement.requestFullscreen().catch(() => {});
       }}
     >
-      {on ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+      {on ? <Minimize2 className="h-4 w-4" aria-hidden /> : <Maximize2 className="h-4 w-4" aria-hidden />}
+      {g("fullShort")}
     </button>
   );
 }

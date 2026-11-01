@@ -340,11 +340,11 @@ export function SupportWhatsApp() {
                         ) : (
                           <>
                             <span>¿Te sirvió?</span>
-                            <button type="button" onClick={() => rate(m, "up")} aria-label="Sí, me sirvió" className="rounded-full p-1 hover:bg-muted hover:text-primary">
-                              <ThumbsUp className="h-3.5 w-3.5" />
+                            <button type="button" onClick={() => rate(m, "up")} aria-label="Sí, me sirvió" className="inline-flex items-center gap-1 rounded-full px-2 py-1 ring-1 ring-border hover:bg-muted hover:text-primary">
+                              <ThumbsUp className="h-3.5 w-3.5" aria-hidden /> Sí
                             </button>
-                            <button type="button" onClick={() => rate(m, "down")} aria-label="No me sirvió" className="rounded-full p-1 hover:bg-muted hover:text-destructive">
-                              <ThumbsDown className="h-3.5 w-3.5" />
+                            <button type="button" onClick={() => rate(m, "down")} aria-label="No me sirvió" className="inline-flex items-center gap-1 rounded-full px-2 py-1 ring-1 ring-border hover:bg-muted hover:text-destructive">
+                              <ThumbsDown className="h-3.5 w-3.5" aria-hidden /> No
                             </button>
                           </>
                         )}
@@ -442,8 +442,8 @@ export function SupportWhatsApp() {
               aria-label="Tu consulta"
               className="flex-1 rounded-full border border-input bg-background px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
             />
-            <button type="submit" aria-label="Enviar" disabled={!input.trim() || typing} className="rounded-full bg-primary p-2.5 text-primary-foreground hover:opacity-90 disabled:opacity-50">
-              <Send className="h-4 w-4" />
+            <button type="submit" aria-label="Enviar" disabled={!input.trim() || typing} className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-2.5 text-sm font-bold text-primary-foreground hover:opacity-90 disabled:opacity-50">
+              <Send className="h-4 w-4" aria-hidden /> Enviar
             </button>
           </form>
         </div>

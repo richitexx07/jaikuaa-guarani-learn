@@ -248,7 +248,6 @@ function Board({ series, onResult, onRematch, onRemote, theme }: { series: DuelS
             <span className="max-w-[9rem] truncate text-xs font-semibold" style={{ color: TV.oro }}>{q.emoji} {q.cat}</span>
           </div>
           <span key={`b${score[1]}`} className="tv-punto rotate-180 font-display text-4xl font-bold tabular-nums" style={{ color: "#D3A6FF" }}>{score[1]}</span>
-          <span className="h-11 w-11" aria-hidden />
           <span className="sr-only" aria-live="polite">{sd("scoreSr", { a: score[0], b: score[1] })}</span>
         </div>
         {winner !== null && <p className="px-2 pb-1 pt-1 text-center text-xs text-white/90">{q.explanation}</p>}

@@ -21,7 +21,8 @@ export function DisplayToggles() {
         title={prefs.dark ? "Modo claro" : "Modo oscuro"}
         onClick={() => update({ ...prefs, dark: !prefs.dark })}
       >
-        {prefs.dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        {prefs.dark ? <Sun className="h-4 w-4" aria-hidden /> : <Moon className="h-4 w-4" aria-hidden />}
+        <span className="text-xs">{prefs.dark ? "Claro" : "Oscuro"}</span>
       </Button>
       <Button
         variant={prefs.largeText ? "secondary" : "ghost"}

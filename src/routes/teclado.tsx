@@ -153,7 +153,7 @@ function TecladoPage() {
         </div>
         <div className="grid grid-cols-4 gap-2">
           <Button type="button" variant="outline" className="col-span-3 h-12" onPointerDown={(e) => e.preventDefault()} onClick={() => insert(" ")}>espacio</Button>
-          <Button type="button" variant="outline" className="h-12" onPointerDown={(e) => e.preventDefault()} onClick={backspace} aria-label="Borrar"><Delete /></Button>
+          <Button type="button" variant="outline" className="h-12" onPointerDown={(e) => e.preventDefault()} onClick={backspace} aria-label="Borrar"><Delete aria-hidden /> Borrar</Button>
         </div>
       </section>
 

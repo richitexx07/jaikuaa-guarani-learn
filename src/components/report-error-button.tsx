@@ -60,13 +60,14 @@ export function ReportErrorButton({ gn, es = "", lugar, className }: Props) {
         <button
           type="button"
           className={cn(
-            "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+            "inline-flex h-8 shrink-0 items-center justify-center gap-1 rounded-full px-2 text-xs font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
             className,
           )}
           aria-label={`Señalar un error en «${gn}»`}
           title="Señalar un error"
         >
-          <Flag className="h-4 w-4" aria-hidden />
+          <Flag className="h-3.5 w-3.5" aria-hidden />
+          ¿Error?
         </button>
       </DialogTrigger>
       <DialogContent className="max-w-md">

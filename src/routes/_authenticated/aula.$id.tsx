@@ -162,7 +162,7 @@ function AulaDocente() {
                               refresh();
                             }}
                           >
-                            <UserMinus className="h-4 w-4" />
+                            <UserMinus className="h-4 w-4" aria-hidden /> Quitar
                           </Button>
                         </td>
                       </tr>
@@ -192,7 +192,7 @@ function AulaDocente() {
                         </p>
                       </div>
                       <Button
-                        size="icon"
+                        size="sm"
                         variant="ghost"
                         aria-label={`Borrar la tarea ${t.titulo}`}
                         onClick={async () => {
@@ -201,7 +201,7 @@ function AulaDocente() {
                           refresh();
                         }}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" aria-hidden /> Borrar
                       </Button>
                     </li>
                   );

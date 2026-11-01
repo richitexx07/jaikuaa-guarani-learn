@@ -338,7 +338,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
     <div className="space-y-4">
       {/* Marcador */}
       <div className="flex items-center gap-2 rounded-2xl border-4 border-[#1C2B44] bg-black p-2">
-        <button type="button" onClick={() => setConfirmExit(true)} aria-label="Salir de la tanda" className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white/80 hover:bg-white/10"><X className="h-5 w-5" /></button>
+        <button type="button" onClick={() => setConfirmExit(true)} aria-label="Salir de la tanda" className="inline-flex h-9 shrink-0 items-center gap-1 rounded-full px-2.5 text-xs font-bold text-white/85 ring-1 ring-white/25 hover:bg-white/10"><X className="h-4 w-4" aria-hidden />Salir</button>
         {[{ n: myName, r: mine, c: P.host }, { n: rivalName, r: theirs, c: P.guest }].map((x, k) => (
           <div key={k} className="min-w-0 flex-1 px-1">
             <div className="flex items-center justify-between gap-1">

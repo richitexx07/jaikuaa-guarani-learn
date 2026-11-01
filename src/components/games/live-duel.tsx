@@ -511,7 +511,7 @@ export function LiveDuel({
   return (
     <div className="relative mx-auto max-w-md space-y-3">
       <div className="flex items-center gap-2 rounded-2xl bg-white p-2 shadow-lg" style={{ color: theme.ink }}>
-        <button type="button" onClick={() => setConfirmExit(true)} aria-label="Salir del duelo" className="grid h-10 w-10 shrink-0 place-items-center rounded-full hover:bg-black/5"><X className="h-5 w-5" /></button>
+        <button type="button" onClick={() => setConfirmExit(true)} aria-label="Salir del duelo" className="inline-flex h-10 shrink-0 items-center gap-1 rounded-full px-3 text-sm font-bold ring-1 ring-black/15 hover:bg-black/5"><X className="h-4 w-4" aria-hidden />Salir</button>
         <ScoreSide name={myName} n={my} color={theme.mine} />
         <span className="text-xs font-bold opacity-50">a {target}</span>
         <ScoreSide name={rivalName ?? "Rival"} n={their} color={theme.rival} right />
@@ -562,7 +562,7 @@ export function LiveDuel({
           <div className="mt-2 flex items-center justify-center gap-2">
             <p className={`text-center font-display font-bold leading-tight ${round.pre ? "text-base font-medium opacity-90" : round.prompt.length > 40 ? "text-xl" : "text-4xl"}`}>{round.prompt}</p>
             {round.audio && (
-              <button type="button" aria-label="Escuchar otra vez" onClick={() => void playGuarani(round.audio!)} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/20"><Volume2 className="h-5 w-5" /></button>
+              <button type="button" aria-label="Escuchar otra vez" onClick={() => void playGuarani(round.audio!)} className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-white/20 px-3 text-sm font-bold"><Volume2 className="h-4 w-4" aria-hidden />Escuchar</button>
             )}
           </div>
           {round.sub && <p className="mt-1 text-center text-sm opacity-80">{round.sub}</p>}

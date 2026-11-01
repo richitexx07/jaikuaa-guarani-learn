@@ -449,7 +449,8 @@ function Dashboard() {
               onClick={handleSignOut}
               aria-label={t("signOut")}
             >
-              <LogOut />
+              <LogOut aria-hidden />
+              <span className="sm:hidden">Salir</span>
               <span className="hidden sm:inline">{t("signOut")}</span>
             </Button>
           </div>

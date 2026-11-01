@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { BookOpen, Check, Loader2, SkipForward, Undo2, WifiOff, X, Zap } from "lucide-react";
+import { BookOpen, Check, Loader2, SkipForward, Undo2, WifiOff, X, Zap, CircleHelp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SpeakerButton } from "@/components/audio/speaker-button";
@@ -274,7 +274,7 @@ function QuickValidatePage() {
         </Link>
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" onClick={() => setGuide(true)} aria-label="Cómo se usa">
-            ?
+            <CircleHelp aria-hidden /> Ayuda
           </Button>
           <Button variant="ghost" size="sm" onClick={() => void undo()} disabled={!history.length || busy}>
             <Undo2 aria-hidden /> Deshacer

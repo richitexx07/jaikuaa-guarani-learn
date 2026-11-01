@@ -229,7 +229,7 @@ function ProposeForm() {
           <div className="flex gap-2">
             <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="En guaraní o en castellano" />
             <Button variant="outline" onClick={() => search.mutate()} disabled={query.trim().length < 2 || search.isPending}>
-              <Search className="h-4 w-4" />
+              <Search className="h-4 w-4" aria-hidden /> Buscar
             </Button>
           </div>
           {results.length > 0 && (

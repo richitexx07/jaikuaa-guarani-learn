@@ -256,7 +256,7 @@ function Board({ pool, series, onResult, onRematch, onRemote }: { pool: GameWord
         <span key={`a${score[0]}`} className="dv-punto font-display text-4xl font-bold tabular-nums" style={{ color: V.azul }}>{score[0]}</span>
         <Rayo className="h-10 w-7" />
         <span key={`b${score[1]}`} className="dv-punto rotate-180 font-display text-4xl font-bold tabular-nums" style={{ color: V.rojo }}>{score[1]}</span>
-        <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-black/5 disabled:opacity-30" onClick={() => say(round.word)} disabled={!round.word.hasAudio} aria-label={tt("listen")}><Volume2 /></button>
+        <button type="button" className="inline-flex h-11 touch-manipulation items-center gap-1.5 rounded-full px-3 text-sm font-bold ring-2 ring-current/30 hover:bg-black/5 disabled:opacity-30" onClick={() => say(round.word)} disabled={!round.word.hasAudio} aria-label={tt("listen")}><Volume2 className="h-4 w-4" aria-hidden />{tt("listenShort")}</button>
         <span className="sr-only" aria-live="polite">{tt("scoreSr", { a: score[0], b: score[1] })}</span>
       </div>
       <PlayerHalf p={0} round={round} winner={winner} locked={locked[0]} wrong={wrongPick[0]} onPick={pick} />

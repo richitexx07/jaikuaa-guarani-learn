@@ -32,6 +32,8 @@ const T = {
   meaning: { es: "¿Qué significa?", pt: "O que significa?", en: "What does it mean?", de: "Was bedeutet das?", fr: "Que veut dire ce mot ?", zh: "這是什麼意思？" },
   // Árbitro de mesa (duelos en un mismo celular)
   pause: { es: "Pausa: tablas, rendirse o salir", pt: "Pausa: empate, desistir ou sair", en: "Pause: draw, resign or leave", de: "Pause: Remis, aufgeben oder verlassen", fr: "Pause : nul, abandon ou quitter", zh: "暫停：和局、認輸或離開" },
+  pauseShort: { es: "Pausa", pt: "Pausa", en: "Pause", de: "Pause", fr: "Pause", zh: "暫停" },
+  listenShort: { es: "Escuchar", pt: "Ouvir", en: "Listen", de: "Hören", fr: "Écouter", zh: "聽" },
   refereeTitle: { es: "Partida en pausa", pt: "Partida em pausa", en: "Game paused", de: "Spiel pausiert", fr: "Partie en pause", zh: "對局暫停" },
   refereeHint: { es: "¿Qué hacemos con esta partida?", pt: "O que fazemos com esta partida?", en: "What should we do with this game?", de: "Was machen wir mit diesem Spiel?", fr: "Que fait-on de cette partie ?", zh: "這局要怎麼處理？" },
   keepPlaying: { es: "Seguir jugando", pt: "Continuar jogando", en: "Keep playing", de: "Weiterspielen", fr: "Continuer à jouer", zh: "繼續比賽" },
