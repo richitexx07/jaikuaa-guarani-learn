@@ -60,6 +60,7 @@ import { Route as AuthenticatedTraductorRouteImport } from './routes/_authentica
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
 import { Route as AuthenticatedValidacionRouteImport } from './routes/_authenticated/validacion'
 import { Route as AuthenticatedValidarRouteImport } from './routes/_authenticated/validar'
+import { Route as ApiRecordatorioRouteImport } from './routes/api/recordatorio'
 import { Route as ApiTutorRouteImport } from './routes/api/tutor'
 import { Route as StudioIndexRouteImport } from './routes/studio.index'
 import { Route as StudioSplatRouteImport } from './routes/studio.$'
@@ -364,6 +365,11 @@ const AuthenticatedValidarRoute = AuthenticatedValidarRouteImport.update({
   id: '/validar',
   path: '/validar',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiRecordatorioRoute = ApiRecordatorioRouteImport.update({
+  id: '/api/recordatorio',
+  path: '/api/recordatorio',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiTutorRoute = ApiTutorRouteImport.update({
   id: '/api/tutor',
@@ -685,6 +691,7 @@ export interface FileRoutesByFullPath {
   '/tutor': typeof AuthenticatedTutorRoute
   '/validacion': typeof AuthenticatedValidacionRoute
   '/validar': typeof AuthenticatedValidarRoute
+  '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar/$code': typeof VerificarCodeRoute
@@ -782,6 +789,7 @@ export interface FileRoutesByTo {
   '/tutor': typeof AuthenticatedTutorRoute
   '/validacion': typeof AuthenticatedValidacionRoute
   '/validar': typeof AuthenticatedValidarRoute
+  '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar/$code': typeof VerificarCodeRoute
@@ -880,6 +888,7 @@ export interface FileRoutesById {
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
   '/_authenticated/validacion': typeof AuthenticatedValidacionRoute
   '/_authenticated/validar': typeof AuthenticatedValidarRoute
+  '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar/$code': typeof VerificarCodeRoute
@@ -980,6 +989,7 @@ export interface FileRouteTypes {
     | '/tutor'
     | '/validacion'
     | '/validar'
+    | '/api/recordatorio'
     | '/api/tutor'
     | '/studio/$'
     | '/verificar/$code'
@@ -1077,6 +1087,7 @@ export interface FileRouteTypes {
     | '/tutor'
     | '/validacion'
     | '/validar'
+    | '/api/recordatorio'
     | '/api/tutor'
     | '/studio/$'
     | '/verificar/$code'
@@ -1174,6 +1185,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tutor'
     | '/_authenticated/validacion'
     | '/_authenticated/validar'
+    | '/api/recordatorio'
     | '/api/tutor'
     | '/studio/$'
     | '/verificar/$code'
@@ -1257,6 +1269,7 @@ export interface RootRouteChildren {
   TrRoute: typeof TrRoute
   TurismoRoute: typeof TurismoRoute
   ZhRoute: typeof ZhRoute
+  ApiRecordatorioRoute: typeof ApiRecordatorioRoute
   ApiTutorRoute: typeof ApiTutorRoute
   StudioSplatRoute: typeof StudioSplatRoute
   VerificarCodeRoute: typeof VerificarCodeRoute
@@ -1621,6 +1634,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/validar'
       preLoaderRoute: typeof AuthenticatedValidarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/recordatorio': {
+      id: '/api/recordatorio'
+      path: '/api/recordatorio'
+      fullPath: '/api/recordatorio'
+      preLoaderRoute: typeof ApiRecordatorioRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/tutor': {
       id: '/api/tutor'
@@ -2154,6 +2174,7 @@ const rootRouteChildren: RootRouteChildren = {
   TrRoute: TrRoute,
   TurismoRoute: TurismoRoute,
   ZhRoute: ZhRoute,
+  ApiRecordatorioRoute: ApiRecordatorioRoute,
   ApiTutorRoute: ApiTutorRoute,
   StudioSplatRoute: StudioSplatRoute,
   VerificarCodeRoute: VerificarCodeRoute,

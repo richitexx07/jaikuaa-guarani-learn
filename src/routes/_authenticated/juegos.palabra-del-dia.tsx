@@ -13,6 +13,7 @@ import { K } from "@/lib/offline-pack";
 import { localWotdPlay, queueWotdAnswer, rememberWotdPlay } from "@/lib/offline-sync";
 import { logAnswer } from "@/lib/answer-log";
 import { ShareResult } from "@/components/games/share-result";
+import { StayCard } from "@/components/stay-card";
 import { syncStats } from "@/lib/gamification";
 
 export const Route = createFileRoute("/_authenticated/juegos/palabra-del-dia")({
@@ -237,6 +238,7 @@ function WordOfDayContent() {
                 <p className="text-xs opacity-70">{tr("wotdSaved")}</p>
               )}
               {played.correct && <div className="pt-1"><ShareResult text={tr("wotdShare")} /></div>}
+              <StayCard className="mt-3" />
               <p className="text-sm opacity-70">{tr("wotdTomorrow")}</p>
             </div>
           )}

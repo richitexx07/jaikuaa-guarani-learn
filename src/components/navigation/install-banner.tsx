@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { Download, Share, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useStats } from "@/lib/gamification";
 import { canPromptInstall, isIos, isStandalone, onInstallChange, promptInstall } from "@/lib/install-prompt";
 
 const DISMISS_KEY = "jaikuaa:install-dismissed";
@@ -22,6 +23,7 @@ export function InstallBanner() {
   const [prompt, setPrompt] = useState(false);
   const [ios, setIos] = useState(false);
   const [visible, setVisible] = useState(false);
+  const stats = useStats();
 
   useEffect(() => {
     if (isStandalone() || window.self !== window.top || recentlyDismissed()) return;
@@ -39,7 +41,8 @@ export function InstallBanner() {
     return onInstallChange(update);
   }, []);
 
-  if (!visible || pathname !== "/dashboard") return null;
+  // Momento justo: recién después de que la persona hizo algo (antes, el aviso molesta y se cierra sin leer).
+  if (!visible || pathname !== "/dashboard" || stats.xp <= 0) return null;
 
   const dismiss = () => {
     try {

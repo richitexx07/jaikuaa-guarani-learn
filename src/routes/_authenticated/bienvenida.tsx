@@ -12,6 +12,7 @@ import { useAppLang } from "@/lib/i18n";
 import { markWelcomeSeen } from "@/lib/welcome";
 import jaiSaluda from "@/assets/jai/jai-saluda.webp";
 import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
+import { StayCard } from "@/components/stay-card";
 import jaiAnimo from "@/assets/jai/jai-animo.webp";
 
 /**
@@ -166,6 +167,7 @@ function Bienvenida() {
                 </>
               )}
               <NextButtons t={t} />
+              <StayCard className="mt-2" />
             </div>
           )}
         </section>
