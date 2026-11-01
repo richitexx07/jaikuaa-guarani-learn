@@ -24,6 +24,7 @@ import { DemoBrandPanel } from '@/components/games/demo-brand-panel';
 import { demoLedText, useDemoBrand } from '@/lib/demo-brand';
 import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from '@/components/games/reto';
 import { leccionDeReto, orderedBy, shufflerFor } from '@/lib/reto';
+import { PauseButton, RefereeMenu, useEndTitle, type DuelEnd } from '@/components/games/duel-referee';
 
 export const Route=createFileRoute('/_authenticated/juegos/penales')({
  head:()=>({meta:[{title:'Penales: Solo y Duelo | Jaikuaa'},{name:'description',content:'Palabras, estadio y una tanda de penales. Jugá solo o compartí un duelo en el mismo celular.'},{property:'og:title',content:'Penales: Solo y Duelo | Jaikuaa'},{property:'og:description',content:'Una tanda de penales con vocabulario publicado y audio de voces reales.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary'}]}),component:Penalties,
@@ -69,19 +70,22 @@ type Played={word:GameWord;outcome:Outcome;player:number};
 function Match({seed,partida,lesson,words,duel,names,ledText,muted,onAgain,onModes}:{seed:number;partida:Partida;lesson:number|null;words:GameWord[];duel:boolean;names:[string,string];ledText:string;muted:boolean;onAgain:()=>void;onModes:()=>void}){
  const {p,msg,label}=usePT();
  const deck=useMemo(()=>shufflerFor(seed)(orderedBy(words,w=>w.gn)),[words,seed]);
- const [turn,setTurn]=useState(0),[choice,setChoice]=useState<string|null>(null),[played,setPlayed]=useState<Played[]>([]),[last,setLast]=useState<Outcome|null>(null),[finished,setFinished]=useState(false),[guess,setGuess]=useState<Dive|null>(null);
+ const [turn,setTurn]=useState(0),[choice,setChoice]=useState<string|null>(null),[played,setPlayed]=useState<Played[]>([]),[last,setLast]=useState<Outcome|null>(null),[finished,setFinished]=useState(false),[guess,setGuess]=useState<Dive|null>(null),[menu,setMenu]=useState(false),[end,setEnd]=useState<DuelEnd|null>(null),endTitle=useEndTitle();
  const word=deck[turn%deck.length];
  const options=useMemo(()=>{if(!word)return [];const mezclar=shufflerFor(seed,turn+1);return mezclar([word,...mezclar(orderedBy(words.filter(w=>w.gn!==word.gn),w=>w.gn)).slice(0,2)]);},[word,words,seed,turn]);
  const player=duel?turn%2:0,results=[played.filter(p=>p.player===0).map(p=>p.outcome),played.filter(p=>p.player===1).map(p=>p.outcome)],goals=results.map(r=>r.filter(isGoal).length),xp=xpFor(results[0]),recorded=useRef(false);
  useEffect(()=>{if(!finished||recorded.current)return;recorded.current=true;recordCompletion({source:'game',sourceRef:'penales',xp});if(duel||goals[0]>=3)celebrate('big');},[finished,xp]);
  if(!word)return null;
+ function endBy(e:DuelEnd){setEnd(e);setFinished(true);}
+ const champ:0|1=end?.kind==='forfeit'?(end.loser===0?1:0):goals[0]>=goals[1]?0:1;
  const knew=choice===word.gn;
  function answer(gn:string){if(choice!==null)return;setChoice(gn);if(word.hasAudio&&!muted)void playGuarani(word.gn);}
  function next(){const done=duel?duelFinished(results[0],results[1]):played.length>=5;if(done){setFinished(true);return;}setTurn(t=>t+1);setChoice(null);setLast(null);setGuess(null);}
  const sudden=duel&&turn>=10;
- const message=finished?(duel?(goals[0]===goals[1]?p('drawMsg'):p('wonMsg',{n:goals[0]>goals[1]?names[0]:names[1]})):p('doneMsg')) :last?msg(last):choice!==null?(knew?p('rightMsg'):p('wrongMsg')):`${duel?names[player]+': ':''}${p('goNext')}`;
+ const message=finished?(duel?(end?endTitle(end,champ,''):goals[0]===goals[1]?p('drawMsg'):p('wonMsg',{n:goals[0]>goals[1]?names[0]:names[1]})):p('doneMsg')) :last?msg(last):choice!==null?(knew?p('rightMsg'):p('wrongMsg')):`${duel?names[player]+': ':''}${p('goNext')}`;
  const stars=goals[0]>=5?3:goals[0]>=3?2:goals[0]>=1?1:0;
  return <div className="space-y-4 pt-3">
+ {duel&&!finished&&<><RefereeMenu open={menu} onClose={()=>setMenu(false)} onEnd={endBy} colors={['#0E7C86','#B5452B']} ink={P.noche}/><div className="flex justify-end"><PauseButton onClick={()=>setMenu(true)} className="text-white hover:bg-white/10"/></div></>}
  {/* Marcador de luces */}
  <div className="rounded-2xl border-4 bg-black p-3" style={{borderColor:'#1C2B44'}}>
   <div className={`grid gap-3 ${duel?'grid-cols-2':'grid-cols-1'}`}>
@@ -94,7 +98,7 @@ function Match({seed,partida,lesson,words,duel,names,ledText,muted,onAgain,onMod
  </div>
  <PenaltyMascot message={message} mood={finished?(duel||goals[0]>=3?'victory':'success'):last?(isGoal(last)?'success':'error'):choice!==null?(knew?'success':'error'):'idle'}/>
  {finished?<div className="space-y-5 text-center"><div className="text-5xl tracking-widest" style={{color:P.led}} aria-label={`${stars} de 3 estrellas`}>{'★'.repeat(stars)}<span className="opacity-25">{'★'.repeat(3-stars)}</span></div>
- <h2 className="font-display text-3xl font-bold">{duel?(goals[0]===goals[1]?p('draw'):p('won',{n:goals[0]>goals[1]?names[0]:names[1]})):p('ofFive',{n:goals[0]})}</h2><p className="font-bold" style={{color:P.led}}>+{xp} XP{duel?` · ${p('player',{n:1})}`:''}</p>
+ <h2 className="font-display text-3xl font-bold">{duel?(end?endTitle(end,champ,''):goals[0]===goals[1]?p('draw'):p('won',{n:goals[0]>goals[1]?names[0]:names[1]})):p('ofFive',{n:goals[0]})}</h2><p className="font-bold" style={{color:P.led}}>+{xp} XP{duel?` · ${p('player',{n:1})}`:''}</p>
  <ul className="divide-y divide-white/10 rounded-2xl bg-white/[.06] px-3 text-left">{played.map((pl,i)=><li key={i} className="flex items-center gap-2 py-3 text-sm"><span className="h-3 w-3 shrink-0 rounded-full" style={{background:isGoal(pl.outcome)?P.gol:P.mal}} aria-label={isGoal(pl.outcome)?p('goal'):p('missed')}/><div className="min-w-0 flex-1">{duel&&<span className="block text-xs text-white/60">{names[pl.player]}</span>}<span className="font-semibold">{pl.word.gn}</span><span className="text-white/60"> — {pl.word.es}</span></div>{pl.word.hasAudio&&<SpeakerButton gn={pl.word.gn}/>}</li>)}</ul>
  <div className="flex flex-wrap justify-center gap-2"><button type="button" onClick={onAgain} className="inline-flex h-12 items-center gap-2 rounded-2xl px-6 font-bold" style={{background:P.led,color:P.noche}}><RotateCcw className="h-5 w-5"/>{duel?p('rematch'):p('again')}</button><button type="button" className="h-12 rounded-2xl px-4 font-semibold text-white/80" onClick={onModes}>{p('changeMode')}</button></div>
 {!duel&&<RetoFinal partida={partida} puntaje={goals[0]} extra={lesson===null?undefined:String(lesson)}/>}

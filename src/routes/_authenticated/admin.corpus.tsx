@@ -1579,6 +1579,8 @@ function DashboardPanel() {
             <StatCard label="Pendientes de validación" value={d.pendingValidation} />
           </div>
 
+          <SourcesCard sources={d.sources} />
+
           <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
             <div className="mb-3 font-display font-semibold text-foreground">
               Usuarios activos por día
@@ -1601,6 +1603,62 @@ function DashboardPanel() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+/** Enlaces con origen para compartir y cuántos se registraron desde cada lugar. */
+const SHARE_PLACES = [
+  ["facebook", "Facebook"],
+  ["whatsapp", "WhatsApp"],
+  ["instagram", "Instagram"],
+  ["tiktok", "TikTok"],
+] as const;
+
+function SourcesCard({ sources }: { sources: { source: string; count: number }[] }) {
+  const [copied, setCopied] = useState<string | null>(null);
+  const total = sources.reduce((a, x) => a + x.count, 0);
+  const max = Math.max(1, ...sources.map((x) => x.count));
+  async function copy(place: string) {
+    const url = `https://www.jaikuaa.com/?de=${place}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(place);
+      window.setTimeout(() => setCopied(null), 2000);
+    } catch {
+      window.prompt("Copiá este enlace:", url);
+    }
+  }
+  return (
+    <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+      <div className="font-display font-semibold text-foreground">¿De dónde llegaron los nuevos?</div>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Se cuenta desde el 1/11/2026. «directo»: entraron sin enlace con origen. «sin dato»: cuentas de antes.
+      </p>
+      {total === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">Todavía no hay registros nuevos en el período.</p>
+      ) : (
+        <ul className="mt-3 space-y-1.5">
+          {sources.map((x) => (
+            <li key={x.source} className="flex items-center gap-2 text-sm">
+              <span className="w-24 shrink-0 truncate font-medium">{x.source}</span>
+              <span className="h-3 rounded bg-primary/80" style={{ width: `${(x.count / max) * 60}%`, minWidth: 4 }} />
+              <span className="tabular-nums text-muted-foreground">{x.count}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="mt-4 border-t border-border/60 pt-3">
+        <p className="text-sm font-medium">Enlaces para compartir (cada uno cuenta por separado)</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {SHARE_PLACES.map(([place, label]) => (
+            <Button key={place} type="button" variant="outline" size="sm" onClick={() => void copy(place)}>
+              {copied === place ? "¡Copiado!" : `Copiar enlace de ${label}`}
+            </Button>
+          ))}
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">Ejemplo: https://www.jaikuaa.com/?de=facebook</p>
+      </div>
     </div>
   );
 }

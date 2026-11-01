@@ -739,9 +739,35 @@ export const getPilotDashboard = createServerFn({ method: "POST" })
       };
     });
 
+    // De dónde llegaron los nuevos del período (?de=facebook, ?de=whatsapp…), anotado al crear la cuenta.
+    const sourceOf = new Map<string, string>();
+    try {
+      for (let page = 1; page <= 50; page++) {
+        const { data: lu, error: luErr } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 1000 });
+        if (luErr) break;
+        for (const u of lu.users) {
+          const s = (u.user_metadata as Record<string, unknown> | null)?.signup_source;
+          if (typeof s === "string" && s) sourceOf.set(u.id, s);
+        }
+        if (lu.users.length < 1000) break;
+      }
+    } catch {
+      /* si falla, el tablero sigue sin este dato */
+    }
+    const sourceCount = new Map<string, number>();
+    for (const p of profiles) {
+      if (!inPeriod(pyDay(p.created_at))) continue;
+      const s = sourceOf.get(p.id) ?? "sin dato";
+      sourceCount.set(s, (sourceCount.get(s) ?? 0) + 1);
+    }
+    const sources = [...sourceCount.entries()]
+      .map(([source, count]) => ({ source, count }))
+      .sort((a, b) => b.count - a.count);
+
     return {
       startDay,
       today,
+      sources,
       registered: profiles.length,
       newUsers: profiles.filter((p) => inPeriod(pyDay(p.created_at))).length,
       activeUsers: new Set(ptx.map((x) => x.user_id)).size,

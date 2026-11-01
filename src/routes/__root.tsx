@@ -22,6 +22,7 @@ import { applyDisplayPrefs, readDisplayPrefs } from "@/lib/display-prefs";
 import { registerOfflineSupport } from "@/lib/pwa";
 import { syncAllPending, totalPending } from "@/lib/offline-sync";
 import { pendingAnswersCount } from "@/lib/answer-log";
+import { captureSource, claimSource } from "@/lib/signup-source";
 import jaiSorpresa from "@/assets/jai/jai-sorpresa.webp";
 
 function NotFoundComponent() {
@@ -178,9 +179,15 @@ function RootComponent() {
   }, []);
 
   useEffect(() => {
+    // De dónde llegó la persona (?de=facebook, ?de=whatsapp…): se anota al crear la cuenta.
+    captureSource();
     void redeemPendingPilotCode();
+    void claimSource();
     const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") void redeemPendingPilotCode();
+      if (event === "SIGNED_IN") {
+        void redeemPendingPilotCode();
+        void claimSource();
+      }
     });
     return () => data.subscription.unsubscribe();
   }, []);
