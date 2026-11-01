@@ -24,6 +24,7 @@ import { syncAllPending, totalPending } from "@/lib/offline-sync";
 import { pendingAnswersCount } from "@/lib/answer-log";
 import { captureSource, claimSource } from "@/lib/signup-source";
 import { markHadAccount } from "@/lib/guest";
+import { shareMetaFor } from "@/lib/share-meta";
 import jaiSorpresa from "@/assets/jai/jai-sorpresa.webp";
 
 function NotFoundComponent() {
@@ -88,9 +89,20 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  head: ({ matches }) => {
+    const share = shareMetaFor(matches?.[matches.length - 1]?.pathname ?? "/");
+    return {
     meta: [
       { charSet: "utf-8" },
+      // Vista previa por defecto de cualquier enlace (las páginas con su propio título lo reemplazan).
+      { title: share.title },
+      { name: "description", content: share.description },
+      { property: "og:title", content: share.title },
+      { property: "og:description", content: share.description },
+      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#1E3A5F" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
@@ -135,7 +147,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "/manifest.webmanifest",
       },
     ],
-  }),
+    };
+  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,

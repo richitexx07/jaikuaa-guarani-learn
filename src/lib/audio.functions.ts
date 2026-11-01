@@ -7,7 +7,9 @@ const Input = z.object({ gn: z.string().min(1).max(120) });
 
 const URL_TTL_SECONDS = 60 * 60; // 1 hora como máximo
 const LIMIT_SIGNED_IN = 300; // por hora por usuario
-const LIMIT_ANON = 30; // por hora por IP
+// Por IP: en el Paraguay muchos celulares salen a internet por la MISMA IP de la empresa (Tigo, Personal, Claro).
+// Un tope bajo dejaría sin voces a cientos de invitados a la vez el día del lanzamiento.
+const LIMIT_ANON = 600; // por hora por IP
 
 function slugifyAudio(gn: string): string {
   let x = gn.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -104,7 +106,7 @@ export const getAudioSignedUrl = createServerFn({ method: "POST" })
 
 const BatchInput = z.object({ gns: z.array(z.string().min(1).max(120)).min(1).max(60) });
 const LIMIT_BATCH_SIGNED_IN = 400; // tandas por hora por usuario
-const LIMIT_BATCH_ANON = 60; // tandas por hora por IP
+const LIMIT_BATCH_ANON = 1500; // tandas por hora por IP (compartida por muchos celulares)
 
 /**
  * Enlaces firmados para VARIAS palabras en un solo viaje al servidor (una tanda por pantalla).

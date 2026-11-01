@@ -1,5 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { translate } from "./i18n";
+import { ensureOverlay } from "./i18n-overlay";
+
+// Las traducciones de los idiomas extra se descargan bajo pedido (no viajan en el arranque).
+beforeAll(async () => {
+  await ensureOverlay("ja");
+});
 describe("idioma de la interfaz", () => {
   it("traduce el botón de ingreso a los tres idiomas", () => {
     expect(translate("es", "auth.login")).toBe("Iniciar sesión");

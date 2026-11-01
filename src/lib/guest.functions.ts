@@ -8,7 +8,8 @@ import type { JuegoId, JuegoTexto } from "@/lib/juego-textos";
  * Lo mínimo para jugar sin cuenta: SOLO contenido ya publicado (lo mismo que ve cualquiera que se registra).
  * Con tope por dirección de internet para que nadie descargue el corpus a lo bruto.
  */
-const LIMIT_GUEST_PER_HOUR = 120;
+// Alto a propósito: muchos celulares comparten la misma IP de la empresa de telefonía.
+const LIMIT_GUEST_PER_HOUR = 3000;
 
 async function guard(kind: string) {
   const { consumeRateLimit, clientIp } = await import("@/lib/server-guards.server");

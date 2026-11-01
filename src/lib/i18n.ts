@@ -1,6 +1,6 @@
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { EXTRA } from "./i18n-extra";
-import { ovText } from "./i18n-overlay";
+import { ensureOverlay, overlayVersion, ovText, subscribeOverlay } from "./i18n-overlay";
 
 /**
  * Idioma de la interfaz (ES/PT/EN). Solo traduce botones y textos de sistema;
@@ -63,7 +63,12 @@ function subscribe(cb: () => void) {
 }
 
 export function useUiLang(): UiLang {
-  return useSyncExternalStore(subscribe, read, () => "es");
+  const lang = useSyncExternalStore(subscribe, read, () => "es");
+  // Idiomas extra (japonés, ruso…): sus traducciones se descargan recién cuando alguien los elige,
+  // y al llegar la pantalla se vuelve a pintar.
+  useSyncExternalStore(subscribeOverlay, overlayVersion, () => 0);
+  useEffect(() => { void ensureOverlay(lang); }, [lang]);
+  return lang;
 }
 
 export function useAppLang(): AppLang {

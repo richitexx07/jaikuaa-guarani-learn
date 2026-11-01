@@ -63,6 +63,9 @@ function AuthPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Registro con correo que pide confirmar: se muestra «Revisá tu correo» en vez de rebotar al inicio de sesión.
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const [resent, setResent] = useState(false);
 
   useEffect(() => {
     const ref = cleanRefCode(new URLSearchParams(window.location.search).get("ref"));
@@ -132,7 +135,7 @@ function AuthPage() {
           setErrorMsg(parsed.error.issues[0].message);
           return;
         }
-        const { error } = await supabase.auth.signUp({
+        const { data: signed, error } = await supabase.auth.signUp({
           email: parsed.data.email,
           password: parsed.data.password,
           options: {
@@ -142,6 +145,10 @@ function AuthPage() {
         });
         if (error) {
           setErrorMsg(error.message.includes("registered") ? t("auth.errExists") : t("auth.errCreate"));
+          return;
+        }
+        if (!signed.session) {
+          setSentTo(parsed.data.email);
           return;
         }
         toast.success(t("auth.created"));
@@ -203,6 +210,20 @@ function AuthPage() {
             </div>
           )}
 
+          {sentTo ? (
+            <CheckEmail
+              email={sentTo}
+              lang={lang}
+              resent={resent}
+              onResend={async () => {
+                await supabase.auth.resend({ type: "signup", email: sentTo, options: { emailRedirectTo: `${window.location.origin}/dashboard` } }).catch(() => {});
+                setResent(true);
+              }}
+              onGoogle={handleGoogle}
+              onBack={() => { setSentTo(null); setResent(false); }}
+            />
+          ) : (
+          <>
           <Button type="button" variant="outline" size="lg" className="mt-8 h-14 w-full border-2 text-base font-semibold" onClick={handleGoogle}>
             <GoogleIcon /> {t("auth.google")}
           </Button>
@@ -285,6 +306,8 @@ function AuthPage() {
               {loading ? t("auth.loading") : isLogin ? t("auth.login") : t("auth.create")}
             </Button>
           </form>
+          </>
+          )}
 
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
@@ -299,6 +322,52 @@ function AuthPage() {
         </div>
       </main>
       <SiteFooter />
+    </div>
+  );
+}
+
+const CE = {
+  title: { es: "¡Listo! Revisá tu correo", pt: "Pronto! Confira seu e-mail", en: "Done! Check your email" },
+  body: {
+    es: "Te mandamos un enlace a {e}. Abrilo y tocá el enlace para entrar a Jaikuaa.",
+    pt: "Enviamos um link para {e}. Abra e toque no link para entrar no Jaikuaa.",
+    en: "We sent a link to {e}. Open it and tap the link to enter Jaikuaa.",
+  },
+  spam: { es: "¿No aparece? Mirá en «Spam» o «Promociones».", pt: "Não aparece? Veja em «Spam» ou «Promoções».", en: "Not there? Check «Spam» or «Promotions»." },
+  gmail: { es: "Abrir Gmail", pt: "Abrir o Gmail", en: "Open Gmail" },
+  resend: { es: "Mandármelo de nuevo", pt: "Enviar de novo", en: "Send it again" },
+  resent: { es: "Listo, te lo mandamos de nuevo.", pt: "Pronto, enviamos de novo.", en: "Done, we sent it again." },
+  google: { es: "Mejor entrar con Google (un toque, sin correo)", pt: "Melhor entrar com Google (um toque, sem e-mail)", en: "Use Google instead (one tap, no email)" },
+  back: { es: "Corregir el correo", pt: "Corrigir o e-mail", en: "Fix the email" },
+};
+
+function CheckEmail({ email, lang, resent, onResend, onGoogle, onBack }: {
+  email: string; lang: string; resent: boolean; onResend: () => void; onGoogle: () => void; onBack: () => void;
+}) {
+  const l = (lang === "pt" || lang === "en" ? lang : "es") as "es" | "pt" | "en";
+  const isGmail = /@(gmail|googlemail)\.com$/i.test(email);
+  return (
+    <div className="mt-8 space-y-4 rounded-3xl border-2 border-primary/30 bg-primary/5 p-6 text-center" role="status">
+      <p className="text-5xl" aria-hidden>📩</p>
+      <h2 className="font-display text-2xl font-bold">{CE.title[l]}</h2>
+      <p className="text-base">{CE.body[l].replace("{e}", email)}</p>
+      <p className="text-sm text-muted-foreground">{CE.spam[l]}</p>
+      {isGmail && (
+        <a href="https://mail.google.com/" target="_blank" rel="noopener noreferrer" className="flex h-12 items-center justify-center rounded-2xl bg-primary px-6 font-bold text-primary-foreground">
+          {CE.gmail[l]}
+        </a>
+      )}
+      <Button type="button" variant="outline" size="lg" className="h-12 w-full border-2 font-semibold" onClick={onGoogle}>
+        <GoogleIcon /> {CE.google[l]}
+      </Button>
+      <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
+        {resent ? (
+          <span className="font-medium text-primary">{CE.resent[l]}</span>
+        ) : (
+          <button type="button" className="font-semibold text-primary underline underline-offset-4" onClick={onResend}>{CE.resend[l]}</button>
+        )}
+        <button type="button" className="text-muted-foreground underline underline-offset-4" onClick={onBack}>{CE.back[l]}</button>
+      </div>
     </div>
   );
 }

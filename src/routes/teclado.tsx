@@ -8,7 +8,7 @@ import { getGameWords } from "@/lib/games.functions";
 import { buildIndex, clean, isNasal, lastWord, PARES, type Fix } from "@/lib/limpiador";
 import { PageHero } from "@/components/page-hero";
 import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
-import jaiImg from "@/assets/jai-tradicional.png";
+import jaiImg from "@/assets/jai-tradicional.webp";
 
 export const Route = createFileRoute("/teclado")({
   head: () => ({
