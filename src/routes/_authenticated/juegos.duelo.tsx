@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Loader2, RotateCcw, Volume2, X } from "lucide-react";
+import { Loader2, RotateCcw, Volume2 } from "lucide-react";
 import { LessonFilter, NotEnough, pickDistinct, shuffle, useGameWords } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
 import { ShareResult } from "@/components/games/share-result";
@@ -11,6 +11,7 @@ import type { GameWord } from "@/lib/games.functions";
 import { useSDT } from "@/lib/i18n-sopa-duelo";
 import { LiveDuel, LiveDuelStart, type LiveRound } from "@/components/games/live-duel";
 import { ponerSalaEnLaUrl, salaDeLaUrl } from "@/lib/use-sala";
+import { NEW_SERIES, PauseButton, RefereeMenu, SeriesLine, addResult, useEndTitle, type DuelEnd, type DuelSeries } from "@/components/games/duel-referee";
 
 export const Route = createFileRoute("/_authenticated/juegos/duelo")({
   head: () => ({
@@ -37,6 +38,7 @@ function Duel() {
   const [lesson, setLesson] = useState<number | null>(null);
   const q = useGameWords(lesson);
   const [match, setMatch] = useState(0);
+  const [series, setSeries] = useState<DuelSeries>(NEW_SERIES);
   const [remote, setRemote] = useState<{ code: string; host: boolean } | null>(() => {
     const c = salaDeLaUrl();
     return c ? { code: c, host: false } : null;
@@ -86,7 +88,7 @@ function Duel() {
         ) : pool.length < MIN_WORDS ? (
           <NotEnough min={MIN_WORDS} />
         ) : (
-          <Board key={`${lesson}-${match}`} pool={pool} onRematch={() => setMatch((m) => m + 1)} onRemote={(code, host) => { ponerSalaEnLaUrl(code); setRemote({ code, host }); }} />
+          <Board key={`${lesson}-${match}`} pool={pool} series={series} onResult={(r) => setSeries((s) => addResult(s, r))} onRematch={() => { setSeries((s) => ({ ...s, match: s.match + 1 })); setMatch((m) => m + 1); }} onRemote={(code, host) => { ponerSalaEnLaUrl(code); setRemote({ code, host }); }} />
         )}
       </div>
     </GameStage>
@@ -133,7 +135,7 @@ function liveRounds(pool: GameWord[]): LiveRound[] {
   });
 }
 
-function Board({ pool, onRematch, onRemote }: { pool: GameWord[]; onRematch: () => void; onRemote: (code: string, host: boolean) => void }) {
+function Board({ pool, series, onResult, onRematch, onRemote }: { pool: GameWord[]; series: DuelSeries; onResult: (r: 0 | 1 | "draw") => void; onRematch: () => void; onRemote: (code: string, host: boolean) => void }) {
   const feedback = useGameFeedback();
   const tt = useSDT();
   const used = useRef(new Set<string>());
@@ -144,23 +146,28 @@ function Board({ pool, onRematch, onRemote }: { pool: GameWord[]; onRematch: () 
   const [wrongPick, setWrongPick] = useState<[string | null, string | null]>([null, null]);
   const [started, setStarted] = useState(false);
   const recorded = useRef(false);
-  const finished = score[0] >= TARGET || score[1] >= TARGET;
-  // XP solo para el dueño de la sesión (Jugador 1): 3 por punto + 5 si gana, máx. 20.
-  const xp = Math.min(20, score[0] * 3 + (score[0] >= TARGET ? 5 : 0));
+  const [menu, setMenu] = useState(false);
+  const [end, setEnd] = useState<DuelEnd | null>(null);
+  const endTitle = useEndTitle();
+  const finished = end !== null || score[0] >= TARGET || score[1] >= TARGET;
+  // XP solo para el dueño de la sesión (Jugador 1): 3 por punto + 5 si gana jugando (no por rendición), máx. 20.
+  const xp = Math.min(20, score[0] * 3 + (end === null && score[0] >= TARGET ? 5 : 0));
+  const champ: 0 | 1 = end?.kind === "forfeit" ? (end.loser === 0 ? 1 : 0) : score[0] > score[1] ? 0 : 1;
 
   const say = useCallback((w: GameWord) => { if (w.hasAudio) void playGuarani(w.gn); }, []);
 
-  useEffect(() => { if (started) say(round.word); }, [round, started, say]);
+  useEffect(() => { if (started && !finished) say(round.word); }, [round, started, say]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!finished || recorded.current) return;
     recorded.current = true;
     feedback("victory");
+    onResult(end?.kind === "draw" ? "draw" : champ);
     if (xp > 0) recordCompletion({ source: "game", sourceRef: "duelo", xp });
-  }, [finished, xp, feedback]);
+  }, [finished, xp, feedback]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function pick(p: 0 | 1, option: string) {
-    if (!started || finished || winner !== null || locked[p]) return;
+    if (!started || finished || menu || winner !== null || locked[p]) return;
     if (option === round.word.es) {
       feedback("success");
       setWinner(p);
@@ -211,33 +218,41 @@ function Board({ pool, onRematch, onRemote }: { pool: GameWord[]; onRematch: () 
   }
 
   if (finished) {
-    const w = score[0] > score[1] ? 0 : 1;
-    const champ = tt("player", { n: w + 1 });
+    const w = champ;
+    const draw = end?.kind === "draw";
     return (
-      <div className="mx-auto max-w-md space-y-4 rounded-3xl p-6 text-center text-white shadow-2xl ring-4 ring-white" style={{ background: COLOR[w] }}>
+      <div className="mx-auto max-w-md space-y-4">
+      <div className="space-y-4 rounded-3xl p-6 text-center text-white shadow-2xl ring-4 ring-white" style={{ background: draw ? V.tinta : COLOR[w] }}>
         <svg viewBox="0 0 64 64" className="mx-auto h-20 w-20" aria-hidden>
           <path d="M18 8 H46 V22 Q46 38 32 40 Q18 38 18 22 Z" fill={V.oro} />
           <path d="M18 12 H8 Q8 26 20 28 M46 12 H56 Q56 26 44 28" fill="none" stroke={V.oro} strokeWidth="4" />
           <rect x="28" y="40" width="8" height="10" fill={V.oro} />
           <rect x="20" y="50" width="24" height="6" rx="2" fill={V.oro} />
         </svg>
-        <p className="font-display text-3xl font-bold">{tt("wonDuel", { n: champ })}</p>
+        <p className="font-display text-3xl font-bold">{endTitle(end, w, tt("wonDuel", { n: tt("player", { n: w + 1 }) }))}</p>
         <p className="font-display text-6xl font-bold tabular-nums">{score[0]} — {score[1]}</p>
         {xp > 0 && <p className="font-bold" style={{ color: V.oro }}>+{xp} XP</p>}
         <p className="text-xs opacity-80">{tt("xpNote")}</p>
+        <SeriesLine series={series} className="text-white/90" />
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl bg-white px-6 font-bold" style={{ color: COLOR[w] }}><RotateCcw className="h-5 w-5" /> {tt("rematch")}</button>
+          <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl bg-white px-6 font-bold" style={{ color: draw ? V.tinta : COLOR[w] }}><RotateCcw className="h-5 w-5" /> {tt("rematch")}</button>
           <ShareResult text={tt("share", { a: score[0], b: score[1] })} />
         </div>
+      </div>
+      <div className="rounded-3xl bg-white p-4" style={{ color: V.tinta }}>
+        <p className="text-center font-display font-bold">{tt("remoteRematch")}</p>
+        <LiveDuelStart theme={{ mine: V.azul, rival: V.rojo, ink: V.tinta, accent: V.oro }} onStart={onRemote} />
+      </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col overflow-hidden" style={{ background: V.tinta }}>
+    <div className="fixed inset-0 z-50 flex h-[100dvh] touch-manipulation select-none flex-col overflow-hidden overscroll-none" style={{ background: V.tinta }}>
+      <RefereeMenu open={menu} onClose={() => setMenu(false)} onEnd={setEnd} colors={COLOR} ink={V.tinta} />
       <PlayerHalf p={1} round={round} winner={winner} locked={locked[1]} wrong={wrongPick[1]} onPick={pick} rotated />
       <div className="relative flex shrink-0 items-center justify-between gap-2 bg-white px-2 py-2" style={{ color: V.tinta }}>
-        <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-black/5" onClick={onRematch} aria-label={tt("exit")}><X /></button>
+        <PauseButton onClick={() => setMenu(true)} className="hover:bg-black/5" />
         <span key={`a${score[0]}`} className="dv-punto font-display text-4xl font-bold tabular-nums" style={{ color: V.azul }}>{score[0]}</span>
         <Rayo className="h-10 w-7" />
         <span key={`b${score[1]}`} className="dv-punto rotate-180 font-display text-4xl font-bold tabular-nums" style={{ color: V.rojo }}>{score[1]}</span>

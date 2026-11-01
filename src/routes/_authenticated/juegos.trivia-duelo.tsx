@@ -2,7 +2,7 @@ import { useJU } from "@/lib/i18n-juegos-ui";
 import { useSDT } from "@/lib/i18n-sopa-duelo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { RotateCcw, X } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { shuffle } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
 import { ShareResult } from "@/components/games/share-result";
@@ -14,6 +14,7 @@ import { claveTrivia, getTexto } from "@/lib/juego-textos";
 import { useJuegoTextos } from "@/lib/use-juego-textos";
 import { LiveDuel, LiveDuelStart, type LiveRound } from "@/components/games/live-duel";
 import { ponerSalaEnLaUrl, salaDeLaUrl } from "@/lib/use-sala";
+import { NEW_SERIES, PauseButton, RefereeMenu, SeriesLine, addResult, useEndTitle, type DuelEnd, type DuelSeries } from "@/components/games/duel-referee";
 
 export const Route = createFileRoute("/_authenticated/juegos/trivia-duelo")({
   head: () => ({
@@ -39,6 +40,7 @@ function buildDeck(): Q[] {
 
 function TriviaDuel() {
   const [match, setMatch] = useState(0);
+  const [series, setSeries] = useState<DuelSeries>(NEW_SERIES);
   const { idx: textos } = useJuegoTextos();
   const tt = useJU();
   const [remote, setRemote] = useState<{ code: string; host: boolean } | null>(() => {
@@ -82,7 +84,7 @@ function TriviaDuel() {
             }}
           />
         ) : (
-          <Board key={match} onRematch={() => setMatch((m) => m + 1)} onRemote={(code, host) => { ponerSalaEnLaUrl(code); setRemote({ code, host }); }} theme={theme} />
+          <Board key={match} series={series} onResult={(r) => setSeries((s) => addResult(s, r))} onRematch={() => { setSeries((s) => ({ ...s, match: s.match + 1 })); setMatch((m) => m + 1); }} onRemote={(code, host) => { ponerSalaEnLaUrl(code); setRemote({ code, host }); }} theme={theme} />
         )}
       </GameStage>
     </>
@@ -131,7 +133,7 @@ function Focos() {
   );
 }
 
-function Board({ onRematch, onRemote, theme }: { onRematch: () => void; onRemote: (code: string, host: boolean) => void; theme: { mine: string; rival: string; ink: string; accent: string } }) {
+function Board({ series, onResult, onRematch, onRemote, theme }: { series: DuelSeries; onResult: (r: 0 | 1 | "draw") => void; onRematch: () => void; onRemote: (code: string, host: boolean) => void; theme: { mine: string; rival: string; ink: string; accent: string } }) {
   const feedback = useGameFeedback();
   const tt = useJU();
   const sd = useSDT();
@@ -144,16 +146,22 @@ function Board({ onRematch, onRemote, theme }: { onRematch: () => void; onRemote
   const [winner, setWinner] = useState<0 | 1 | "none" | null>(null);
   const [started, setStarted] = useState(false);
   const recorded = useRef(false);
+  const [menu, setMenu] = useState(false);
+  const [end, setEnd] = useState<DuelEnd | null>(null);
+  const endTitle = useEndTitle();
   const q = deck[idx % deck.length]!;
-  const finished = score[0] >= TARGET || score[1] >= TARGET;
-  const xp = Math.min(20, score[0] * 3 + (score[0] >= TARGET ? 5 : 0));
+  const finished = end !== null || score[0] >= TARGET || score[1] >= TARGET;
+  // XP solo para Jugador 1: 3 por punto; el bonus de victoria, solo si ganó jugando (no por rendición).
+  const xp = Math.min(20, score[0] * 3 + (end === null && score[0] >= TARGET ? 5 : 0));
+  const champ: 0 | 1 = end?.kind === "forfeit" ? (end.loser === 0 ? 1 : 0) : score[0] > score[1] ? 0 : 1;
 
   useEffect(() => {
     if (!finished || recorded.current) return;
     recorded.current = true;
     feedback("victory");
+    onResult(end?.kind === "draw" ? "draw" : champ);
     if (xp > 0) recordCompletion({ source: "game", sourceRef: "trivia-duelo", xp });
-  }, [finished, xp, feedback]);
+  }, [finished, xp, feedback]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function next(sc: [number, number]) {
     if (sc[0] >= TARGET || sc[1] >= TARGET) return;
@@ -161,7 +169,7 @@ function Board({ onRematch, onRemote, theme }: { onRematch: () => void; onRemote
   }
 
   function pick(p: 0 | 1, option: number) {
-    if (!started || finished || winner !== null || picks[p] !== null) return;
+    if (!started || finished || menu || winner !== null || picks[p] !== null) return;
     const np: [number | null, number | null] = p === 0 ? [option, picks[1]] : [picks[0], option];
     setPicks(np);
     if (option === q.answer) {
@@ -202,39 +210,45 @@ function Board({ onRematch, onRemote, theme }: { onRematch: () => void; onRemote
   }
 
   if (finished) {
-    const w = score[0] > score[1] ? 0 : 1;
-    const champ = sd("player", { n: w + 1 });
+    const w = champ;
+    const draw = end?.kind === "draw";
     return (
       <div className="mx-auto max-w-md space-y-4 text-center">
         <Focos />
-        <div className="space-y-3 rounded-3xl p-6 text-white shadow-2xl ring-4" style={{ background: JC[w], ["--tw-ring-color" as string]: TV.oro }}>
-          <p className="text-5xl" aria-hidden>🏆</p>
-          <p className="font-display text-3xl font-bold">{tt("trWon", { n: champ })}</p>
+        <div className="space-y-3 rounded-3xl p-6 text-white shadow-2xl ring-4" style={{ background: draw ? TV.estudio : JC[w], ["--tw-ring-color" as string]: TV.oro }}>
+          <p className="text-5xl" aria-hidden>{draw ? "🤝" : "🏆"}</p>
+          <p className="font-display text-3xl font-bold">{endTitle(end, w, tt("trWon", { n: sd("player", { n: w + 1 }) }))}</p>
           <p className="font-display text-6xl font-bold tabular-nums">{score[0]} — {score[1]}</p>
           {xp > 0 && <p className="font-bold" style={{ color: TV.oro }}>+{xp} XP</p>}
           <p className="text-xs opacity-80">{sd("xpNote")}</p>
+          <SeriesLine series={series} className="text-white/90" />
         </div>
         <div className="flex flex-wrap justify-center gap-2">
           <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl px-6 font-bold" style={{ background: TV.oro, color: TV.tinta }}><RotateCcw className="h-5 w-5" /> {sd("rematch")}</button>
           <ShareResult text={tt("trShare", { a: score[0], b: score[1] })} />
+        </div>
+        <div className="rounded-3xl bg-white p-4 text-left" style={{ color: TV.tinta }}>
+          <p className="text-center font-display font-bold">{sd("remoteRematch")}</p>
+          <LiveDuelStart theme={theme} onStart={onRemote} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col overflow-hidden" style={{ background: TV.estudio }}>
+    <div className="fixed inset-0 z-50 flex h-[100dvh] touch-manipulation select-none flex-col overflow-hidden overscroll-none" style={{ background: TV.estudio }}>
+      <RefereeMenu open={menu} onClose={() => setMenu(false)} onEnd={setEnd} colors={JC} ink={TV.tinta} />
       <Half p={1} q={q} gn={q ? getTexto(textos, "trivia", claveTrivia(q.catId, q.n), "pregunta") : undefined} pick={picks[1]} winner={winner} onPick={pick} rotated />
       <div className="relative shrink-0 px-2 py-2 text-white" style={{ background: TV.estudio }}>
         <div className="flex items-center justify-between gap-2">
-          <button type="button" className="grid h-10 w-10 place-items-center rounded-full hover:bg-white/10" onClick={onRematch} aria-label={sd("exit")}><X /></button>
+          <PauseButton onClick={() => setMenu(true)} className="text-white hover:bg-white/10" />
           <span key={`a${score[0]}`} className="tv-punto font-display text-4xl font-bold tabular-nums" style={{ color: "#5FE0E8" }}>{score[0]}</span>
           <div className="flex items-center gap-2">
             <Pulsador className="h-10 w-10" late={winner === null} />
             <span className="max-w-[9rem] truncate text-xs font-semibold" style={{ color: TV.oro }}>{q.emoji} {q.cat}</span>
           </div>
           <span key={`b${score[1]}`} className="tv-punto rotate-180 font-display text-4xl font-bold tabular-nums" style={{ color: "#D3A6FF" }}>{score[1]}</span>
-          <span className="h-10 w-10" aria-hidden />
+          <span className="h-11 w-11" aria-hidden />
           <span className="sr-only" aria-live="polite">{sd("scoreSr", { a: score[0], b: score[1] })}</span>
         </div>
         {winner !== null && <p className="px-2 pb-1 pt-1 text-center text-xs text-white/90">{q.explanation}</p>}

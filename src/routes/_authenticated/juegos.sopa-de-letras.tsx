@@ -145,20 +145,33 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
   const [start, setStart] = useState<number | null>(null);
   const [found, setFound] = useState<Set<number>>(new Set());
   const [miss, setMiss] = useState<number[]>([]);
-  const done = found.size === placed.length;
+  const [hintCell, setHintCell] = useState<number | null>(null);
+  const [revealed, setRevealed] = useState(false);
+  const [sure, setSure] = useState(false);
+  const solved = found.size === placed.length;
+  const done = solved || revealed;
   const recorded = useRef(false);
   const t0 = useRef(Date.now());
   const [segundos, setSegundos] = useState(0);
   useEffect(() => {
-    if (done) setSegundos(Math.max(1, Math.round((Date.now() - t0.current) / 1000)));
-  }, [done]);
+    if (solved) setSegundos(Math.max(1, Math.round((Date.now() - t0.current) / 1000)));
+  }, [solved]);
 
   useEffect(() => {
-    if (!done || recorded.current) return;
+    // Rendirse muestra las palabras pero no suma XP.
+    if (!solved || recorded.current) return;
     recorded.current = true;
     feedback("victory");
     recordCompletion({ source: "game", sourceRef: "sopa-de-letras", xp: XP });
-  }, [done]);
+  }, [solved]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /** Pista: marca la primera letra de una palabra que falta. */
+  function giveHint() {
+    const left = placed.map((p, i) => (found.has(i) ? -1 : i)).filter((i) => i >= 0);
+    if (!left.length) return;
+    const i = left[Math.floor(Math.random() * left.length)]!;
+    setHintCell(placed[i]!.cells[0]!);
+  }
 
   const foundCells = new Set(placed.flatMap((p, i) => (found.has(i) ? p.cells : [])));
 
@@ -181,6 +194,7 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
     if (idx >= 0) {
       feedback("success");
       setFound((f) => new Set(f).add(idx));
+      if (hintCell !== null && placed[idx]!.cells[0] === hintCell) setHintCell(null);
       if (placed[idx]!.word.hasAudio) void playGuarani(placed[idx]!.word.gn);
     } else {
       feedback("error");
@@ -228,14 +242,18 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
       <div className="flex items-center gap-3 rounded-2xl bg-white/80 p-2 pr-4 ring-1 ring-[#C9DCF0]">
         <img
           key={found.size}
-          src={done ? jaiFesteja : found.size > 0 ? jaiAplaude : jaiPiensa}
+          src={solved ? jaiFesteja : found.size > 0 && !revealed ? jaiAplaude : jaiPiensa}
           alt=""
           className="sp-jai h-16 w-16 shrink-0 object-contain"
         />
         <p className="min-w-0 flex-1 text-sm leading-snug">
-          {done
+          {solved
             ? tt("allFound")
-            : found.size > 0
+            : revealed
+              ? tt("restNote")
+              : hintCell !== null
+                ? tt("hintNote")
+                : found.size > 0
               ? tt("left", { n: placed.length - found.size })
               : tt("swipe")}
         </p>
@@ -247,7 +265,7 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
         <div className="relative">
           <div className="pointer-events-none absolute inset-0" aria-hidden>
             {placed.map((p, i) =>
-              found.has(i) ? <span key={i} className="sp-mark absolute rounded-full" style={{ ...marca(p.cells), background: MARCADORES[i % MARCADORES.length], transformOrigin: Math.floor(p.cells[0]! / size) === Math.floor(p.cells[p.cells.length - 1]! / size) ? "left center" : "center top" }} /> : null,
+              found.has(i) || revealed ? <span key={i} className="sp-mark absolute rounded-full" style={{ ...marca(p.cells), background: found.has(i) ? MARCADORES[i % MARCADORES.length] : "#D5DCE6", transformOrigin: Math.floor(p.cells[0]! / size) === Math.floor(p.cells[p.cells.length - 1]! / size) ? "left center" : "center top" }} /> : null,
             )}
             {drag && trail.size > 0 && <span className="absolute rounded-full" style={{ ...marca([...trail].sort((x, y) => x - y)), background: "rgba(255,224,102,.75)" }} />}
           </div>
@@ -270,7 +288,7 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
                 style={{
                   color: foundCells.has(i) ? S.tinta : miss.includes(i) ? S.margen : "#2A3E62",
                   background: start === i ? "#FFE066" : "transparent",
-                  boxShadow: start === i ? `0 0 0 2px ${S.tinta}` : "none",
+                  boxShadow: start === i ? `0 0 0 2px ${S.tinta}` : hintCell === i && !done ? `0 0 0 3px ${S.margen}` : "none",
                 }}
               >
                 {displayLetter(t)}
@@ -282,14 +300,14 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
 
       <ul className="grid grid-cols-2 gap-2">
         {placed.map((p, i) => {
-          const ok = found.has(i);
+          const ok = found.has(i) || revealed;
           return (
             <li
               key={i}
               className={`flex min-h-12 min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 rounded-xl px-3 py-2 text-sm transition sm:text-base ${ok ? "" : "ring-1 ring-[#C9DCF0]"}`}
-              style={{ background: ok ? MARCADORES[i % MARCADORES.length] : "#FFFFFF" }}
+              style={{ background: found.has(i) ? MARCADORES[i % MARCADORES.length] : ok ? "#E6EBF2" : "#FFFFFF" }}
             >
-              {ok && <Check className="h-4 w-4 shrink-0" strokeWidth={3} aria-hidden />}
+              {found.has(i) && <Check className="h-4 w-4 shrink-0" strokeWidth={3} aria-hidden />}
               <span className={ok ? "text-xs font-medium opacity-70" : "font-semibold"}>{p.word.es}</span>
               {ok && (
                 <span className="flex items-center gap-1">
@@ -302,7 +320,35 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
         })}
       </ul>
 
-      {done && (
+      {!done && (
+        <div className="flex flex-wrap justify-center gap-2">
+          <button type="button" onClick={giveHint} className="min-h-11 touch-manipulation rounded-2xl bg-white px-5 text-sm font-bold ring-1 ring-[#C9DCF0]" style={{ color: S.tinta }}>
+            {tt("hint")}
+          </button>
+          <button
+            type="button"
+            onClick={() => (sure ? setRevealed(true) : setSure(true))}
+            onBlur={() => setSure(false)}
+            className="min-h-11 touch-manipulation rounded-2xl px-5 text-sm font-semibold ring-1 ring-[#C9DCF0]"
+            style={{ color: sure ? "#fff" : S.tinta, background: sure ? S.margen : "transparent" }}
+          >
+            {sure ? tt("confirmShowRest") : tt("showRest")}
+          </button>
+        </div>
+      )}
+
+      {revealed && !solved && (
+        <div className="space-y-3 rounded-3xl bg-white p-6 text-center shadow-lg ring-1 ring-[#C9DCF0]">
+          <img src={jaiPiensa} alt="" className="mx-auto h-24 w-auto object-contain" />
+          <p className="font-display text-2xl font-bold">{tt("restTitle")}</p>
+          <p className="text-sm leading-snug opacity-80">{tt("restNote")}</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: S.tinta }}>{tt("anotherSoup")}</button>
+          </div>
+        </div>
+      )}
+
+      {solved && (
         <div className="space-y-3 rounded-3xl bg-white p-6 text-center shadow-lg ring-1 ring-[#C9DCF0]">
           <img src={jaiFesteja} alt={tt("jaiCheers")} className="mx-auto h-32 w-auto object-contain" />
           <p className="font-display text-3xl font-bold">{tt("foundTitle")}</p>

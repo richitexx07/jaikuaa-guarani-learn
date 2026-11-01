@@ -30,6 +30,31 @@ const T = {
   rivalPoint: { es: "Punto rival", pt: "Ponto do rival", en: "Rival's point", de: "Punkt für Gegner", fr: "Point adverse", zh: "對手得分" },
   locked: { es: "Bloqueado…", pt: "Bloqueado…", en: "Locked…", de: "Gesperrt…", fr: "Bloqué…", zh: "鎖定中…" },
   meaning: { es: "¿Qué significa?", pt: "O que significa?", en: "What does it mean?", de: "Was bedeutet das?", fr: "Que veut dire ce mot ?", zh: "這是什麼意思？" },
+  // Árbitro de mesa (duelos en un mismo celular)
+  pause: { es: "Pausa: tablas, rendirse o salir", pt: "Pausa: empate, desistir ou sair", en: "Pause: draw, resign or leave", de: "Pause: Remis, aufgeben oder verlassen", fr: "Pause : nul, abandon ou quitter", zh: "暫停：和局、認輸或離開" },
+  refereeTitle: { es: "Partida en pausa", pt: "Partida em pausa", en: "Game paused", de: "Spiel pausiert", fr: "Partie en pause", zh: "對局暫停" },
+  refereeHint: { es: "¿Qué hacemos con esta partida?", pt: "O que fazemos com esta partida?", en: "What should we do with this game?", de: "Was machen wir mit diesem Spiel?", fr: "Que fait-on de cette partie ?", zh: "這局要怎麼處理？" },
+  keepPlaying: { es: "Seguir jugando", pt: "Continuar jogando", en: "Keep playing", de: "Weiterspielen", fr: "Continuer à jouer", zh: "繼續比賽" },
+  draw: { es: "Tablas: empate de común acuerdo", pt: "Empate de comum acordo", en: "Draw by agreement", de: "Remis im Einvernehmen", fr: "Match nul d'un commun accord", zh: "雙方同意和局" },
+  forfeit: { es: "Se rinde el Jugador {n}", pt: "O Jogador {n} desiste", en: "Player {n} resigns", de: "Spieler {n} gibt auf", fr: "Le joueur {n} abandonne", zh: "玩家 {n} 認輸" },
+  exitToGames: { es: "Salir a los juegos", pt: "Sair para os jogos", en: "Back to games", de: "Zurück zu den Spielen", fr: "Retour aux jeux", zh: "回到遊戲列表" },
+  confirmDraw: { es: "¿Los dos aceptan las tablas?", pt: "Os dois aceitam o empate?", en: "Do both players agree to a draw?", de: "Sind beide mit Remis einverstanden?", fr: "Les deux acceptent le match nul ?", zh: "雙方都同意和局嗎？" },
+  confirmForfeit: { es: "¿El Jugador {n} se rinde?", pt: "O Jogador {n} desiste?", en: "Does Player {n} resign?", de: "Gibt Spieler {n} auf?", fr: "Le joueur {n} abandonne ?", zh: "玩家 {n} 確定認輸嗎？" },
+  confirmExit: { es: "¿Salir? Esta partida no se guarda.", pt: "Sair? Esta partida não será salva.", en: "Leave? This game won't be saved.", de: "Verlassen? Dieses Spiel wird nicht gespeichert.", fr: "Quitter ? Cette partie ne sera pas enregistrée.", zh: "要離開嗎？這局不會儲存。" },
+  yes: { es: "Sí", pt: "Sim", en: "Yes", de: "Ja", fr: "Oui", zh: "是" },
+  no: { es: "No, volver", pt: "Não, voltar", en: "No, go back", de: "Nein, zurück", fr: "Non, revenir", zh: "不，返回" },
+  drawTitle: { es: "¡Tablas! Empate de común acuerdo", pt: "Empate de comum acordo!", en: "Draw by agreement!", de: "Remis im Einvernehmen!", fr: "Match nul d'un commun accord !", zh: "雙方同意和局！" },
+  forfeitTitle: { es: "Gana el Jugador {w}: el Jugador {l} se rindió", pt: "Vence o Jogador {w}: o Jogador {l} desistiu", en: "Player {w} wins: Player {l} resigned", de: "Spieler {w} gewinnt: Spieler {l} hat aufgegeben", fr: "Le joueur {w} gagne : le joueur {l} a abandonné", zh: "玩家 {w} 獲勝：玩家 {l} 認輸" },
+  series: { es: "Partida {m} · Serie: Jugador 1 {a} — Jugador 2 {b}", pt: "Partida {m} · Série: Jogador 1 {a} — Jogador 2 {b}", en: "Game {m} · Series: Player 1 {a} — Player 2 {b}", de: "Spiel {m} · Serie: Spieler 1 {a} — Spieler 2 {b}", fr: "Partie {m} · Série : joueur 1 {a} — joueur 2 {b}", zh: "第 {m} 局 · 系列賽：玩家 1 {a} — 玩家 2 {b}" },
+  seriesDraws: { es: "{d} tablas", pt: "{d} empates", en: "{d} draws", de: "{d} Remis", fr: "{d} nuls", zh: "{d} 次和局" },
+  remoteRematch: { es: "¿Revancha cada uno en su celular?", pt: "Revanche cada um no seu celular?", en: "Rematch, each on your own phone?", de: "Revanche, jeder am eigenen Handy?", fr: "Revanche, chacun sur son téléphone ?", zh: "要各用自己的手機再戰嗎？" },
+  // Sopa de letras: pista y rendirse
+  hint: { es: "Pista", pt: "Dica", en: "Hint", de: "Tipp", fr: "Indice", zh: "提示" },
+  hintNote: { es: "Te marqué dónde empieza una palabra.", pt: "Marquei onde começa uma palavra.", en: "I marked where a word starts.", de: "Ich habe markiert, wo ein Wort beginnt.", fr: "J'ai marqué où commence un mot.", zh: "我標出了一個詞的開頭。" },
+  showRest: { es: "Rendirme y ver las que faltan", pt: "Desistir e ver as que faltam", en: "Give up and show the rest", de: "Aufgeben und den Rest zeigen", fr: "Abandonner et voir les mots restants", zh: "放棄並顯示剩下的詞" },
+  confirmShowRest: { es: "¿Seguro? Sí, mostrarlas", pt: "Tem certeza? Sim, mostrar", en: "Sure? Yes, show them", de: "Sicher? Ja, zeigen", fr: "Sûr ? Oui, les montrer", zh: "確定嗎？是，顯示" },
+  restTitle: { es: "Estas eran las que faltaban", pt: "Estas eram as que faltavam", en: "These were the missing ones", de: "Das waren die fehlenden", fr: "Voici les mots qui manquaient", zh: "這些就是剩下的詞" },
+  restNote: { es: "Tranquilo: equivocarse también es aprender. Escuchalas, repasalas y probá con otra sopa.", pt: "Calma: errar também é aprender. Ouça, revise e tente outro caça-palavras.", en: "Relax: mistakes are part of learning. Listen, review and try another puzzle.", de: "Keine Sorge: Fehler gehören zum Lernen. Hör sie dir an, wiederhole sie und versuch ein neues Rätsel.", fr: "Pas de souci : se tromper fait partie de l'apprentissage. Écoutez, révisez et essayez une autre grille.", zh: "別擔心：犯錯也是學習。聽一聽、複習一下，再試一局。" },
 } satisfies Record<string, L>;
 
 export type SDKey = keyof typeof T;

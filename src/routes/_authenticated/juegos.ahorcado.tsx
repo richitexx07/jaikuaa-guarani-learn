@@ -126,15 +126,19 @@ function Board({ word, partida, lesson, onNext }: { word: GameWord; partida: Par
   const [guessed, setGuessed] = useState<Set<string>>(new Set());
   const wrong = [...guessed].filter((g) => !tokens.includes(g)).length;
   const won = tokens.every((t) => guessed.has(t));
-  const lost = wrong >= LIVES;
+  const [gaveUp, setGaveUp] = useState(false);
+  const [sure, setSure] = useState(false);
+  const lost = wrong >= LIVES || gaveUp;
   const done = won || lost;
+  // Rendirse no suma XP (así nadie junta puntos rindiéndose); perder jugando sí suma un poco.
+  const xpGained = won ? XP_WIN : gaveUp ? 0 : XP_LOSS;
   const recorded = useRef(false);
 
   useEffect(() => {
     if (!done || recorded.current) return;
     recorded.current = true;
     feedback(won ? "victory" : "error");
-    recordCompletion({ source: "game", sourceRef: "ahorcado", xp: won ? XP_WIN : XP_LOSS });
+    if (xpGained > 0) recordCompletion({ source: "game", sourceRef: "ahorcado", xp: xpGained });
     if (word.hasAudio) void playGuarani(word.gn);
   }, [done, won, word]);
 
@@ -170,20 +174,22 @@ function Board({ word, partida, lesson, onNext }: { word: GameWord; partida: Par
 
       {done ? (
         <div className="space-y-3 rounded-3xl p-5 text-center shadow-xl" style={{ background: A.papel }}>
-          <p className="font-display text-3xl font-bold">{won ? tr("wellDone") : tr("outOfChipas")}</p>
+          <p className="font-display text-3xl font-bold">{won ? tr("wellDone") : gaveUp ? tr("gaveUpTitle") : tr("outOfChipas")}</p>
           <div className="flex flex-wrap items-center justify-center gap-2 text-lg">
             <span className="font-display text-2xl font-bold" style={{ color: A.verde }}>{word.gn}</span>
             {word.hasAudio && <SpeakerButton gn={word.gn} size="md" />}
             <span className="opacity-70">— {word.es}</span>
           </div>
-          <p className="font-bold" style={{ color: A.verde }}>+{won ? XP_WIN : XP_LOSS} XP</p>
+          {gaveUp && <p className="text-sm leading-snug opacity-80">{tr("gaveUpNote")}</p>}
+          {xpGained > 0 && <p className="font-bold" style={{ color: A.verde }}>+{xpGained} XP</p>}
           <div className="flex flex-wrap justify-center gap-2">
             <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: A.rojo }}>{tr("anotherWord")}</button>
           </div>
           <RetoFinal partida={partida} puntaje={won ? LIVES - wrong : 0} extra={lesson === null ? undefined : String(lesson)} />
         </div>
       ) : (
-        <div className="grid grid-cols-6 gap-1.5 rounded-3xl p-2 sm:grid-cols-9" style={{ background: "rgba(0,0,0,.18)" }}>
+        <>
+        <div className="grid touch-manipulation grid-cols-6 gap-1.5 rounded-3xl p-2 select-none sm:grid-cols-9" style={{ background: "rgba(0,0,0,.18)" }}>
           {ACHEGETY.map((k) => {
             const used = guessed.has(k);
             const hit = used && tokens.includes(k);
@@ -206,6 +212,18 @@ function Board({ word, partida, lesson, onNext }: { word: GameWord; partida: Par
             );
           })}
         </div>
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => (sure ? setGaveUp(true) : setSure(true))}
+            onBlur={() => setSure(false)}
+            className="min-h-11 touch-manipulation rounded-2xl px-4 text-sm font-semibold underline-offset-4 hover:underline"
+            style={{ color: sure ? A.rojo : A.papel, background: sure ? A.papel : "rgba(0,0,0,.2)" }}
+          >
+            {sure ? tr("confirmGiveUp") : tr("giveUp")}
+          </button>
+        </div>
+        </>
       )}
     </div>
   );

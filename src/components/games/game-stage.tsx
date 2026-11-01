@@ -94,5 +94,7 @@ const STAGE_CSS = `
 .game-stage-tools button { background: transparent; color: var(--stage-ink); border-color: color-mix(in srgb, var(--stage-ink) 30%, transparent); }
 .game-stage-tools button:hover { background: color-mix(in srgb, var(--stage-ink) 10%, transparent); color: var(--stage-ink); }
 .game-stage-sponsor p, .game-stage-sponsor p span { color: color-mix(in srgb, var(--stage-ink) 75%, transparent) !important; }
+.game-stage { overscroll-behavior-y: contain; }
+.game-stage button, .game-stage [role="button"] { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .game-stage :focus-visible { outline: 3px solid color-mix(in srgb, var(--stage-ink) 85%, transparent); outline-offset: 2px; }
 `;

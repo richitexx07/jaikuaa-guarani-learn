@@ -6,6 +6,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { AppLanguageToggle } from "@/components/app-language-toggle";
 import { useT } from "@/lib/i18n";
 import {
+  BarChart3,
   BookOpen,
   CheckCircle2,
   ChevronRight,
@@ -118,6 +119,7 @@ function StaffShortcuts() {
         <StaffLink to="/admin/corpus" icon={CheckCircle2} label="Bandeja de validación" />
         <StaffLink to="/validacion" icon={RefreshCw} label="Circuito de validación" />
         {/* Studio (motor de Alan): solo administradores lo ven. */}
+        {data.isAdmin && <StaffLink href="/admin/corpus?tab=tablero" icon={BarChart3} label="Analíticas en vivo" />}
         {data.isAdmin && <StaffLink href="/studio" icon={FlaskConical} label="Jaikuaa Studio · motor en desarrollo" />}
         {data.isAdmin && <StaffLink to="/admin/noticias" icon={Newspaper} label="Noticias para aprobar" />}
         {data.isAdmin && <StaffLink to="/admin/jai" icon={MessageCircleQuestion} label="Qué le preguntan a Jai" />}
