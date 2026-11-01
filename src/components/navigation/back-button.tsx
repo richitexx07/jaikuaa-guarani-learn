@@ -18,6 +18,9 @@ export function BackButton() {
   };
 
   return (
+    <>
+    {/* Espacio al final de la página para que el botón flotante no tape el último botón (p. ej. «Empezar gratis»). */}
+    <div aria-hidden className="h-20 print:hidden" />
     <button
       type="button"
       onClick={goBack}
@@ -28,5 +31,6 @@ export function BackButton() {
     >
       <ArrowLeft className="h-5 w-5 sm:h-4 sm:w-4" /> <span>{t("bbBack")}</span>
     </button>
+    </>
   );
 }

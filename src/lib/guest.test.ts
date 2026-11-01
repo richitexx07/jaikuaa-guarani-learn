@@ -18,6 +18,13 @@ describe("jugar sin cuenta", () => {
 });
 
 describe("seguí donde quedaste", () => {
+  const store = new Map<string, string>();
+  vi.stubGlobal("localStorage", {
+    getItem: (k: string) => store.get(k) ?? null,
+    setItem: (k: string, v: string) => void store.set(k, String(v)),
+    removeItem: (k: string) => void store.delete(k),
+  });
+
   it("recuerda el último lugar y no acepta direcciones de afuera", () => {
     rememberPlace({ href: "/juegos/ahorcado", title: "Ahorcado con chipas", kind: "game" });
     expect(readPlace()?.title).toBe("Ahorcado con chipas");

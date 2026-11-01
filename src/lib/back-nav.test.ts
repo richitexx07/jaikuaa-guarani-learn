@@ -7,9 +7,13 @@ describe("botón Volver", () => {
     expect(showsBackButton("/dashboard")).toBe(false);
     expect(showsBackButton("/auth")).toBe(false);
   });
-  it("aparece en el laboratorio y en los juegos", () => {
+  it("aparece en el laboratorio", () => {
     expect(showsBackButton("/laboratorio")).toBe(true);
-    expect(showsBackButton("/juegos/ahorcado")).toBe(true);
+  });
+  it("no aparece en los juegos: ya tienen «← Juegos» arriba y tapaba botones", () => {
+    expect(showsBackButton("/juegos")).toBe(false);
+    expect(showsBackButton("/juegos/ahorcado")).toBe(false);
+    expect(showsBackButton("/juegos/penales")).toBe(false);
   });
   it("sin historial lleva a la sección superior", () => {
     expect(fallbackBackPath("/juegos/ahorcado")).toBe("/juegos");

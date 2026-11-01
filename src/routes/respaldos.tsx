@@ -50,7 +50,8 @@ const RESPALDOS: Respaldo[] = [
     who: "Secretaría de Políticas Lingüísticas",
     doc: "Resolución N.° 116/2026",
     what: "De interés lingüístico",
-    detail: "Otorgada por el órgano rector de la política lingüística del Paraguay.",
+    detail: "Otorgada el 29 de julio de 2026 por el órgano rector de la política lingüística del Paraguay.",
+    pdf: "/respaldos/spl-resolucion-116-2026.pdf",
   },
 ];
 

@@ -24,10 +24,14 @@ export function PreLaunchBanner() {
     <>
       <div
         role="note"
-        className="flex items-center justify-center gap-2 border-b border-primary/20 bg-primary/5 px-4 py-2 text-center text-xs font-medium text-primary sm:text-sm"
+        className="flex items-center justify-center gap-2 border-b border-primary/20 bg-primary/5 px-4 py-1.5 text-center text-xs font-medium text-primary sm:py-2 sm:text-sm"
       >
         <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden />
-        <span>
+        {/* En el celular, una sola línea corta: el aviso largo comía media pantalla. */}
+        <span className="sm:hidden">
+          <strong>{t("pl.strong")}</strong> {t("pl.short")}
+        </span>
+        <span className="hidden sm:inline">
           <strong>{t("pl.strong")}</strong> {t("pl.rest")}
         </span>
       </div>

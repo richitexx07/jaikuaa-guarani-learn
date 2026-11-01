@@ -167,6 +167,7 @@ const DICT = {
   "ea.strong": { es: "Todavía no lanzamos oficialmente.", pt: "Ainda não lançamos oficialmente.", en: "We haven't officially launched yet." },
   "ea.rest": { es: "Igual ya podés usarlo gratis, y lo que aprendas desde hoy queda guardado.", pt: "Mesmo assim você já pode usar grátis, e o que aprender a partir de hoje fica salvo.", en: "You can already use it for free, and everything you learn from today is saved." },
   "pl.strong": { es: "Acceso anticipado:", pt: "Acesso antecipado:", en: "Early access:" },
+  "pl.short": { es: "Palabras en revisión por docentes especialistas.", pt: "Palavras em revisão por professores especialistas.", en: "Words under review by specialist teachers." },
   "pl.rest": { es: "Jaikuaa todavía no se lanzó oficialmente. Las palabras están en revisión por docentes especialistas; si ves un error, avisanos.", pt: "O Jaikuaa ainda não foi lançado oficialmente. As palavras estão em revisão por professores especialistas; se vir um erro, avise-nos.", en: "Jaikuaa has not officially launched yet. Words are being reviewed by specialist teachers; if you spot a mistake, let us know." },
   "val.badge": { es: "En revisión", pt: "Em revisão", en: "Under review" },
   "lang.preliminary": { es: "Traducción preliminar, en revisión", pt: "Tradução preliminar, em revisão", en: "Preliminary translation, under review" },

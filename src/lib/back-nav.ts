@@ -8,6 +8,8 @@ export function showsBackButton(pathname: string): boolean {
   if (p.startsWith("/studio")) return false;
   // Pantallas de trabajo del piloto: ya tienen su enlace arriba y los botones de acción abajo.
   if (["/validar", "/docente", "/practica"].some((x) => p === x || p.startsWith(x + "/"))) return false;
+  // Juegos: ya tienen «← Juegos» arriba; el flotante tapaba botones del juego en el celular.
+  if (p === "/juegos" || p.startsWith("/juegos/")) return false;
   return !HIDDEN.has(p);
 }
 
