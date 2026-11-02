@@ -444,10 +444,9 @@ function ChoiceStep({
   }
 
   const q = questions[i];
-  const isCorrect = picked !== null && picked === q.item.es;
-
   const rev = i % 2 === 1;
   const answer = rev ? q.item.gn : q.item.es;
+  const isCorrect = picked !== null && picked === answer;
   return (
     <div>
       <div className="mb-3 flex items-center justify-between text-xs font-semibold text-muted-foreground">
