@@ -58,6 +58,7 @@ import jaiImg from "@/assets/jai/jai-saluda.webp";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import bannerAprender from "@/assets/banners/banner-aprender.webp";
 import bannerCurso from "@/assets/banners/banner-curso.webp";
+import bannerCastellano from "@/assets/banners/banner-castellano-tecnico.jpg";
 import bannerEscolar from "@/assets/banners/banner-escolar.webp";
 import coverKaraoke from "@/assets/covers/cover-karaoke.webp";
 import miniKaraoke from "@/assets/covers/mini/mini-karaoke.webp";
@@ -487,6 +488,32 @@ function Dashboard() {
             <BigAction to="/juegos" img={coverKaraoke} rotate={JUEGOS_ROTAN} title={t("dash.play")} desc={t("dash.playDesc")} tone="accent" />
             <BigAction to="/juegos/palabra-del-dia" img={coverPalabra} title={t("dash.word")} desc={t("dash.wordDesc")} tone="card" />
           </nav>
+
+          {/* PRÓXIMA NOVEDAD — Castellano técnico para guaranihablantes */}
+          <section aria-labelledby="novedad-castellano" className="relative mt-5 overflow-hidden rounded-3xl border border-primary/20 shadow-xl">
+            <img src={bannerCastellano} alt="Joven estudiante del interior con cuaderno y celular, camino a la ciudad" width={1536} height={768} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-[30%_center]" />
+            <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-primary/10 sm:bg-gradient-to-l sm:from-primary sm:via-primary/85 sm:to-transparent" />
+            <span aria-hidden className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-12 bg-gradient-to-r from-transparent via-primary-foreground/15 to-transparent motion-safe:animate-[shine_5s_ease-in-out_infinite]" />
+            <div className="relative flex min-h-[320px] flex-col justify-end p-5 sm:ml-auto sm:min-h-[280px] sm:w-3/5 sm:justify-center sm:p-8">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-accent-foreground shadow">
+                  <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full rounded-full bg-accent-foreground/70 motion-safe:animate-ping" /><span className="relative h-2 w-2 rounded-full bg-accent-foreground" /></span>
+                  Próxima novedad
+                </span>
+                <span className="rounded-full border border-primary-foreground/40 bg-primary-foreground/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-primary-foreground backdrop-blur-sm">
+                  En desarrollo
+                </span>
+              </div>
+              <h2 id="novedad-castellano" className="mt-3 font-display text-2xl font-bold leading-tight text-primary-foreground sm:text-3xl">
+                Castellano técnico y formal
+                <span className="block text-base font-semibold text-primary-foreground/85 sm:text-lg">para quienes ya hablan guaraní</span>
+              </h2>
+              <p className="mt-2 text-sm text-primary-foreground/90">
+                Redacción, trámites y vocabulario académico para jóvenes del interior. Se prepara y revisa con docentes especialistas.
+              </p>
+              <p className="mt-3 text-xs font-medium text-primary-foreground/75">Hoy ya practicás en las dos direcciones: castellano ⇄ guaraní.</p>
+            </div>
+          </section>
 
           {/* INVITAR — franja compacta con vida */}
           <Link
