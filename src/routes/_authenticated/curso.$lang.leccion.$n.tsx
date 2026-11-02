@@ -400,11 +400,14 @@ function ChoiceStep({
     }
     const pool = lesson.vocab;
     const items = shuffle(pool).slice(0, Math.min(5, pool.length));
-    return items.map((item) => {
-      const distractors = shuffle(pool.filter((p) => p.es !== item.es))
+    // Bilingüismo de doble vía: las preguntas pares van guaraní → castellano y las impares castellano → guaraní.
+    return items.map((item, idx) => {
+      const rev = idx % 2 === 1;
+      const key = rev ? "gn" : "es";
+      const distractors = shuffle(pool.filter((p) => p[key] !== item[key]))
         .slice(0, 3)
-        .map((d) => d.es);
-      return { item, options: shuffle([item.es, ...distractors]) };
+        .map((d) => d[key]);
+      return { item, options: shuffle([item[key], ...distractors]) };
     });
   }, [lesson]);
 
@@ -441,26 +444,27 @@ function ChoiceStep({
   }
 
   const q = questions[i];
-  const isCorrect = picked !== null && picked === q.item.es;
-
+  const rev = i % 2 === 1;
+  const answer = rev ? q.item.gn : q.item.es;
+  const isCorrect = picked !== null && picked === answer;
   return (
     <div>
       <div className="mb-3 flex items-center justify-between text-xs font-semibold text-muted-foreground">
-        <span>{tx("lsMeaning")}</span>
+        <span>{rev ? "¿Cómo se dice en guaraní?" : tx("lsMeaning")}</span>
         <span className="rounded-full bg-muted px-2.5 py-0.5">
           {tx("csOf", { a: i + 1, b: questions.length })}
         </span>
       </div>
       <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-elegant sm:p-6">
         <div className="flex flex-col items-center gap-3 py-2 text-center">
-          <SpeakerButton gn={q.item.gn} size="md" />
-          <div className="font-display text-4xl font-bold leading-tight text-primary">{q.item.gn}</div>
+          {!rev && <SpeakerButton gn={q.item.gn} size="md" />}
+          <div className="font-display text-4xl font-bold leading-tight text-primary">{rev ? q.item.es : q.item.gn}</div>
         </div>
 
         <div className="mt-5 grid gap-2.5">
           {q.options.map((opt) => {
             const isPicked = picked === opt;
-            const isAnswer = opt === q.item.es;
+            const isAnswer = opt === answer;
             let cls =
               "flex min-h-14 items-center justify-between gap-2 rounded-2xl border-2 border-border/70 bg-background px-4 py-3 text-left text-base font-semibold transition active:scale-[0.98] hover:border-primary/50";
             if (picked) {
@@ -475,8 +479,8 @@ function ChoiceStep({
                 disabled={picked !== null}
                 onClick={() => {
                   setPicked(opt);
-                  if (opt === q.item.es) setCorrect((c) => c + 1);
-                  logAnswer(q.item.gn, opt === q.item.es, "lesson", lessonRef);
+                  if (opt === answer) setCorrect((c) => c + 1);
+                  logAnswer(q.item.gn, opt === answer, "lesson", lessonRef);
                 }}
                 className={cls}
               >
