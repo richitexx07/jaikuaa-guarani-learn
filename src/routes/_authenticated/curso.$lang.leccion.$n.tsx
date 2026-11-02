@@ -400,11 +400,14 @@ function ChoiceStep({
     }
     const pool = lesson.vocab;
     const items = shuffle(pool).slice(0, Math.min(5, pool.length));
-    return items.map((item) => {
-      const distractors = shuffle(pool.filter((p) => p.es !== item.es))
+    // Bilingüismo de doble vía: las preguntas pares van guaraní → castellano y las impares castellano → guaraní.
+    return items.map((item, idx) => {
+      const rev = idx % 2 === 1;
+      const key = rev ? "gn" : "es";
+      const distractors = shuffle(pool.filter((p) => p[key] !== item[key]))
         .slice(0, 3)
-        .map((d) => d.es);
-      return { item, options: shuffle([item.es, ...distractors]) };
+        .map((d) => d[key]);
+      return { item, options: shuffle([item[key], ...distractors]) };
     });
   }, [lesson]);
 
