@@ -157,5 +157,20 @@ export function NotEnough({ min }: { min: number }) {
 }
 
 export function XpNote({ xp }: { xp: number }) {
-  return <p className="text-center text-sm font-semibold text-accent">+{xp} XP</p>;
+  return <ExitAfterGame xp={xp} />;
+}
+
+function ExitAfterGame({ xp }: { xp: number }) {
+  const guest = useIsGuest();
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <p className="text-center text-sm font-semibold text-accent">+{xp} XP</p>
+      <Link
+        to={guest ? "/juegos" : "/dashboard"}
+        className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-background px-5 text-sm font-semibold text-foreground hover:bg-muted"
+      >
+        {guest ? "Listo · Volver a los juegos" : "Listo · Volver al panel"}
+      </Link>
+    </div>
+  );
 }
