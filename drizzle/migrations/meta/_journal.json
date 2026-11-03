@@ -120,6 +120,13 @@
       "when": 1793249916528,
       "tag": "0016_referral_only_verified_activity",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793664638542,
+      "tag": "0017_has_role_solo_propio",
+      "breakpoints": true
     }
   ]
 }

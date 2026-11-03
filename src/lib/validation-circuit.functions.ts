@@ -462,8 +462,20 @@ export const addReviewer = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const db = await admin();
-    const { data: prof } = await db.from("profiles").select("id").ilike("email", data.email).maybeSingle();
-    if (!prof) return { ok: false as const, error: "Primero tiene que crear su cuenta en Jaikuaa" };
+    const email = data.email.toLowerCase();
+    const { data: profs } = await db.from("profiles").select("id, email").eq("email", email).limit(2);
+    if (!profs || profs.length !== 1) return { ok: false as const, error: "Primero tiene que crear su cuenta en Jaikuaa" };
+    const prof = profs[0];
+    // Los registros entran sin confirmar el correo: exigimos que la cuenta haya ingresado
+    // con Google (correo verificado por Google) para no dar permisos a un impostor.
+    const { data: au } = await db.auth.admin.getUserById(prof.id);
+    const providers = (au?.user?.app_metadata?.providers as string[] | undefined) ?? [];
+    if (!au?.user || au.user.email?.toLowerCase() !== email || !providers.includes("google")) {
+      return {
+        ok: false as const,
+        error: "Por seguridad, la persona tiene que entrar una vez a Jaikuaa con «Continuar con Google» usando ese correo.",
+      };
+    }
     const { error } = await db
       .from("content_reviewers")
       .upsert({ user_id: prof.id, added_by: context.userId }, { onConflict: "user_id", ignoreDuplicates: true });
