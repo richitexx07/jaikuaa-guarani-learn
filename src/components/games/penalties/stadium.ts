@@ -12,12 +12,57 @@ function drawNet(now: number){const n=S.net,k=n?Math.max(0,1-(now-n.t)/900):0;ct
   const bulge=(x: number,y: number): [number, number]=>{if(!k||!n)return[x,y];const d=Math.hypot(x-n.x,y-n.y),f=Math.max(0,1-d/120)*k*14;return[x+(x-n.x)/(d||1)*f*.4,y-f*.2+f];};
   for(let x=G.x;x<=G.x+G.w;x+=20){ctx.beginPath();for(let y=G.y;y<=G.y+G.h;y+=10){const[a,b]=bulge(x,y);y===G.y?ctx.moveTo(a,b):ctx.lineTo(a,b);}ctx.stroke();}
   for(let y=G.y;y<=G.y+G.h;y+=20){ctx.beginPath();for(let x=G.x;x<=G.x+G.w;x+=10){const[a,b]=bulge(x,y);x===G.x?ctx.moveTo(a,b):ctx.lineTo(a,b);}ctx.stroke();}}
+function limb(x1:number,y1:number,x2:number,y2:number,w:number,c:string){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
 function drawKeeper(now: number){const k=S.keeper,idle=(S.phase==='aim'||S.phase==='power')&&!reduce?Math.sin(now/(S.knew?420:200))*(S.knew?6:16):0;
-  ctx.save();ctx.translate(k.x+idle,k.y);ctx.rotate(k.ang);const arm=24+k.stretch*18;
-  ctx.fillStyle=palette['gold'];ctx.beginPath();ctx.roundRect(-22,-30,44,58,10);ctx.fill();ctx.fillStyle=palette['kit-dark'];ctx.fillRect(-20,28,16,30);ctx.fillRect(4,28,16,30);
-  ctx.fillStyle=palette['skin'];ctx.beginPath();ctx.arc(0,-46,15,0,7);ctx.fill();ctx.fillStyle=palette['kit-dark'];ctx.fillRect(-15,-58,30,7);
-  ctx.strokeStyle=palette['gold'];ctx.lineWidth=13;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-18,-22);ctx.lineTo(-18-arm,-34-k.stretch*16);ctx.moveTo(18,-22);ctx.lineTo(18+arm,-34-k.stretch*16);ctx.stroke();
-  ctx.fillStyle=palette['white'];ctx.beginPath();ctx.arc(-22-arm,-36-k.stretch*16,10,0,7);ctx.arc(22+arm,-36-k.stretch*16,10,0,7);ctx.fill();ctx.restore();}
+  const bob=reduce?0:Math.abs(Math.sin(now/260))*2;
+  ctx.save();ctx.translate(k.x+idle,k.y-bob);ctx.rotate(k.ang);ctx.scale(1.3,1.3);const st=k.stretch,arm=30+st*22,hy=-30-st*22;
+  // sombra
+  ctx.fillStyle=alpha('black',.25);ctx.beginPath();ctx.ellipse(0,52,34,7,0,0,7);ctx.fill();
+  // piernas abiertas con medias y botines
+  limb(-10,18,-22,42,13,palette['skin']);limb(10,18,22,42,13,palette['skin']);
+  limb(-21,36,-24,46,14,palette['gold']);limb(21,36,24,46,14,palette['gold']);
+  ctx.fillStyle=palette['black'];ctx.beginPath();ctx.ellipse(-27,50,10,5,0,0,7);ctx.ellipse(27,50,10,5,0,0,7);ctx.fill();
+  // short
+  ctx.fillStyle=palette['kit-dark'];ctx.beginPath();ctx.roundRect(-20,6,40,18,5);ctx.fill();
+  // brazos con mangas y guantes grandes
+  limb(-18,-20,-18-arm*.55,(-20+hy)/2,12,palette['gold']);limb(-18-arm*.55,(-20+hy)/2,-18-arm,hy,10,palette['gold']);
+  limb(18,-20,18+arm*.55,(-20+hy)/2,12,palette['gold']);limb(18+arm*.55,(-20+hy)/2,18+arm,hy,10,palette['gold']);
+  [-1,1].forEach(d=>{const gx=d*(22+arm),gy=hy-2;ctx.fillStyle=palette['white'];ctx.beginPath();ctx.ellipse(gx,gy,10,12,d*.3,0,7);ctx.fill();ctx.strokeStyle=palette['kit-dark'];ctx.lineWidth=2;ctx.stroke();ctx.fillStyle=palette['kit-dark'];ctx.fillRect(gx-8,gy+7,16,4);});
+  // camiseta con degradé y cuello
+  const jg=ctx.createLinearGradient(-22,0,22,0);jg.addColorStop(0,alpha('gold',.75));jg.addColorStop(.5,palette['gold']);jg.addColorStop(1,alpha('gold',.75));
+  ctx.fillStyle=palette['kit-dark'];ctx.beginPath();ctx.roundRect(-23,-30,46,40,12);ctx.fill();
+  ctx.fillStyle=jg;ctx.beginPath();ctx.roundRect(-22,-30,44,40,12);ctx.fill();
+  ctx.strokeStyle=palette['kit-dark'];ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-22,-6);ctx.lineTo(22,-6);ctx.stroke();
+  ctx.fillStyle=palette['kit-dark'];ctx.beginPath();ctx.moveTo(-8,-30);ctx.lineTo(0,-22);ctx.lineTo(8,-30);ctx.fill();
+  // cuello y cabeza
+  ctx.fillStyle=palette['skin'];ctx.fillRect(-5,-36,10,8);ctx.beginPath();ctx.ellipse(0,-48,14,16,0,0,7);ctx.fill();
+  ctx.beginPath();ctx.arc(-14,-48,3.5,0,7);ctx.arc(14,-48,3.5,0,7);ctx.fill();
+  ctx.fillStyle=palette['kit-dark'];ctx.beginPath();ctx.ellipse(0,-58,15,9,0,Math.PI,0);ctx.fill();ctx.fillRect(-15,-59,30,4);
+  ctx.fillStyle=palette['white'];ctx.beginPath();ctx.arc(-5,-48,3,0,7);ctx.arc(5,-48,3,0,7);ctx.fill();
+  ctx.fillStyle=palette['black'];ctx.beginPath();ctx.arc(-5,-48,1.6,0,7);ctx.arc(5,-48,1.6,0,7);ctx.fill();
+  ctx.strokeStyle=palette['black'];ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(-5,-39);ctx.quadraticCurveTo(0,st>.3?-35:-37,5,-39);ctx.stroke();
+  ctx.restore();}
+function drawShooter(now:number){const kick=S.phase==='shot'||S.phase==='result';const lean=kick?.18:0;const sway=reduce||kick?0:Math.sin(now/400)*1.5;
+  ctx.save();ctx.translate(352+sway,600);ctx.rotate(lean);
+  ctx.fillStyle=alpha('black',.25);ctx.beginPath();ctx.ellipse(0,-4,40,8,0,0,7);ctx.fill();
+  // piernas (de espaldas): la derecha patea
+  limb(-14,-48,-18,-8,16,palette['skin']);
+  if(kick)limb(14,-48,40,-30,16,palette['skin']);else limb(14,-48,16,-8,16,palette['skin']);
+  ctx.fillStyle=palette['white'];ctx.fillRect(-26,-26,16,18);if(!kick)ctx.fillRect(8,-26,16,18);
+  ctx.fillStyle=palette['black'];ctx.beginPath();ctx.ellipse(-18,-6,12,6,0,0,7);ctx.fill();if(kick){ctx.beginPath();ctx.ellipse(44,-30,12,6,-.5,0,7);ctx.fill();}else{ctx.beginPath();ctx.ellipse(16,-6,12,6,0,0,7);ctx.fill();}
+  // short
+  ctx.fillStyle=palette['kit-dark'];ctx.beginPath();ctx.roundRect(-30,-70,60,26,6);ctx.fill();
+  // brazos
+  limb(-30,-120,-44,-80,13,palette['skin']);limb(30,-120,44,-80,13,palette['skin']);
+  limb(-30,-122,-38,-104,15,palette['white']);limb(30,-122,38,-104,15,palette['white']);
+  // camiseta a rayas genérica (sin escudo ni marca)
+  ctx.save();ctx.beginPath();ctx.roundRect(-32,-134,64,70,14);ctx.clip();ctx.fillStyle=palette['white'];ctx.fillRect(-32,-134,64,70);ctx.fillStyle=palette['red'];for(let x=-30;x<32;x+=16)ctx.fillRect(x,-134,8,70);
+  const sh=ctx.createLinearGradient(-32,0,32,0);sh.addColorStop(0,alpha('black',.25));sh.addColorStop(.5,alpha('black',0));sh.addColorStop(1,alpha('black',.25));ctx.fillStyle=sh;ctx.fillRect(-32,-134,64,70);ctx.restore();
+  // cabeza de espaldas
+  ctx.fillStyle=palette['skin'];ctx.fillRect(-7,-144,14,12);ctx.beginPath();ctx.arc(-17,-156,4,0,7);ctx.arc(17,-156,4,0,7);ctx.fill();
+  ctx.fillStyle=palette['kit-dark'];ctx.beginPath();ctx.ellipse(0,-158,17,19,0,0,7);ctx.fill();
+  ctx.strokeStyle=alpha('white',.15);ctx.lineWidth=2;ctx.beginPath();ctx.arc(-4,-164,9,3.6,5);ctx.stroke();
+  ctx.restore();}
 function draw(now: number){
   const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,palette['night']);bg.addColorStop(.35,palette['sky']);bg.addColorStop(.36,palette['grass']);bg.addColorStop(1,palette['grass-dark']);ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
   [[120,30],[680,30]].forEach(([lx,ly])=>{const g=ctx.createRadialGradient(lx,ly,2,lx,ly,180);g.addColorStop(0,alpha('white', .35));g.addColorStop(1,alpha('white', 0));ctx.fillStyle=g;ctx.fillRect(lx-180,0,360,220);});
@@ -50,7 +95,7 @@ function draw(now: number){
   const b=S.ball;ctx.fillStyle=alpha('black', .25);ctx.beginPath();ctx.ellipse(b.x,Math.max(b.y+b.r,G.y+G.h-10)+4,b.r,b.r*.35,0,0,7);ctx.fill();
   ctx.fillStyle=palette['white'];ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,7);ctx.fill();ctx.save();ctx.translate(b.x,b.y);ctx.rotate(reduce?0:b.y/25);ctx.fillStyle=palette['kit-dark'];ctx.beginPath();for(let i=0;i<5;i++){const a=i/5*Math.PI*2;ctx.lineTo(Math.cos(a)*b.r*.42,Math.sin(a)*b.r*.42);}ctx.fill();ctx.restore();
   // Generic striped shirt: no crest, sponsor or team identifier.
-  ctx.save();ctx.translate(400,S.phase==='shot'?576:582);ctx.fillStyle=palette['white'];ctx.beginPath();ctx.roundRect(-28,-4,56,44,10);ctx.fill();ctx.save();ctx.clip();ctx.fillStyle=palette['red'];for(let x=-28;x<28;x+=16)ctx.fillRect(x,-4,8,44);ctx.restore();ctx.fillStyle=palette['kit-dark'];ctx.beginPath();ctx.arc(0,-16,14,0,7);ctx.fill();ctx.restore();
+  drawShooter(now);
   if(S.banner){const q=(now-S.banner.t)/1400;if(q>1)S.banner=null;else{const s=reduce?1:Math.min(1,q*5)*(1+.08*Math.sin(q*20));ctx.save();ctx.translate(400,300);ctx.scale(s,s);ctx.globalAlpha=q>.8?(1-q)/.2:1;ctx.font='800 54px sans-serif';ctx.textAlign='center';ctx.lineWidth=10;ctx.strokeStyle=palette['black'];ctx.strokeText(S.banner.txt,0,20,720);ctx.fillStyle=S.banner.c;ctx.fillText(S.banner.txt,0,20,720);ctx.restore();}}
   }
 
