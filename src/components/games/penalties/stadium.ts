@@ -14,8 +14,8 @@ function drawNet(now: number){const n=S.net,k=n?Math.max(0,1-(now-n.t)/900):0;ct
   for(let y=G.y;y<=G.y+G.h;y+=20){ctx.beginPath();for(let x=G.x;x<=G.x+G.w;x+=10){const[a,b]=bulge(x,y);x===G.x?ctx.moveTo(a,b):ctx.lineTo(a,b);}ctx.stroke();}}
 function limb(x1:number,y1:number,x2:number,y2:number,w:number,c:string){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
 function drawKeeper(now: number){const k=S.keeper,idle=(S.phase==='aim'||S.phase==='power')&&!reduce?Math.sin(now/(S.knew?420:200))*(S.knew?6:16):0;
-  const bob=reduce?0:Math.abs(Math.sin(now/260))*2;
-  ctx.save();ctx.translate(k.x+idle,k.y-bob);ctx.rotate(k.ang);ctx.scale(1.3,1.3);const st=k.stretch,arm=30+st*22,hy=-30-st*22;
+  const party=!!S.banner&&S.banner.txt==='¡ATAJÓ!'&&!reduce;const bob=party?Math.abs(Math.sin(now/90))*14:reduce?0:Math.abs(Math.sin(now/260))*2;
+  ctx.save();ctx.translate(k.x+idle,k.y-bob);ctx.rotate(k.ang);ctx.scale(1.3,1.3);const st=party?1:k.stretch,arm=30+st*22,hy=party?-70:-30-st*22;
   // sombra
   ctx.fillStyle=alpha('black',.25);ctx.beginPath();ctx.ellipse(0,52,34,7,0,0,7);ctx.fill();
   // piernas abiertas con medias y botines

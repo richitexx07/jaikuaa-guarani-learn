@@ -1,22 +1,10 @@
-- [x] SEO: tres hallazgos antiguos revisados; H1 de Comenzar y metadatos de contenido completos, fechas legales históricas conservadas; ocho pruebas y páginas públicas/Panel verificados sin publicar.
-- [x] Google OAuth propio: bloqueo reproducido en www.jaikuaa.com; Google devuelve redirect_uri_mismatch, sin errores de JavaScript; portada e ingreso cargan con HTTP 200.
-- [x] Invitaciones de juegos: regreso único; 7 pruebas y verificación con sesión real conservan la sala K7M2QP en lugar de abrir el Panel.
-- [ ] Google OAuth propio: autorizar exactamente https://www.jaikuaa.com/~oauth/callback en el cliente de Google Cloud y repetir ingreso completo; requiere acceso del propietario a Google Cloud.
-- [x] Piloto Ateneo: bandeja de Validación docente en el panel.
-- [x] Práctica: detectar aprobación en la pantalla abierta mediante actualización periódica de permisos pendientes, también en Docente y Panel.
-- [x] Audio: corregir bloqueo tras fallas temporales y verificar reproducción y reintento sin modificar grabaciones.
-- [x] Piloto Ateneo: Cuaderno digital del docente (/cuaderno) con semáforo y planilla.
-- [x] Modo sin conexión: app guardada, audios escuchados y avances que se sincronizan al volver la señal.
-- [ ] Juegos Duelo Cara a Cara y Relámpago Guaraní.
-- [x] Teclado Guaraní (/teclado) con Copiar y WhatsApp.
-- [x] Publicar juegos actualizados + teclado.
-- [x] Studio: autorización de Richard para lallamaqueinflamahk-max/jaikuua-studio-app, rama main (no implica confirmar Git sync).
-- [ ] Studio: completar revisión del código de main (repositorio público descargado); middleware inspeccionado, .env.example no está incluido. Definir acceso previsto sin eliminar controles administrativos.
-- [x] Studio (Jaikuaa): desvío /studio → https://jaikuua-studio-app.vercel.app/studio con prefijo, IP del visitante y cookies/redirecciones sin duplicar el prefijo (17/10).
-- [ ] Studio (Vercel): volver a publicar el build con basePath "/studio"; hoy la versión en vivo sigue en la raíz y /studio/* da ADMIN_CERT_REQUIRED.
-- [ ] Studio: montar despliegue Next.js aislado bajo /studio y verificar enlaces, APIs, assets y cookies; despliegue documentado https://jaikuaa-studio.vercel.app responde 200 en / y /lab, pero 404 en /studio. Requiere configurar el prefijo y actualizar el despliegue externo; no hay acceso concedido a Vercel ni a las reglas del dominio.
-- [ ] Studio: añadir únicamente el enlace Studio al menú existente cuando el montaje esté listo; ejecutar pruebas y verificar el flujo.
-- [x] Publicar 27/10: ficha técnica, blindajes (certificados, planillas, aulas) y traducciones subidos a www.jaikuaa.com; verificado con sesión real (Panel, Juegos, Cuaderno, Embajadores, Certificado y Ficha) sin errores de consola, y la protección de planillas presente en el script publicado. Escaneo nuevo: 6 avisos bajos, todos en tablas públicas de referencia.
-- [ ] Emoji suelto en el Panel (saludo con sol) y en Chacra (iconos): decidir con Richard si se sacan, porque la regla de la casa es cero emojis y la prueba solo detecta el banderín y la planta.
-- [x] Publicar 27/10 18:04: botón «Grabar / Reemplazar voz» en las 109 palabras de /validar, para que Ferreira y Aliente graben encima de la voz vieja. Verificado en www.jaikuaa.com (HTTP 200, título correcto) y en el script publicado validar-Q5mw2r6k.js.
-- [ ] Grabación oficial: que Ferreira y Aliente graben las 109 palabras de cero y reemplacen todos los audios actuales.
+# Roadmap
+- [x] Tembi'u: dibujos propios de los platos
+- [x] Botón grande «Jugar de nuevo» al terminar (pantalla final compartida)
+- [ ] La Chacra: huerta más viva
+- [ ] Consultorio: caras de pacientes al nivel del cuerpo
+- [x] Penales: festejo del arquero al atajar
+- [ ] Penales: tribuna y pasto con brillo
+- [ ] Memoria: dorso con Jai y vuelta animada
+- [ ] Audio automático al aparecer palabra (solo grabación humana)
+- [ ] Botón «Retá a alguien» en /juegos
