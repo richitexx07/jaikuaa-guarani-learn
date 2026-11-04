@@ -96,6 +96,7 @@ const T = {
   lsGoodJob: ["¡Buen trabajo!", "Bom trabalho!", "Good job!", "Gut gemacht!", "Bon travail !", "做得好！"],
   lsGot: ["Acertaste {a} de {b}.", "Você acertou {a} de {b}.", "You got {a} of {b} right.", "Du hast {a} von {b} richtig.", "Vous avez {a} bonnes réponses sur {b}.", "你答對了 {b} 題中的 {a} 題。"],
   lsNextMatch: ["Siguiente: unir las parejas", "Próximo: ligar os pares", "Next: match the pairs", "Weiter: Paare zuordnen", "Suivant : associer les paires", "下一步：配對"],
+  lsHowGn: ["¿Cómo se dice en guaraní?", "Como se diz em guarani?", "How do you say it in Guarani?", "Wie sagt man das auf Guaraní?", "Comment le dit-on en guarani ?", "用瓜拉尼語怎麼說？"],
   lsMeaning: ["¿Qué significa?", "O que significa?", "What does it mean?", "Was bedeutet das?", "Que veut dire ce mot ?", "這是什麼意思？"],
   lsRight: ["¡Muy bien! Esa es.", "Muito bem! É essa.", "Great! That's it.", "Sehr gut! Genau.", "Très bien ! C'est ça.", "很好！就是這個。"],
   lsAlmost: ["Casi.", "Quase.", "Almost.", "Fast.", "Presque.", "差一點。"],

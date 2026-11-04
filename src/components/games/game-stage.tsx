@@ -35,7 +35,7 @@ export function GameStage({
   children: ReactNode;
   wide?: boolean;
   extra?: ReactNode;
-  back?: { to: "/juegos" | "/dashboard"; label: string };
+  back?: { to: "/juegos" | "/dashboard" | "/"; label: string };
 }) {
   const { g } = useGT();
   const b = back ?? { to: "/juegos" as const, label: g("back") };

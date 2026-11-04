@@ -453,7 +453,7 @@ function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partid
       {playing && (
         <QuitGameButton
           className="text-white"
-          label="Terminar la canción y ver el resultado"
+          kind="song"
           onQuit={() => { arpa.current.stop(); audio.current?.pause(); setPlaying(false); setBeat(total); }}
         />
       )}

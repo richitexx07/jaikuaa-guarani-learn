@@ -1,3 +1,4 @@
+import { useGT } from "@/lib/i18n-games";
 import { createFileRoute } from "@tanstack/react-router";
 import { useJU } from "@/lib/i18n-juegos-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -117,6 +118,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
   const [platos, setPlatos] = useState<{ dish: Dish; ok: boolean }[]>([]);
   const [gaveUp, setGaveUp] = useState(false);
   const [sure, setSure] = useState(false);
+  const { g } = useGT();
   const dish = dishes[i];
   const options = useMemo(() => {
     if (!dish) return [];
@@ -221,7 +223,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
 
       {checked && (
         <p className="rounded-2xl px-4 py-3 text-center font-display text-lg font-bold" style={{ background: good ? T.verde : "rgba(0,0,0,.35)" }} aria-live="polite">
-          {gaveUp ? "Esta es la receta: los ingredientes marcados en verde. Este plato no suma." : good ? tt("tbGood") : tt("tbBad")}
+          {gaveUp ? g("recipeShown") : good ? tt("tbGood") : tt("tbBad")}
         </p>
       )}
 
@@ -258,7 +260,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
       )}
       {!checked && (
         <button type="button" onClick={giveUp} className="h-11 w-full rounded-2xl text-sm font-bold text-white ring-1 ring-white/30 hover:bg-white/10">
-          {sure ? "¿Seguro? Tocá otra vez para ver la receta" : "Rendirme y ver la receta"}
+          {sure ? g("giveUpRecipeSure") : g("giveUpRecipe")}
         </button>
       )}
     </section>

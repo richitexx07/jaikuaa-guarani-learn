@@ -450,7 +450,7 @@ function ChoiceStep({
   return (
     <div>
       <div className="mb-3 flex items-center justify-between text-xs font-semibold text-muted-foreground">
-        <span>{rev ? "¿Cómo se dice en guaraní?" : tx("lsMeaning")}</span>
+        <span>{rev ? tx("lsHowGn") : tx("lsMeaning")}</span>
         <span className="rounded-full bg-muted px-2.5 py-0.5">
           {tx("csOf", { a: i + 1, b: questions.length })}
         </span>

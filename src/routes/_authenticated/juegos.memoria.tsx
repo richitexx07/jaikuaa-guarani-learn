@@ -229,14 +229,14 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
             }}
             className="h-11 rounded-2xl px-5 text-sm font-bold text-white ring-1 ring-white/30 hover:bg-white/10"
           >
-            {sure ? "¿Seguro? Tocá otra vez para ver todas las parejas" : "Rendirme y ver las parejas"}
+            {sure ? g("giveUpPairsSure") : g("giveUpPairs")}
           </button>
         </div>
       )}
       {gaveUp && (
         <div className="space-y-3 rounded-3xl p-6 text-center" style={{ background: M.papel, color: M.tinta }}>
-          <p className="font-display text-xl font-bold">¡Tranquilo! Errar es parte de aprender.</p>
-          <p className="text-sm opacity-75">Estas son todas las parejas. Repasalas y volvé a intentarlo (sin XP).</p>
+          <p className="font-display text-xl font-bold">{g("gaveUpPairsTitle")}</p>
+          <p className="text-sm opacity-75">{g("gaveUpPairsNote")}</p>
           <ul className="mx-auto max-w-sm space-y-1 text-left">
             {words.map((w) => (
               <li key={w.gn} className="flex items-center justify-between gap-2 rounded-xl px-3 py-1.5" style={{ background: "#fff" }}>
@@ -244,7 +244,7 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
                 <span className="text-sm">{w.es}</span>
                 {w.hasAudio && (
                   <button type="button" onClick={() => void playGuarani(w.gn)} className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-xs font-bold ring-1 ring-black/15">
-                    <Volume2 className="h-4 w-4" aria-hidden /> Escuchar
+                    <Volume2 className="h-4 w-4" aria-hidden /> {g("listenShort2")}
                   </button>
                 )}
               </li>

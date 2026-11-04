@@ -314,7 +314,7 @@ function Consultorio() {
             {resultado && (
               <Veredicto ronda={ronda} resultado={resultado} idioma={idioma} femenino={pac.femenino} onSeguir={siguiente} ultimo={vidas <= 0 || i + 1 >= rondas.length} />
             )}
-            <QuitGameButton className="mt-3 text-white" label="Terminar la guardia y ver el resultado" onQuit={() => setFase("fin")} />
+            <QuitGameButton className="mt-3 text-white" kind="shift" onQuit={() => setFase("fin")} />
           </div>
         )}
 

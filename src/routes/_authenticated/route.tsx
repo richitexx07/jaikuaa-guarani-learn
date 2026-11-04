@@ -10,6 +10,7 @@ import { rememberAfterLogin } from "@/lib/after-login";
 import { PreLaunchBanner } from "@/components/validation-notice";
 import { authMode, isGuestPath, markHadAccount, useIsGuest } from "@/lib/guest";
 import { GuestBar } from "@/components/guest-bar";
+import { AppLoading } from "@/components/app-loading";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -50,6 +51,8 @@ export const Route = createFileRoute("/_authenticated")({
     // Quien nunca tuvo cuenta en este celular ve «Crear cuenta»; quien ya tuvo, «Iniciar sesión».
     throw redirect({ to: "/auth", search: { mode: authMode() } });
   },
+  // Mientras se arma la sección (enlace directo o primera visita), se ve Jaikuaa cargando y no una pantalla blanca.
+  pendingComponent: AppLoading,
   component: AuthenticatedLayout,
 });
 

@@ -22,6 +22,7 @@ import { useT } from '@/lib/i18n';
 export function GameShell({ title, emoji, children, sponsorSlot, companion = true }: { title: string; emoji: string; children: ReactNode; sponsorSlot?: SponsorSlot; companion?: boolean }) {
   const { lang, g } = useGT();
   const { t } = useT();
+  const guestNav = useIsGuest();
   useRememberPlace(title, "game", title !== "Juegos");
   return (
     <GameKit><div className="game-shell relative isolate flex min-h-screen flex-col bg-background">
@@ -37,7 +38,7 @@ export function GameShell({ title, emoji, children, sponsorSlot, companion = tru
             ))}
           </nav>
           {title === 'Juegos'
-            ? <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary md:hidden">{g("backBoard")}</Link>
+            ? <Link to={guestNav ? "/" : "/dashboard"} className="text-sm font-medium text-muted-foreground hover:text-primary md:hidden">{g(guestNav ? "backHome" : "backBoard")}</Link>
             : <Link to="/juegos" className="text-sm font-medium text-muted-foreground hover:text-primary md:hidden">{g("back")}</Link>}
         </div>
       </header>
@@ -99,7 +100,11 @@ export function useGameWords(lesson: number | null) {
     queryFn: () =>
       withOfflineCache(
         K.gameWords(lesson),
-        async () => ((await hasSessionNow()) ? fn({ data: { lesson } }) : guestFn({ data: { lesson } })),
+        async () => {
+          const r = (await hasSessionNow()) ? await fn({ data: { lesson } }) : await guestFn({ data: { lesson } });
+          // Prefijos y sufijos («-hára») no sirven para jugar: son explicaciones de gramática.
+          return { ...r, words: r.words.filter((w) => !esAfijo(w.gn)) };
+        },
         { label: "Las palabras del juego" },
       ),
     staleTime: 5 * 60_000,
@@ -108,9 +113,19 @@ export function useGameWords(lesson: number | null) {
   const words = q.data?.words;
   useEffect(() => {
     if (!words) return;
-    for (const w of words.filter((x) => x.hasAudio).slice(0, 24)) void prefetchAudio(w.gn);
+    // Primero los 8 que suenan antes; el resto, cuando la pantalla ya se mostró (cuida los datos del celular).
+    const conAudio = words.filter((x) => x.hasAudio);
+    for (const w of conAudio.slice(0, 8)) void prefetchAudio(w.gn);
+    const t = window.setTimeout(() => { for (const w of conAudio.slice(8, 24)) void prefetchAudio(w.gn); }, 4000);
+    return () => window.clearTimeout(t);
   }, [words]);
   return q;
+}
+
+/** «-hára», «mbo-»: piezas de gramática, no palabras para jugar. */
+export function esAfijo(gn: string): boolean {
+  const t = gn.trim();
+  return t.startsWith("-") || t.endsWith("-");
 }
 
 export function shuffle<T>(arr: T[]): T[] {
@@ -162,6 +177,7 @@ export function XpNote({ xp }: { xp: number }) {
 
 function ExitAfterGame({ xp }: { xp: number }) {
   const guest = useIsGuest();
+  const { g } = useGT();
   return (
     <div className="flex flex-col items-center gap-2">
       <p className="text-center text-sm font-semibold text-accent">+{xp} XP</p>
@@ -169,7 +185,7 @@ function ExitAfterGame({ xp }: { xp: number }) {
         to={guest ? "/juegos" : "/dashboard"}
         className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-background px-5 text-sm font-semibold text-foreground hover:bg-muted"
       >
-        {guest ? "Listo · Volver a los juegos" : "Listo · Volver al panel"}
+        {guest ? g("exitToGames") : g("exitToPanel")}
       </Link>
     </div>
   );

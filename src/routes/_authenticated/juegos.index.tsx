@@ -77,7 +77,7 @@ function GamesHome() {
       background="radial-gradient(120% 60% at 50% 0%, #1E3A6B 0%, #0D1B33 55%, #0A1426 100%)"
       css={CSS}
       wide
-      back={{ to: "/dashboard", label: g("backBoard") }}
+      back={guest ? { to: "/", label: g("backHome") } : { to: "/dashboard", label: g("backBoard") }}
     >
       {/* Marquesina */}
       <section className="relative pt-2 sm:pt-6">
