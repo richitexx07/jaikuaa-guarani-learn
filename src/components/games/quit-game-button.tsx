@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGT } from "@/lib/i18n-games";
+import { forgetPlace } from "@/lib/last-place";
 
 /**
  * «Terminar la partida»: salida airosa para juegos de varias rondas.
@@ -17,7 +18,7 @@ export function QuitGameButton({ onQuit, className = "", kind = "game" }: { onQu
   return (
     <button
       type="button"
-      onClick={() => (sure ? onQuit() : setSure(true))}
+      onClick={() => { if (sure) { forgetPlace(); onQuit(); } else setSure(true); }}
       className={`h-11 w-full touch-manipulation rounded-2xl px-4 text-sm font-bold ring-1 ring-white/30 hover:bg-white/10 ${className}`}
     >
       {sure ? g("quitSure") : g(kind === "shift" ? "quitShift" : kind === "song" ? "quitSong" : "quitGame")}

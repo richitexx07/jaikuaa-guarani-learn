@@ -12,6 +12,11 @@ export function rememberPlace(p: Omit<LastPlace, "at">) {
   } catch { /* sin almacenamiento */ }
 }
 
+/** Al terminar o abandonar, el panel deja de insistir con ese juego. */
+export function forgetPlace() {
+  try { localStorage.removeItem(KEY); } catch { /* sin almacenamiento */ }
+}
+
 export function readPlace(now = Date.now()): LastPlace | null {
   try {
     const v = JSON.parse(localStorage.getItem(KEY) || "null") as LastPlace | null;
