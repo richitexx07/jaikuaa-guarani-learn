@@ -155,7 +155,7 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
         </div>
         <RetoFinal partida={partida} puntaje={score} />
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: F.tungsteno, color: F.carbon }}>{tt("tgNew")}</button>
+          <button type="button" onClick={onAgain} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold" style={{ background: F.tungsteno, color: F.carbon }}>{tt("tgNew")}</button>
         </div>
       </section>
     );
@@ -237,7 +237,7 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
         })}
       </div>
       {pick && (
-        <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold" style={{ background: F.tungsteno, color: F.carbon }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
+        <button type="button" className="h-14 w-full rounded-2xl tap-3d-dark font-display text-lg font-bold" style={{ background: F.tungsteno, color: F.carbon }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
           {i + 1 === ROUNDS ? tt("tgSeeCredits") : tt("tgNext")}
         </button>
       )}

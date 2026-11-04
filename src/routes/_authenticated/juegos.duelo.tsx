@@ -208,7 +208,7 @@ function Board({ pool, series, onResult, onRematch, onRemote }: { pool: GameWord
           <p className="mt-2 text-sm leading-relaxed opacity-80">
             {tt("rules", { n: TARGET })}
           </p>
-          <button type="button" className="mt-4 h-14 w-full rounded-2xl font-display text-xl font-bold text-white" style={{ background: V.tinta }} onClick={() => setStarted(true)}>
+          <button type="button" className="mt-4 h-14 w-full rounded-2xl tap-3d-dark font-display text-xl font-bold text-white" style={{ background: V.tinta }} onClick={() => setStarted(true)}>
             {tt("startDuel")}
           </button>
           <LiveDuelStart theme={{ mine: V.azul, rival: V.rojo, ink: V.tinta, accent: V.oro }} onStart={onRemote} />
@@ -235,7 +235,7 @@ function Board({ pool, series, onResult, onRematch, onRemote }: { pool: GameWord
         <p className="text-xs opacity-80">{tt("xpNote")}</p>
         <SeriesLine series={series} className="text-white/90" />
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl bg-white px-6 font-bold" style={{ color: draw ? V.tinta : COLOR[w] }}><RotateCcw className="h-5 w-5" /> {tt("rematch")}</button>
+          <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl tap-3d-dark bg-white px-6 font-bold" style={{ color: draw ? V.tinta : COLOR[w] }}><RotateCcw className="h-5 w-5" /> {tt("rematch")}</button>
           <ShareResult text={tt("share", { a: score[0], b: score[1] })} />
         </div>
       </div>

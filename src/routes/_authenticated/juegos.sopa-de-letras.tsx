@@ -322,7 +322,7 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
 
       {!done && (
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={giveHint} className="min-h-11 touch-manipulation rounded-2xl bg-white px-5 text-sm font-bold ring-1 ring-[#C9DCF0]" style={{ color: S.tinta }}>
+          <button type="button" onClick={giveHint} className="min-h-11 touch-manipulation rounded-2xl tap-3d-dark bg-white px-5 text-sm font-bold ring-1 ring-[#C9DCF0]" style={{ color: S.tinta }}>
             {tt("hint")}
           </button>
           <button
@@ -343,7 +343,7 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
           <p className="font-display text-2xl font-bold">{tt("restTitle")}</p>
           <p className="text-sm leading-snug opacity-80">{tt("restNote")}</p>
           <div className="flex flex-wrap justify-center gap-2">
-            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: S.tinta }}>{tt("anotherSoup")}</button>
+            <button type="button" onClick={onNext} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold text-white" style={{ background: S.tinta }}>{tt("anotherSoup")}</button>
           </div>
         </div>
       )}
@@ -356,7 +356,7 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
           <p className="text-3xl tracking-widest text-[#F2B544]" aria-label={tt("stars3")}>★★★</p>
           <p className="font-bold text-[#2F7A4A]">+{XP} XP</p>
           <div className="flex flex-wrap justify-center gap-2">
-            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: S.tinta }}>{tt("anotherSoup")}</button>
+            <button type="button" onClick={onNext} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold text-white" style={{ background: S.tinta }}>{tt("anotherSoup")}</button>
           </div>
           {segundos > 0 && <RetoFinal partida={partida} puntaje={segundos} extra={extra} />}
         </div>

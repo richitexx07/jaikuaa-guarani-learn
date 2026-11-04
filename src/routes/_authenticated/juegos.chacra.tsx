@@ -146,7 +146,7 @@ function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: 
           <p className="mt-3 font-bold" style={{ color: C.verde }}>+{xp} XP</p>
         </div>
         <RetoFinal partida={partida} puntaje={score} />
-        <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold text-white shadow-lg" style={{ background: C.tierra }}>{tt("chAgain")}</button>
+        <button type="button" onClick={onAgain} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold text-white shadow-lg" style={{ background: C.tierra }}>{tt("chAgain")}</button>
       </section>
     );
   }
@@ -191,7 +191,7 @@ function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: 
             ? ok ? { background: C.verde, color: "#fff" } : o === pick ? { background: C.rojo, color: "#fff" } : { background: "rgba(255,255,255,.55)", color: "rgba(42,36,22,.5)" }
             : { background: "rgba(255,255,255,.92)", color: C.tinta };
           return (
-            <button key={o} type="button" lang="gn" onClick={() => choose(o)} disabled={!!pick} className="min-h-16 rounded-2xl px-3 py-3 font-display text-xl font-bold shadow-md transition active:scale-[.97]" style={estilo}>
+            <button key={o} type="button" lang="gn" onClick={() => choose(o)} disabled={!!pick} className="min-h-16 rounded-2xl tap-3d-dark px-3 py-3 font-display text-xl font-bold shadow-md transition active:scale-[.97]" style={estilo}>
               {o}
             </button>
           );
@@ -207,7 +207,7 @@ function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: 
             </p>
             <p className="mt-2"><b>{tt("chTip")}</b> {v.caso.consejo}</p>
           </div>
-          <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold text-white shadow-lg" style={{ background: C.tierra }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
+          <button type="button" className="h-14 w-full rounded-2xl tap-3d-dark font-display text-lg font-bold text-white shadow-lg" style={{ background: C.tierra }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
             {i + 1 === VISITAS_POR_DIA ? tt("chFinish") : tt("chNext")}
           </button>
         </div>

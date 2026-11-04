@@ -114,7 +114,7 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
         </div>
         <RetoFinal partida={partida} puntaje={score} />
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: J.oro, color: J.tinta }}>{tt("tjNew")}</button>
+          <button type="button" onClick={onAgain} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold" style={{ background: J.oro, color: J.tinta }}>{tt("tjNew")}</button>
         </div>
       </section>
     );
@@ -168,7 +168,7 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
             ? right ? { background: J.verde, color: "#fff" } : o === pick ? { background: J.rojo, color: "#fff" } : { background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.45)" }
             : { background: "rgba(255,255,255,.08)", color: "#fff", boxShadow: `inset 0 0 0 2px rgba(232,194,106,.45)` };
           return (
-            <button key={o} type="button" onClick={() => choose(o)} disabled={!!pick} className="min-h-14 rounded-2xl px-4 py-3 text-left font-display text-lg font-bold transition active:scale-[.98]" style={estilo}>
+            <button key={o} type="button" onClick={() => choose(o)} disabled={!!pick} className="min-h-14 rounded-2xl tap-3d-dark px-4 py-3 text-left font-display text-lg font-bold transition active:scale-[.98]" style={estilo}>
               {o}
             </button>
           );
@@ -187,7 +187,7 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
               <p className="mt-2 text-xs text-white/60">{tt("tjPending")}</p>
             )}
           </div>
-          <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold" style={{ background: J.oro, color: J.tinta }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
+          <button type="button" className="h-14 w-full rounded-2xl tap-3d-dark font-display text-lg font-bold" style={{ background: J.oro, color: J.tinta }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
             {i + 1 === ROUNDS ? tt("tjSeeRuling") : tt("tjNext")}
           </button>
         </div>

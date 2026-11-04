@@ -103,7 +103,7 @@ function Pronto({ decir, escuchar, total, isStaff, onVistaPrevia }: { decir: num
         {isStaff && (
           <div className="mt-4 grid gap-2">
             <Link to="/mostrador/editar" search={{ rubro: "atencion" }} className="flex h-12 items-center justify-center rounded-2xl font-bold text-white" style={{ background: V.azul }}>{tt("vtWrite", { n: total })}</Link>
-            <button type="button" onClick={onVistaPrevia} className="h-12 rounded-2xl font-bold ring-1 ring-black/15">{tt("vtTry")}</button>
+            <button type="button" onClick={onVistaPrevia} className="h-12 rounded-2xl tap-3d-dark font-bold ring-1 ring-black/15">{tt("vtTry")}</button>
           </div>
         )}
       </div>
@@ -166,7 +166,7 @@ function Turno({ seed, frases, vistaPrevia, urls, partida, onAgain }: { seed: nu
           {!vistaPrevia && <p className="mt-3 font-bold" style={{ color: V.verde }}>+{xp} XP</p>}
         </div>
         {!vistaPrevia && <RetoFinal partida={partida} puntaje={score} />}
-        <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold shadow-lg" style={{ background: V.turno, color: V.tinta }}>{tt("vtAgain")}</button>
+        <button type="button" onClick={onAgain} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold shadow-lg" style={{ background: V.turno, color: V.tinta }}>{tt("vtAgain")}</button>
       </section>
     );
   }
@@ -244,7 +244,7 @@ function Turno({ seed, frases, vistaPrevia, urls, partida, onAgain }: { seed: nu
             ? ok ? { background: V.verde, color: "#fff" } : o.key === pick ? { background: V.rojo, color: "#fff" } : { background: "rgba(255,255,255,.12)", color: "rgba(255,255,255,.5)" }
             : { background: "rgba(255,255,255,.95)", color: V.tinta };
           return (
-            <button key={o.key} type="button" lang={o.gn ? "gn" : "es"} onClick={() => choose(o.key)} disabled={!!pick} className="min-h-14 rounded-2xl px-4 py-3 text-left text-lg font-bold shadow-md transition active:scale-[.98]" style={estilo}>
+            <button key={o.key} type="button" lang={o.gn ? "gn" : "es"} onClick={() => choose(o.key)} disabled={!!pick} className="min-h-14 rounded-2xl tap-3d-dark px-4 py-3 text-left text-lg font-bold shadow-md transition active:scale-[.98]" style={estilo}>
               {o.label}
             </button>
           );
@@ -257,7 +257,7 @@ function Turno({ seed, frases, vistaPrevia, urls, partida, onAgain }: { seed: nu
             {pick === "__tiempo__" ? tt("vtTimeout", { n: cliente.nombre }) : pick === correcta ? tt("vtOk", { n: cliente.nombre }) : tt("vtAlmost")}
             {r.tipo === "escuchar" && <> {tt("vtMeans")} <b>«{r.frase.es}»</b>.</>}
           </p>
-          <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold shadow-lg" style={{ background: V.turno, color: V.tinta }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
+          <button type="button" className="h-14 w-full rounded-2xl tap-3d-dark font-display text-lg font-bold shadow-lg" style={{ background: V.turno, color: V.tinta }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
             {i + 1 === rondas.length ? tt("vtClose") : tt("vtNext")}
           </button>
         </div>

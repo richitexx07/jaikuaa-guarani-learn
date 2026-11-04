@@ -553,7 +553,7 @@ function Ficha({
         <button
           type="button"
           onClick={onEscuchar}
-          className="mt-5 flex h-14 w-full items-center justify-center gap-3 rounded-2xl text-base font-bold text-white shadow-md transition active:scale-[0.98]"
+          className="mt-5 flex h-14 w-full items-center justify-center gap-3 rounded-2xl tap-3d-dark text-base font-bold text-white shadow-md transition active:scale-[0.98]"
           style={{ background: C.ambo }}
         >
           <Volume2 className="h-6 w-6" /> {t("escuchar", idioma)}
@@ -856,7 +856,7 @@ function Fin({
       <button
         type="button"
         onClick={onOtro}
-        className="mt-6 flex h-16 w-full items-center justify-center gap-3 rounded-2xl text-lg font-bold text-[#062A2E] shadow-lg transition active:scale-[0.98]"
+        className="mt-6 flex h-16 w-full items-center justify-center gap-3 rounded-2xl tap-3d-dark text-lg font-bold text-[#062A2E] shadow-lg transition active:scale-[0.98]"
         style={{ background: C.fosforo }}
       >
         <RotateCcw className="h-5 w-5" /> {t("otroTurno", idioma)}

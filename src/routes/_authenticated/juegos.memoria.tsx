@@ -250,7 +250,7 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
               </li>
             ))}
           </ul>
-          <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: M.tinta }}>{g("playAgain")}</button>
+          <button type="button" onClick={onNext} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold text-white" style={{ background: M.tinta }}>{g("playAgain")}</button>
         </div>
       )}
       {done && (
@@ -262,7 +262,7 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
           </p>
           <p className="font-bold" style={{ color: M.verde }}>+{xp} XP</p>
           <div className="flex flex-wrap justify-center gap-2">
-            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: M.tinta }}>{g("playAgain")}</button>
+            <button type="button" onClick={onNext} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold text-white" style={{ background: M.tinta }}>{g("playAgain")}</button>
           </div>
           <RetoFinal partida={partida} puntaje={attempts} extra={lesson === null ? undefined : String(lesson)} />
         </div>

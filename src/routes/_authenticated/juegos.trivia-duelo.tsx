@@ -200,7 +200,7 @@ function Board({ series, onResult, onRematch, onRemote, theme }: { series: DuelS
           <p className="mt-2 text-sm leading-relaxed opacity-80">
             {tt("trRules", { n: TARGET })}
           </p>
-          <button type="button" className="mt-4 h-14 w-full rounded-2xl font-display text-xl font-bold" style={{ background: TV.oro, color: TV.tinta }} onClick={() => setStarted(true)}>
+          <button type="button" className="mt-4 h-14 w-full rounded-2xl tap-3d-dark font-display text-xl font-bold" style={{ background: TV.oro, color: TV.tinta }} onClick={() => setStarted(true)}>
             {sd("startDuel")}
           </button>
           <LiveDuelStart theme={theme} onStart={onRemote} />
@@ -224,7 +224,7 @@ function Board({ series, onResult, onRematch, onRemote, theme }: { series: DuelS
           <SeriesLine series={series} className="text-white/90" />
         </div>
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl px-6 font-bold" style={{ background: TV.oro, color: TV.tinta }}><RotateCcw className="h-5 w-5" /> {sd("rematch")}</button>
+          <button type="button" onClick={onRematch} className="inline-flex h-12 items-center gap-2 rounded-2xl tap-3d-dark px-6 font-bold" style={{ background: TV.oro, color: TV.tinta }}><RotateCcw className="h-5 w-5" /> {sd("rematch")}</button>
           <ShareResult text={tt("trShare", { a: score[0], b: score[1] })} />
         </div>
         <div className="rounded-3xl bg-white p-4 text-left" style={{ color: TV.tinta }}>

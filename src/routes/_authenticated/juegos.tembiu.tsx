@@ -175,7 +175,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
         </div>
         <RetoFinal partida={partida} puntaje={score} />
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: T.ocre, color: T.tinta }}>{tt("tbAgain")}</button>
+          <button type="button" onClick={onAgain} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold" style={{ background: T.ocre, color: T.tinta }}>{tt("tbAgain")}</button>
           <Link to="/dashboard" className="flex h-12 items-center rounded-2xl px-6 font-bold ring-1 ring-white/40" style={{ color: T.papel }}>Listo · Volver al panel</Link>
         </div>
       </section>
@@ -255,8 +255,8 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
               type="button"
               onClick={() => toggle(x)}
               aria-pressed={on}
-              className="tb-pick tap-3d-dark relative flex min-h-28 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-center"
-              style={{ background: T.papel, color: T.tinta, boxShadow: `0 0 0 4px ${ring}, 0 5px 0 0 #C9A97C, 0 10px 18px -8px rgba(0,0,0,.6)`, opacity: checked && !right && !on ? 0.45 : 1 }}
+              className="tb-pick relative flex min-h-28 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-center"
+              style={{ background: T.papel, color: T.tinta, boxShadow: `0 0 0 4px ${ring}, 0 10px 18px -8px rgba(0,0,0,.6)`, opacity: checked && !right && !on ? 0.45 : 1 }}
             >
               <span className="grid h-12 w-12 place-items-center rounded-full text-3xl" style={{ background: "#F3DFC0" }} aria-hidden>{ing[x]?.emoji}</span>
               <b className="text-sm leading-tight sm:text-base">{ing[x]?.gn}</b>
@@ -276,7 +276,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
         </button>
       )}
       {!checked && (
-        <button type="button" onClick={giveUp} className="h-11 w-full rounded-2xl text-sm font-bold text-white ring-1 ring-white/30 hover:bg-white/10">
+        <button type="button" onClick={giveUp} className="h-11 w-full rounded-2xl tap-3d-dark text-sm font-bold text-white ring-1 ring-white/30 hover:bg-white/10">
           {sure ? g("giveUpRecipeSure") : g("giveUpRecipe")}
         </button>
       )}

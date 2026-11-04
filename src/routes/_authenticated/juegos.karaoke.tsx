@@ -341,8 +341,8 @@ function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partid
         </div>
         <Recorder song={song} />
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: K.oro, color: K.noche }}>{tt("kkAgain")}</button>
-          <button type="button" onClick={onBack} className="h-12 rounded-2xl px-6 font-bold ring-1 ring-white/30">{tt("kkOther")}</button>
+          <button type="button" onClick={onAgain} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold" style={{ background: K.oro, color: K.noche }}>{tt("kkAgain")}</button>
+          <button type="button" onClick={onBack} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold ring-1 ring-white/30">{tt("kkOther")}</button>
         </div>
         <RetoFinal partida={partida} puntaje={points} total={song.lines.length * 5} extra={song.id} coincide={!partida.reto || partida.reto.x === song.id} />
       </section>
