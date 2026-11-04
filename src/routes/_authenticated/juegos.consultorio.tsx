@@ -498,10 +498,19 @@ function Avatar({ p, estado }: { p: Paciente; estado: "espera" | "bien" | "mal" 
       <ellipse cx="50" cy="54" rx="26" ry="30" fill={piel} />
       <path d={p.femenino ? "M24 46 Q30 20 50 20 Q70 20 76 46 Q64 30 50 32 Q36 30 24 46" : "M25 44 Q28 20 50 20 Q72 20 75 44 Q70 32 50 32 Q30 32 25 44"} fill={pelo} />
       <path d={ceja} stroke="#3a2a20" strokeWidth="2.2" strokeLinecap="round" />
-      <circle cx="40" cy="50" r="3" fill="#1b1b1b" />
-      <circle cx="60" cy="50" r="3" fill="#1b1b1b" />
+      {[40, 60].map((x) => (
+        <g key={x}>
+          <ellipse cx={x} cy="50" rx="4.6" ry="4.2" fill="#fff" />
+          <circle cx={x} cy="50.5" r="2.8" fill="#4A2F1C" />
+          <circle cx={x + 1} cy="49" r="0.9" fill="#fff" />
+        </g>
+      ))}
+      <circle cx="33" cy="60" r="5" fill="#E9877A" opacity=".35" />
+      <circle cx="67" cy="60" r="5" fill="#E9877A" opacity=".35" />
+      <path d="M50 52 Q47 58 50 60" stroke="#00000033" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+      {p.edad > 62 && <g fill="none" stroke="#3a2a20" strokeWidth="1.4"><circle cx="40" cy="50" r="6.5" /><circle cx="60" cy="50" r="6.5" /><path d="M46.5 50 L53.5 50" /></g>}
       <path d={boca} stroke="#6b2b2b" strokeWidth="3" fill="none" strokeLinecap="round" />
-      <path d="M22 100 Q22 82 50 82 Q78 82 78 100 Z" fill="#7FB8C9" />
+      <path d="M22 100 Q22 82 50 82 Q78 82 78 100 Z" fill="#7FB8C9" /><path d="M42 82 L50 92 L58 82" fill="none" stroke="#4A8A9C" strokeWidth="2" />
     </svg>
   );
 }
