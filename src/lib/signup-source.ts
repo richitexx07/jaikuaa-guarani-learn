@@ -21,10 +21,26 @@ export function cleanSource(raw: string | null | undefined): string | null {
 }
 
 /** Lee ?de= (o utm_source=) de la dirección y lo guarda si todavía no había uno. */
-export function captureSource(search: string = typeof window === "undefined" ? "" : window.location.search) {
+/** Si el enlace no trae ?de=, se deduce de la página de donde vino (Facebook, Instagram…). */
+export function sourceFromReferrer(ref: string): string | null {
+  let host = "";
+  try { host = new URL(ref).hostname.toLowerCase(); } catch { return null; }
+  if (/(^|\.)instagram\.com$/.test(host)) return "instagram";
+  if (/(^|\.)(facebook\.com|fb\.com|fb\.me)$/.test(host)) return "facebook";
+  if (/(^|\.)tiktok\.com$/.test(host)) return "tiktok";
+  if (/(^|\.)(whatsapp\.com|wa\.me)$/.test(host)) return "whatsapp";
+  if (/(^|\.)chatgpt\.com$/.test(host)) return "chatgptcom";
+  if (/(^|\.)google\.[a-z.]+$/.test(host)) return "google";
+  return null;
+}
+
+export function captureSource(
+  search: string = typeof window === "undefined" ? "" : window.location.search,
+  referrer: string = typeof document === "undefined" ? "" : document.referrer,
+) {
   try {
     const q = new URLSearchParams(search);
-    const s = cleanSource(q.get("de") ?? q.get("utm_source"));
+    const s = cleanSource(q.get("de") ?? q.get("utm_source")) ?? sourceFromReferrer(referrer);
     if (s && !localStorage.getItem(SOURCE_KEY)) localStorage.setItem(SOURCE_KEY, s);
   } catch {
     /* sin almacenamiento: no pasa nada */

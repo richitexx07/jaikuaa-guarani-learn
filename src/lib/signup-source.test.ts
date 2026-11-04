@@ -24,3 +24,13 @@ describe("origen de los registros", () => {
     expect(sourceToClaim(undefined, undefined, "facebook", now)).toBeNull();
   });
 });
+
+import { sourceFromReferrer as fromRef } from "./signup-source";
+describe("origen por la página de donde vino", () => {
+  it("reconoce Facebook e Instagram sin ?de=", () => {
+    expect(fromRef("https://l.facebook.com/l.php?u=x")).toBe("facebook");
+    expect(fromRef("https://l.instagram.com/")).toBe("instagram");
+    expect(fromRef("https://www.jaikuaa.com/")).toBeNull();
+    expect(fromRef("")).toBeNull();
+  });
+});

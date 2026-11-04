@@ -26,6 +26,7 @@ import { syncAllPending, totalPending } from "@/lib/offline-sync";
 import { pendingAnswersCount } from "@/lib/answer-log";
 import { captureSource, claimSource } from "@/lib/signup-source";
 import { markHadAccount } from "@/lib/guest";
+import { cleanRefCode, REF_STORAGE_KEY } from "@/lib/ambassador";
 import { shareMetaFor } from "@/lib/share-meta";
 import jaiSorpresa from "@/assets/jai/jai-sorpresa.webp";
 
@@ -197,6 +198,11 @@ function RootComponent() {
   useEffect(() => {
     // De dónde llegó la persona (?de=facebook, ?de=whatsapp…): se anota al crear la cuenta.
     captureSource();
+    // Código de embajador (?ref=) en cualquier página: así se acredita aunque primero juegue sin cuenta.
+    try {
+      const ref = cleanRefCode(new URLSearchParams(window.location.search).get("ref"));
+      if (ref) localStorage.setItem(REF_STORAGE_KEY, ref);
+    } catch { /* sin almacenamiento */ }
     void redeemPendingPilotCode();
     void claimSource();
     const { data } = supabase.auth.onAuthStateChange((event) => {

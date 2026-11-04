@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { GameStage } from "@/components/games/game-stage";
 import { COVER_TONE, type CoverId } from "@/components/games/game-covers";
 import { COVER_IMAGE } from "@/components/games/game-cover-images";
-import { useRecordVisit } from "@/lib/gamification";
+import { useRecordVisit, useStats } from "@/lib/gamification";
 import jaiImg from "@/assets/jai-gamer.webp";
 import { useState } from "react";
 import { authMode, isGuestPath, useIsGuest } from "@/lib/guest";
@@ -69,6 +69,7 @@ const byId = (id: CoverId) => GAMES.find((g) => g.id === id)!;
 function GamesHome() {
   useRecordVisit("juegos");
   const guest = useIsGuest();
+  const stats = useStats();
   const destacado = byId(guest ? "penales" : "consultorio");
   const { lang, g } = useGT();
   return (
@@ -96,6 +97,17 @@ function GamesHome() {
           </div>
         </div>
       </section>
+
+      {guest && stats.xp > 0 && (
+        <Link
+          to="/auth"
+          search={{ mode: authMode() }}
+          className="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-[#F6C445] px-4 py-3 text-[#3A1A05] ring-1 ring-black/10"
+        >
+          <span className="text-sm font-semibold">Ganaste {stats.xp} XP en este celular. Creá tu cuenta gratis para no perderlos.</span>
+          <span className="shrink-0 rounded-xl bg-[#1E3A5F] px-3 py-2 text-xs font-bold text-white">Guardar mis puntos</span>
+        </Link>
+      )}
 
       {/* Destacado */}
       <Link
