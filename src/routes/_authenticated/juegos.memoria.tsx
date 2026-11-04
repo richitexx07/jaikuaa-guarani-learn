@@ -236,7 +236,7 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
       {gaveUp && (
         <div className="space-y-3 rounded-3xl p-6 text-center" style={{ background: M.papel, color: M.tinta }}>
           <p className="font-display text-xl font-bold">¡Tranquilo! Errar es parte de aprender.</p>
-          <p className="text-sm opacity-75">Estas son todas las parejas. Tocá las tarjetas en guaraní de arriba no suenan acá; repasalas y volvé a intentarlo (sin XP).</p>
+          <p className="text-sm opacity-75">Estas son todas las parejas. Repasalas y volvé a intentarlo (sin XP).</p>
           <ul className="mx-auto max-w-sm space-y-1 text-left">
             {words.map((w) => (
               <li key={w.gn} className="flex items-center justify-between gap-2 rounded-xl px-3 py-1.5" style={{ background: "#fff" }}>
