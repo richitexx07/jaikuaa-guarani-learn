@@ -98,8 +98,9 @@ function Consultorio() {
     } catch {}
   };
 
-  // Contenido: palabras del cuerpo (lección 4) y frases de salud publicadas con voz.
-  const cuerpoQ = useGameWords(4);
+  // Contenido: TODAS las partes del cuerpo publicadas con voz (no solo la lección 4), así cada palabra
+  // nueva de salud que publiquen los docentes (mano, panza, pecho…) suma pacientes sola. Y las frases de salud.
+  const cuerpoQ = useGameWords(null);
   const listFn = useServerFn(listMostrador);
   const audioFn = useServerFn(getMostradorAudio);
   const frasesQ = useQuery({
