@@ -183,7 +183,7 @@ function Board({ word, partida, lesson, onNext }: { word: GameWord; partida: Par
           {gaveUp && <p className="text-sm leading-snug opacity-80">{tr("gaveUpNote")}</p>}
           {xpGained > 0 && <p className="font-bold" style={{ color: A.verde }}>+{xpGained} XP</p>}
           <div className="flex flex-wrap justify-center gap-2">
-            <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: A.rojo }}>{tr("anotherWord")}</button>
+            <button type="button" onClick={onNext} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold text-white" style={{ background: A.rojo }}>{tr("anotherWord")}</button>
           </div>
           <RetoFinal partida={partida} puntaje={won ? LIVES - wrong : 0} extra={lesson === null ? undefined : String(lesson)} />
         </div>

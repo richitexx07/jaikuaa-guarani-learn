@@ -167,7 +167,7 @@ function LockedNotice({ title, onClose }: { title: string; onClose: () => void }
         <p className="mt-2 text-center text-sm text-white/80">Creá tu cuenta gratis para jugarlo. Mientras tanto, podés jugar sin cuenta a los juegos marcados como libres.</p>
         <Link to="/auth" search={{ mode: authMode() }} className="mt-5 flex h-12 items-center justify-center rounded-2xl bg-[#3DE0B0] font-bold text-[#062A2E]">Crear mi cuenta gratis</Link>
         <Link to="/juegos/penales" className="mt-2 flex h-12 items-center justify-center rounded-2xl bg-white/10 font-bold">Jugar Penales sin cuenta</Link>
-        <button type="button" onClick={onClose} className="mt-2 h-11 w-full rounded-2xl font-semibold text-white/70">Ver otros juegos</button>
+        <button type="button" onClick={onClose} className="mt-2 h-11 w-full rounded-2xl tap-3d-dark font-semibold text-white/70">Ver otros juegos</button>
       </div>
     </div>
   );

@@ -175,7 +175,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
         </div>
         <RetoFinal partida={partida} puntaje={score} />
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: T.ocre, color: T.tinta }}>{tt("tbAgain")}</button>
+          <button type="button" onClick={onAgain} className="h-12 rounded-2xl tap-3d-dark px-6 font-bold" style={{ background: T.ocre, color: T.tinta }}>{tt("tbAgain")}</button>
           <Link to="/dashboard" className="flex h-12 items-center rounded-2xl px-6 font-bold ring-1 ring-white/40" style={{ color: T.papel }}>Listo · Volver al panel</Link>
         </div>
       </section>
@@ -255,8 +255,8 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
               type="button"
               onClick={() => toggle(x)}
               aria-pressed={on}
-              className="tb-pick relative flex min-h-28 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-center"
-              style={{ background: T.papel, color: T.tinta, boxShadow: `0 0 0 4px ${ring}, 0 8px 18px -10px rgba(0,0,0,.6)`, opacity: checked && !right && !on ? 0.45 : 1 }}
+              className="tb-pick tap-3d-dark relative flex min-h-28 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-center"
+              style={{ background: T.papel, color: T.tinta, boxShadow: `0 0 0 4px ${ring}, 0 10px 18px -8px rgba(0,0,0,.6)`, opacity: checked && !right && !on ? 0.45 : 1 }}
             >
               <span className="grid h-12 w-12 place-items-center rounded-full text-3xl" style={{ background: "#F3DFC0" }} aria-hidden>{ing[x]?.emoji}</span>
               <b className="text-sm leading-tight sm:text-base">{ing[x]?.gn}</b>
@@ -267,11 +267,11 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
         })}
       </div>
       {checked ? (
-        <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold" style={{ background: T.ocre, color: T.tinta }} onClick={next}>
+        <button type="button" className="btn-3d [--btn-base:#E0A030] h-14 w-full rounded-2xl font-display text-lg font-bold" style={{ background: T.ocre, color: T.tinta }} onClick={next}>
           {i + 1 === ROUNDS ? tt("tbSeeTable") : tt("tbNext")}
         </button>
       ) : (
-        <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold transition disabled:opacity-40" style={{ background: T.ocre, color: T.tinta }} disabled={picked.length !== 5} onClick={check}>
+        <button type="button" className="btn-3d [--btn-base:#E0A030] h-14 w-full rounded-2xl font-display text-lg font-bold disabled:opacity-40" style={{ background: T.ocre, color: T.tinta }} disabled={picked.length !== 5} onClick={check}>
           {tt("tbCook")}
         </button>
       )}

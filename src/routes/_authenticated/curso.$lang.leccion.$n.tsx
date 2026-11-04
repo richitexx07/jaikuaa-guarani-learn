@@ -466,7 +466,7 @@ function ChoiceStep({
             const isPicked = picked === opt;
             const isAnswer = opt === answer;
             let cls =
-              "flex min-h-14 items-center justify-between gap-2 rounded-2xl border-2 border-border/70 bg-background px-4 py-3 text-left text-base font-semibold transition active:scale-[0.98] hover:border-primary/50";
+              "flex min-h-14 items-center justify-between gap-2 rounded-2xl border-2 border-border bg-background px-4 py-3 text-left text-base font-semibold tap-3d hover:border-primary/50";
             if (picked) {
               if (isAnswer) cls += " border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200";
               else if (isPicked) cls += " lx-shake border-accent bg-accent/10 text-accent";
