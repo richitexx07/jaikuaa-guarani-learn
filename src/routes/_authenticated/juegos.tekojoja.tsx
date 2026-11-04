@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { QuitGameButton } from "@/components/games/quit-game-button";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shuffle } from "@/components/games/game-shell";
 import { GameStage } from "@/components/games/game-stage";
@@ -191,6 +192,7 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
           </button>
         </div>
       )}
+      <QuitGameButton className="text-white" onQuit={() => { setPick(null); setI(ROUNDS); }} />
     </section>
   );
 }

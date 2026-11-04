@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { QuitGameButton } from "@/components/games/quit-game-button";
 import { useJU } from "@/lib/i18n-juegos-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GameStage } from "@/components/games/game-stage";
@@ -198,6 +199,7 @@ function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: 
           </button>
         </div>
       )}
+      <QuitGameButton className="text-white" onQuit={() => { setPick(null); setI(visitas.length); }} />
     </section>
   );
 }
