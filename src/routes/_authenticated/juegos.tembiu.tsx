@@ -276,7 +276,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
         </button>
       )}
       {!checked && (
-        <button type="button" onClick={giveUp} className="h-11 w-full rounded-2xl tap-3d-dark text-sm font-bold text-white ring-1 ring-white/30 hover:bg-white/10">
+        <button type="button" onClick={giveUp} className="h-11 w-full rounded-2xl text-sm font-bold text-white ring-1 ring-white/30 hover:bg-white/10">
           {sure ? g("giveUpRecipeSure") : g("giveUpRecipe")}
         </button>
       )}

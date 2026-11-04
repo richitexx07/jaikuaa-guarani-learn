@@ -103,7 +103,7 @@ function Pronto({ decir, escuchar, total, isStaff, onVistaPrevia }: { decir: num
         {isStaff && (
           <div className="mt-4 grid gap-2">
             <Link to="/mostrador/editar" search={{ rubro: "atencion" }} className="flex h-12 items-center justify-center rounded-2xl font-bold text-white" style={{ background: V.azul }}>{tt("vtWrite", { n: total })}</Link>
-            <button type="button" onClick={onVistaPrevia} className="h-12 rounded-2xl tap-3d-dark font-bold ring-1 ring-black/15">{tt("vtTry")}</button>
+            <button type="button" onClick={onVistaPrevia} className="h-12 rounded-2xl font-bold ring-1 ring-black/15">{tt("vtTry")}</button>
           </div>
         )}
       </div>

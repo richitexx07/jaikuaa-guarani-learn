@@ -322,7 +322,7 @@ function Board({ puzzle, partida, extra, onNext }: { puzzle: Puzzle; partida: Pa
 
       {!done && (
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" onClick={giveHint} className="min-h-11 touch-manipulation rounded-2xl tap-3d-dark bg-white px-5 text-sm font-bold ring-1 ring-[#C9DCF0]" style={{ color: S.tinta }}>
+          <button type="button" onClick={giveHint} className="min-h-11 touch-manipulation rounded-2xl bg-white px-5 text-sm font-bold ring-1 ring-[#C9DCF0]" style={{ color: S.tinta }}>
             {tt("hint")}
           </button>
           <button
