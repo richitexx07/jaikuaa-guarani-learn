@@ -70,6 +70,8 @@ function draw(now: number){
   if(hype>0&&!reduce){[90,250,550,710].forEach((fx,i)=>{const fy=40+(i%2)*18,r=26+Math.sin(now/60+i)*6;const g=ctx.createRadialGradient(fx,fy,1,fx,fy,r*2.4);g.addColorStop(0,alpha(i%2?'gold':'red',.9*hype));g.addColorStop(1,alpha('red',0));ctx.fillStyle=g;ctx.fillRect(fx-r*2.4,fy-r*2.4,r*4.8,r*4.8);for(let k=0;k<6;k++){ctx.fillStyle=alpha('white',.5*hype);ctx.beginPath();ctx.arc(fx+Math.sin(now/120+k*2)*14,fy-((now/8+k*20)%70),2,0,7);ctx.fill();}});}
   const led=[ledText,'JAIKUAA · EL ESTADIO DE LAS PALABRAS','APRENDÉ JUGANDO · AUDIO DE VOCES REALES'][Math.floor(now/9000)%3];ledText=led;ctx.font='800 16px sans-serif';const ledWidth=Math.max(420,ctx.measureText(ledText).width+90);const off=reduce?0:(now/12)%ledWidth;ctx.fillStyle=palette['black'];ctx.fillRect(0,92,W,24);ctx.save();ctx.beginPath();ctx.rect(0,92,W,24);ctx.clip();ctx.fillStyle=palette['gold'];for(let x=-ledWidth;x<W+ledWidth;x+=ledWidth)ctx.fillText(ledText + "  ·  ",x-off+20,110);ctx.restore();
   for(let i=0;i<6;i++){ctx.fillStyle=i%2?palette['grass']:palette['stripe'];ctx.fillRect(0,216+i*64,W,64);}
+  {const gl=ctx.createRadialGradient(400,330,20,400,330,420);gl.addColorStop(0,alpha('white',.14));gl.addColorStop(1,alpha('white',0));ctx.fillStyle=gl;ctx.fillRect(0,216,W,H-216);}
+  ctx.fillStyle=alpha('black',.35);ctx.fillRect(0,84,W,8);ctx.fillStyle=alpha('white',.08);for(let r=0;r<4;r++)ctx.fillRect(0,18+r*18,W,2);
   ctx.strokeStyle=alpha('white', .85);ctx.lineWidth=4;ctx.strokeRect(70,G.y+G.h,660,170);ctx.beginPath();ctx.arc(400,520,5,0,7);ctx.fillStyle=palette['white'];ctx.fill();
   drawNet(now);
   // target hint: corners glow
