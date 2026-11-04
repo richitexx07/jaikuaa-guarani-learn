@@ -98,6 +98,15 @@ function GamesHome() {
         </div>
       </section>
 
+      <a
+        href={`https://wa.me/?text=${encodeURIComponent("Mba'éichapa! Te reto a jugar en guaraní con voces reales, gratis y sin descargar nada. ¿Me ganás? https://www.jaikuaa.com/juegos?de=reto")}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 text-base font-bold text-[#0B3B1E] shadow-lg"
+      >
+        Retá a alguien por WhatsApp
+      </a>
+
       {guest && stats.xp > 0 && (
         <Link
           to="/auth"
