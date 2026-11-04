@@ -3,14 +3,13 @@ import { QuitGameButton } from "@/components/games/quit-game-button";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Volume2 } from "lucide-react";
 import { GameStage } from "@/components/games/game-stage";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from "@/components/games/reto";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
-import { getMostradorAudio, listMostrador } from "@/lib/mostrador.functions";
+import { useMostrador } from "@/lib/use-mostrador";
 import { playFrase, prefetchFrases } from "@/lib/mostrador-audio";
 import { armarTurnoVentanilla, CLIENTES, CLIENTES_POR_TURNO, frasesUsables, gnDe, hayParaJugar, MIN_DECIR, MIN_ESCUCHAR, type RondaVentanilla } from "@/lib/ventanilla";
 import type { Frase } from "@/lib/mostrador";
@@ -42,20 +41,19 @@ const CSS = `
 `;
 
 function Ventanilla() {
-  const listFn = useServerFn(listMostrador);
-  const audioFn = useServerFn(getMostradorAudio);
+  const { listar, audios } = useMostrador();
   const partida = useRetoPartida("ventanilla", { total: CLIENTES_POR_TURNO });
   const { seed, otra } = partida;
   const [vistaPrevia, setVistaPrevia] = useState(false);
 
-  const q = useQuery({ queryKey: ["mostrador", "atencion", vistaPrevia], queryFn: () => listFn({ data: { rubro: "atencion", todas: vistaPrevia } }), retry: false });
+  const q = useQuery({ queryKey: ["mostrador", "atencion", vistaPrevia], queryFn: () => listar("atencion", vistaPrevia), retry: false });
   const frases = useMemo(() => q.data?.frases ?? [], [q.data]);
   const ids = useMemo(() => frases.filter((f) => f.hasAudio).map((f) => f.id), [frases]);
   const audioQ = useQuery({
     queryKey: ["mostrador-audio", "atencion", ids.join(",")],
     enabled: ids.length > 0,
     staleTime: 30 * 60_000,
-    queryFn: () => audioFn({ data: { ids: ids.slice(0, 80) } }),
+    queryFn: () => audios(ids.slice(0, 80)),
   });
   const urls = audioQ.data?.urls ?? {};
   useEffect(() => { if (audioQ.data?.urls) prefetchFrases(audioQ.data.urls); }, [audioQ.data?.urls]);

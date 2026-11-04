@@ -3,6 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import type { GameWord } from "@/lib/games.functions";
 import type { JuegoId, JuegoTexto } from "@/lib/juego-textos";
+import type { Frase } from "@/lib/mostrador";
 
 /**
  * Lo mínimo para jugar sin cuenta: SOLO contenido ya publicado (lo mismo que ve cualquiera que se registra).
@@ -76,3 +77,61 @@ export const listJuegoTextosGuest = createServerFn({ method: "GET" }).handler(as
   }));
   return { textos, isStaff: false };
 });
+
+// ── Frases de atención (Consultorio y Ventanilla) para quien juega sin cuenta ──
+
+const RubroGuest = z.enum(["salud", "atencion"]);
+
+/** Frases PUBLICADAS de un rubro (lo mismo que ve cualquier cuenta común). */
+export const listMostradorGuest = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ rubro: RubroGuest }).parse(d))
+  .handler(async ({ data }) => {
+    await guard("mostrador");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = supabaseAdmin as any;
+    const { data: rows, error } = await db
+      .from("mostrador_frases")
+      .select("id, rubro, situacion, tipo, es, gn, audio_path, orden, status")
+      .eq("rubro", data.rubro)
+      .eq("status", "publicada")
+      .order("orden");
+    if (error) throw new Error(error.message);
+    const frases: Frase[] = ((rows ?? []) as Record<string, unknown>[]).map((r) => ({
+      id: r.id as string,
+      rubro: r.rubro as Frase["rubro"],
+      situacion: r.situacion as string,
+      tipo: r.tipo as Frase["tipo"],
+      es: r.es as string,
+      gn: (r.gn as string | null) ?? null,
+      hasAudio: !!r.audio_path,
+      orden: r.orden as number,
+      status: r.status as Frase["status"],
+    }));
+    return { frases, pendientes: 0, isStaff: false };
+  });
+
+/** Enlaces temporales de las grabaciones de frases publicadas. */
+export const getMostradorAudioGuest = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ ids: z.array(z.string().uuid()).min(1).max(80) }).parse(d))
+  .handler(async ({ data }) => {
+    await guard("mostrador-audio");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = supabaseAdmin as any;
+    const { data: rows } = await db
+      .from("mostrador_frases")
+      .select("id, audio_path")
+      .in("id", data.ids)
+      .eq("status", "publicada")
+      .not("audio_path", "is", null);
+    const list = (rows ?? []) as { id: string; audio_path: string }[];
+    const urls: Record<string, string> = {};
+    if (list.length === 0) return { urls, limited: false };
+    const { data: signed } = await db.storage.from("guarani-audio").createSignedUrls(list.map((x) => x.audio_path), 60 * 60);
+    for (const s of (signed ?? []) as { path: string | null; signedUrl: string | null; error: string | null }[]) {
+      const row = list.find((x) => x.audio_path === s.path);
+      if (row && s.signedUrl && !s.error) urls[row.id] = s.signedUrl;
+    }
+    return { urls, limited: false };
+  });

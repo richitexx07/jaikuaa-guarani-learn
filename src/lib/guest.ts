@@ -16,10 +16,21 @@ export const GUEST_GAMES = [
   "/juegos/duelo",
   "/juegos/trivia-duelo",
   "/juegos/penales",
+  // Los juegos con reto: así quien recibe un reto por WhatsApp juega sin crear cuenta.
+  "/juegos/consultorio",
+  "/juegos/ventanilla",
+  "/juegos/chacra",
+  "/juegos/karaoke",
+  "/juegos/tembiu",
+  "/juegos/taanga",
+  "/juegos/tekojoja",
+  "/trivia",
 ] as const;
 
 export function isGuestPath(pathname: string): boolean {
   const p = pathname.replace(/\/+$/, "") || "/";
+  // Cada categoría de la trivia (/trivia/historia, /trivia/comidas…).
+  if (/^\/trivia\/[a-z0-9-]+$/i.test(p)) return true;
   return (GUEST_GAMES as readonly string[]).includes(p);
 }
 

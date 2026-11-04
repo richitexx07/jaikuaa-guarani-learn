@@ -2,13 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { QuitGameButton } from "@/components/games/quit-game-button";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { Loader2, RotateCcw, Stethoscope, Volume2 } from "lucide-react";
 import { GameKit, GameSoundButton, useGameKit } from "@/components/games/game-kit";
 import { useGameWords } from "@/components/games/game-shell";
 import { recordCompletion } from "@/lib/gamification";
 import { playGuarani } from "@/lib/audio";
-import { getMostradorAudio, listMostrador } from "@/lib/mostrador.functions";
+import { useMostrador } from "@/lib/use-mostrador";
 import { playFrase, prefetchFrases } from "@/lib/mostrador-audio";
 import {
   armarTurno,
@@ -101,11 +100,10 @@ function Consultorio() {
   // Contenido: TODAS las partes del cuerpo publicadas con voz (no solo la lección 4), así cada palabra
   // nueva de salud que publiquen los docentes (mano, panza, pecho…) suma pacientes sola. Y las frases de salud.
   const cuerpoQ = useGameWords(null);
-  const listFn = useServerFn(listMostrador);
-  const audioFn = useServerFn(getMostradorAudio);
+  const { listar, audios } = useMostrador();
   const frasesQ = useQuery({
     queryKey: ["mostrador", "salud"],
-    queryFn: () => listFn({ data: { rubro: "salud", todas: false } }),
+    queryFn: () => listar("salud"),
     retry: false,
   });
   const cuerpo: PalabraCuerpo[] = useMemo(
@@ -128,7 +126,7 @@ function Consultorio() {
     queryKey: ["mostrador-audio", "salud", ids.join(",")],
     enabled: ids.length > 0,
     staleTime: 30 * 60 * 1000,
-    queryFn: () => audioFn({ data: { ids: ids.slice(0, 80) } }),
+    queryFn: () => audios(ids.slice(0, 80)),
   });
   const urls = audioQ.data?.urls ?? {};
   useEffect(() => { if (audioQ.data?.urls) prefetchFrases(audioQ.data.urls); }, [audioQ.data?.urls]);

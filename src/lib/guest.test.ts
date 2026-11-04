@@ -11,7 +11,10 @@ describe("jugar sin cuenta", () => {
     expect(isGuestPath("/juegos/")).toBe(true);
     expect(isGuestPath("/juegos/ahorcado")).toBe(true);
     expect(isGuestPath("/juegos/duelo")).toBe(true);
-    expect(isGuestPath("/juegos/karaoke")).toBe(false);
+    expect(isGuestPath("/juegos/karaoke")).toBe(true);
+    expect(isGuestPath("/trivia/historia")).toBe(true);
+    expect(isGuestPath("/trivia/historia/otra")).toBe(false);
+    expect(isGuestPath("/juegos/palabra-del-dia")).toBe(false);
     expect(isGuestPath("/dashboard")).toBe(false);
     expect(isGuestPath("/admin/corpus")).toBe(false);
   });
