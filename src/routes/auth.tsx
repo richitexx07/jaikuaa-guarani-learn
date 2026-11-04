@@ -1,3 +1,5 @@
+import { OpenInBrowser } from "@/components/open-in-browser";
+import { inAppBrowser } from "@/lib/in-app-browser";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
 import { useEffect, useState } from "react";
@@ -163,6 +165,12 @@ function AuthPage() {
   }
 
   async function handleGoogle() {
+    // Dentro de Facebook, Instagram o TikTok, Google bloquea el ingreso: se muestra el aviso en lugar de un error.
+    if (inAppBrowser()) {
+      document.getElementById("abrir-en-navegador")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      toast.message(lang === "pt" ? "Abra o Jaikuaa no navegador do celular para entrar com Google." : lang === "en" ? "Open Jaikuaa in your phone's browser to use Google." : "Abrí Jaikuaa en el navegador del celular para entrar con Google.");
+      return;
+    }
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: `${window.location.origin}/auth`,
     });
@@ -224,6 +232,7 @@ function AuthPage() {
             />
           ) : (
           <>
+          <div id="abrir-en-navegador"><OpenInBrowser lang={lang} className="mt-6" /></div>
           <Button type="button" variant="outline" size="lg" className="mt-8 h-14 w-full border-2 text-base font-semibold" onClick={handleGoogle}>
             <GoogleIcon /> {t("auth.google")}
           </Button>
