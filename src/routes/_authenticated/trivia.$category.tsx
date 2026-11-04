@@ -1,11 +1,11 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { TRIVIA_CATEGORIAS } from "@/lib/listas-livianas";
 import { ValidationNotice } from "@/components/validation-notice";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import {
   TRIVIA,
-  TRIVIA_ORDER,
   QUESTION_SECONDS,
   XP_PER_CORRECT,
   XP_STREAK_BONUS,
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/trivia/$category")({
       { name: "twitter:card", content: "summary" },
     ] }),
   loader: ({ params }) => {
-    if (!TRIVIA_ORDER.includes(params.category as TriviaCategoryId)) throw notFound();
+    if (!TRIVIA_CATEGORIAS.includes(params.category)) throw notFound();
     return { category: params.category as TriviaCategoryId };
   },
   component: TriviaQuiz,

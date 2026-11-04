@@ -2,23 +2,23 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Printer } from "lucide-react";
-import { z } from "zod";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { getSponsorReport } from "@/lib/sponsors.functions";
 import { SPONSOR_SLOTS, type SponsorSlot } from "@/lib/sponsor-slots";
 import { SUPPORT_WHATSAPP } from "@/lib/contact";
 
-const searchSchema = z.object({
-  sponsor: z.string().max(120).optional(),
-  days: z.union([z.literal(7), z.literal(30), z.literal(90)]).optional(),
-});
+// Sin zod a propósito: esta validación viaja en el arranque de la app y zod pesa mucho.
+function parseSearch(s: Record<string, unknown>): { sponsor?: string; days?: 7 | 30 | 90 } {
+  const out: { sponsor?: string; days?: 7 | 30 | 90 } = {};
+  if (typeof s.sponsor === "string" && s.sponsor.length <= 120) out.sponsor = s.sponsor;
+  const d = Number(s.days);
+  if (d === 7 || d === 30 || d === 90) out.days = d;
+  return out;
+}
 
 export const Route = createFileRoute("/_authenticated/admin/informe-auspiciante")({
-  validateSearch: (s: Record<string, unknown>) => {
-    const r = searchSchema.safeParse({ ...s, days: s.days === undefined ? undefined : Number(s.days) });
-    return r.success ? r.data : {};
-  },
+  validateSearch: (s: Record<string, unknown>) => parseSearch(s),
   head: () => ({ meta: [{ title: "Jaikuaa — Informe para auspiciante" },
       { name: "description", content: "Consultá el informe de presencia de auspiciantes en Jaikuaa y prepará su versión imprimible." },
       { property: "og:title", content: "Jaikuaa — Informe para auspiciante" },

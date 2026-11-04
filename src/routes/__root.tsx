@@ -15,7 +15,9 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SplashScreen } from "@/components/splash-screen";
 import { supabase } from "@/integrations/supabase/client";
 import { redeemPendingPilotCode } from "@/lib/pilot-code";
-import { SupportWhatsApp } from "@/components/support-whatsapp";
+import { lazy, Suspense } from "react";
+// El botón de ayuda con Jai trae muchos textos: se descarga aparte, después de mostrar la pantalla.
+const SupportWhatsApp = lazy(() => import("@/components/support-whatsapp").then((m) => ({ default: m.SupportWhatsApp })));
 import { BackButton } from "@/components/navigation/back-button";
 import { Toaster } from "@/components/ui/sonner";
 import { applyDisplayPrefs, readDisplayPrefs } from "@/lib/display-prefs";
@@ -213,7 +215,9 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <BackButton />
-      <SupportWhatsApp />
+      <Suspense fallback={null}>
+        <SupportWhatsApp />
+      </Suspense>
       {/* Los avisos breves ("Validación registrada", "Otra persona ya la validó"...). Arriba, para no tapar botones. */}
       <Toaster position="top-center" richColors closeButton />
     </QueryClientProvider>

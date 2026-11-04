@@ -1,11 +1,18 @@
 import { useRouter, useRouterState } from "@tanstack/react-router";
-import { usePubTx } from "@/lib/i18n-public";
+import { useAppLang } from "@/lib/i18n";
 import { ArrowLeft } from "lucide-react";
 import { fallbackBackPath, showsBackButton } from "@/lib/back-nav";
 import { showsBottomNav } from "@/lib/bottom-nav";
 
+// Textos propios: antes este botón traía al arranque todos los textos de las páginas públicas.
+const TX = {
+  bbBack: { es: "Volver", pt: "Voltar", en: "Back", de: "Zurück", fr: "Retour", zh: "返回" },
+  bbBackAria: { es: "Volver a la pantalla anterior", pt: "Voltar à tela anterior", en: "Back to the previous screen", de: "Zurück zum vorherigen Bildschirm", fr: "Retour à l'écran précédent", zh: "返回上一個畫面" },
+} as const;
+
 export function BackButton() {
-  const t = usePubTx();
+  const lang = useAppLang();
+  const t = (k: keyof typeof TX) => TX[k][lang] ?? TX[k].es;
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   if (!showsBackButton(pathname)) return null;

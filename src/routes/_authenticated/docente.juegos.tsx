@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { JUEGO_IDS } from "@/lib/listas-livianas";
 import { useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -24,7 +25,8 @@ import {
 } from "@/lib/juego-textos";
 import { JUEGO_TEXTOS_KEY, useJuegoTextos } from "@/lib/use-juego-textos";
 
-const IDS = JUEGOS_EDITOR.map((j) => j.id);
+// Lista liviana: así los textos de los juegos no viajan en el arranque de la app.
+const IDS: readonly JuegoId[] = JUEGO_IDS;
 const isJuego = (s: unknown): s is JuegoId => typeof s === "string" && (IDS as string[]).includes(s);
 
 const RUTA_JUEGO: Record<JuegoId, string> = {

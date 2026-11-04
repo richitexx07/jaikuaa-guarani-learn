@@ -23,9 +23,8 @@ export const Route = createFileRoute("/_authenticated/guarani-escolar/rescate")(
 });
 
 const WHENS = ["Hoy", "Mañana", "En 3 días", "Esta semana"] as const;
-const GRADES = ESCOLAR_GRADES;
 type When = (typeof WHENS)[number];
-type Grade = (typeof GRADES)[number];
+type Grade = (typeof ESCOLAR_GRADES)[number];
 
 type Phase =
   | { kind: "setup" }
@@ -203,7 +202,7 @@ function SetupScreen({
         <div>
           <label className="block text-sm font-semibold text-foreground">{t("whichGrade2")}</label>
           <div className="mt-3 flex flex-wrap gap-2">
-            {GRADES.map((g) => (
+            {ESCOLAR_GRADES.map((g) => (
               <Button
                 key={g}
                 variant={g === grade ? "cta" : "outline"}
