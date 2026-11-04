@@ -1,3 +1,4 @@
+import { useAppLang } from "@/lib/i18n";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ValidationBadge } from "@/components/validation-notice";
 import { DisplayToggles } from "@/components/display-toggles";
@@ -58,8 +59,8 @@ import jaiImg from "@/assets/jai/jai-saluda.webp";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import bannerAprender from "@/assets/banners/banner-aprender.webp";
 import bannerCurso from "@/assets/banners/banner-curso.webp";
-import bannerCastellano from "@/assets/banners/banner-castellano-tecnico.jpg";
 import bannerEscolar from "@/assets/banners/banner-escolar.webp";
+import bannerCastellano from "@/assets/banners/banner-castellano-tecnico.webp";
 import coverKaraoke from "@/assets/covers/cover-karaoke.webp";
 import miniKaraoke from "@/assets/covers/mini/mini-karaoke.webp";
 import miniPenales from "@/assets/covers/mini/mini-penales.webp";
@@ -490,30 +491,7 @@ function Dashboard() {
           </nav>
 
           {/* PRÓXIMA NOVEDAD — Castellano técnico para guaranihablantes */}
-          <section aria-labelledby="novedad-castellano" className="relative mt-5 overflow-hidden rounded-3xl border border-primary/20 shadow-xl">
-            <img src={bannerCastellano} alt="Joven estudiante del interior con cuaderno y celular, camino a la ciudad" width={1536} height={768} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-[30%_center]" />
-            <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-primary/10 sm:bg-gradient-to-l sm:from-primary sm:via-primary/85 sm:to-transparent" />
-            <span aria-hidden className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-12 bg-gradient-to-r from-transparent via-primary-foreground/15 to-transparent motion-safe:animate-[shine_5s_ease-in-out_infinite]" />
-            <div className="relative flex min-h-[320px] flex-col justify-end p-5 sm:ml-auto sm:min-h-[280px] sm:w-3/5 sm:justify-center sm:p-8">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-accent-foreground shadow">
-                  <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full rounded-full bg-accent-foreground/70 motion-safe:animate-ping" /><span className="relative h-2 w-2 rounded-full bg-accent-foreground" /></span>
-                  Próxima novedad
-                </span>
-                <span className="rounded-full border border-primary-foreground/40 bg-primary-foreground/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-primary-foreground backdrop-blur-sm">
-                  En desarrollo
-                </span>
-              </div>
-              <h2 id="novedad-castellano" className="mt-3 font-display text-2xl font-bold leading-tight text-primary-foreground sm:text-3xl">
-                Castellano técnico y formal
-                <span className="block text-base font-semibold text-primary-foreground/85 sm:text-lg">para quienes ya hablan guaraní</span>
-              </h2>
-              <p className="mt-2 text-sm text-primary-foreground/90">
-                Redacción, trámites y vocabulario académico para jóvenes del interior. Se prepara y revisa con docentes especialistas.
-              </p>
-              <p className="mt-3 text-xs font-medium text-primary-foreground/75">Hoy ya practicás en las dos direcciones: castellano ⇄ guaraní.</p>
-            </div>
-          </section>
+          <NovedadCastellano />
 
           {/* INVITAR — franja compacta con vida */}
           <Link
@@ -881,5 +859,66 @@ function FreeCard({
       </span>
       <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5" aria-hidden />
     </Link>
+  );
+}
+
+/* Próxima novedad (plan real, en desarrollo): textos en los 6 idiomas de contenido. */
+const NOV = {
+  badge: { es: "Próxima novedad", pt: "Próxima novidade", en: "Coming soon", de: "Demnächst", fr: "Bientôt", zh: "即將推出" },
+  dev: { es: "En desarrollo", pt: "Em desenvolvimento", en: "In development", de: "In Entwicklung", fr: "En développement", zh: "開發中" },
+  title: { es: "Castellano técnico y formal", pt: "Espanhol técnico e formal", en: "Technical and formal Spanish", de: "Fach- und Amtsspanisch", fr: "Espagnol technique et formel", zh: "專業與正式西班牙語" },
+  sub: { es: "para quienes ya hablan guaraní", pt: "para quem já fala guarani", en: "for people who already speak Guarani", de: "für alle, die schon Guaraní sprechen", fr: "pour ceux qui parlent déjà guarani", zh: "給已會說瓜拉尼語的人" },
+  body: {
+    es: "Redacción, trámites y vocabulario académico para jóvenes del interior. Se prepara y revisa con docentes especialistas.",
+    pt: "Redação, trâmites e vocabulário acadêmico para jovens do interior. É preparado e revisado com professores especialistas.",
+    en: "Writing, paperwork and academic vocabulary for young people from rural Paraguay. Prepared and reviewed with specialist teachers.",
+    de: "Schreiben, Behördengänge und Fachwortschatz für junge Menschen vom Land. Vorbereitet und geprüft mit Fachlehrkräften.",
+    fr: "Rédaction, démarches et vocabulaire académique pour les jeunes de l'intérieur du pays. Préparé et revu avec des enseignants spécialisés.",
+    zh: "為鄉村青年準備的寫作、辦事手續與學術詞彙，由專業教師編寫並審閱。",
+  },
+  now: {
+    es: "Hoy ya practicás en las dos direcciones: castellano ⇄ guaraní.",
+    pt: "Hoje você já pratica nas duas direções: espanhol ⇄ guarani.",
+    en: "You can already practise both ways today: Spanish ⇄ Guarani.",
+    de: "Du übst schon heute in beide Richtungen: Spanisch ⇄ Guaraní.",
+    fr: "Vous pratiquez déjà dans les deux sens : espagnol ⇄ guarani.",
+    zh: "現在已可雙向練習：西班牙語 ⇄ 瓜拉尼語。",
+  },
+  alt: {
+    es: "Joven estudiante del interior con cuaderno y celular, camino a la ciudad",
+    pt: "Jovem estudante do interior com caderno e celular, a caminho da cidade",
+    en: "Young student from rural Paraguay with a notebook and phone, on the way to the city",
+    de: "Junge Studentin vom Land mit Heft und Handy auf dem Weg in die Stadt",
+    fr: "Jeune étudiant de l'intérieur avec un cahier et un téléphone, en route vers la ville",
+    zh: "帶著筆記本和手機、前往城市的鄉村青年學生",
+  },
+} as const;
+
+function NovedadCastellano() {
+  const lang = useAppLang();
+  const x = (k: keyof typeof NOV) => NOV[k][lang] ?? NOV[k].es;
+  return (
+    <section aria-labelledby="novedad-castellano" className="relative mt-5 overflow-hidden rounded-3xl border border-primary/20 shadow-xl">
+      <img src={bannerCastellano} alt={x("alt")} width={1280} height={640} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-[30%_center]" />
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-primary/10 sm:bg-gradient-to-l sm:from-primary sm:via-primary/85 sm:to-transparent" />
+      <span aria-hidden className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-12 bg-gradient-to-r from-transparent via-primary-foreground/15 to-transparent motion-safe:animate-[shine_5s_ease-in-out_infinite]" />
+      <div className="relative flex min-h-[320px] flex-col justify-end p-5 sm:ml-auto sm:min-h-[280px] sm:w-3/5 sm:justify-center sm:p-8">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-accent-foreground shadow">
+            <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full rounded-full bg-accent-foreground/70 motion-safe:animate-ping" /><span className="relative h-2 w-2 rounded-full bg-accent-foreground" /></span>
+            {x("badge")}
+          </span>
+          <span className="rounded-full border border-primary-foreground/40 bg-primary-foreground/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-primary-foreground backdrop-blur-sm">
+            {x("dev")}
+          </span>
+        </div>
+        <h2 id="novedad-castellano" className="mt-3 font-display text-2xl font-bold leading-tight text-primary-foreground sm:text-3xl">
+          {x("title")}
+          <span className="block text-base font-semibold text-primary-foreground/85 sm:text-lg">{x("sub")}</span>
+        </h2>
+        <p className="mt-2 text-sm text-primary-foreground/90">{x("body")}</p>
+        <p className="mt-3 text-xs font-medium text-primary-foreground/75">{x("now")}</p>
+      </div>
+    </section>
   );
 }
