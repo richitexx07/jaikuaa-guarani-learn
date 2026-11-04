@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { crearReto, guardarResultadoReto, verReto, type RetoGuardado, type RetoResultado } from "@/lib/reto.functions";
 import { useIsGuest } from "@/lib/guest";
 import { rememberAfterLogin } from "@/lib/after-login";
-import { decodeReto, newSeed, RETO_NOMBRE, RETO_RUTA, veredicto, type RetoJuego } from "@/lib/reto";
+import { decodeReto, newSeed, RETO_NOMBRE, RETO_RUTA, retoUrl, veredicto, type RetoJuego } from "@/lib/reto";
+import { celebrate } from "@/lib/confetti";
 
 const INK = "#13233F";
 
@@ -239,8 +240,8 @@ export function RetoBanner({ partida, extra, total, coincide = true, className =
   const r = coincide ? partida.reto : null;
   const guest = useIsGuest();
 
-  // Sin cuenta no se arman retos (el reto guarda el nombre y el puntaje de cada uno).
-  if (guest) return null;
+  // Sin cuenta: no se arman tablas, pero si llegó por el reto de un amigo, se le muestra quién lo retó.
+  if (guest && !(r && !r.id)) return null;
 
   if (partida.cargando) {
     return (
@@ -364,20 +365,7 @@ export function RetoFinal({
   const v = r && !r.id && r.p !== undefined ? veredicto(puntaje, { p: r.p, m: r.m ? 1 : undefined }) : null;
 
   if (guest) {
-    return (
-      <div className={`mx-auto w-full max-w-md space-y-3 rounded-3xl bg-white p-4 text-center shadow-xl ${className}`} style={{ color: INK }}>
-        <p className="font-display text-lg font-bold">¿Te gustó? Guardá tus puntos y retá a tus amigos</p>
-        <p className="text-sm opacity-75">Creá tu cuenta gratis en un toque, con Google o con tu correo. Los puntos que hiciste ahora se suman a tu cuenta.</p>
-        <a
-          href="/auth?mode=signup"
-          onClick={() => rememberAfterLogin(window.location.pathname)}
-          className="inline-flex h-12 items-center justify-center rounded-2xl px-6 font-bold text-white"
-          style={{ background: "#1E3A5F" }}
-        >
-          Crear mi cuenta gratis
-        </a>
-      </div>
-    );
+    return <RetoInvitado partida={partida} puntaje={puntaje} total={t} extra={extra} legado={r && !r.id ? r : null} className={className} />;
   }
 
   return (
@@ -420,6 +408,79 @@ export function RetoFinal({
             </button>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+const KEY_NOMBRE = "jaikuaa:mi-nombre";
+
+/**
+ * Sin cuenta también se reta: el enlace lleva la partida y el puntaje (no se guarda nada en la base).
+ * Si entró por el reto de un amigo, primero ve quién ganó. Abajo, la invitación a guardar sus puntos.
+ */
+function RetoInvitado({ partida, puntaje, total, extra, legado, className }: {
+  partida: Partida; puntaje: number; total: number; extra?: string; legado: RetoActivo | null; className: string;
+}) {
+  const [nombre, setNombre] = useState("");
+  useEffect(() => {
+    try { setNombre(localStorage.getItem(KEY_NOMBRE) ?? ""); } catch { /* sin almacenamiento */ }
+  }, []);
+  const v = legado?.p !== undefined ? veredicto(puntaje, { p: legado.p, m: legado.m ? 1 : undefined }) : null;
+  const festejado = useRef(false);
+  useEffect(() => {
+    if (v === "gane" && !festejado.current) { festejado.current = true; celebrate("big"); }
+  }, [v]);
+  const { juego, meta } = partida;
+  const limpio = nombre.replace(/[<>]/g, "").trim().slice(0, 20);
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://www.jaikuaa.com";
+  const url = retoUrl(origin, {
+    j: juego, s: partida.seed, p: puntaje, t: total, n: limpio || "Tu amigo",
+    ...(extra ? { x: extra } : {}), ...(meta.menosEsMejor ? { m: 1 as const } : {}), ...(meta.unidad ? { u: meta.unidad } : {}),
+  });
+  const mio = puntajeDe({ t: total, u: meta.unidad }, puntaje);
+  const texto = v === "gane" && legado
+    ? `¡Le gané a ${legado.n} en ${RETO_NOMBRE[juego]} de Jaikuaa! Hice ${mio}. ¿Vos te animás? Jugá la misma partida:\n${url}`
+    : invitacion(juego, url, mio);
+  return (
+    <div className={`mx-auto w-full max-w-md space-y-4 rounded-3xl bg-white p-4 text-center shadow-xl ${className}`} style={{ color: INK }}>
+      {v && legado ? (
+        <div>
+          <Trophy className="mx-auto h-9 w-9" style={{ color: v === "perdi" ? "#8A94A6" : "#E0A100" }} aria-hidden />
+          <p className="mt-1 font-display text-2xl font-bold">{v === "gane" ? `¡Le ganaste a ${legado.n}!` : v === "perdi" ? `${legado.n} te ganó… ¡revancha!` : `¡Empate con ${legado.n}!`}</p>
+          <p className="text-sm opacity-75">Vos {mio} · {legado.n} {puntajeDe(legado, legado.p!)}</p>
+        </div>
+      ) : (
+        <div>
+          <p className="font-display text-xl font-bold">¿Quién sabe más guaraní?</p>
+          <p className="text-sm opacity-75">Retá a un amigo: le llega esta misma partida y ve tu puntaje. No necesita cuenta.</p>
+        </div>
+      )}
+      <label className="block text-left text-sm font-semibold" htmlFor="reto-nombre">
+        Tu nombre en el reto
+        <input
+          id="reto-nombre"
+          value={nombre}
+          maxLength={20}
+          placeholder="Por ejemplo: Ramona"
+          onChange={(e) => {
+            setNombre(e.target.value);
+            try { localStorage.setItem(KEY_NOMBRE, e.target.value); } catch { /* nada */ }
+          }}
+          className="mt-1 h-12 w-full rounded-2xl border-2 border-black/15 bg-white px-4 text-base font-normal"
+        />
+      </label>
+      <Compartir url={url} texto={texto} />
+      <div className="rounded-2xl bg-[#EEF3FB] p-3">
+        <p className="text-sm font-semibold">Guardá tus puntos y seguí mañana desde cualquier celular</p>
+        <a
+          href="/auth?mode=signup"
+          onClick={() => rememberAfterLogin(window.location.pathname)}
+          className="mt-2 inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-bold text-white"
+          style={{ background: "#1E3A5F" }}
+        >
+          Crear mi cuenta gratis
+        </a>
       </div>
     </div>
   );

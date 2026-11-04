@@ -11,6 +11,7 @@ import { PreLaunchBanner } from "@/components/validation-notice";
 import { authMode, isGuestPath, markHadAccount, useIsGuest } from "@/lib/guest";
 import { GuestBar } from "@/components/guest-bar";
 import { AppLoading } from "@/components/app-loading";
+import { decodeReto } from "@/lib/reto";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -23,7 +24,10 @@ export const Route = createFileRoute("/_authenticated")({
     };
     // Algunos juegos se pueden jugar sin cuenta: la cuenta se pide para guardar los puntos.
     // Los enlaces de reto (?reto=) sí piden cuenta: el reto guarda nombre y puntaje de cada uno.
-    const guest = isGuestPath(location.pathname) && !/[?&]reto=/.test(location.href) ? { user: null as User | null } : null;
+    // Los retos de la base (con tabla) piden cuenta; los que viajan en el enlace (los que manda un invitado), no.
+    const retoRaw = new URL(location.href, "https://www.jaikuaa.com").searchParams.get("reto");
+    const retoSinCuenta = !retoRaw || decodeReto(retoRaw) !== null;
+    const guest = isGuestPath(location.pathname) && retoSinCuenta ? { user: null as User | null } : null;
     if (isOffline()) {
       const ok = offlineUser();
       if (ok) return ok;
