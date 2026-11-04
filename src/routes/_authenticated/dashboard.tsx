@@ -87,7 +87,8 @@ import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 import jaiProfe from "@/assets/jai-profe.webp";
 import jaiAtencion from "@/assets/jai-atencion-pro.webp";
 import jaiAgro from "@/assets/jai-agro.webp";
-import { useLastPlace } from "@/lib/last-place";
+import { forgetPlace, useLastPlace } from "@/lib/last-place";
+import { X } from "lucide-react";
 import { shouldShowWelcome, welcomeSeen } from "@/lib/welcome";
 import triviaVocabulario from "@/assets/trivia/trivia-vocabulario.webp";
 const jaiAsset = { url: jaiImg };
@@ -135,8 +136,18 @@ function StaffShortcuts() {
 /** «Seguí donde quedaste»: un toque para volver al último juego o lección. */
 function ResumeCard() {
   const place = useLastPlace();
-  if (!place) return null;
+  const [hidden, setHidden] = useState(false);
+  if (!place || hidden) return null;
   return (
+    <div className="relative">
+    <button
+      type="button"
+      aria-label="Cerrar «Seguí donde quedaste»"
+      onClick={() => { forgetPlace(); setHidden(true); }}
+      className="absolute right-2 top-7 z-10 grid h-9 w-9 place-items-center rounded-full bg-primary-foreground/15 text-primary-foreground"
+    >
+      <X className="h-4 w-4" aria-hidden />
+    </button>
     <a
       href={place.href}
       className="mt-5 flex min-h-16 items-center gap-3 rounded-2xl bg-primary px-4 py-3 text-primary-foreground shadow-lift transition active:scale-[0.98]"
@@ -148,8 +159,9 @@ function ResumeCard() {
         <span className="block text-xs font-semibold opacity-80">Seguí donde quedaste</span>
         <span className="block truncate font-display text-lg font-bold leading-tight">{place.title}</span>
       </span>
-      <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
+      <ChevronRight className="mr-9 h-5 w-5 shrink-0" aria-hidden />
     </a>
+    </div>
   );
 }
 

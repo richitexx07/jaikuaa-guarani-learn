@@ -1,5 +1,7 @@
 import { useGT } from "@/lib/i18n-games";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { QuitGameButton } from "@/components/games/quit-game-button";
+import { forgetPlace } from "@/lib/last-place";
 import { useJU } from "@/lib/i18n-juegos-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GameStage } from "@/components/games/game-stage";
@@ -133,6 +135,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
   useEffect(() => {
     if (!done || recorded.current) return;
     recorded.current = true;
+    forgetPlace();
     feedback("victory");
     if (xp > 0) recordCompletion({ source: "game", sourceRef: "tembiu", xp });
   }, [done, xp]);
@@ -160,6 +163,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
         <RetoFinal partida={partida} puntaje={score} />
         <div className="flex flex-wrap justify-center gap-2">
           <button type="button" onClick={onAgain} className="h-12 rounded-2xl px-6 font-bold" style={{ background: T.ocre, color: T.tinta }}>{tt("tbAgain")}</button>
+          <Link to="/dashboard" className="flex h-12 items-center rounded-2xl px-6 font-bold ring-1 ring-white/40" style={{ color: T.papel }}>Listo · Volver al panel</Link>
         </div>
       </section>
     );
@@ -263,6 +267,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
           {sure ? g("giveUpRecipeSure") : g("giveUpRecipe")}
         </button>
       )}
+      <QuitGameButton className="text-white" onQuit={() => { setPicked([]); setChecked(false); setI(ROUNDS); }} />
     </section>
   );
 }
