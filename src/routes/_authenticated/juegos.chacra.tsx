@@ -21,7 +21,10 @@ import ch_mandio from "@/assets/chacra/mandio.jpg";
 import ch_kure from "@/assets/chacra/kure.jpg";
 import ch_kumanda from "@/assets/chacra/kumanda.jpg";
 import ch_cosecha from "@/assets/chacra/cosecha.jpg";
-const CHACRA_IMG: Record<string, string> = {"Avati": ch_avati, "Kamby": ch_kamby, "Amana": ch_amana, "Ra'ỹi": ch_raiyi, "Ryguasu": ch_ryguasu, "Mandi'o": ch_mandio, "Kure": ch_kure, "Kumanda": ch_kumanda, "Ñemono'õ": ch_cosecha};
+import ch_monte from "@/assets/chacra/monte.jpg";
+import ch_kavaju from "@/assets/chacra/kavaju.jpg";
+import ch_kaa from "@/assets/chacra/ka-a.jpg";
+const CHACRA_IMG: Record<string, string> = {"Avati": ch_avati, "Kamby": ch_kamby, "Amana": ch_amana, "Ra'ỹi": ch_raiyi, "Ryguasu": ch_ryguasu, "Mandi'o": ch_mandio, "Kure": ch_kure, "Kumanda": ch_kumanda, "Ñemono'õ": ch_cosecha, "Ka'aguy": ch_monte, "Kavaju": ch_kavaju, "Ka'a": ch_kaa};
 import jaiAgro from "@/assets/jai-agro.webp";
 
 export const Route = createFileRoute("/_authenticated/juegos/chacra")({
@@ -133,7 +136,7 @@ function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: 
           <ul className="mt-4 space-y-1 text-left text-sm">
             {visitas.map((v, k) => (
               <li key={k} className="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2">
-                <span aria-hidden>{v.caso.emoji}</span>
+                {CHACRA_IMG[v.caso.palabra] ? <img src={CHACRA_IMG[v.caso.palabra]} alt="" width={816} height={816} loading="lazy" className="h-8 w-8 shrink-0 rounded-lg object-cover" /> : <span aria-hidden>{v.caso.emoji}</span>}
                 <b lang="gn">{v.caso.palabra}</b>
                 <span className="opacity-70">— {v.es}</span>
                 <span className="ml-auto">{oks[k] ? "✅" : "❌"}</span>
