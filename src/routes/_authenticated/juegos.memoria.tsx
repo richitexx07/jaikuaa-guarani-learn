@@ -138,7 +138,9 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
   const [open, setOpen] = useState<number[]>([]);
   const [matched, setMatched] = useState<Set<number>>(new Set());
   const [attempts, setAttempts] = useState(0);
-  const done = matched.size === PAIRS;
+  const [gaveUp, setGaveUp] = useState(false);
+  const [sure, setSure] = useState(false);
+  const done = matched.size === PAIRS && !gaveUp;
   const xp = Math.max(10, 20 - Math.max(0, attempts - PAIRS));
   const recorded = useRef(false);
 
@@ -150,7 +152,7 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
   }, [done, xp]);
 
   function flip(c: Card) {
-    if (open.length === 2 || open.includes(c.id) || matched.has(c.pair)) return;
+    if (gaveUp || open.length === 2 || open.includes(c.id) || matched.has(c.pair)) return;
     if (c.kind === "gn" && c.word.hasAudio) void playGuarani(c.word.gn);
     const next = [...open, c.id];
     setOpen(next);
@@ -215,6 +217,42 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
           );
         })}
       </div>
+      {!done && !gaveUp && (
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => {
+              if (!sure) { setSure(true); return; }
+              setGaveUp(true);
+              setOpen([]);
+              setMatched(new Set(words.map((_, i) => i)));
+            }}
+            className="h-11 rounded-2xl px-5 text-sm font-bold text-white ring-1 ring-white/30 hover:bg-white/10"
+          >
+            {sure ? "¿Seguro? Tocá otra vez para ver todas las parejas" : "Rendirme y ver las parejas"}
+          </button>
+        </div>
+      )}
+      {gaveUp && (
+        <div className="space-y-3 rounded-3xl p-6 text-center" style={{ background: M.papel, color: M.tinta }}>
+          <p className="font-display text-xl font-bold">¡Tranquilo! Errar es parte de aprender.</p>
+          <p className="text-sm opacity-75">Estas son todas las parejas. Tocá las tarjetas en guaraní de arriba no suenan acá; repasalas y volvé a intentarlo (sin XP).</p>
+          <ul className="mx-auto max-w-sm space-y-1 text-left">
+            {words.map((w) => (
+              <li key={w.gn} className="flex items-center justify-between gap-2 rounded-xl px-3 py-1.5" style={{ background: "#fff" }}>
+                <span className="font-display font-bold">{w.gn}</span>
+                <span className="text-sm">{w.es}</span>
+                {w.hasAudio && (
+                  <button type="button" onClick={() => void playGuarani(w.gn)} className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-xs font-bold ring-1 ring-black/15">
+                    <Volume2 className="h-4 w-4" aria-hidden /> Escuchar
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+          <button type="button" onClick={onNext} className="h-12 rounded-2xl px-6 font-bold text-white" style={{ background: M.tinta }}>{g("playAgain")}</button>
+        </div>
+      )}
       {done && (
         <div className="space-y-3 rounded-3xl p-6 text-center" style={{ background: M.papel, color: M.tinta }}>
           <Roseton color={M.rojo} className="mx-auto h-14 w-14" />
