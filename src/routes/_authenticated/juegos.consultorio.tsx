@@ -596,26 +596,83 @@ function CuerpoMapa({
   return (
     <div className="mx-auto max-w-[300px]">
       <svg viewBox="0 0 240 370" className="w-full" role="group" aria-label={idioma === "es" ? "Cuerpo del paciente" : "Corpo do paciente"}>
-        {/* Cuerpo */}
-        <rect x="104" y="150" width="32" height="22" fill={piel} />
-        <path d="M70 175 Q120 158 170 175 L176 290 Q120 302 64 290 Z" fill="#7FB8C9" />
-        <path d="M70 180 Q52 200 48 258" stroke="#7FB8C9" strokeWidth="22" strokeLinecap="round" fill="none" />
-        <path d="M170 180 Q188 200 192 258" stroke="#7FB8C9" strokeWidth="22" strokeLinecap="round" fill="none" />
-        <circle cx="46" cy="268" r="13" fill={piel} />
-        <circle cx="194" cy="268" r="13" fill={piel} />
-        <path d="M100 290 L98 342 M140 290 L142 342" stroke="#2F6F7C" strokeWidth="24" strokeLinecap="round" />
-        <ellipse cx="98" cy="350" rx="18" ry="9" fill="#33383A" />
-        <ellipse cx="142" cy="350" rx="18" ry="9" fill="#33383A" />
+        <defs>
+          <radialGradient id="cj-skin" cx="45%" cy="35%" r="70%">
+            <stop offset="0%" stopColor="#F6CFA8" />
+            <stop offset="70%" stopColor={piel} />
+            <stop offset="100%" stopColor="#C98F66" />
+          </radialGradient>
+          <linearGradient id="cj-bata" x1="0" x2="1">
+            <stop offset="0%" stopColor="#5E9FB3" />
+            <stop offset="45%" stopColor="#8CC6D6" />
+            <stop offset="100%" stopColor="#5E9FB3" />
+          </linearGradient>
+          <linearGradient id="cj-pant" x1="0" x2="1">
+            <stop offset="0%" stopColor="#24596A" />
+            <stop offset="50%" stopColor="#367F92" />
+            <stop offset="100%" stopColor="#24596A" />
+          </linearGradient>
+          <radialGradient id="cj-cheek"><stop offset="0%" stopColor="#E9877A" stopOpacity=".55" /><stop offset="100%" stopColor="#E9877A" stopOpacity="0" /></radialGradient>
+          <linearGradient id="cj-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5A3D29" /><stop offset="100%" stopColor="#2E1F15" /></linearGradient>
+        </defs>
+        {/* Sombra en el piso */}
+        <ellipse cx="120" cy="360" rx="70" ry="8" fill="#0003" />
+        {/* Piernas */}
+        <path d="M86 284 Q84 320 90 344 L108 344 Q112 316 116 290 Z" fill="url(#cj-pant)" />
+        <path d="M154 284 Q156 320 150 344 L132 344 Q128 316 124 290 Z" fill="url(#cj-pant)" />
+        {/* Zapatillas */}
+        <path d="M78 352 Q80 340 98 340 Q116 340 118 352 Q98 358 78 352 Z" fill="#2B3134" />
+        <path d="M122 352 Q124 340 142 340 Q160 340 162 352 Q142 358 122 352 Z" fill="#2B3134" />
+        <path d="M80 351 L116 351 M124 351 L160 351" stroke="#E8EEF0" strokeWidth="2.5" />
+        {/* Brazos */}
+        <path d="M74 182 Q52 204 46 254" stroke="url(#cj-bata)" strokeWidth="24" strokeLinecap="round" fill="none" />
+        <path d="M166 182 Q188 204 194 254" stroke="url(#cj-bata)" strokeWidth="24" strokeLinecap="round" fill="none" />
+        {/* Manos con dedos */}
+        {[46, 194].map((x) => (
+          <g key={x} fill="url(#cj-skin)" stroke="#B57B52" strokeWidth="1">
+            <ellipse cx={x} cy="268" rx="13" ry="14" />
+            <rect x={x - 11} y="274" width="5" height="11" rx="2.5" />
+            <rect x={x - 4.5} y="276" width="5" height="12" rx="2.5" />
+            <rect x={x + 2} y="275" width="5" height="11" rx="2.5" />
+          </g>
+        ))}
+        {/* Torso con bata de paciente */}
+        <rect x="106" y="148" width="28" height="26" rx="6" fill="url(#cj-skin)" />
+        <path d="M68 178 Q120 156 172 178 L178 290 Q120 304 62 290 Z" fill="url(#cj-bata)" />
+        <path d="M104 166 L120 190 L136 166" fill="none" stroke="#4A8A9C" strokeWidth="3" strokeLinejoin="round" />
+        <path d="M120 190 L120 292" stroke="#4A8A9C" strokeWidth="1.5" strokeDasharray="2 6" />
+        {[208, 236, 264].map((y) => <circle key={y} cx="120" cy={y} r="2.5" fill="#F2F7F8" />)}
+        <path d="M66 288 Q120 300 176 288" stroke="#4A8A9C" strokeWidth="3" fill="none" />
+        {/* Pulsera de internación */}
+        <rect x="36" y="250" width="20" height="6" rx="2" fill="#F4F4F0" stroke="#C8102E" strokeWidth="1" />
         {/* Cabeza */}
-        <ellipse cx="50" cy="96" rx="11" ry="16" fill={piel} />
-        <ellipse cx="190" cy="96" rx="11" ry="16" fill={piel} />
-        <circle cx="120" cy="92" r="70" fill={piel} />
-        <path d="M52 76 Q58 22 120 20 Q182 22 188 76 Q170 44 120 44 Q70 44 52 76" fill="#3B2A1E" />
-        <circle cx="96" cy="86" r="6" fill="#1b1b1b" />
-        <circle cx="144" cy="86" r="6" fill="#1b1b1b" />
-        <path d="M120 98 Q114 112 122 114" stroke="#B07A55" strokeWidth="3" fill="none" strokeLinecap="round" />
-        <path d="M104 132 Q120 142 136 132" stroke="#8A3B3B" strokeWidth="4" fill="none" strokeLinecap="round" />
-        <path d="M140 190 c-4-6-12-3-10 4 c1 5 10 10 10 10 s9-5 10-10 c2-7-6-10-10-4z" fill="#D52B1E33" />
+        <ellipse cx="50" cy="96" rx="12" ry="17" fill="url(#cj-skin)" />
+        <ellipse cx="190" cy="96" rx="12" ry="17" fill="url(#cj-skin)" />
+        <path d="M50 88 Q45 96 50 104 M190 88 Q195 96 190 104" stroke="#B57B52" strokeWidth="2" fill="none" />
+        <circle cx="120" cy="92" r="70" fill="url(#cj-skin)" />
+        <path d="M50 84 Q52 18 120 16 Q188 18 190 84 Q180 52 152 44 Q138 58 112 52 Q84 48 66 62 Q56 70 50 84" fill="url(#cj-hair)" />
+        <path d="M84 36 Q110 26 140 32" stroke="#7A5638" strokeWidth="3" fill="none" strokeLinecap="round" />
+        {/* Cejas */}
+        <path d="M82 68 Q96 62 108 68 M132 68 Q144 62 158 68" stroke="#3B2A1E" strokeWidth="4" fill="none" strokeLinecap="round" />
+        {/* Ojos */}
+        {[96, 144].map((x) => (
+          <g key={x}>
+            <ellipse cx={x} cy="86" rx="10" ry="9" fill="#FFFFFF" />
+            <circle cx={x} cy="87" r="6" fill="#5A3A22" />
+            <circle cx={x} cy="87" r="3" fill="#141414" />
+            <circle cx={x + 2} cy="84" r="1.8" fill="#FFFFFF" />
+          </g>
+        ))}
+        {/* Mejillas */}
+        <circle cx="78" cy="114" r="14" fill="url(#cj-cheek)" />
+        <circle cx="162" cy="114" r="14" fill="url(#cj-cheek)" />
+        {/* Nariz y boca */}
+        <path d="M120 96 Q112 112 118 116 Q122 118 126 115" stroke="#B07A55" strokeWidth="3" fill="none" strokeLinecap="round" />
+        <path d="M102 130 Q120 146 138 130 Q120 138 102 130 Z" fill="#9E4444" stroke="#7E3030" strokeWidth="2" strokeLinejoin="round" />
+        {/* Corazón */}
+        <path d="M140 190 c-4-6-12-3-10 4 c1 5 10 10 10 10 s9-5 10-10 c2-7-6-10-10-4z" fill="#C8102E55" />
+        {/* Ombligo */}
+        <circle cx="120" cy="252" r="0" />
 
         {zonas.map((z) => {
           const esCorrecta = bloqueado && z.id === correcta;
