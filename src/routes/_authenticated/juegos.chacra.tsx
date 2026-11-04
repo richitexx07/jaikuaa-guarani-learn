@@ -12,6 +12,16 @@ import { usePrefetchAudios } from "@/lib/audio";
 import { armarVisitas, VISITAS_POR_DIA, type VisitaChacra } from "@/lib/chacra";
 import { getTexto } from "@/lib/juego-textos";
 import { useJuegoTextos } from "@/lib/use-juego-textos";
+import ch_avati from "@/assets/chacra/avati.jpg";
+import ch_kamby from "@/assets/chacra/kamby.jpg";
+import ch_amana from "@/assets/chacra/amana.jpg";
+import ch_raiyi from "@/assets/chacra/raiyi.jpg";
+import ch_ryguasu from "@/assets/chacra/ryguasu.jpg";
+import ch_mandio from "@/assets/chacra/mandio.jpg";
+import ch_kure from "@/assets/chacra/kure.jpg";
+import ch_kumanda from "@/assets/chacra/kumanda.jpg";
+import ch_cosecha from "@/assets/chacra/cosecha.jpg";
+const CHACRA_IMG: Record<string, string> = {"Avati": ch_avati, "Kamby": ch_kamby, "Amana": ch_amana, "Ra'ỹi": ch_raiyi, "Ryguasu": ch_ryguasu, "Mandi'o": ch_mandio, "Kure": ch_kure, "Kumanda": ch_kumanda, "Ñemono'õ": ch_cosecha};
 import jaiAgro from "@/assets/jai-agro.webp";
 
 export const Route = createFileRoute("/_authenticated/juegos/chacra")({
@@ -156,7 +166,7 @@ function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: 
 
       <div key={i} className="ch-in overflow-hidden rounded-3xl shadow-2xl" style={{ background: C.papel, color: C.tinta }}>
         <div className="flex items-center gap-3 px-4 pt-4">
-          <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl text-4xl" style={{ background: "#F3E3C3" }} aria-hidden>{v.caso.emoji}</span>
+          {CHACRA_IMG[v.caso.palabra] ? <img src={CHACRA_IMG[v.caso.palabra]} alt="" width={816} height={816} className="h-24 w-24 shrink-0 rounded-2xl object-cover shadow-md ring-2 ring-white" /> : <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl text-4xl" style={{ background: "#F3E3C3" }} aria-hidden>{v.caso.emoji}</span>}
           <div className="min-w-0">
             <p className="text-xs font-semibold opacity-60">{tt("chVisit", { i: i + 1, n: VISITAS_POR_DIA })}</p>
             <p className="font-display text-xl font-bold">{v.caso.productor}</p>
