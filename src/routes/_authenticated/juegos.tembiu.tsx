@@ -255,7 +255,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
               type="button"
               onClick={() => toggle(x)}
               aria-pressed={on}
-              className="tb-pick relative flex min-h-28 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-center"
+              className="tb-pick tap-3d-dark relative flex min-h-28 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-center"
               style={{ background: T.papel, color: T.tinta, boxShadow: `0 0 0 4px ${ring}, 0 10px 18px -8px rgba(0,0,0,.6)`, opacity: checked && !right && !on ? 0.45 : 1 }}
             >
               <span className="grid h-12 w-12 place-items-center rounded-full text-3xl" style={{ background: "#F3DFC0" }} aria-hidden>{ing[x]?.emoji}</span>
