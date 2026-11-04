@@ -115,6 +115,8 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
   const [checked, setChecked] = useState(false);
   const [score, setScore] = useState(0);
   const [platos, setPlatos] = useState<{ dish: Dish; ok: boolean }[]>([]);
+  const [gaveUp, setGaveUp] = useState(false);
+  const [sure, setSure] = useState(false);
   const dish = dishes[i];
   const options = useMemo(() => {
     if (!dish) return [];
@@ -171,8 +173,16 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
     setPlatos((p) => [...p, { dish, ok: good }]);
     if (good) { setScore((s) => s + 1); feedback("success"); } else feedback("error");
   }
-  function next() { setI((n) => n + 1); setPicked([]); setChecked(false); }
-  const good = checked && picked.every((x) => dish.ok.includes(x));
+  function giveUp() {
+    if (!sure) { setSure(true); return; }
+    setSure(false);
+    setPicked([...dish.ok].slice(0, 5));
+    setChecked(true);
+    setGaveUp(true);
+    setPlatos((p) => [...p, { dish, ok: false }]);
+  }
+  function next() { setI((n) => n + 1); setPicked([]); setChecked(false); setGaveUp(false); setSure(false); }
+  const good = checked && !gaveUp && picked.every((x) => dish.ok.includes(x));
 
   return (
     <section className="space-y-4 pt-1">
@@ -211,7 +221,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
 
       {checked && (
         <p className="rounded-2xl px-4 py-3 text-center font-display text-lg font-bold" style={{ background: good ? T.verde : "rgba(0,0,0,.35)" }} aria-live="polite">
-          {good ? tt("tbGood") : tt("tbBad")}
+          {gaveUp ? "Esta es la receta: los ingredientes marcados en verde. Este plato no suma." : good ? tt("tbGood") : tt("tbBad")}
         </p>
       )}
 
@@ -244,6 +254,11 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
       ) : (
         <button type="button" className="h-14 w-full rounded-2xl font-display text-lg font-bold transition disabled:opacity-40" style={{ background: T.ocre, color: T.tinta }} disabled={picked.length !== 5} onClick={check}>
           {tt("tbCook")}
+        </button>
+      )}
+      {!checked && (
+        <button type="button" onClick={giveUp} className="h-11 w-full rounded-2xl text-sm font-bold text-white ring-1 ring-white/30 hover:bg-white/10">
+          {sure ? "¿Seguro? Tocá otra vez para ver la receta" : "Rendirme y ver la receta"}
         </button>
       )}
     </section>
