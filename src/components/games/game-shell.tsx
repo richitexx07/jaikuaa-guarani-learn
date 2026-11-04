@@ -181,6 +181,13 @@ function ExitAfterGame({ xp }: { xp: number }) {
   return (
     <div className="flex flex-col items-center gap-2">
       <p className="text-center text-sm font-semibold text-accent">+{xp} XP</p>
+      <button
+        type="button"
+        onClick={() => window.location.reload()}
+        className="inline-flex h-14 w-full max-w-xs items-center justify-center rounded-xl bg-primary px-6 text-base font-bold text-primary-foreground shadow-lg hover:opacity-90"
+      >
+        {g("playAgain")}
+      </button>
       <Link
         to={guest ? "/juegos" : "/dashboard"}
         className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-background px-5 text-sm font-semibold text-foreground hover:bg-muted"
