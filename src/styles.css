@@ -483,7 +483,7 @@ body { background-image: radial-gradient(circle at 0% 0%, color-mix(in oklab, va
 
 /* Botones táctiles con relieve 3D: base sólida que se hunde al tocar */
 @utility btn-3d {
-  --btn-edge: color-mix(in oklab, currentColor 0%, var(--btn-base, var(--primary)) 70%, black);
+  --btn-edge: color-mix(in oklab, var(--btn-base, var(--primary)) 70%, black);
   box-shadow: 0 4px 0 0 var(--btn-edge), inset 0 1px 0 0 color-mix(in oklab, white 28%, transparent);
   transform: translateY(0);
   transition: transform 80ms ease-out, box-shadow 80ms ease-out, background-color 150ms;
