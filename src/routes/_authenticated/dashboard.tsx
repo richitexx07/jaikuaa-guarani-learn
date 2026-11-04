@@ -87,7 +87,8 @@ import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 import jaiProfe from "@/assets/jai-profe.webp";
 import jaiAtencion from "@/assets/jai-atencion-pro.webp";
 import jaiAgro from "@/assets/jai-agro.webp";
-import { useLastPlace } from "@/lib/last-place";
+import { forgetPlace, useLastPlace } from "@/lib/last-place";
+import { X } from "lucide-react";
 import { shouldShowWelcome, welcomeSeen } from "@/lib/welcome";
 import triviaVocabulario from "@/assets/trivia/trivia-vocabulario.webp";
 const jaiAsset = { url: jaiImg };
@@ -158,8 +159,9 @@ function ResumeCard() {
         <span className="block text-xs font-semibold opacity-80">Seguí donde quedaste</span>
         <span className="block truncate font-display text-lg font-bold leading-tight">{place.title}</span>
       </span>
-      <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
+      <ChevronRight className="mr-9 h-5 w-5 shrink-0" aria-hidden />
     </a>
+    </div>
   );
 }
 
