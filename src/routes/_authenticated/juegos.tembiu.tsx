@@ -267,6 +267,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
           {sure ? g("giveUpRecipeSure") : g("giveUpRecipe")}
         </button>
       )}
+      <QuitGameButton className="text-white" onQuit={() => { setPicked([]); setChecked(false); setI(ROUNDS); }} />
     </section>
   );
 }

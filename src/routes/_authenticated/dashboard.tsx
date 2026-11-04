@@ -135,8 +135,18 @@ function StaffShortcuts() {
 /** «Seguí donde quedaste»: un toque para volver al último juego o lección. */
 function ResumeCard() {
   const place = useLastPlace();
-  if (!place) return null;
+  const [hidden, setHidden] = useState(false);
+  if (!place || hidden) return null;
   return (
+    <div className="relative">
+    <button
+      type="button"
+      aria-label="Cerrar «Seguí donde quedaste»"
+      onClick={() => { forgetPlace(); setHidden(true); }}
+      className="absolute right-2 top-7 z-10 grid h-9 w-9 place-items-center rounded-full bg-primary-foreground/15 text-primary-foreground"
+    >
+      <X className="h-4 w-4" aria-hidden />
+    </button>
     <a
       href={place.href}
       className="mt-5 flex min-h-16 items-center gap-3 rounded-2xl bg-primary px-4 py-3 text-primary-foreground shadow-lift transition active:scale-[0.98]"
