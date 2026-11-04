@@ -1,4 +1,5 @@
 import { useJU } from "@/lib/i18n-juegos-ui";
+import { QuitGameButton } from "@/components/games/quit-game-button";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -263,6 +264,7 @@ function Turno({ seed, frases, vistaPrevia, urls, partida, onAgain }: { seed: nu
           </button>
         </div>
       )}
+      <QuitGameButton className="text-white" onQuit={() => { setPick(null); setI(rondas.length); }} />
     </section>
   );
 }

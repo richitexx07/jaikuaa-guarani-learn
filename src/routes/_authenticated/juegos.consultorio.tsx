@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { QuitGameButton } from "@/components/games/quit-game-button";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -313,6 +314,7 @@ function Consultorio() {
             {resultado && (
               <Veredicto ronda={ronda} resultado={resultado} idioma={idioma} femenino={pac.femenino} onSeguir={siguiente} ultimo={vidas <= 0 || i + 1 >= rondas.length} />
             )}
+            <QuitGameButton className="mt-3 text-white" label="Terminar la guardia y ver el resultado" onQuit={() => setFase("fin")} />
           </div>
         )}
 

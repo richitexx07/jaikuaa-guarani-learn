@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { QuitGameButton } from "@/components/games/quit-game-button";
 import { useJU } from "@/lib/i18n-juegos-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shuffle } from "@/components/games/game-shell";
@@ -240,6 +241,7 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
           {i + 1 === ROUNDS ? tt("tgSeeCredits") : tt("tgNext")}
         </button>
       )}
+      <QuitGameButton className="text-white" onQuit={() => { setPick(null); setI(ROUNDS); }} />
     </section>
   );
 }

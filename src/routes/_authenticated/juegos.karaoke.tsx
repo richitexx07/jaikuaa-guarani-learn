@@ -1,4 +1,5 @@
 import { useJU } from "@/lib/i18n-juegos-ui";
+import { QuitGameButton } from "@/components/games/quit-game-button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shuffle } from "@/components/games/game-shell";
@@ -448,6 +449,13 @@ function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partid
         >
           <Play className="h-6 w-6" fill="currentColor" /> ¡Ñapurahéi! {tt("kkSing")}
         </button>
+      )}
+      {playing && (
+        <QuitGameButton
+          className="text-white"
+          label="Terminar la canción y ver el resultado"
+          onQuit={() => { arpa.current.stop(); audio.current?.pause(); setPlaying(false); setBeat(total); }}
+        />
       )}
       <p className="text-center text-sm text-white/60">{tt("kkTip")}</p>
     </section>
