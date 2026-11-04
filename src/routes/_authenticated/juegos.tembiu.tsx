@@ -13,6 +13,19 @@ import { recordCompletion } from "@/lib/gamification";
 import { DISHES, ING, type Dish } from "@/lib/juegos-contenido";
 import { applyTembiu } from "@/lib/juego-textos";
 import { useJuegoTextos } from "@/lib/use-juego-textos";
+import imgSopa from "@/assets/tembiu/sopa.jpg";
+import imgChipaGuasu from "@/assets/tembiu/chipa-guasu.jpg";
+import imgMbeju from "@/assets/tembiu/mbeju.jpg";
+import imgVori from "@/assets/tembiu/vori-vori.jpg";
+import imgChipa from "@/assets/tembiu/chipa.jpg";
+import imgPastel from "@/assets/tembiu/pastel-mandio.jpg";
+import imgKiveve from "@/assets/tembiu/kiveve.jpg";
+
+const DISH_IMG: Record<string, string> = { "Sopa paraguaya": imgSopa, "Chipa guasu": imgChipaGuasu, Mbeju: imgMbeju, "Vori vori": imgVori, Chipa: imgChipa, "Pastel mandi'o": imgPastel, Kiveve: imgKiveve };
+function DishPic({ dish, className }: { dish: Dish; className: string }) {
+  const src = DISH_IMG[dish.name];
+  return src ? <img src={src} alt="" width={816} height={816} loading="lazy" className={`${className} object-cover`} /> : <span className={className} aria-hidden>{dish.emoji}</span>;
+}
 
 export const Route = createFileRoute("/_authenticated/juegos/tembiu")({
   head: () => ({
@@ -153,7 +166,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
           <ul className="mt-4 grid grid-cols-5 gap-2">
             {platos.map((p, k) => (
               <li key={k} className="flex flex-col items-center gap-1 text-xs">
-                <span className="grid h-14 w-14 place-items-center rounded-full border-4 text-3xl" style={{ borderColor: p.ok ? T.verde : "#D8C6AA", background: "#fff", opacity: p.ok ? 1 : 0.55 }}>{p.dish.emoji}</span>
+                <span className="grid h-14 w-14 place-items-center overflow-hidden rounded-full border-4" style={{ borderColor: p.ok ? T.verde : "#D8C6AA", background: "#fff", opacity: p.ok ? 1 : 0.55 }}><DishPic dish={p.dish} className="h-full w-full text-3xl" /></span>
                 <span className="leading-tight">{p.dish.name}</span>
               </li>
             ))}
@@ -206,7 +219,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
           <span className="absolute left-1/2 top-0 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full shadow" style={{ background: T.rojo }} aria-hidden />
           <p className="text-xs font-semibold opacity-60">{tt("tbOrder", { i: i + 1, n: ROUNDS })}</p>
           <div className="mt-1 flex items-center gap-3">
-            <span className="text-5xl" aria-hidden>{dish.emoji}</span>
+            <DishPic dish={dish} className="h-20 w-20 shrink-0 rounded-2xl text-5xl shadow-md ring-2 ring-white" />
             <h2 className="font-display text-3xl font-bold leading-none">{dish.name}</h2>
           </div>
           <p className="mt-2 text-sm opacity-80">{dish.info}</p>
