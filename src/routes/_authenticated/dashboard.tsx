@@ -88,7 +88,7 @@ import jaiProfe from "@/assets/jai-profe.webp";
 import jaiAtencion from "@/assets/jai-atencion-pro.webp";
 import jaiAgro from "@/assets/jai-agro.webp";
 import { forgetPlace, useLastPlace } from "@/lib/last-place";
-import { X } from "lucide-react";
+import { X, BookOpen } from "lucide-react";
 import { shouldShowWelcome, welcomeSeen } from "@/lib/welcome";
 import triviaVocabulario from "@/assets/trivia/trivia-vocabulario.webp";
 const jaiAsset = { url: jaiImg };
@@ -606,6 +606,7 @@ function Dashboard() {
                 {t("d.toolsIntro")}
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
+                <FreeCard to="/libreria" icon={BookOpen} title="Librería Jaikuaa" desc="Libros que se leen y libros que hablan. En desarrollo." accent="accent" />
                 <FreeCard to="/aula" img={jaiProfe} title={t("d.aula.t")} desc={t("d.aula.d")} accent="primary" />
                 <FreeCard to="/pronunciar" img={jaiBienvenida} title={t("d.pron.t")} desc={t("d.pron.d")} accent="primary" />
                 <FreeCard to="/mostrador" img={jaiAtencion} title={t("d.mostr.t")} desc={t("d.mostr.d")} accent="primary" inValidation />

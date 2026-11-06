@@ -68,6 +68,9 @@ function Header() {
           <BrandLogo />
         </a>
         <div className="flex items-center gap-3">
+          <Link to="/libreria" className="rounded-full border border-primary/30 px-3 py-1.5 text-sm font-semibold text-primary hover:bg-primary/5">
+            Librería
+          </Link>
           <LanguageSwitcher current="es" />
           <DisplayToggles />
         </div>

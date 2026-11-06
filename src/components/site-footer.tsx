@@ -39,6 +39,9 @@ export function SiteFooter() {
             <Link to="/respaldos" className="text-muted-foreground transition-colors hover:text-foreground">
               {t("ftBacking")}
             </Link>
+            <Link to="/libreria" className="font-semibold text-primary transition-colors hover:text-foreground">
+              Librería
+            </Link>
             <Link to="/instituciones" className="text-muted-foreground transition-colors hover:text-foreground">
               {t("navInst")}
             </Link>

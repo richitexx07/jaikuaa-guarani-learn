@@ -172,6 +172,16 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
             ))}
           </ul>
           <p className="mt-4 font-bold" style={{ color: T.verde }}>+{xp} XP</p>
+          <div className="mt-5 space-y-3 border-t border-dashed pt-4 text-left" style={{ borderColor: "#D8C6AA" }}>
+            <p className="text-center font-display text-lg font-bold">Recetario de la abuela</p>
+            {platos.map((p, k) => (
+              <div key={k} className="rounded-xl bg-white/70 p-3 text-sm">
+                <p className="font-bold">{p.dish.name} <span className="text-xs font-semibold" style={{ color: p.ok ? T.verde : T.rojo }}>· {p.ok ? "Bien" : "Repasar"}</span></p>
+                <p className="mt-0.5 opacity-80">{p.dish.info}</p>
+                <p className="mt-1 text-xs">{p.dish.ok.map((x) => ing[x] ? `${ing[x]!.gn} (${ing[x]!.es})` : x).join(" · ")}</p>
+              </div>
+            ))}
+          </div>
         </div>
         <RetoFinal partida={partida} puntaje={score} />
         <div className="flex flex-wrap justify-center gap-2">
