@@ -90,7 +90,7 @@ function LibreriaPage() {
               Libros que se leen <span className="block text-accent-foreground/90">y libros que hablan</span>
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-primary-foreground/85 sm:text-lg">
-              La casa digital de las obras en guaraní y bilingües. Para leer en el celular y, por primera vez,
+              La casa digital de las obras en guaraní y bilingües. Para leer en el celular y también
               escuchar cada página con <strong>voz humana real</strong>: la del autor o la de un docente.
             </p>
             <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -147,9 +147,9 @@ function LibreriaPage() {
             <h2 className="text-center font-display text-2xl font-bold sm:text-3xl">¿Por qué publicar en Jaikuaa?</h2>
             <div className="mt-7 grid gap-4 sm:grid-cols-3">
               {[
-                { icon: Globe2, t: "Llegás a todo el mundo", d: "Paraguayos en Argentina, España, EE. UU. y más compran tu obra digital sin pagar flete." },
-                { icon: Headphones, t: "Tu voz, tu libro", d: "Grabamos tu obra con voz humana. Un formato único que ninguna librería ofrece." },
-                { icon: HandCoins, t: "Reparto claro", d: "La mayor parte es para quien crea, con informe mensual. Se firma con cada autor o editorial." },
+                { icon: Globe2, t: "Llegás a todo el mundo", d: "Paraguayos en Argentina, España, EE. UU. y más van a poder comprar tu obra digital sin pagar flete." },
+                { icon: Headphones, t: "Tu voz, tu libro", d: "Grabamos tu obra con voz humana, para que quien aprende escuche cómo se pronuncia." },
+                { icon: HandCoins, t: "Reparto claro", d: "El porcentaje depende de quién trae al lector y se firma con cada autor o editorial. Informe todos los meses." },
               ].map((b) => (
                 <div key={b.t} className="rounded-2xl border border-border/60 bg-card p-5">
                   <b.icon className="h-7 w-7 text-primary" />

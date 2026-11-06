@@ -13,13 +13,14 @@ import { recordCompletion } from "@/lib/gamification";
 import { DISHES, ING, type Dish } from "@/lib/juegos-contenido";
 import { applyTembiu } from "@/lib/juego-textos";
 import { useJuegoTextos } from "@/lib/use-juego-textos";
-import imgSopa from "@/assets/tembiu/sopa.jpg";
-import imgChipaGuasu from "@/assets/tembiu/chipa-guasu.jpg";
-import imgMbeju from "@/assets/tembiu/mbeju.jpg";
-import imgVori from "@/assets/tembiu/vori-vori.jpg";
-import imgChipa from "@/assets/tembiu/chipa.jpg";
-import imgPastel from "@/assets/tembiu/pastel-mandio.jpg";
-import imgKiveve from "@/assets/tembiu/kiveve.jpg";
+import { Olla3DView } from "@/components/games/tembiu/olla-3d";
+import imgSopa from "@/assets/tembiu/sopa.webp";
+import imgChipaGuasu from "@/assets/tembiu/chipa-guasu.webp";
+import imgMbeju from "@/assets/tembiu/mbeju.webp";
+import imgVori from "@/assets/tembiu/vori-vori.webp";
+import imgChipa from "@/assets/tembiu/chipa.webp";
+import imgPastel from "@/assets/tembiu/pastel-mandio.webp";
+import imgKiveve from "@/assets/tembiu/kiveve.webp";
 
 const DISH_IMG: Record<string, string> = { "Sopa paraguaya": imgSopa, "Chipa guasu": imgChipaGuasu, Mbeju: imgMbeju, "Vori vori": imgVori, Chipa: imgChipa, "Pastel mandi'o": imgPastel, Kiveve: imgKiveve };
 function DishPic({ dish, className }: { dish: Dish; className: string }) {
@@ -238,7 +239,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
           </div>
         </div>
         <div>
-          <Olla picked={picked} ing={ing} hot={picked.length > 0} />
+          <Olla3DView picked={picked} resultado={checked && !gaveUp ? (good ? "bien" : "mal") : null} plano={<Olla picked={picked} ing={ing} hot={picked.length > 0} />} />
           <div className="mt-1 flex items-center justify-center gap-2">
             {Array.from({ length: 5 }, (_, k) => (
               <span key={k} className="h-3 w-3 rounded-full ring-2 ring-white/50" style={{ background: k < picked.length ? T.ocre : "transparent" }} />

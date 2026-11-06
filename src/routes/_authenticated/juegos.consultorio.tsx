@@ -34,6 +34,7 @@ import {
 } from "@/lib/consultorio";
 import jaiImg from "@/assets/jai-doctor.webp";
 import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from "@/components/games/reto";
+import { Paciente3DView } from "@/components/games/consultorio/paciente-3d";
 import { mulberry32, orderedBy } from "@/lib/reto";
 
 export const Route = createFileRoute("/_authenticated/juegos/consultorio")({
@@ -314,12 +315,22 @@ function Consultorio() {
             />
             <Ficha key={i} p={pac} triage={tri} ronda={ronda} idioma={idioma} onEscuchar={() => sonar(ronda)} resultado={resultado}>
               {ronda.tipo === "cuerpo" && (
-                <CuerpoMapa
+                <Paciente3DView
+                  paciente={pac}
                   correcta={ronda.palabra.region}
                   elegida={(resultado?.elegida as RegionId | undefined) ?? null}
                   bloqueado={!!resultado}
                   idioma={idioma}
                   onElegir={(r) => responder(r === ronda.palabra.region, r)}
+                  plano={
+                    <CuerpoMapa
+                      correcta={ronda.palabra.region}
+                      elegida={(resultado?.elegida as RegionId | undefined) ?? null}
+                      bloqueado={!!resultado}
+                      idioma={idioma}
+                      onElegir={(r) => responder(r === ronda.palabra.region, r)}
+                    />
+                  }
                 />
               )}
               {ronda.tipo !== "cuerpo" && (

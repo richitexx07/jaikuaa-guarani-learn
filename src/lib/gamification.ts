@@ -247,6 +247,9 @@ export function syncStats(): Promise<void> {
   if (syncPromise) return syncPromise;
   syncPromise = (async () => {
     if (isOffline() || !(await hasSession())) return;
+    // Primero la invitación del embajador: si se suben antes los puntos de invitado, la base la rechaza.
+    const { claimPendingReferral } = await import("@/lib/referral-claim");
+    await claimPendingReferral();
     await flushPending();
     const local = read();
     let server = await getMyStats();
