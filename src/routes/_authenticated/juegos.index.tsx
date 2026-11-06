@@ -43,6 +43,7 @@ const GAMES: Game[] = [
 ];
 
 const SHELVES: { key: string; title: string; bajada: string; items: CoverId[] }[] = [
+  { key: "estreno", title: "Lo nuevo", bajada: "Recién salidos del horno", items: ["consultorio", "tembiu", "penales"] },
   { key: "cultura", title: "Cultura paraguaya", bajada: "Música, cocina, cine y fútbol", items: ["karaoke", "tembiu", "taanga", "penales"] },
   { key: "trabajo", title: "Guaraní para el trabajo", bajada: "Salud, atención al público, campo y justicia", items: ["consultorio", "ventanilla", "chacra", "tekojoja"] },
   { key: "dos", title: "De a dos", bajada: "En el mismo celular o cada uno en el suyo", items: ["nee-rape", "duelo", "trivia-duelo"] },

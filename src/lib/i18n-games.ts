@@ -143,6 +143,10 @@ export const GAME_DESC: Record<string, L> = {
 };
 
 export const SHELF_TEXT: Record<string, { title: L; bajada: L }> = {
+  estreno: {
+    title: { es: "Lo nuevo", pt: "Novidades", en: "What's new", de: "Neu", fr: "Nouveautés", zh: "最新" },
+    bajada: { es: "Recién salidos del horno", pt: "Acabaram de sair do forno", en: "Fresh out of the oven", de: "Frisch aus dem Ofen", fr: "Tout juste sortis du four", zh: "剛出爐" },
+  },
   cultura: {
     title: { es: "Cultura paraguaya", pt: "Cultura paraguaia", en: "Paraguayan culture", de: "Paraguayische Kultur", fr: "Culture paraguayenne", zh: "巴拉圭文化" },
     bajada: { es: "Música, cocina, cine y fútbol", pt: "Música, culinária, cinema e futebol", en: "Music, food, film and football", de: "Musik, Küche, Film und Fußball", fr: "Musique, cuisine, cinéma et football", zh: "音樂、美食、電影與足球" },
