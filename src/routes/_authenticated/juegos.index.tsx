@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { LanzamientoBanner } from "@/components/lanzamiento-banner";
 import { GameStage } from "@/components/games/game-stage";
 import { COVER_TONE, type CoverId } from "@/components/games/game-covers";
 import { COVER_IMAGE } from "@/components/games/game-cover-images";
@@ -81,6 +82,7 @@ function GamesHome() {
       wide
       back={guest ? { to: "/", label: g("backHome") } : { to: "/dashboard", label: g("backBoard") }}
     >
+      <LanzamientoBanner oscuro className="mt-1" />
       {/* Marquesina */}
       <section className="relative pt-2 sm:pt-6">
         <div className="vit-lights flex justify-center gap-3 sm:gap-5" aria-hidden>

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { LanzamientoBanner } from "@/components/lanzamiento-banner";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
@@ -43,6 +44,9 @@ function Index() {
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
       <main className="flex-1">
+        <div className="px-4 pt-3 sm:px-6">
+          <LanzamientoBanner className="mx-auto max-w-5xl" />
+        </div>
         <Hero />
         <Adentro />
         <LiveAudioPreview />
