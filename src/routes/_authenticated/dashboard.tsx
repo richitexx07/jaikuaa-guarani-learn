@@ -502,8 +502,8 @@ function Dashboard() {
             <BigAction to="/juegos/palabra-del-dia" img={coverPalabra} title={t("dash.word")} desc={t("dash.wordDesc")} tone="card" />
           </nav>
 
-          {/* PRÓXIMA NOVEDAD — Castellano técnico para guaranihablantes */}
-          <NovedadCastellano />
+          {/* NOVEDAD — Librería Jaikuaa */}
+          <NovedadLibreria />
 
           {/* INVITAR — franja compacta con vida */}
           <Link
@@ -906,6 +906,43 @@ const NOV = {
     zh: "帶著筆記本和手機、前往城市的鄉村青年學生",
   },
 } as const;
+
+function NovedadLibreria() {
+  return (
+    <Link
+      to="/libreria"
+      aria-labelledby="novedad-libreria"
+      className="group relative mt-5 block overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary via-primary to-primary/80 p-5 shadow-xl transition-all hover:-translate-y-0.5 active:scale-[0.99] sm:p-8"
+    >
+      <span aria-hidden className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-12 bg-gradient-to-r from-transparent via-primary-foreground/15 to-transparent motion-safe:animate-[shine_5s_ease-in-out_infinite]" />
+      <div aria-hidden className="pointer-events-none absolute -right-6 bottom-0 flex items-end gap-1.5 opacity-90 sm:right-6">
+        <span className="h-28 w-7 rounded-t-md bg-accent shadow-lg" />
+        <span className="h-36 w-8 rounded-t-md bg-primary-foreground/90 shadow-lg" />
+        <span className="h-24 w-6 rounded-t-md bg-accent/70 shadow-lg" />
+        <span className="h-32 w-7 -rotate-6 rounded-t-md bg-primary-foreground/60 shadow-lg" />
+      </div>
+      <div className="relative max-w-[78%] sm:max-w-[65%]">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-accent-foreground shadow">
+            <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full rounded-full bg-accent-foreground/70 motion-safe:animate-ping" /><span className="relative h-2 w-2 rounded-full bg-accent-foreground" /></span>
+            Novedad
+          </span>
+          <span className="rounded-full border border-primary-foreground/40 bg-primary-foreground/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-primary-foreground">
+            En desarrollo
+          </span>
+        </div>
+        <h2 id="novedad-libreria" className="mt-3 font-display text-2xl font-bold leading-tight text-primary-foreground sm:text-3xl">
+          Librería Jaikuaa
+          <span className="block text-base font-semibold text-primary-foreground/85 sm:text-lg">Libros que se leen y libros que hablan</span>
+        </h2>
+        <p className="mt-2 text-sm text-primary-foreground/90">Obras de autores y editoriales, con la voz real de quien las escribe. ¿Escribiste un libro? Postulalo.</p>
+        <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary-foreground px-4 py-2 text-sm font-bold text-primary shadow transition-transform group-hover:translate-x-0.5">
+          <BookOpen className="h-4 w-4" aria-hidden /> Entrar a la Librería
+        </span>
+      </div>
+    </Link>
+  );
+}
 
 function NovedadCastellano() {
   const lang = useAppLang();
