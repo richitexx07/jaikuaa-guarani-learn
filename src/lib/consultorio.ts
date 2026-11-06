@@ -248,3 +248,25 @@ export function paciente(i: number, rnd: () => number = Math.random, ronda?: Ron
   const edad = ex.edadMin + Math.floor(rnd() * (ex.edadMax - ex.edadMin + 1));
   return { nombre: p.n, femenino: p.f, edad, piel: Math.floor(rnd() * 4), pelo: Math.floor(rnd() * 4) };
 }
+
+/* ------------------------------ Triage de guardia ------------------------------ */
+
+export type Triage = "verde" | "amarillo" | "rojo";
+
+/** Cada color de triage da otro tiempo y otro premio: el rojo es urgente, pero vale más. */
+export const TRIAGE: Record<Triage, { segundos: number; mult: number; es: string; pt: string; color: string }> = {
+  verde: { segundos: 24, mult: 1, es: "Leve", pt: "Leve", color: "#1E9E78" },
+  amarillo: { segundos: 18, mult: 1.25, es: "Urgente", pt: "Urgente", color: "#E0A11B" },
+  rojo: { segundos: 12, mult: 1.5, es: "Emergencia", pt: "Emergência", color: "#D52B1E" },
+};
+
+/** Color de triage de un paciente: 20% rojo, 35% amarillo, 45% verde. */
+export function triageDe(rnd: () => number = Math.random): Triage {
+  const r = rnd();
+  return r < 0.2 ? "rojo" : r < 0.55 ? "amarillo" : "verde";
+}
+
+/** Puntos con el triage aplicado. */
+export function puntosConTriage(segundosRestantes: number, racha: number, tr: Triage): number {
+  return Math.round(puntosPorAcierto(segundosRestantes, racha) * TRIAGE[tr].mult);
+}

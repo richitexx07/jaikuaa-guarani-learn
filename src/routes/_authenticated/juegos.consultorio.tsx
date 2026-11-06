@@ -15,7 +15,10 @@ import {
   estrellas,
   paciente as nuevoPaciente,
   PACIENTES_POR_TURNO,
-  puntosPorAcierto,
+  puntosConTriage,
+  TRIAGE,
+  triageDe,
+  type Triage,
   regionDe,
   REGIONES,
   SEGUNDOS_POR_PACIENTE,
@@ -76,6 +79,7 @@ const CSS = `
 @media (prefers-reduced-motion: reduce) { .cj-ecg, .cj-pulse, .cj-flat, .cj-enter { animation: none !important; } }
 `;
 
+type Historia = { nombre: string; femenino: boolean; gn: string; es: string; ok: boolean; triage: Triage };
 type Fase = "intro" | "jugando" | "fin";
 type Resultado = null | { ok: boolean; porTiempo?: boolean; elegida?: string };
 
@@ -139,6 +143,8 @@ function Consultorio() {
   const [fase, setFase] = useState<Fase>("intro");
   const [rondas, setRondas] = useState<Ronda[]>([]);
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
+  const [triages, setTriages] = useState<Triage[]>([]);
+  const [historia, setHistoria] = useState<Historia[]>([]);
   const [i, setI] = useState(0);
   const [vidas, setVidas] = useState(VIDAS);
   const [puntos, setPuntos] = useState(0);
@@ -153,6 +159,8 @@ function Consultorio() {
 
   const ronda = rondas[i];
   const pac = pacientes[i];
+  const tri: Triage = triages[i] ?? "verde";
+  const segTotal = TRIAGE[tri].segundos;
 
   const sonar = useCallback(
     (r: Ronda | undefined) => {
@@ -173,6 +181,8 @@ function Consultorio() {
     setRondas(rs);
     // Con la misma semilla: en un reto, los dos jugadores ven los mismos pacientes.
     setPacientes(rs.map((r, k) => nuevoPaciente(k, rnd, r)));
+    setTriages(rs.map(() => triageDe(rnd)));
+    setHistoria([]);
     setI(0);
     setVidas(VIDAS);
     setPuntos(0);
@@ -190,10 +200,10 @@ function Consultorio() {
   // Al llegar cada paciente: dice lo que le pasa y arranca el reloj.
   useEffect(() => {
     if (fase !== "jugando" || !ronda) return;
-    setRestante(SEGUNDOS_POR_PACIENTE);
+    setRestante(segTotal);
     const id = window.setTimeout(() => sonar(ronda), 450);
     return () => window.clearTimeout(id);
-  }, [fase, i, ronda, sonar]);
+  }, [fase, i, ronda, sonar, segTotal]);
 
   useEffect(() => {
     if (fase !== "jugando" || resultado) return;
@@ -206,12 +216,17 @@ function Consultorio() {
       if (resultado || !ronda) return;
       setResultado({ ok, elegida, porTiempo });
       setAtendidos((n) => n + 1);
+      if (pac) {
+        const gn = ronda.tipo === "cuerpo" ? ronda.palabra.gn : ronda.frase.gn;
+        const es = ronda.tipo === "cuerpo" ? ronda.palabra.es : ronda.frase.es;
+        setHistoria((h) => [...h, { nombre: pac.nombre, femenino: pac.femenino, gn, es, ok, triage: tri }]);
+      }
       if (ok) {
         const nr = racha + 1;
         setRacha(nr);
         setMejorRacha((m) => Math.max(m, nr));
         setAciertos((n) => n + 1);
-        setPuntos((p) => p + puntosPorAcierto(Math.floor(restante), nr));
+        setPuntos((p) => p + puntosConTriage(Math.floor(restante), nr, tri));
         react("success");
         if (ronda.tipo === "indicacion") void playFrase(ronda.frase.id, urls[ronda.frase.id]);
       } else {
@@ -220,7 +235,7 @@ function Consultorio() {
         react("error");
       }
     },
-    [resultado, ronda, racha, restante, react, urls],
+    [resultado, ronda, racha, restante, react, urls, pac, tri],
   );
 
   useEffect(() => {
@@ -295,8 +310,9 @@ function Consultorio() {
               total={rondas.length}
               resultado={resultado}
               idioma={idioma}
+              segTotal={segTotal}
             />
-            <Ficha key={i} p={pac} ronda={ronda} idioma={idioma} onEscuchar={() => sonar(ronda)} resultado={resultado}>
+            <Ficha key={i} p={pac} triage={tri} ronda={ronda} idioma={idioma} onEscuchar={() => sonar(ronda)} resultado={resultado}>
               {ronda.tipo === "cuerpo" && (
                 <CuerpoMapa
                   correcta={ronda.palabra.region}
@@ -327,6 +343,7 @@ function Consultorio() {
             puntos={puntos}
             xp={ganado ?? 0}
             onOtro={empezar}
+            historia={historia}
             partida={partida}
           />
         )}
@@ -368,8 +385,8 @@ function Intro({
           {idioma === "es" ? "por turno, con voces reales" : "por plantão, com vozes reais"}
         </li>
         <li className="rounded-2xl bg-white/10 p-3">
-          <span className="block font-semibold text-white">{SEGUNDOS_POR_PACIENTE} segundos</span>
-          {idioma === "es" ? "para atender a cada uno" : "para atender cada um"}
+          <span className="block font-semibold text-white">{idioma === "es" ? "Triage de guardia" : "Triagem"}</span>
+          {idioma === "es" ? "emergencia: menos tiempo, más puntos" : "emergência: menos tempo, mais pontos"}
         </li>
         <li className="rounded-2xl bg-white/10 p-3">
           <span className="block font-semibold text-white">{VIDAS} vidas</span>
@@ -433,7 +450,9 @@ function Monitor({
   total,
   resultado,
   idioma,
+  segTotal,
 }: {
+  segTotal: number;
   restante: number;
   vidas: number;
   puntos: number;
@@ -443,8 +462,8 @@ function Monitor({
   resultado: Resultado;
   idioma: Idioma;
 }) {
-  const urgente = restante <= 6 && !resultado;
-  const vel = resultado ? 2.4 : Math.max(0.7, (restante / SEGUNDOS_POR_PACIENTE) * 2.4);
+  const urgente = restante <= Math.min(6, segTotal / 2) && !resultado;
+  const vel = resultado ? 2.4 : Math.max(0.7, (restante / segTotal) * 2.4);
   const color = resultado ? (resultado.ok ? C.fosforo : C.rojo) : urgente ? C.ambar : C.fosforo;
   return (
     <div className="overflow-hidden rounded-3xl border border-white/15 bg-[#062A2E] text-white shadow-xl">
@@ -517,6 +536,7 @@ function Avatar({ p, estado }: { p: Paciente; estado: "espera" | "bien" | "mal" 
 
 function Ficha({
   p,
+  triage,
   ronda,
   idioma,
   onEscuchar,
@@ -524,6 +544,7 @@ function Ficha({
   children,
 }: {
   p: Paciente;
+  triage: Triage;
   ronda: Ronda;
   idioma: Idioma;
   onEscuchar: () => void;
@@ -545,6 +566,10 @@ function Ficha({
           </p>
           <span className="mt-1 inline-block rounded-md px-2 py-0.5 text-xs font-semibold" style={{ background: "#FCE7B0", color: "#6A4A00" }}>
             {motivo}
+          </span>
+          <span className="ml-1.5 mt-1 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-bold text-white" style={{ background: TRIAGE[triage].color }}>
+            <span className={`h-2 w-2 rounded-full bg-white ${triage === "rojo" ? "animate-pulse" : ""}`} aria-hidden />
+            {idioma === "es" ? "Triage" : "Triagem"}: {TRIAGE[triage][idioma]} · {TRIAGE[triage].segundos} s{TRIAGE[triage].mult > 1 ? ` · ×${TRIAGE[triage].mult}` : ""}
           </span>
         </div>
       </div>
@@ -808,7 +833,9 @@ function Fin({
   xp,
   onOtro,
   partida,
+  historia,
 }: {
+  historia: Historia[];
   idioma: Idioma;
   aciertos: number;
   atendidos: number;
@@ -852,6 +879,28 @@ function Fin({
           {xp > 0 && <p className="mt-4 text-sm text-white/80">+{xp} XP</p>}
         </div>
       </div>
+      {historia.length > 0 && (
+        <div className="mt-5 rounded-3xl p-5 shadow-2xl" style={{ background: C.ficha, color: C.tinta }}>
+          <h3 className="font-display text-xl font-bold">{idioma === "es" ? "Historia clínica del turno" : "Prontuário do plantão"}</h3>
+          <p className="text-xs opacity-70">{idioma === "es" ? "Repasá lo que escuchaste y dijiste." : "Revise o que você ouviu e disse."}</p>
+          <ol className="mt-3 divide-y divide-[#C9DCD8]">
+            {historia.map((h, k) => (
+              <li key={k} className="flex items-start gap-3 py-2.5">
+                <span className="mt-1 h-3 w-3 shrink-0 rounded-full" style={{ background: TRIAGE[h.triage].color }} aria-label={TRIAGE[h.triage][idioma]} />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold">{h.nombre}</p>
+                  <p className="text-sm">
+                    <span className="font-bold" lang="gn">{h.gn}</span> <span className="opacity-70">= {enIdioma(h.es, idioma, h.femenino)}</span>
+                  </p>
+                </div>
+                <span className="shrink-0 rounded-md px-2 py-0.5 text-xs font-bold" style={h.ok ? { background: "#D8F6EC", color: "#14614F" } : { background: "#FBE2DF", color: "#7A1F17" }}>
+                  {h.ok ? (idioma === "es" ? "Bien" : "Certo") : idioma === "es" ? "Repasar" : "Revisar"}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
       <RetoFinal partida={partida} puntaje={aciertos} total={total} className="mt-5" />
       <button
         type="button"

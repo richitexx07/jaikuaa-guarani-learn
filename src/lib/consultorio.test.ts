@@ -84,3 +84,20 @@ describe("consultorio", () => {
     expect(enIdioma("¿Dónde vive?", "es", true)).toBe("¿Dónde vive?");
   });
 });
+
+import { TRIAGE, triageDe, puntosConTriage } from "./consultorio";
+describe("triage", () => {
+  it("rojo da 12 s y ×1.5", () => {
+    expect(TRIAGE.rojo.segundos).toBe(12);
+    expect(puntosConTriage(0, 1, "rojo")).toBe(150);
+  });
+  it("verde da 24 s y sin extra", () => {
+    expect(TRIAGE.verde.segundos).toBe(24);
+    expect(puntosConTriage(0, 1, "verde")).toBe(100);
+  });
+  it("reparte por sorteo", () => {
+    expect(triageDe(() => 0.1)).toBe("rojo");
+    expect(triageDe(() => 0.4)).toBe("amarillo");
+    expect(triageDe(() => 0.9)).toBe("verde");
+  });
+});
