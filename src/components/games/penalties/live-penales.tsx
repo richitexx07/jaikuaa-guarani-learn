@@ -10,6 +10,7 @@ import { recordCompletion } from "@/lib/gamification";
 import { newSeed, orderedBy, shufflerFor } from "@/lib/reto";
 import { useSala } from "@/lib/use-sala";
 import type { GameWord } from "@/lib/games.functions";
+import { kitSeguro, useMiKit, type Kit } from "@/components/games/penalties/camisetas";
 
 /**
  * Penales a distancia, cada uno en su celular. Se turnan: uno patea (responde la palabra y
@@ -21,7 +22,7 @@ import type { GameWord } from "@/lib/games.functions";
  */
 
 const P = { noche: "#071A33", led: "#FFB23E", gol: "#3BE38A", mal: "#FF5A4E", blanco: "#F4F7FB", host: "#2F6FDE", guest: "#D9452B" };
-const EVENTS = ["start", "dive", "answer", "aim", "kick", "shot", "sync", "hello", "ended", "llena", "rematch"] as const;
+const EVENTS = ["start", "dive", "answer", "aim", "kick", "shot", "sync", "hello", "ended", "llena", "rematch", "kit"] as const;
 const GRACE_RIVAL_MS = 30000;
 const GRACE_ME_MS = 45000;
 const NEXT_MS = 2600;
@@ -56,6 +57,9 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
   const [watchAim, setWatchAim] = useState<{ aim: Point; phase: "aim" | "power" } | null>(null);
   const [watchShot, setWatchShot] = useState<Shot | null>(null);
   const kickRecibido = useRef(-1);
+  // La camiseta de cada uno (la del otro llega por la sala).
+  const [miKit] = useMiKit();
+  const [rivalKit, setRivalKit] = useState<Kit | null>(null);
   const [last, setLast] = useState<Outcome | null>(null);
   const [end, setEnd] = useState<End>(null);
   const [llena, setLlena] = useState(false);
@@ -175,6 +179,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
         // Por las dudas: si mi animación no termina (celular lento), igual se cuenta el penal.
         else window.setTimeout(() => applyShot(tt, p.outcome as Outcome), 3000);
       }
+      else if (e === "kit") setRivalKit(kitSeguro(p.kit));
       else if (e === "rematch" && role === "host") startMatch();
       else if (e === "hello" && m && from && (from === m.hostUid || from === m.guestUid)) {
         if (endRef.current) send("ended");
@@ -185,6 +190,12 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
     },
   });
   salaRef.current = sala;
+  const claveSala = match ? `${match.hostUid}|${match.guestUid}` : null;
+  const kitPropio: Kit = { ...miKit, nombre: miKit.nombre.trim() || (sala.me?.name ?? "").trim().slice(0, 12) };
+  const kitTxt = JSON.stringify(kitPropio);
+  useEffect(() => {
+    if (claveSala) send("kit", { kit: kitPropio });
+  }, [claveSala, sala.rival.uid, kitTxt]); // eslint-disable-line react-hooks/exhaustive-deps
   meUid.current = sala.me?.uid ?? null;
   if (sala.rival.name) lastRivalName.current = sala.rival.name;
 
@@ -399,6 +410,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
                 <div className="overflow-hidden rounded-2xl ring-4 ring-black/40">
                   <PenaltyPitch
                     key={t}
+                    kit={kitPropio}
                     guess={dive}
                     knew={knew}
                     ready={choice !== null}
@@ -456,6 +468,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
               <div className="overflow-hidden rounded-2xl ring-4 ring-black/40">
                 <PenaltyPitch
                   key={`ver-${t}`}
+                  kit={rivalKit ?? { ...miKit, pais: "PY", nombre: "" }}
                   guess={myDive}
                   knew={rivalChoice === word.gn}
                   ready={false}

@@ -54,6 +54,16 @@ const T = {
   rightMsg: { es: "¡Respuesta correcta! El arquero reacciona tarde.", pt: "Resposta correta! O goleiro reage tarde.", en: "Correct! The keeper reacts too late.", de: "Richtig! Der Torwart reagiert zu spät.", fr: "Bonne réponse ! Le gardien réagit trop tard.", zh: "答對了！守門員反應慢了。" },
   wrongMsg: { es: "Esta vez no. El arquero está atento, pero todavía podés marcar.", pt: "Desta vez não. O goleiro está atento, mas você ainda pode marcar.", en: "Not this time. The keeper is alert, but you can still score.", de: "Diesmal nicht. Der Torwart passt auf, aber du kannst noch treffen.", fr: "Pas cette fois. Le gardien est attentif, mais vous pouvez encore marquer.", zh: "這次沒答對。守門員很警覺，但你仍有機會進球。" },
   goNext: { es: "¡Vamos por el próximo penal!", pt: "Vamos para o próximo pênalti!", en: "On to the next penalty!", de: "Auf zum nächsten Elfmeter!", fr: "Au tir suivant !", zh: "準備下一球！" },
+  kitTitle: { es: "Tu camiseta", pt: "Sua camisa", en: "Your shirt", de: "Dein Trikot", fr: "Votre maillot", zh: "你的球衣" },
+  kitInfo: { es: "Un amistoso con el Jai: elegí los colores de tu país y poné tu nombre en la espalda.", pt: "Um amistoso com o Jai: escolha as cores do seu país e coloque seu nome nas costas.", en: "A friendly match with Jai: pick your country's colors and put your name on the back.", de: "Ein Freundschaftsspiel mit Jai: Wähle die Farben deines Landes und deinen Namen für den Rücken.", fr: "Un match amical avec Jai : choisissez les couleurs de votre pays et mettez votre nom dans le dos.", zh: "和 Jai 的友誼賽：選擇你國家的顏色，把名字印在背後。" },
+  kitHe: { es: "Jugador", pt: "Jogador", en: "Player (he)", de: "Spieler", fr: "Joueur", zh: "男球員" },
+  kitShe: { es: "Jugadora", pt: "Jogadora", en: "Player (she)", de: "Spielerin", fr: "Joueuse", zh: "女球員" },
+  kitName: { es: "Nombre en la espalda", pt: "Nome nas costas", en: "Name on the back", de: "Name auf dem Rücken", fr: "Nom dans le dos", zh: "背後的名字" },
+  kitNumber: { es: "Número", pt: "Número", en: "Number", de: "Nummer", fr: "Numéro", zh: "號碼" },
+  kitCountry: { es: "País", pt: "País", en: "Country", de: "Land", fr: "Pays", zh: "國家" },
+  kitSouth: { es: "Sudamérica", pt: "América do Sul", en: "South America", de: "Südamerika", fr: "Amérique du Sud", zh: "南美洲" },
+  kitWorld: { es: "Del mundo", pt: "Do mundo", en: "Around the world", de: "Aus aller Welt", fr: "Du monde entier", zh: "世界各地" },
+  kitWho: { es: "¿Quién patea?", pt: "Quem chuta?", en: "Who's shooting?", de: "Wer schießt?", fr: "Qui tire ?", zh: "誰來踢？" },
 } satisfies Record<string, L>;
 
 const MSG: Record<Outcome, L> = {

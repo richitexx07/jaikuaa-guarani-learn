@@ -3,14 +3,16 @@ import { drawStadium } from './stadium';
 import { freshScene, G, H, W, labels, powerAt, resolveShot, type Dive, type Outcome, type Point, type Scene, type Shot } from './physics';
 import { StadiumSound } from '../game-sound';
 import { celebrate } from '@/lib/confetti';
+import { useMiKit, type Kit } from './camisetas';
 
 /** watch: modo espectador (el arquero a distancia ve en vivo cómo apunta y patea el otro). onAim/onKick: el que patea avisa lo que hace. */
-export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,onKick}:{knew:boolean;ready:boolean;ledText:string;muted:boolean;onShot:(o:Outcome)=>void;guess?:Dive;watch?:{aim?:Point|null;phase?:'aim'|'power'|null;shot?:Shot|null};onAim?:(p:Point,phase:'aim'|'power')=>void;onKick?:(shot:Shot)=>void}){
+export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,onKick,kit}:{kit?:Kit;knew:boolean;ready:boolean;ledText:string;muted:boolean;onShot:(o:Outcome)=>void;guess?:Dive;watch?:{aim?:Point|null;phase?:'aim'|'power'|null;shot?:Shot|null};onAim?:(p:Point,phase:'aim'|'power')=>void;onKick?:(shot:Shot)=>void}){
  const canvas=useRef<HTMLCanvasElement>(null),scene=useRef<Scene>(freshScene()),animation=useRef<((now:number)=>void)|null>(null),sound=useRef(new StadiumSound());
  const callback=useRef(onShot);callback.current=onShot;
  const settings=useRef({ledText,muted});settings.current={ledText,muted};
  const aimCb=useRef(onAim);aimCb.current=onAim;const kickCb=useRef(onKick);kickCb.current=onKick;
  const spectator=!!watch;scene.current.spectator=spectator;
+ const [miKit]=useMiKit();scene.current.kit=kit??miKit;
  // Espectador: copia lo que hace el que patea.
  useEffect(()=>{if(!watch)return;const s=scene.current;if(s.phase==='shot'||s.phase==='result')return;if(watch.aim)s.aim=watch.aim;if(watch.phase==='power'&&s.phase!=='power'){s.phase='power';s.powerStart=performance.now();}else if(watch.phase==='aim')s.phase='aim';},[watch?.aim?.x,watch?.aim?.y,watch?.phase]);// eslint-disable-line react-hooks/exhaustive-deps
  useEffect(()=>{if(watch?.shot&&scene.current.phase!=='shot'&&scene.current.phase!=='result')animate(watch.shot,performance.now());},[watch?.shot]);// eslint-disable-line react-hooks/exhaustive-deps
@@ -35,7 +37,7 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,
    s.ball={x:400+(shot.end.x-400)*e,y:520+(shot.end.y-520)*e-Math.sin(q*Math.PI)*50,r:16-6*e};
    const kq=reduce?q:Math.max(0,Math.min(1,((t-now)/1000-shot.react)/Math.max(.05,shot.T-shot.react))),ke=1-Math.pow(1-kq,2);
    s.keeper={x:400+(shot.keeper.x-400)*ke,y:278+(shot.keeper.y-278)*ke,ang:Math.sign(shot.keeper.x-400)*Math.min(1.2,Math.abs(shot.keeper.x-400)/170)*ke,stretch:ke};
-   if(q>=1){animation.current=null;s.phase='result';const goal=shot.outcome==='goal'||shot.outcome==='angle';s.banner={t,txt:labels[shot.outcome],c:getComputedStyle(canvas.current??document.documentElement).getPropertyValue(goal?'--stadium-gold':'--stadium-miss')};
+   if(q>=1){animation.current=null;s.phase='result';s.outcome=shot.outcome;const goal=shot.outcome==='goal'||shot.outcome==='angle';s.banner={t,txt:labels[shot.outcome],c:getComputedStyle(canvas.current??document.documentElement).getPropertyValue(goal?'--stadium-gold':'--stadium-miss')};
     if(goal){s.cheer=t;s.net={...shot.end,t};celebrate(shot.outcome==='angle'?'big':'small');}sound.current.play(goal?'cheer':shot.outcome==='post'?'post':'hit');if(shot.outcome==='post')s.shake=t;
     if(!reduce)try{navigator.vibrate?.(goal?[40,30,60]:30);}catch{}
     callback.current(shot.outcome);
