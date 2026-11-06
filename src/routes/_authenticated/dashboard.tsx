@@ -88,7 +88,7 @@ import jaiProfe from "@/assets/jai-profe.webp";
 import jaiAtencion from "@/assets/jai-atencion-pro.webp";
 import jaiAgro from "@/assets/jai-agro.webp";
 import { forgetPlace, useLastPlace } from "@/lib/last-place";
-import { X, BookOpen } from "lucide-react";
+import { X } from "lucide-react";
 import { shouldShowWelcome, welcomeSeen } from "@/lib/welcome";
 import triviaVocabulario from "@/assets/trivia/trivia-vocabulario.webp";
 const jaiAsset = { url: jaiImg };
