@@ -3,7 +3,7 @@ import { useCallback, useSyncExternalStore } from "react";
 /**
  * Camisetas por país para el pateador de Penales.
  * Solo los colores de cada país: sin escudos, sin marcas y sin banderas (un amistoso con el Jai, nunca rivales).
- * Primero Paraguay y los países de la MICSUR; después, los de los idiomas de la app.
+ * Primero Paraguay y los países de la MICSUR; después, uno o más por cada idioma de la app (si está el idioma, está la camiseta).
  * El nombre de cada país lo da el navegador en el idioma elegido (Intl.DisplayNames), sin traducir a mano.
  */
 export type Diseno = {
@@ -40,6 +40,12 @@ export const CAMISETAS = {
   JP: { base: "#1E3C8C", vivo: "#BC002D", numero: "#FFFFFF" },
   KR: { base: "#C8102E", vivo: "#003478", numero: "#FFFFFF" },
   MA: { base: "#C1272D", vivo: "#006233", numero: "#FFFFFF" },
+  TW: { base: "#1F4FA3", vivo: "#FFFFFF", numero: "#FFFFFF" },
+  RU: { base: "#FFFFFF", vivo: "#D52B1E", numero: "#0039A6" },
+  IL: { base: "#FFFFFF", vivo: "#0038B8", numero: "#0038B8" },
+  IN: { base: "#1F5FAF", vivo: "#FF9933", numero: "#FFFFFF" },
+  TR: { base: "#E30A17", vivo: "#FFFFFF", numero: "#FFFFFF" },
+  KE: { base: "#BB0000", vivo: "#006600", numero: "#FFFFFF" },
 } satisfies Record<string, Diseno>;
 
 export type Pais = keyof typeof CAMISETAS;
@@ -50,6 +56,12 @@ export const PAISES_MICSUR: Pais[] = ["PY", "AR", "BO", "BR", "CL", "CO", "EC", 
 export type Figura = "chico" | "chica";
 export type Kit = { pais: Pais; figura: Figura; nombre: string; numero: number };
 export const KIT_INICIAL: Kit = { pais: "PY", figura: "chico", nombre: "", numero: 10 };
+
+const BANDERAS = import.meta.glob<string>("/src/assets/banderas/*.webp", { eager: true, import: "default" });
+/** La bandera del país (para elegir); la camiseta en sí no lleva bandera. */
+export function bandera(p: Pais): string | undefined {
+  return BANDERAS[`/src/assets/banderas/${p.toLowerCase()}.webp`];
+}
 
 export function esPais(v: unknown): v is Pais {
   return typeof v === "string" && v in CAMISETAS;

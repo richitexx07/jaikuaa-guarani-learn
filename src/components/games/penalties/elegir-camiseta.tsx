@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 import { useAppLang } from "@/lib/i18n";
 import { usePT } from "@/lib/i18n-penales";
-import { CAMISETAS, PAISES, PAISES_MICSUR, nombrePais, useMiKit, type Kit, type Pais } from "./camisetas";
+import { CAMISETAS, PAISES, PAISES_MICSUR, bandera, nombrePais, useMiKit, type Kit, type Pais } from "./camisetas";
 
 /** La espalda de la camiseta dibujada (nombre y número), para ver cómo queda antes de patear. */
 export function EspaldaCamiseta({ kit, className = "", mini = false }: { kit: Kit; className?: string; mini?: boolean }) {
@@ -42,7 +42,11 @@ function BotonPais({ p, elegido, lang, onElegir }: { p: Pais; elegido: boolean; 
       className="flex min-h-12 items-center gap-2 rounded-xl px-2 py-1.5 text-left text-sm font-semibold transition active:scale-95"
       style={elegido ? { background: "#F4F7FB", color: "#071A33", boxShadow: "0 0 0 3px #FFB23E" } : { background: "rgba(255,255,255,.08)", boxShadow: "inset 0 0 0 2px rgba(255,255,255,.14)" }}
     >
-      <EspaldaCamiseta mini kit={{ pais: p, figura: "chico", nombre: "", numero: 10 }} className="h-8 w-8 shrink-0" />
+      {bandera(p) ? (
+        <img src={bandera(p)} alt="" width={40} height={30} loading="lazy" className="h-[30px] w-10 shrink-0 rounded-[5px] object-cover shadow-[0_1px_3px_rgba(0,0,0,.4)] ring-1 ring-black/15" />
+      ) : (
+        <EspaldaCamiseta mini kit={{ pais: p, figura: "chico", nombre: "", numero: 10 }} className="h-8 w-8 shrink-0" />
+      )}
       <span className="min-w-0 leading-tight">{nombrePais(p, lang)}</span>
     </button>
   );
