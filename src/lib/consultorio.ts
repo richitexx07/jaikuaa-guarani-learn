@@ -242,7 +242,7 @@ export type Paciente = { nombre: string; femenino: boolean; edad: number; piel: 
 
 /** Un paciente coherente con lo que se le va a decir o preguntar en esa ronda. */
 export function paciente(i: number, rnd: () => number = Math.random, ronda?: Ronda): Paciente {
-  const ex = ronda && ronda.tipo !== "cuerpo" ? exigencias(ronda.frase.es) : { genero: null, edadMin: 6, edadMax: 85 };
+  const ex = ronda && ronda.tipo !== "cuerpo" ? exigencias(ronda.frase.es) : { genero: null, edadMin: 16, edadMax: 85 };
   const lista = ex.genero ? NOMBRES.filter((x) => x.f === (ex.genero === "f")) : NOMBRES;
   const p = lista[(i + Math.floor(rnd() * lista.length)) % lista.length]!;
   const edad = ex.edadMin + Math.floor(rnd() * (ex.edadMax - ex.edadMin + 1));

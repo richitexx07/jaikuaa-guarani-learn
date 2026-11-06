@@ -34,7 +34,7 @@ import {
 } from "@/lib/consultorio";
 import jaiImg from "@/assets/jai-doctor.webp";
 import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from "@/components/games/reto";
-import { Paciente3DView } from "@/components/games/consultorio/paciente-3d";
+import { CaraPaciente, PacienteIlustrado } from "@/components/games/consultorio/paciente-ilustrado";
 import { mulberry32, orderedBy } from "@/lib/reto";
 
 export const Route = createFileRoute("/_authenticated/juegos/consultorio")({
@@ -74,9 +74,6 @@ const CSS = `
 @keyframes cj-flat { 50% { opacity: 0.2 } }
 .cj-enter { animation: cj-enter 0.45s cubic-bezier(.2,.8,.2,1) 1; }
 @keyframes cj-enter { from { transform: translateY(18px) rotate(-1.5deg); opacity: 0 } to { transform: none; opacity: 1 } }
-.cj-region { cursor: pointer; outline: none; }
-.cj-region .cj-ring { opacity: 0; transition: opacity .15s; }
-.cj-region:hover .cj-ring, .cj-region:focus-visible .cj-ring { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .cj-ecg, .cj-pulse, .cj-flat, .cj-enter { animation: none !important; } }
 `;
 
@@ -315,22 +312,13 @@ function Consultorio() {
             />
             <Ficha key={i} p={pac} triage={tri} ronda={ronda} idioma={idioma} onEscuchar={() => sonar(ronda)} resultado={resultado}>
               {ronda.tipo === "cuerpo" && (
-                <Paciente3DView
+                <PacienteIlustrado
                   paciente={pac}
                   correcta={ronda.palabra.region}
                   elegida={(resultado?.elegida as RegionId | undefined) ?? null}
                   bloqueado={!!resultado}
                   idioma={idioma}
                   onElegir={(r) => responder(r === ronda.palabra.region, r)}
-                  plano={
-                    <CuerpoMapa
-                      correcta={ronda.palabra.region}
-                      elegida={(resultado?.elegida as RegionId | undefined) ?? null}
-                      bloqueado={!!resultado}
-                      idioma={idioma}
-                      onElegir={(r) => responder(r === ronda.palabra.region, r)}
-                    />
-                  }
                 />
               )}
               {ronda.tipo !== "cuerpo" && (
@@ -513,38 +501,6 @@ function Monitor({
   );
 }
 
-const PIEL = ["#F2C9A0", "#D9A57B", "#B57B52", "#8A5A3B"];
-const PELO = ["#2B1D14", "#5A3A22", "#9A9A9A", "#C9A15B"];
-
-function Avatar({ p, estado }: { p: Paciente; estado: "espera" | "bien" | "mal" }) {
-  const piel = PIEL[p.piel]!;
-  const pelo = p.edad > 62 ? PELO[2]! : PELO[p.pelo]!;
-  const boca = estado === "bien" ? "M38 62 Q50 72 62 62" : estado === "mal" ? "M38 68 Q50 60 62 68" : "M40 65 Q50 66 60 65";
-  const ceja = estado === "espera" ? "M34 40 L44 43 M56 43 L66 40" : "M34 42 L44 41 M56 41 L66 42";
-  return (
-    <svg viewBox="0 0 100 100" className="h-20 w-20 shrink-0 sm:h-24 sm:w-24" aria-hidden>
-      <circle cx="50" cy="50" r="48" fill="#DCEFEA" />
-      {p.femenino && <path d="M18 56 Q14 18 50 14 Q86 18 82 56 L76 80 L24 80 Z" fill={pelo} />}
-      <ellipse cx="50" cy="54" rx="26" ry="30" fill={piel} />
-      <path d={p.femenino ? "M24 46 Q30 20 50 20 Q70 20 76 46 Q64 30 50 32 Q36 30 24 46" : "M25 44 Q28 20 50 20 Q72 20 75 44 Q70 32 50 32 Q30 32 25 44"} fill={pelo} />
-      <path d={ceja} stroke="#3a2a20" strokeWidth="2.2" strokeLinecap="round" />
-      {[40, 60].map((x) => (
-        <g key={x}>
-          <ellipse cx={x} cy="50" rx="4.6" ry="4.2" fill="#fff" />
-          <circle cx={x} cy="50.5" r="2.8" fill="#4A2F1C" />
-          <circle cx={x + 1} cy="49" r="0.9" fill="#fff" />
-        </g>
-      ))}
-      <circle cx="33" cy="60" r="5" fill="#E9877A" opacity=".35" />
-      <circle cx="67" cy="60" r="5" fill="#E9877A" opacity=".35" />
-      <path d="M50 52 Q47 58 50 60" stroke="#00000033" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-      {p.edad > 62 && <g fill="none" stroke="#3a2a20" strokeWidth="1.4"><circle cx="40" cy="50" r="6.5" /><circle cx="60" cy="50" r="6.5" /><path d="M46.5 50 L53.5 50" /></g>}
-      <path d={boca} stroke="#6b2b2b" strokeWidth="3" fill="none" strokeLinecap="round" />
-      <path d="M22 100 Q22 82 50 82 Q78 82 78 100 Z" fill="#7FB8C9" /><path d="M42 82 L50 92 L58 82" fill="none" stroke="#4A8A9C" strokeWidth="2" />
-    </svg>
-  );
-}
-
 function Ficha({
   p,
   triage,
@@ -569,7 +525,7 @@ function Ficha({
       {/* El clip de la tablilla */}
       <div className="absolute -top-3 left-1/2 h-6 w-24 -translate-x-1/2 rounded-md bg-[#9FB4B2] shadow-inner" aria-hidden />
       <div className="flex items-center gap-4">
-        <Avatar p={p} estado={resultado ? (resultado.ok ? "bien" : "mal") : "espera"} />
+        <CaraPaciente paciente={p} className="h-20 w-20 shrink-0 ring-4 ring-white shadow-md" />
         <div className="min-w-0 flex-1">
           <p className="font-display text-2xl font-bold leading-tight">{p.nombre}</p>
           <p className="text-sm opacity-70">
@@ -608,151 +564,6 @@ function Ficha({
 }
 
 /** Dibujo del cuerpo con las partes que se pueden tocar. Cabeza grande para que la cara se toque fácil. */
-function CuerpoMapa({
-  correcta,
-  elegida,
-  bloqueado,
-  idioma,
-  onElegir,
-}: {
-  correcta: RegionId;
-  elegida: RegionId | null;
-  bloqueado: boolean;
-  idioma: Idioma;
-  onElegir: (r: RegionId) => void;
-}) {
-  const piel = "#E8B990";
-  const zonas: { id: RegionId; shape: ReactNode; ring: ReactNode }[] = [
-    // La cabeza va primero (abajo): toda la cabeza se puede tocar, y ojos, nariz, boca y orejas quedan encima.
-    { id: "cabeza", shape: <circle cx="120" cy="92" r="70" />, ring: <ellipse cx="120" cy="40" rx="58" ry="24" /> },
-    { id: "ojo", shape: <><circle cx="96" cy="86" r="17" /><circle cx="144" cy="86" r="17" /></>, ring: <><circle cx="96" cy="86" r="17" /><circle cx="144" cy="86" r="17" /></> },
-    { id: "oreja", shape: <><ellipse cx="50" cy="96" rx="15" ry="20" /><ellipse cx="190" cy="96" rx="15" ry="20" /></>, ring: <><ellipse cx="50" cy="96" rx="15" ry="20" /><ellipse cx="190" cy="96" rx="15" ry="20" /></> },
-    { id: "nariz", shape: <circle cx="120" cy="108" r="12" />, ring: <circle cx="120" cy="108" r="12" /> },
-    { id: "boca", shape: <ellipse cx="120" cy="134" rx="22" ry="11" />, ring: <ellipse cx="120" cy="134" rx="22" ry="11" /> },
-    { id: "panza", shape: <ellipse cx="120" cy="250" rx="46" ry="30" />, ring: <circle cx="120" cy="245" r="22" /> },
-    { id: "corazon", shape: <circle cx="140" cy="198" r="22" />, ring: <circle cx="140" cy="198" r="18" /> },
-    { id: "mano", shape: <><circle cx="46" cy="268" r="17" /><circle cx="194" cy="268" r="17" /></>, ring: <><circle cx="46" cy="268" r="17" /><circle cx="194" cy="268" r="17" /></> },
-    { id: "pie", shape: <><ellipse cx="98" cy="350" rx="20" ry="11" /><ellipse cx="142" cy="350" rx="20" ry="11" /></>, ring: <><ellipse cx="98" cy="350" rx="20" ry="11" /><ellipse cx="142" cy="350" rx="20" ry="11" /></> },
-  ];
-  const etiqueta = (id: RegionId) => {
-    const r = REGIONES.find((x) => x.id === id)!;
-    return idioma === "pt" ? r.pt : r.es[0]!.charAt(0).toUpperCase() + r.es[0]!.slice(1);
-  };
-  return (
-    <div className="mx-auto max-w-[300px]">
-      <svg viewBox="0 0 240 370" className="w-full" role="group" aria-label={idioma === "es" ? "Cuerpo del paciente" : "Corpo do paciente"}>
-        <defs>
-          <radialGradient id="cj-skin" cx="45%" cy="35%" r="70%">
-            <stop offset="0%" stopColor="#F6CFA8" />
-            <stop offset="70%" stopColor={piel} />
-            <stop offset="100%" stopColor="#C98F66" />
-          </radialGradient>
-          <linearGradient id="cj-bata" x1="0" x2="1">
-            <stop offset="0%" stopColor="#5E9FB3" />
-            <stop offset="45%" stopColor="#8CC6D6" />
-            <stop offset="100%" stopColor="#5E9FB3" />
-          </linearGradient>
-          <linearGradient id="cj-pant" x1="0" x2="1">
-            <stop offset="0%" stopColor="#24596A" />
-            <stop offset="50%" stopColor="#367F92" />
-            <stop offset="100%" stopColor="#24596A" />
-          </linearGradient>
-          <radialGradient id="cj-cheek"><stop offset="0%" stopColor="#E9877A" stopOpacity=".55" /><stop offset="100%" stopColor="#E9877A" stopOpacity="0" /></radialGradient>
-          <linearGradient id="cj-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5A3D29" /><stop offset="100%" stopColor="#2E1F15" /></linearGradient>
-        </defs>
-        {/* Sombra en el piso */}
-        <ellipse cx="120" cy="360" rx="70" ry="8" fill="#0003" />
-        {/* Piernas */}
-        <path d="M86 284 Q84 320 90 344 L108 344 Q112 316 116 290 Z" fill="url(#cj-pant)" />
-        <path d="M154 284 Q156 320 150 344 L132 344 Q128 316 124 290 Z" fill="url(#cj-pant)" />
-        {/* Zapatillas */}
-        <path d="M78 352 Q80 340 98 340 Q116 340 118 352 Q98 358 78 352 Z" fill="#2B3134" />
-        <path d="M122 352 Q124 340 142 340 Q160 340 162 352 Q142 358 122 352 Z" fill="#2B3134" />
-        <path d="M80 351 L116 351 M124 351 L160 351" stroke="#E8EEF0" strokeWidth="2.5" />
-        {/* Brazos */}
-        <path d="M74 182 Q52 204 46 254" stroke="url(#cj-bata)" strokeWidth="24" strokeLinecap="round" fill="none" />
-        <path d="M166 182 Q188 204 194 254" stroke="url(#cj-bata)" strokeWidth="24" strokeLinecap="round" fill="none" />
-        {/* Manos con dedos */}
-        {[46, 194].map((x) => (
-          <g key={x} fill="url(#cj-skin)" stroke="#B57B52" strokeWidth="1">
-            <ellipse cx={x} cy="268" rx="13" ry="14" />
-            <rect x={x - 11} y="274" width="5" height="11" rx="2.5" />
-            <rect x={x - 4.5} y="276" width="5" height="12" rx="2.5" />
-            <rect x={x + 2} y="275" width="5" height="11" rx="2.5" />
-          </g>
-        ))}
-        {/* Torso con bata de paciente */}
-        <rect x="106" y="148" width="28" height="26" rx="6" fill="url(#cj-skin)" />
-        <path d="M68 178 Q120 156 172 178 L178 290 Q120 304 62 290 Z" fill="url(#cj-bata)" />
-        <path d="M104 166 L120 190 L136 166" fill="none" stroke="#4A8A9C" strokeWidth="3" strokeLinejoin="round" />
-        <path d="M120 190 L120 292" stroke="#4A8A9C" strokeWidth="1.5" strokeDasharray="2 6" />
-        {[208, 236, 264].map((y) => <circle key={y} cx="120" cy={y} r="2.5" fill="#F2F7F8" />)}
-        <path d="M66 288 Q120 300 176 288" stroke="#4A8A9C" strokeWidth="3" fill="none" />
-        {/* Pulsera de internación */}
-        <rect x="36" y="250" width="20" height="6" rx="2" fill="#F4F4F0" stroke="#C8102E" strokeWidth="1" />
-        {/* Cabeza */}
-        <ellipse cx="50" cy="96" rx="12" ry="17" fill="url(#cj-skin)" />
-        <ellipse cx="190" cy="96" rx="12" ry="17" fill="url(#cj-skin)" />
-        <path d="M50 88 Q45 96 50 104 M190 88 Q195 96 190 104" stroke="#B57B52" strokeWidth="2" fill="none" />
-        <circle cx="120" cy="92" r="70" fill="url(#cj-skin)" />
-        <path d="M50 84 Q52 18 120 16 Q188 18 190 84 Q180 52 152 44 Q138 58 112 52 Q84 48 66 62 Q56 70 50 84" fill="url(#cj-hair)" />
-        <path d="M84 36 Q110 26 140 32" stroke="#7A5638" strokeWidth="3" fill="none" strokeLinecap="round" />
-        {/* Cejas */}
-        <path d="M82 68 Q96 62 108 68 M132 68 Q144 62 158 68" stroke="#3B2A1E" strokeWidth="4" fill="none" strokeLinecap="round" />
-        {/* Ojos */}
-        {[96, 144].map((x) => (
-          <g key={x}>
-            <ellipse cx={x} cy="86" rx="10" ry="9" fill="#FFFFFF" />
-            <circle cx={x} cy="87" r="6" fill="#5A3A22" />
-            <circle cx={x} cy="87" r="3" fill="#141414" />
-            <circle cx={x + 2} cy="84" r="1.8" fill="#FFFFFF" />
-          </g>
-        ))}
-        {/* Mejillas */}
-        <circle cx="78" cy="114" r="14" fill="url(#cj-cheek)" />
-        <circle cx="162" cy="114" r="14" fill="url(#cj-cheek)" />
-        {/* Nariz y boca */}
-        <path d="M120 96 Q112 112 118 116 Q122 118 126 115" stroke="#B07A55" strokeWidth="3" fill="none" strokeLinecap="round" />
-        <path d="M102 130 Q120 146 138 130 Q120 138 102 130 Z" fill="#9E4444" stroke="#7E3030" strokeWidth="2" strokeLinejoin="round" />
-        {/* Corazón */}
-        <path d="M140 190 c-4-6-12-3-10 4 c1 5 10 10 10 10 s9-5 10-10 c2-7-6-10-10-4z" fill="#C8102E55" />
-        {/* Ombligo */}
-        <circle cx="120" cy="252" r="0" />
-
-        {zonas.map((z) => {
-          const esCorrecta = bloqueado && z.id === correcta;
-          const esMal = bloqueado && elegida === z.id && z.id !== correcta;
-          const fill = esCorrecta ? "#3DE0B088" : esMal ? "#D52B1E77" : "transparent";
-          return (
-            <g
-              key={z.id}
-              className={`cj-region ${esCorrecta ? "cj-pulse" : ""}`}
-              role="button"
-              tabIndex={bloqueado ? -1 : 0}
-              aria-label={etiqueta(z.id)}
-              aria-disabled={bloqueado}
-              onClick={() => !bloqueado && onElegir(z.id)}
-              onKeyDown={(e) => {
-                if (!bloqueado && (e.key === "Enter" || e.key === " ")) {
-                  e.preventDefault();
-                  onElegir(z.id);
-                }
-              }}
-            >
-              <g fill={fill} stroke={esCorrecta ? C.fosforo : esMal ? C.rojo : "none"} strokeWidth="3">
-                {z.shape}
-              </g>
-              <g className="cj-ring" fill="none" stroke={C.ambo} strokeWidth="2.5" strokeDasharray="5 4">
-                {z.ring}
-              </g>
-            </g>
-          );
-        })}
-      </svg>
-    </div>
-  );
-}
-
 function Opciones({
   ronda,
   idioma,
