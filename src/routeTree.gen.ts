@@ -28,6 +28,7 @@ import { Route as InversionRouteImport } from './routes/inversion'
 import { Route as ItRouteImport } from './routes/it'
 import { Route as JaRouteImport } from './routes/ja'
 import { Route as KoRouteImport } from './routes/ko'
+import { Route as LibreriaRouteImport } from './routes/libreria'
 import { Route as PilotoAteneoRouteImport } from './routes/piloto-ateneo'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as PtRouteImport } from './routes/pt'
@@ -200,6 +201,11 @@ const JaRoute = JaRouteImport.update({
 const KoRoute = KoRouteImport.update({
   id: '/ko',
   path: '/ko',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibreriaRoute = LibreriaRouteImport.update({
+  id: '/libreria',
+  path: '/libreria',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PilotoAteneoRoute = PilotoAteneoRouteImport.update({
@@ -659,6 +665,7 @@ export interface FileRoutesByFullPath {
   '/it': typeof ItRoute
   '/ja': typeof JaRoute
   '/ko': typeof KoRoute
+  '/libreria': typeof LibreriaRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
   '/privacidad': typeof PrivacidadRoute
   '/pt': typeof PtRoute
@@ -758,6 +765,7 @@ export interface FileRoutesByTo {
   '/it': typeof ItRoute
   '/ja': typeof JaRoute
   '/ko': typeof KoRoute
+  '/libreria': typeof LibreriaRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
   '/privacidad': typeof PrivacidadRoute
   '/pt': typeof PtRoute
@@ -856,6 +864,7 @@ export interface FileRoutesById {
   '/it': typeof ItRoute
   '/ja': typeof JaRoute
   '/ko': typeof KoRoute
+  '/libreria': typeof LibreriaRoute
   '/piloto-ateneo': typeof PilotoAteneoRoute
   '/privacidad': typeof PrivacidadRoute
   '/pt': typeof PtRoute
@@ -957,6 +966,7 @@ export interface FileRouteTypes {
     | '/it'
     | '/ja'
     | '/ko'
+    | '/libreria'
     | '/piloto-ateneo'
     | '/privacidad'
     | '/pt'
@@ -1056,6 +1066,7 @@ export interface FileRouteTypes {
     | '/it'
     | '/ja'
     | '/ko'
+    | '/libreria'
     | '/piloto-ateneo'
     | '/privacidad'
     | '/pt'
@@ -1153,6 +1164,7 @@ export interface FileRouteTypes {
     | '/it'
     | '/ja'
     | '/ko'
+    | '/libreria'
     | '/piloto-ateneo'
     | '/privacidad'
     | '/pt'
@@ -1254,6 +1266,7 @@ export interface RootRouteChildren {
   ItRoute: typeof ItRoute
   JaRoute: typeof JaRoute
   KoRoute: typeof KoRoute
+  LibreriaRoute: typeof LibreriaRoute
   PilotoAteneoRoute: typeof PilotoAteneoRoute
   PrivacidadRoute: typeof PrivacidadRoute
   PtRoute: typeof PtRoute
@@ -1409,6 +1422,13 @@ declare module '@tanstack/react-router' {
       path: '/ko'
       fullPath: '/ko'
       preLoaderRoute: typeof KoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/libreria': {
+      id: '/libreria'
+      path: '/libreria'
+      fullPath: '/libreria'
+      preLoaderRoute: typeof LibreriaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/piloto-ateneo': {
@@ -2159,6 +2179,7 @@ const rootRouteChildren: RootRouteChildren = {
   ItRoute: ItRoute,
   JaRoute: JaRoute,
   KoRoute: KoRoute,
+  LibreriaRoute: LibreriaRoute,
   PilotoAteneoRoute: PilotoAteneoRoute,
   PrivacidadRoute: PrivacidadRoute,
   PtRoute: PtRoute,
