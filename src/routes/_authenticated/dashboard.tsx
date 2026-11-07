@@ -55,6 +55,8 @@ import { StaffRequestCard } from "@/components/pilot/staff-request-card";
 import { staffStatusRefreshInterval } from "@/lib/staff-status-refresh";
 import { OfflinePackCard } from "@/components/offline/offline-pack-card";
 import { AulaPendientes } from "@/components/aula/aula-pendientes";
+import { NovedadLibreria } from "@/components/libreria/novedad-libreria";
+import { RetoCard } from "@/components/games/reto-card";
 import jaiImg from "@/assets/jai/jai-saluda.webp";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import bannerAprender from "@/assets/banners/banner-aprender.webp";
@@ -505,25 +507,8 @@ function Dashboard() {
           {/* NOVEDAD — Librería Jaikuaa */}
           <NovedadLibreria />
 
-          {/* INVITAR — franja compacta con vida */}
-          <Link
-            to="/embajadores"
-            className="group relative mt-5 flex items-center gap-3 overflow-hidden rounded-2xl border border-primary/15 bg-gradient-to-r from-primary/10 via-card to-accent/10 px-4 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
-          >
-            <span aria-hidden className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-12 bg-gradient-to-r from-transparent via-primary-foreground/40 to-transparent motion-safe:animate-[shine_3.5s_ease-in-out_infinite]" />
-            <span aria-hidden className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
-              <span className="absolute inset-0 rounded-full bg-accent/20 motion-safe:animate-ping" style={{ animationDuration: "2.6s" }} />
-              <svg viewBox="0 0 24 24" className="relative h-5 w-5" fill="currentColor"><path d="M12 21s-7-4.35-9.5-8.5C.9 9.6 2.6 6 6 6c2 0 3.2 1.1 4 2.3h4C14.8 7.1 16 6 18 6c3.4 0 5.1 3.6 3.5 6.5C19 16.65 12 21 12 21z"/></svg>
-            </span>
-            <div className="relative min-w-0 flex-1">
-              <p className="font-display text-sm font-bold leading-tight text-foreground">{t("dash.inviteTitle")}</p>
-              <p className="text-xs text-muted-foreground">{t("dash.inviteDesc")}</p>
-            </div>
-            <span className="relative inline-flex shrink-0 items-center gap-1 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm transition-transform group-hover:scale-105">
-              {t("dash.share")}
-              <span className="transition-transform group-hover:translate-x-0.5">→</span>
-            </span>
-          </Link>
+          {/* RETAR — la tarjeta de «¿Quién sabe más guaraní?», con su código de embajador */}
+          <RetoCard guest={false} />
 
           <div className="mt-6 space-y-3">
             <StatsBar />
@@ -906,43 +891,6 @@ const NOV = {
     zh: "帶著筆記本和手機、前往城市的鄉村青年學生",
   },
 } as const;
-
-function NovedadLibreria() {
-  return (
-    <Link
-      to="/libreria"
-      aria-labelledby="novedad-libreria"
-      className="group relative mt-5 block overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary via-primary to-primary/80 p-5 shadow-xl transition-all hover:-translate-y-0.5 active:scale-[0.99] sm:p-8"
-    >
-      <span aria-hidden className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-12 bg-gradient-to-r from-transparent via-primary-foreground/15 to-transparent motion-safe:animate-[shine_5s_ease-in-out_infinite]" />
-      <div aria-hidden className="pointer-events-none absolute -right-6 bottom-0 flex items-end gap-1.5 opacity-90 sm:right-6">
-        <span className="h-28 w-7 rounded-t-md bg-accent shadow-lg" />
-        <span className="h-36 w-8 rounded-t-md bg-primary-foreground/90 shadow-lg" />
-        <span className="h-24 w-6 rounded-t-md bg-accent/70 shadow-lg" />
-        <span className="h-32 w-7 -rotate-6 rounded-t-md bg-primary-foreground/60 shadow-lg" />
-      </div>
-      <div className="relative max-w-[78%] sm:max-w-[65%]">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-accent-foreground shadow">
-            <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full rounded-full bg-accent-foreground/70 motion-safe:animate-ping" /><span className="relative h-2 w-2 rounded-full bg-accent-foreground" /></span>
-            Novedad
-          </span>
-          <span className="rounded-full border border-primary-foreground/40 bg-primary-foreground/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-primary-foreground">
-            En desarrollo
-          </span>
-        </div>
-        <h2 id="novedad-libreria" className="mt-3 font-display text-2xl font-bold leading-tight text-primary-foreground sm:text-3xl">
-          Librería Jaikuaa
-          <span className="block text-base font-semibold text-primary-foreground/85 sm:text-lg">Libros que se leen y libros que hablan</span>
-        </h2>
-        <p className="mt-2 text-sm text-primary-foreground/90">Obras de autores y editoriales, con la voz real de quien las escribe. ¿Escribiste un libro? Postulalo.</p>
-        <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary-foreground px-4 py-2 text-sm font-bold text-primary shadow transition-transform group-hover:translate-x-0.5">
-          <BookOpen className="h-4 w-4" aria-hidden /> Entrar a la Librería
-        </span>
-      </div>
-    </Link>
-  );
-}
 
 function NovedadCastellano() {
   const lang = useAppLang();

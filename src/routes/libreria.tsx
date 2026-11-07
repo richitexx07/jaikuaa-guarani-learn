@@ -8,6 +8,7 @@ import { SUPPORT_WHATSAPP } from "@/lib/contact";
 import jaiProfe from "@/assets/jai-profe.webp";
 import coverConsultorio from "@/assets/covers/cover-consultorio.webp";
 import { MarketingHeader } from "@/components/marketing/page-parts";
+import { LIB_COLORES, Nanduti } from "@/components/libreria/arte";
 import {
   BookOpen, Headphones, Globe2, HandCoins, Stethoscope, Scale, Languages,
   Feather, GraduationCap, Send, FileText, Mic, CheckCircle2, Building2, PenLine, ArrowRight,
@@ -28,15 +29,7 @@ export const Route = createFileRoute("/libreria")({
   component: LibreriaPage,
 });
 
-/** Colores de la casa: azul noche, dorado, rojo y papel. */
-const C = {
-  noche: "#0D1B33",
-  azul: "#1E3A5F",
-  dorado: "#F6C445",
-  rojo: "#D52B1E",
-  papel: "#FFF8EA",
-  tinta: "#1B2433",
-};
+const C = LIB_COLORES;
 
 /** Cada estantería es un lomo de libro: color, altura y un pequeño detalle de ñandutí. */
 const AREAS = [
@@ -65,27 +58,6 @@ const CSS = `
 @keyframes lb-pag{0%,70%,100%{transform:rotateY(0)}80%{transform:rotateY(-160deg)}90%{transform:rotateY(-160deg)}}
 @media (prefers-reduced-motion: reduce){.lb-onda i,.lb-jai,.lb-pagina{animation:none!important}}
 `;
-
-/** Encaje de ñandutí de fondo (dibujado, sin imagen). */
-/** Redondeo a 2 decimales: el servidor y el celular calculan el último decimal distinto y React avisaba. */
-const r2 = (n: number) => Math.round(n * 100) / 100;
-
-function Nanduti({ className = "" }: { className?: string }) {
-  const anillos = [14, 28, 42, 56, 70, 84];
-  return (
-    <svg viewBox="-100 -100 200 200" className={className} aria-hidden>
-      {anillos.map((r) => <circle key={r} r={r} fill="none" stroke="currentColor" strokeWidth={r % 28 ? 0.5 : 1} />)}
-      {Array.from({ length: 36 }, (_, k) => {
-        const a = (k / 36) * Math.PI * 2;
-        return <line key={k} x1={0} y1={0} x2={r2(Math.cos(a) * 92)} y2={r2(Math.sin(a) * 92)} stroke="currentColor" strokeWidth={0.35} />;
-      })}
-      {anillos.map((r, i) => Array.from({ length: 10 + i * 4 }, (_, k) => {
-        const a = (k / (10 + i * 4)) * Math.PI * 2;
-        return <circle key={`${r}-${k}`} cx={r2(Math.cos(a) * (r + 7))} cy={r2(Math.sin(a) * (r + 7))} r={1.6} fill="none" stroke="currentColor" strokeWidth={0.45} />;
-      }))}
-    </svg>
-  );
-}
 
 /** El libro abierto del que sale la voz. */
 function LibroQueHabla() {
