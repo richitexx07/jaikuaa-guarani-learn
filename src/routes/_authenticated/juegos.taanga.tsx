@@ -32,6 +32,15 @@ const ROUNDS = 5;
 /* Paleta del set: carbón, luz de tungsteno, rojo de grabación y papel de guion. */
 const F = { carbon: "#141318", panel: "#1F1E25", tungsteno: "#F4C04E", rec: "#E5322D", papel: "#F6F1E6", tinta: "#26252B" };
 
+/** Los fondos ilustrados de cada escena (si están; si no, se dibuja el cielo con colores). */
+const FONDOS = import.meta.glob<string>("/src/assets/taanga/*.webp", { eager: true, import: "default" });
+const LUGARES: [string, string][] = [["mercado", "mercado"], ["parada", "parada"], ["chacra", "chacra"], ["cancha", "cancha"], ["cocina", "cocina"], ["puerto", "puerto"], ["escuela", "escuela"]];
+function fondoDe(place: string): string | null {
+  const p = place.toLowerCase();
+  const hit = LUGARES.find(([clave]) => p.includes(clave));
+  return hit ? FONDOS[`/src/assets/taanga/${hit[1]}.webp`] ?? null : null;
+}
+
 /** Cielo de la escena según el momento del día que dice el lugar. */
 function cielo(place: string): [string, string] {
   const p = place.toLowerCase();
@@ -52,8 +61,10 @@ const CSS = `
 @keyframes tg-flicker { 0% { opacity: 1 } 25% { opacity: .2 } 50% { opacity: .8 } 75% { opacity: .1 } 100% { opacity: .35 } }
 .tg-corte { animation: tg-corte .5s cubic-bezier(.2,1.4,.4,1) 1 both; }
 @keyframes tg-corte { from { transform: scale(1.6); opacity: 0 } }
+.tg-plano { animation: tg-plano 14s ease-out both; transform-origin: 60% 45%; }
+@keyframes tg-plano { from { transform: scale(1.12) translate(1.5%, 1%) } to { transform: scale(1) } }
 .tg-frame { background-image: radial-gradient(circle, ${F.carbon} 3px, transparent 3.5px), radial-gradient(circle, ${F.carbon} 3px, transparent 3.5px); background-size: 16px 12px, 16px 12px; background-position: 4px 0, 4px 100%; background-repeat: repeat-x; }
-@media (prefers-reduced-motion: reduce) { .tg-arm { transition: none } .tg-rec, .tg-flicker, .tg-corte { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .tg-arm { transition: none } .tg-rec, .tg-flicker, .tg-corte, .tg-plano { animation: none !important; } }
 `;
 
 function Taanga() {
@@ -170,6 +181,7 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
     if (ok) { setScore((s) => s + 1); feedback("success"); } else feedback("error");
   }
   const [arriba, abajo] = cielo(scene.place);
+  const fondo = fondoDe(scene.place);
   const s = Math.floor(tc / 24), f = tc % 24;
   const codigo = `00:${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}:${String(f).padStart(2, "0")}`;
 
@@ -180,10 +192,18 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
       {/* El monitor de cámara: arriba el lugar, abajo el subtítulo con el diálogo. */}
       <div className="relative overflow-hidden rounded-xl ring-4" style={{ background: "#000", ["--tw-ring-color" as string]: F.panel }}>
         <div className={`relative aspect-video ${pick && !right ? "tg-flicker" : ""}`} style={{ background: `linear-gradient(180deg, ${arriba} 0%, ${abajo} 100%)` }}>
-          <svg viewBox="0 0 320 180" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden>
-            <path d="M0 130 Q60 112 120 126 T240 118 T320 124 V180 H0Z" fill="#000" opacity=".35" />
-            <path d="M0 150 Q80 138 160 148 T320 144 V180 H0Z" fill="#000" opacity=".5" />
-          </svg>
+          {fondo ? (
+            <>
+              {/* El plano de la escena, con un acercamiento lento de cámara */}
+              <img key={fondo} src={fondo} alt="" width={1600} height={900} className="tg-plano absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,.25) 60%, rgba(0,0,0,.7) 100%)" }} />
+            </>
+          ) : (
+            <svg viewBox="0 0 320 180" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden>
+              <path d="M0 130 Q60 112 120 126 T240 118 T320 124 V180 H0Z" fill="#000" opacity=".35" />
+              <path d="M0 150 Q80 138 160 148 T320 144 V180 H0Z" fill="#000" opacity=".5" />
+            </svg>
+          )}
           <div className="absolute inset-x-0 top-0 h-[9%] bg-black" />
           <div className="absolute inset-x-0 bottom-0 h-[9%] bg-black" />
           <div className="absolute left-3 top-[11%] flex items-center gap-1.5 rounded bg-black/50 px-2 py-0.5 font-mono text-[11px] text-white">

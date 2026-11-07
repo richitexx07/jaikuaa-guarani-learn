@@ -38,10 +38,17 @@ const CSS = `
 @keyframes tj-golpe { 0% { transform: rotate(-28deg) } 60% { transform: rotate(8deg) } 100% { transform: rotate(0deg) } }
 .tj-sello { animation: tj-sello .4s cubic-bezier(.2,1.6,.4,1) .25s 1 both; }
 @keyframes tj-sello { from { transform: scale(2.4) rotate(-20deg); opacity: 0 } }
+.tj-juez-golpe { transform-origin: 50% 100%; animation: tj-juez .5s cubic-bezier(.3,1.6,.5,1) 1; }
+@keyframes tj-juez { 0% { transform: rotate(0) } 35% { transform: rotate(-6deg) translateY(-4px) } 60% { transform: rotate(3deg) translateY(2px) } 100% { transform: none } }
 .tj-in { animation: tj-in .45s cubic-bezier(.2,.8,.2,1) 1 both; }
 @keyframes tj-in { from { transform: translateX(30px) rotate(2deg); opacity: 0 } }
-@media (prefers-reduced-motion: reduce) { .tj-golpe .tj-mazo, .tj-sello, .tj-in { animation: none !important } }
+@media (prefers-reduced-motion: reduce) { .tj-golpe .tj-mazo, .tj-sello, .tj-in, .tj-juez-golpe { animation: none !important } }
 `;
+
+/** El Jai juez y el juzgado ilustrados (si están; si no, queda el mazo dibujado). */
+const ARTE = import.meta.glob<string>("/src/assets/tekojoja/*.webp", { eager: true, import: "default" });
+const JAI_JUEZ = ARTE["/src/assets/tekojoja/jai-juez.webp"] ?? null;
+const JUZGADO = ARTE["/src/assets/tekojoja/juzgado.webp"] ?? null;
 
 function Mazo({ golpe }: { golpe: boolean }) {
   return (
@@ -100,6 +107,7 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
     const stars = score >= 5 ? 3 : score >= 3 ? 2 : score >= 1 ? 1 : 0;
     return (
       <section className="space-y-5 pt-2 text-center">
+        {JAI_JUEZ && <img src={JAI_JUEZ} alt="" width={1024} height={1024} className="tj-in mx-auto -mb-6 h-40 w-auto drop-shadow-2xl" />}
         <div className="tj-in relative mx-auto max-w-md rounded-sm p-7 text-left shadow-2xl" style={{ background: J.papel, color: J.tinta }}>
           <p className="text-center text-xs font-semibold uppercase tracking-wide opacity-60">{tt("tjHeader")}</p>
           <h2 className="mt-2 text-center font-display text-3xl font-bold">{tt("tjResolution")}</h2>
@@ -129,13 +137,33 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
 
   return (
     <section className="space-y-4 pt-1">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="font-display text-xl font-bold">{tt("tjYouAre")}</p>
-          <p className="text-sm text-white/70">{tt("tjRead")}</p>
+      {JAI_JUEZ ? (
+        /* El estrado: el juzgado de fondo y el Jai juez que da el martillazo al decidir */
+        <div className="relative h-36 overflow-hidden rounded-2xl ring-1 ring-white/15 sm:h-44" style={{ background: J.bordo }}>
+          {JUZGADO && <img src={JUZGADO} alt="" width={1600} height={900} className="absolute inset-0 h-full w-full object-cover" />}
+          <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(40,12,10,.92) 0%, rgba(40,12,10,.75) 45%, rgba(40,12,10,0) 75%)" }} />
+          <div className="relative max-w-[60%] p-4 sm:p-5">
+            <p className="font-display text-xl font-bold leading-tight sm:text-2xl">{tt("tjYouAre")}</p>
+            <p className="mt-1 text-sm text-white/80">{tt("tjRead")}</p>
+          </div>
+          <img
+            key={pick ? "golpe" : "espera"}
+            src={JAI_JUEZ}
+            alt=""
+            width={1024}
+            height={1024}
+            className={`absolute -bottom-[12%] right-1 h-[105%] w-auto drop-shadow-2xl ${pick ? "tj-juez-golpe" : ""}`}
+          />
         </div>
-        <Mazo golpe={!!pick} />
-      </div>
+      ) : (
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-display text-xl font-bold">{tt("tjYouAre")}</p>
+            <p className="text-sm text-white/70">{tt("tjRead")}</p>
+          </div>
+          <Mazo golpe={!!pick} />
+        </div>
+      )}
 
       <div key={i} className="tj-in relative">
         <div className="ml-4 h-5 w-32 rounded-t-lg" style={{ background: "#E3CF9F" }} />

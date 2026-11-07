@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { QuitGameButton } from "@/components/games/quit-game-button";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, RotateCcw, Stethoscope, Volume2 } from "lucide-react";
+import { Loader2, RotateCcw, Stethoscope, Volume2, ArrowLeft } from "lucide-react";
 import { GameKit, GameSoundButton, useGameKit } from "@/components/games/game-kit";
 import { useGameWords } from "@/components/games/game-shell";
 import { recordCompletion } from "@/lib/gamification";
@@ -263,8 +263,8 @@ function Consultorio() {
     <div className="min-h-screen pb-28" style={{ background: `linear-gradient(180deg, ${C.ambo} 0%, ${C.amboOscuro} 100%)` }}>
       <style>{CSS}</style>
       <header className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-3 text-white">
-        <Link to="/juegos" className="rounded-md px-2 py-1 text-sm font-medium text-white/80 hover:text-white">
-          ← Juegos
+        <Link to="/juegos" className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-white/35 bg-white/10 px-4 text-sm font-bold text-white hover:bg-white/20">
+          <ArrowLeft className="h-4 w-4" aria-hidden /> Juegos
         </Link>
         <div className="flex items-center gap-2">
           <div className="flex overflow-hidden rounded-full border border-white/30 text-xs font-semibold" role="group" aria-label="Idioma">
