@@ -96,14 +96,17 @@ function drawKeeper(now:number){
   const k=S.keeper,piso=G.y+G.h+6,dx=k.x-400,arriba=Math.min(0,k.y-278),res=S.phase==='result'?S.outcome:undefined;
   const listo=imagen(ARQUERO.listo);if(!listo){drawKeeperVector(now);return;}
   const idle=(S.phase==='aim'||S.phase==='power')&&!reduce?Math.sin(now/(S.knew?420:200))*(S.knew?6:16):0;
-  if(res==='save'){const at=imagen(ARQUERO.atajada)??listo;const bote=reduce?0:Math.abs(Math.sin(now/120))*10*Math.max(0,1-(now-(S.banner?.t??now))/1400);sombra(k.x,piso,48);sprite(at,k.x,piso-bote,190,190);return;}
+  // La estirada se centra en el cuerpo del arquero y nunca se sale del arco (ni por arriba del travesaño ni bajo el césped).
+  const volar=(es:CanvasImageSource,sinGiro=false)=>{const alto=200,cy=Math.max(G.y+alto*.32,Math.min(piso-alto*.28,k.y)),giro=sinGiro?0:Math.max(-.5,Math.min(.25,arriba/220))*Math.sign(dx);sombra(k.x,piso,70*k.stretch+30);sprite(es,k.x+Math.sign(dx)*20,cy+alto/2,alto,alto,dx<0,giro);};
+  if(res==='save'){const t=S.banner?now-S.banner.t:1e9,es=imagen(ARQUERO.estirada);if(t<380&&es&&Math.abs(dx)>24){volar(es);return;}const at=imagen(ARQUERO.atajada)??listo;const bote=reduce?0:Math.abs(Math.sin(now/120))*10*(S.banner?Math.max(0,1-(now-S.banner.t)/1400):0);sombra(k.x,piso,48);sprite(at,k.x,piso-bote,190,190);return;}
   if(res&&Math.abs(dx)>40){const ve=imagen(ARQUERO.vencido)??listo;sombra(k.x,piso,52);sprite(ve,k.x,piso+4,160,160,dx<0);return;}
-  if(S.phase==='shot'&&k.stretch>.18&&Math.abs(dx)>24){const es=imagen(ARQUERO.estirada);if(es){const alto=200,giro=Math.max(-.5,Math.min(.25,arriba/220))*Math.sign(dx);sombra(k.x,piso,70*k.stretch+30);sprite(es,k.x+Math.sign(dx)*20,piso-26+arriba-60*Math.min(1,k.stretch),alto,alto,dx<0,giro);return;}}
+  if(S.phase==='shot'&&k.stretch>.18&&Math.abs(dx)>24){const es=imagen(ARQUERO.estiradaSinPelota)??imagen(ARQUERO.estirada);if(es){volar(es);return;}}
   sombra(k.x+idle,piso,46);sprite(listo,k.x+idle,piso+arriba,180,180);
 }
 function drawShooter(now:number){const kit=S.kit??KIT_INICIAL,kick=S.phase==='shot'||S.phase==='result';
   const im=pateadorPintado(kit,kick?'patea':'listo')??(kick?pateadorPintado(kit,'listo'):null);if(!im){drawShooterVector(now);return;}
-  const alto=290,ancho=alto*im.width/im.height,sway=reduce||kick?0:Math.sin(now/400)*1.5;
+  // Los dibujos vienen recortados al cuerpo: la misma escala para todas las poses, con los pies en el piso.
+  const alto=im.height*.27,ancho=im.width*.27,sway=reduce||kick?0:Math.sin(now/400)*1.5;
   sombra(kick?372:330,H-6,56);sprite(im,(kick?372:330)+sway,H+10,alto,ancho);}
 function drawBall(){const b=S.ball;if(S.phase==='result'&&S.outcome==='save'&&imagen(ARQUERO.atajada))return;
   const pel=imagen(PELOTA);ctx.fillStyle=alpha('black', .25);ctx.beginPath();ctx.ellipse(b.x,Math.max(b.y+b.r,G.y+G.h-10)+4,b.r,b.r*.35,0,0,7);ctx.fill();

@@ -14,6 +14,8 @@ function url(nombre: string): string | null {
 export const ARQUERO = {
   listo: url("jai-arquero-listo"),
   estirada: url("jai-arquero-estirada"),
+  /** La misma estirada con las manos vacías: para cuando la pelota todavía viaja o se le escapa. */
+  estiradaSinPelota: url("jai-arquero-estirada-sin-pelota"),
   atajada: url("jai-arquero-atajada"),
   vencido: url("jai-arquero-vencido"),
 };
@@ -25,9 +27,10 @@ export function pateador(f: Figura, pose: "listo" | "patea"): string | null {
 
 /**
  * Dónde está el arco dentro de estadio-noche.webp (en píxeles de la imagen), medido a mano.
+ * Medido sobre el borde de afuera de los palos y el travesaño, hasta donde los palos tocan el césped.
  * Si se cambia la imagen, hay que volver a medir: el arco del dibujo tiene que caer justo sobre el arco del juego.
  */
-export const ARCO_EN_ESTADIO = { x: 300, y: 220, w: 1000, h: 460 };
+export const ARCO_EN_ESTADIO = { x: 352, y: 349, w: 897, h: 295 };
 
 /* ------------------------------ carga de imágenes ------------------------------ */
 
