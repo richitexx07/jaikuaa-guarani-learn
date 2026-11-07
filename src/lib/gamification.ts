@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyStats, migrateLocalProgress, recordActivity } from "@/lib/progress.functions";
 import { getStoredUser, isNetworkError, isOffline } from "@/lib/offline-data";
+import { sumarPuntosHoy } from "@/lib/meta-diaria";
 
 export type BadgeId =
   | "primer-paso"
@@ -295,6 +296,8 @@ export function recordCompletion(opts: CompleteOpts): void {
     isGuaraniLesson: !!opts.isGuaraniLesson,
     perfectExam: !!opts.perfectExam,
   };
+  // La meta diaria se cuenta en el celular, con o sin cuenta.
+  try { sumarPuntosHoy(ev.xp); } catch { /* la meta es un extra: nunca frena los puntos */ }
   // Primero se guarda en el teléfono y recién después se intenta enviar: si se corta la señal
   // o se cierra la app al instante, el avance no se pierde.
   void (async () => {
@@ -308,6 +311,12 @@ export function recordCompletion(opts: CompleteOpts): void {
           xp: s.xp + ev.xp,
           guaraniLessonsCompleted: s.guaraniLessonsCompleted + (ev.isGuaraniLesson ? 1 : 0),
         });
+        // El momento de alegría: «¡Ganaste N puntos! Guardalos» (components/guardar-puntos.tsx).
+        if (ev.xp > 0) {
+          try {
+            window.dispatchEvent(new CustomEvent("jaikuaa:puntos-invitado", { detail: { total: s.xp + ev.xp, ganado: ev.xp } }));
+          } catch { /* sin ventana: no pasa nada */ }
+        }
       }
       return;
     }

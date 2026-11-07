@@ -104,7 +104,9 @@ const HERO_CSS = `
 .hero-disc { animation: hero-fade 1.2s ease-out both; }
 @keyframes hero-rise { from { opacity: 0; transform: translateY(28px) scale(.96); } }
 @keyframes hero-fade { from { opacity: 0; transform: scale(.85); } }
-@media (prefers-reduced-motion: reduce) { .hero-jai, .hero-disc { animation: none; } }
+.hero-cta { animation: hero-cta 2.4s ease-in-out infinite 1.5s; }
+@keyframes hero-cta { 0%,100% { box-shadow: 0 10px 24px -10px rgba(213,43,30,.55) } 50% { box-shadow: 0 10px 34px -6px rgba(213,43,30,.85) } }
+@media (prefers-reduced-motion: reduce) { .hero-jai, .hero-disc, .hero-cta { animation: none; } }
 `;
 
 function Hero() {
@@ -113,7 +115,6 @@ function Hero() {
       <style>{HERO_CSS}</style>
       <div className="mx-auto grid max-w-6xl items-center gap-6 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
         <div className="relative order-2 text-center lg:order-1 lg:text-left">
-          <EarlyAccessBadge className="mb-7 lg:mx-0" />
           <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
             Aprendé y jugá
             <br />
@@ -126,19 +127,30 @@ function Hero() {
             Ya son más de 100 palabras grabadas por paraguayos, y seguimos grabando.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-            <Button variant="cta" size="lg" asChild>
-              <Link to="/comenzar">Empezar gratis</Link>
-            </Button>
-            <Button variant="ghost" size="lg" asChild>
-              <Link to="/auth" search={{ mode: "login" }}>Iniciar sesión</Link>
-            </Button>
+          {/* Menos fricción: primero se juega, la cuenta se pide después (cuando ya ganó sus primeros puntos). */}
+          <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 lg:mx-0">
+            <Link
+              to="/juegos/penales"
+              search={{ de: "portada" } as never}
+              className="hero-cta flex h-16 items-center justify-center gap-3 rounded-2xl bg-accent px-6 font-display text-xl font-bold text-accent-foreground shadow-lg transition active:scale-[.98]"
+            >
+              <span aria-hidden>⚽</span> Jugá ahora, sin cuenta
+            </Link>
+            <div className="grid grid-cols-2 gap-3">
+              <Button variant="outline" size="lg" asChild>
+                <Link to="/comenzar">Lecciones</Link>
+              </Button>
+              <Button variant="ghost" size="lg" asChild>
+                <Link to="/auth" search={{ mode: "login" }}>Iniciar sesión</Link>
+              </Button>
+            </div>
           </div>
           <p className="mt-4 text-sm lg:text-left">
             <Link to="/juegos" className="font-semibold text-primary underline underline-offset-4">
-              ¿Primero querés probar? Jugá sin registrarte
+              O mirá todos los juegos
             </Link>
           </p>
+          <EarlyAccessBadge className="mt-7 lg:mx-0" />
           <p className="mx-auto mt-6 max-w-md text-xs text-muted-foreground lg:mx-0">
             No vendemos tus datos ni los compartimos con terceros para publicidad.
           </p>

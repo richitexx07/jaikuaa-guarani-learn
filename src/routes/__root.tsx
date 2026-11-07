@@ -28,6 +28,7 @@ import { captureSource, claimSource } from "@/lib/signup-source";
 import { markHadAccount } from "@/lib/guest";
 import { cleanRefCode, REF_STORAGE_KEY } from "@/lib/ambassador";
 import { shareMetaFor } from "@/lib/share-meta";
+import { GuardarPuntos } from "@/components/guardar-puntos";
 import jaiSorpresa from "@/assets/jai/jai-sorpresa.webp";
 
 function NotFoundComponent() {
@@ -221,6 +222,7 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <BackButton />
+      <GuardarPuntos />
       <Suspense fallback={null}>
         <SupportWhatsApp />
       </Suspense>

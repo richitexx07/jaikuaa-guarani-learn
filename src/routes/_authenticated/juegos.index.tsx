@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LanzamientoBanner } from "@/components/lanzamiento-banner";
 import { RetoCard } from "@/components/games/reto-card";
+import { MetaDiaria } from "@/components/meta-diaria";
 import { GameStage } from "@/components/games/game-stage";
 import { COVER_TONE, type CoverId } from "@/components/games/game-covers";
 import { COVER_IMAGE } from "@/components/games/game-cover-images";
@@ -103,6 +104,8 @@ function GamesHome() {
           </div>
         </div>
       </section>
+
+      <MetaDiaria className="mt-5" />
 
       <RetoCard guest={guest} />
 

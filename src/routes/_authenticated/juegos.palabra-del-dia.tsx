@@ -15,6 +15,7 @@ import { logAnswer } from "@/lib/answer-log";
 import { ShareResult } from "@/components/games/share-result";
 import { StayCard } from "@/components/stay-card";
 import { recordCompletion, syncStats } from "@/lib/gamification";
+import { sumarPuntosHoy } from "@/lib/meta-diaria";
 import { answerWordOfDayGuest, getWordOfDayGuest } from "@/lib/guest.functions";
 import { hasSessionNow, useIsGuest } from "@/lib/guest";
 
@@ -173,6 +174,8 @@ function WordOfDayContent() {
         const r = await answerFn({ data: { choice } });
         setResult({ choice, correct: r.correct, answer: r.answer });
         feedback(r.correct ? "victory" : "error");
+        // Con cuenta los puntos los anota el servidor; acá solo se suman a la meta diaria del celular.
+        if (r.correct && (await hasSessionNow())) sumarPuntosHoy(5);
         if (d?.word) logAnswer(d.word.gn, r.correct, "wotd", d.day);
         void syncStats();
         void qc.invalidateQueries({ queryKey: ["word-of-day"] });
