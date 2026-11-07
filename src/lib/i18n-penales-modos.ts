@@ -58,6 +58,11 @@ const T = {
   rachaKit: { es: "Camisetas especiales por racha", pt: "Camisas especiais por sequência", en: "Streak shirts", de: "Trikots für deine Serie", fr: "Maillots de série", zh: "連續紀錄限定球衣" },
   rachaKitD: { es: "Se ganan jugando todos los días.", pt: "Ganhas jogando todos os dias.", en: "Earned by playing every day.", de: "Verdient durch tägliches Spielen.", fr: "Gagnés en jouant chaque jour.", zh: "每天玩就能解鎖。" },
   rachaFalta: { es: "{n} días de racha", pt: "{n} dias de sequência", en: "{n}-day streak", de: "{n} Tage Serie", fr: "{n} jours de série", zh: "連續 {n} 天" },
+  kit_dorada: { es: "Dorada", pt: "Dourada", en: "Gold", de: "Gold", fr: "Dorée", zh: "金色" },
+  kit_noche: { es: "Noche de estadio", pt: "Noite de estádio", en: "Stadium night", de: "Stadionnacht", fr: "Nuit de stade", zh: "球場之夜" },
+  kit_fuego: { es: "Fuego", pt: "Fogo", en: "Fire", de: "Feuer", fr: "Feu", zh: "烈焰" },
+  kit_leyenda: { es: "Leyenda", pt: "Lenda", en: "Legend", de: "Legende", fr: "Légende", zh: "傳奇" },
+  rachaTuya: { es: "Tu mejor racha: {n} días", pt: "Sua melhor sequência: {n} dias", en: "Your best streak: {n} days", de: "Deine beste Serie: {n} Tage", fr: "Votre meilleure série : {n} jours", zh: "你的最佳連續紀錄：{n} 天" },
 } satisfies Record<string, L>;
 
 export type MKey = keyof typeof T;

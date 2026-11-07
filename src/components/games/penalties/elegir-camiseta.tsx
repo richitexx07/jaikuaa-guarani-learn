@@ -1,12 +1,15 @@
 import { useId, useState } from "react";
+import { Lock } from "lucide-react";
+import { usePM } from "@/lib/i18n-penales-modos";
+import { useStats } from "@/lib/gamification";
 import { useAppLang } from "@/lib/i18n";
 import { usePT } from "@/lib/i18n-penales";
-import { CAMISETAS, PAISES, PAISES_MICSUR, bandera, nombrePais, useMiKit, type Kit, type Pais } from "./camisetas";
+import { ESPECIALES, LISTA_ESPECIALES, disenoDe, rachaMaxima, PAISES, PAISES_MICSUR, bandera, nombrePais, useMiKit, type Kit, type Pais } from "./camisetas";
 
 /** La espalda de la camiseta dibujada (nombre y número), para ver cómo queda antes de patear. */
 export function EspaldaCamiseta({ kit, className = "", mini = false }: { kit: Kit; className?: string; mini?: boolean }) {
   const id = useId().replace(/:/g, "");
-  const d: { base: string; rayas?: string; banda?: string; vivo?: string; numero: string } = CAMISETAS[kit.pais];
+  const d: { base: string; rayas?: string; banda?: string; vivo?: string; numero: string } = disenoDe(kit);
   const forma = "M40 10 Q60 18 80 10 L106 24 L98 48 L88 44 L88 122 Q60 128 32 122 L32 44 L22 48 L14 24 Z";
   const nombre = kit.nombre.trim().toUpperCase();
   const borde = d.rayas || d.banda ? d.base : "none";
@@ -60,6 +63,9 @@ export function ElegirCamiseta() {
   const resto = PAISES.filter((x) => !PAISES_MICSUR.includes(x));
   const [abierto, setAbierto] = useState(false);
   const elegir = (pais: Pais) => { guardar({ pais }); setAbierto(false); };
+  const pm = usePM();
+  const stats = useStats();
+  const racha = rachaMaxima(stats.streak);
   return (
     <section className="space-y-3 rounded-2xl bg-white/[.06] p-3 ring-1 ring-white/15" aria-label={p("kitTitle")}>
       <div className="flex items-start gap-3">
@@ -110,6 +116,34 @@ export function ElegirCamiseta() {
             className="mt-1 h-11 w-full rounded-xl border border-white/25 bg-white/10 px-3 text-center font-display text-lg font-bold text-white"
           />
         </label>
+      </div>
+      <div className="space-y-1.5" role="group" aria-label={pm("rachaKit")}>
+        <div className="flex items-baseline justify-between gap-2">
+          <p className="text-xs font-semibold text-white/80">🔥 {pm("rachaKit")}</p>
+          <p className="text-[11px] text-white/60">{racha > 0 ? pm("rachaTuya", { n: racha }) : pm("rachaKitD")}</p>
+        </div>
+        <div className="grid grid-cols-4 gap-1.5">
+          {LISTA_ESPECIALES.map((e) => {
+            const ganada = racha >= ESPECIALES[e].racha;
+            const puesta = kit.especial === e;
+            return (
+              <button
+                key={e}
+                type="button"
+                disabled={!ganada}
+                aria-pressed={puesta}
+                onClick={() => guardar({ especial: puesta ? undefined : e })}
+                className="relative flex flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-center transition active:scale-95 disabled:cursor-not-allowed"
+                style={puesta ? { background: "#F4F7FB", color: "#071A33", boxShadow: "0 0 0 3px #FFB23E" } : { background: "rgba(255,255,255,.08)", boxShadow: "inset 0 0 0 2px rgba(255,255,255,.14)" }}
+              >
+                <EspaldaCamiseta mini kit={{ ...kit, especial: e }} className={`h-10 w-10 ${ganada ? "" : "opacity-35 grayscale"}`} />
+                {!ganada && <Lock className="absolute right-1.5 top-1.5 h-3.5 w-3.5 text-white/80" aria-hidden />}
+                <span className="text-[11px] font-bold leading-tight">{pm(`kit_${e}` as const)}</span>
+                {!ganada && <span className="text-[10px] leading-tight opacity-70">{pm("rachaFalta", { n: ESPECIALES[e].racha })}</span>}
+              </button>
+            );
+          })}
+        </div>
       </div>
       {!abierto ? (
         <div className="grid grid-cols-[1fr_auto] items-center gap-2">

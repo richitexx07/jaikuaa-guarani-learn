@@ -53,8 +53,42 @@ export const PAISES = Object.keys(CAMISETAS) as Pais[];
 /** Los de la MICSUR (Paraguay primero). */
 export const PAISES_MICSUR: Pais[] = ["PY", "AR", "BO", "BR", "CL", "CO", "EC", "PE", "UY", "VE"];
 
+/**
+ * Camisetas especiales que se ganan con la racha de días seguidos (diseños propios de Jaikuaa, sin escudos ni marcas).
+ * Una vez ganada, queda para siempre en ese celular: la racha premia, no castiga.
+ */
+export const ESPECIALES = {
+  dorada: { racha: 3, diseno: { base: "#E7B53C", vivo: "#7A4B00", numero: "#3B2400" } },
+  noche: { racha: 7, diseno: { base: "#0B1E3F", rayas: "#17407A", vivo: "#FFB23E", numero: "#FFB23E" } },
+  fuego: { racha: 15, diseno: { base: "#D9480F", banda: "#FFB23E", numero: "#FFFFFF" } },
+  leyenda: { racha: 30, diseno: { base: "#121212", rayas: "#2B2B2B", vivo: "#E7B53C", numero: "#E7B53C" } },
+} satisfies Record<string, { racha: number; diseno: Diseno }>;
+export type Especial = keyof typeof ESPECIALES;
+export const LISTA_ESPECIALES = Object.keys(ESPECIALES) as Especial[];
+export function esEspecial(v: unknown): v is Especial {
+  return typeof v === "string" && v in ESPECIALES;
+}
+
 export type Figura = "chico" | "chica";
-export type Kit = { pais: Pais; figura: Figura; nombre: string; numero: number };
+export type Kit = { pais: Pais; figura: Figura; nombre: string; numero: number; especial?: Especial };
+
+/** Los colores con los que se pinta la camiseta: la especial si la eligió, si no la de su país. */
+export function disenoDe(k: Kit): Diseno {
+  return k.especial && esEspecial(k.especial) ? ESPECIALES[k.especial].diseno : CAMISETAS[k.pais];
+}
+
+/* ---------------- la mejor racha vista en este celular ---------------- */
+const KEY_RACHA = "jaikuaa:racha-max";
+export function rachaMaxima(rachaActual = 0): number {
+  let max = 0;
+  try { max = Math.max(0, Math.round(Number(localStorage.getItem(KEY_RACHA) ?? 0)) || 0); } catch { /* sin almacenamiento */ }
+  const n = Math.min(365, Math.max(0, Math.round(rachaActual) || 0));
+  if (n > max) {
+    max = n;
+    try { localStorage.setItem(KEY_RACHA, String(n)); } catch { /* sin almacenamiento */ }
+  }
+  return max;
+}
 export const KIT_INICIAL: Kit = { pais: "PY", figura: "chico", nombre: "", numero: 10 };
 
 const BANDERAS = import.meta.glob<string>("/src/assets/banderas/*.webp", { eager: true, import: "default" });
@@ -76,6 +110,7 @@ export function kitSeguro(v: unknown, nombre = ""): Kit {
     figura: o.figura === "chica" ? "chica" : "chico",
     nombre: limpiarNombre(typeof o.nombre === "string" && o.nombre.trim() ? o.nombre : nombre),
     numero: n >= 1 && n <= 99 ? n : 10,
+    ...(esEspecial(o.especial) ? { especial: o.especial } : {}),
   };
 }
 
@@ -126,6 +161,7 @@ export function useMiKit(): [Kit, (k: Partial<Kit>) => void] {
   const kit = useSyncExternalStore(suscribir, leer, () => KIT_INICIAL);
   const guardar = useCallback((k: Partial<Kit>) => {
     const nuevo = kitSeguro({ ...leer(), ...k });
+    if (k.pais !== undefined && k.especial === undefined) delete nuevo.especial;
     if (k.nombre !== undefined) nuevo.nombre = limpiarNombre(k.nombre);
     try { localStorage.setItem(KEY, JSON.stringify(nuevo)); } catch { /* sin almacenamiento */ }
     cacheTxt = undefined;

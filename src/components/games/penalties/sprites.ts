@@ -1,4 +1,4 @@
-import { CAMISETAS, type Figura, type Kit } from "./camisetas";
+import { disenoDe, type Figura, type Kit } from "./camisetas";
 
 /**
  * Las ilustraciones de Penales (Jai arquero, pateadores, pelota y estadio) y la camiseta pintada por país.
@@ -67,7 +67,7 @@ const ultima = new Map<string, HTMLCanvasElement>();
 const esperando = new Map<string, Array<(c: HTMLCanvasElement | null) => void>>();
 
 function claveKit(src: string, k: Kit) {
-  return `${src}|${k.pais}|${k.nombre.trim().toUpperCase()}|${k.numero}`;
+  return `${src}|${k.pais}|${k.especial ?? ""}|${k.nombre.trim().toUpperCase()}|${k.numero}`;
 }
 
 /** El pateador con la camiseta del país ya pintada, o null mientras se pinta. */
@@ -165,7 +165,7 @@ export function pintarCamiseta(im: HTMLImageElement, k: Kit): HTMLCanvasElement 
   const m = medir(peso, w, x0, x1, y0, y1);
 
   // 2) El dibujo de la camiseta del país (rayas, banda, nombre y número), del tamaño de la imagen.
-  const d: { base: string; rayas?: string; banda?: string; vivo?: string; numero: string } = CAMISETAS[k.pais];
+  const d: { base: string; rayas?: string; banda?: string; vivo?: string; numero: string } = disenoDe(k);
   const patron = document.createElement("canvas");
   patron.width = w;
   patron.height = h;

@@ -1,6 +1,6 @@
 import { G, POST, W, H, powerAt, powerZone, type Scene } from './physics';
 import { ARCO_EN_ESTADIO, ARQUERO, ESTADIO, PELOTA, estadoEstadio, imagen, pateadorPintado, pintadoTarde } from './sprites';
-import { CAMISETAS, KIT_INICIAL } from './camisetas';
+import { KIT_INICIAL, disenoDe } from './camisetas';
 export function drawStadium(ctx: CanvasRenderingContext2D, S: Scene, now: number, ledText: string, reduce: boolean, palette: Record<string,string>) {
 const alpha=(role: string, opacity: number)=>`color-mix(in srgb, ${palette[role]} ${opacity*100}%, transparent)`;
 const crowd=Array.from({length:240},(_,i)=>({x:(i*53)%W,y:14+((i*37)%70),c:i%3,ph:i*1.7}));
@@ -56,9 +56,9 @@ function drawShooterVector(now:number){const kick=S.phase==='shot'||S.phase==='r
   ctx.fillStyle=palette['kit-dark'];ctx.beginPath();ctx.roundRect(-30,-70,60,26,6);ctx.fill();
   // brazos
   limb(-30,-120,-44,-80,13,palette['skin']);limb(30,-120,44,-80,13,palette['skin']);
-  limb(-30,-122,-38,-104,15,CAMISETAS[(S.kit??KIT_INICIAL).pais].base);limb(30,-122,38,-104,15,CAMISETAS[(S.kit??KIT_INICIAL).pais].base);
+  limb(-30,-122,-38,-104,15,disenoDe(S.kit??KIT_INICIAL).base);limb(30,-122,38,-104,15,disenoDe(S.kit??KIT_INICIAL).base);
   // camiseta a rayas genérica (sin escudo ni marca)
-  const kit=S.kit??KIT_INICIAL,d:{base:string;rayas?:string;banda?:string;vivo?:string;numero:string}=CAMISETAS[kit.pais];ctx.save();ctx.beginPath();ctx.roundRect(-32,-134,64,70,14);ctx.clip();ctx.fillStyle=d.base;ctx.fillRect(-32,-134,64,70);if(d.rayas){ctx.fillStyle=d.rayas;for(let x=-28;x<32;x+=16)ctx.fillRect(x,-134,8,70);}if(d.banda){ctx.save();ctx.translate(0,-100);ctx.rotate(.8);ctx.fillStyle=d.banda;ctx.fillRect(-60,-8,120,16);ctx.restore();}ctx.textAlign='center';ctx.fillStyle=d.numero;ctx.strokeStyle=d.base;ctx.lineJoin='round';ctx.font='800 9px sans-serif';const nom=kit.nombre.trim().toUpperCase();if(nom){ctx.lineWidth=3;ctx.strokeText(nom,0,-118,52);ctx.fillText(nom,0,-118,52);}ctx.font='800 30px sans-serif';ctx.lineWidth=4;ctx.strokeText(String(kit.numero),0,-84,50);ctx.fillText(String(kit.numero),0,-84,50);ctx.textAlign='start';if(d.vivo){ctx.strokeStyle=d.vivo;ctx.lineWidth=6;ctx.strokeRect(-32,-134,64,70);}
+  const kit=S.kit??KIT_INICIAL,d:{base:string;rayas?:string;banda?:string;vivo?:string;numero:string}=disenoDe(kit);ctx.save();ctx.beginPath();ctx.roundRect(-32,-134,64,70,14);ctx.clip();ctx.fillStyle=d.base;ctx.fillRect(-32,-134,64,70);if(d.rayas){ctx.fillStyle=d.rayas;for(let x=-28;x<32;x+=16)ctx.fillRect(x,-134,8,70);}if(d.banda){ctx.save();ctx.translate(0,-100);ctx.rotate(.8);ctx.fillStyle=d.banda;ctx.fillRect(-60,-8,120,16);ctx.restore();}ctx.textAlign='center';ctx.fillStyle=d.numero;ctx.strokeStyle=d.base;ctx.lineJoin='round';ctx.font='800 9px sans-serif';const nom=kit.nombre.trim().toUpperCase();if(nom){ctx.lineWidth=3;ctx.strokeText(nom,0,-118,52);ctx.fillText(nom,0,-118,52);}ctx.font='800 30px sans-serif';ctx.lineWidth=4;ctx.strokeText(String(kit.numero),0,-84,50);ctx.fillText(String(kit.numero),0,-84,50);ctx.textAlign='start';if(d.vivo){ctx.strokeStyle=d.vivo;ctx.lineWidth=6;ctx.strokeRect(-32,-134,64,70);}
   const sh=ctx.createLinearGradient(-32,0,32,0);sh.addColorStop(0,alpha('black',.25));sh.addColorStop(.5,alpha('black',0));sh.addColorStop(1,alpha('black',.25));ctx.fillStyle=sh;ctx.fillRect(-32,-134,64,70);ctx.restore();
   // cabeza de espaldas
   ctx.fillStyle=palette['skin'];ctx.fillRect(-7,-144,14,12);ctx.beginPath();ctx.arc(-17,-156,4,0,7);ctx.arc(17,-156,4,0,7);ctx.fill();

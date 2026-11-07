@@ -62,3 +62,19 @@ describe("copa de los departamentos", () => {
     expect(c.estado).toBe("campeon");
   });
 });
+
+import { relatosDe } from "./relato-gol";
+import { disenoDe, kitSeguro, CAMISETAS, ESPECIALES } from "@/components/games/penalties/camisetas";
+
+describe("relato del gol y camisetas de racha", () => {
+  it("sin grabaciones no relata; el golazo usa las de gol si no tiene propias", () => {
+    expect(relatosDe("gol", {})).toEqual([]);
+    const l = { "/src/assets/penales/relato/gol-1.mp3": "a.mp3", "/src/assets/penales/relato/gol-2.mp3": "b.mp3" };
+    expect(relatosDe("golazo", l)).toEqual(["a.mp3", "b.mp3"]);
+    expect(relatosDe("golazo", { ...l, "/src/assets/penales/relato/golazo-1.mp3": "c.mp3" })).toEqual(["c.mp3"]);
+  });
+  it("la camiseta especial reemplaza los colores del país y se limpia si llega algo raro", () => {
+    expect(disenoDe(kitSeguro({ pais: "PY", especial: "dorada" }))).toBe(ESPECIALES.dorada.diseno);
+    expect(disenoDe(kitSeguro({ pais: "PY", especial: "trucha" }))).toBe(CAMISETAS.PY);
+  });
+});
