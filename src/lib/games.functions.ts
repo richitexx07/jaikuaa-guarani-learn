@@ -62,7 +62,7 @@ function seeded(seedStr: string) {
 /** Elección determinística por fecha de Paraguay: misma palabra y opciones para todos. */
 type WotdWord = { id: number | string; gn: string; es: string; has_audio: boolean };
 
-async function loadWotdWords(): Promise<WotdWord[]> {
+export async function loadWotdWords(): Promise<WotdWord[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
     .from("corpus_words")
@@ -74,7 +74,7 @@ async function loadWotdWords(): Promise<WotdWord[]> {
   return (data ?? []) as WotdWord[];
 }
 
-async function wordOfDay(day: string, preloaded?: WotdWord[]) {
+export async function wordOfDay(day: string, preloaded?: WotdWord[]) {
   const all = preloaded ?? (await loadWotdWords());
   const withAudio = all.filter((w) => w.has_audio);
   if (withAudio.length === 0) return null;

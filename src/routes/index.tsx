@@ -16,6 +16,8 @@ import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 import bannerCurso from "@/assets/banners/banner-curso.webp";
 import bannerEscolar from "@/assets/banners/banner-escolar.webp";
 import coverKaraoke from "@/assets/covers/cover-karaoke.webp";
+import { RetoCard } from "@/components/games/reto-card";
+import { useIsGuest } from "@/lib/guest";
 
 
 
@@ -48,6 +50,7 @@ function Index() {
           <LanzamientoBanner className="mx-auto max-w-5xl" />
         </div>
         <Hero />
+        <RetoPortada />
         <Adentro />
         <LiveAudioPreview />
         <FoundingSponsors />
@@ -61,18 +64,31 @@ function Index() {
 }
 
 
+/** «¿Quién sabe más guaraní?»: retar a alguien por WhatsApp desde la portada. */
+function RetoPortada() {
+  const guest = useIsGuest();
+  return (
+    <section className="px-4 pb-14 sm:px-6">
+      <div className="mx-auto max-w-3xl">
+        <RetoCard guest={guest} />
+      </div>
+    </section>
+  );
+}
+
 function Header() {
   return (
     <header className="w-full border-b border-border/50 bg-background">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-2 px-3 sm:px-6">
         <a
           href="/"
-          className="flex items-center gap-2 font-display text-xl font-bold tracking-tight text-primary transition-opacity hover:opacity-80"
+          aria-label="Jaikuaa, inicio"
+          className="flex shrink-0 items-center gap-2 font-display text-xl font-bold tracking-tight text-primary transition-opacity hover:opacity-80"
         >
-          <BrandLogo />
+          <BrandLogo wordmarkFromSm />
         </a>
-        <div className="flex items-center gap-3">
-          <Link to="/libreria" className="rounded-full border border-primary/30 px-3 py-1.5 text-sm font-semibold text-primary hover:bg-primary/5">
+        <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
+          <Link to="/libreria" className="shrink-0 whitespace-nowrap rounded-full border border-primary/30 px-2.5 py-1.5 text-sm font-semibold sm:px-3 text-primary hover:bg-primary/5">
             Librería
           </Link>
           <LanguageSwitcher current="es" />

@@ -24,11 +24,12 @@ export const Route = createFileRoute("/_authenticated/juegos/")({
   component: GamesHome,
 });
 
-type Game = { id: CoverId; to: string; title: string; desc: string; xp: string; nuevo?: boolean };
+/** `pronto`: el juego está armado pero todavía sin contenido publicado (se ve, pero se marca «Muy pronto»). */
+type Game = { id: CoverId; to: string; title: string; desc: string; xp: string; nuevo?: boolean; pronto?: boolean };
 
 const GAMES: Game[] = [
   { id: "consultorio", to: "/juegos/consultorio", title: "Consultorio de Jai", desc: "Guaraní médico: atendé pacientes que hablan guaraní. En español y portugués.", xp: "≤20 XP", nuevo: true },
-  { id: "ventanilla", to: "/juegos/ventanilla", title: "Ventanilla de Jai", desc: "Atención al público: atendé la fila en guaraní, como en un banco o una oficina.", xp: "≤20 XP", nuevo: true },
+  { id: "ventanilla", to: "/juegos/ventanilla", title: "Ventanilla de Jai", desc: "Atención al público: atendé la fila en guaraní, como en un banco o una oficina.", xp: "≤20 XP", pronto: true },
   { id: "chacra", to: "/juegos/chacra", title: "Jai en la chacra", desc: "Sos técnico de campo: entendé lo que necesita cada productor.", xp: "≤20 XP", nuevo: true },
   { id: "karaoke", to: "/juegos/karaoke", title: "Purahéi Karaoke", desc: "Cantá al ritmo del arpa y completá el verso a tiempo.", xp: "≤20 XP", nuevo: true },
   { id: "tembiu", to: "/juegos/tembiu", title: "Tembi'u Paraguái", desc: "Armá los platos típicos con sus ingredientes.", xp: "≤20 XP", nuevo: true },
@@ -68,6 +69,7 @@ const CSS = `
 `;
 
 const byId = (id: CoverId) => GAMES.find((g) => g.id === id)!;
+const PRONTO: Record<string, string> = { es: "Muy pronto", pt: "Em breve", en: "Coming soon", de: "Demnächst", fr: "Bientôt", zh: "即將推出" };
 
 function GamesHome() {
   useRecordVisit("juegos");
@@ -196,6 +198,9 @@ function Cover({ g }: { g: Game }) {
           decoding="async"
         />
       </div>
+      {g.pronto && (
+        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-bold text-[#0D1B33]">{PRONTO[lang] ?? PRONTO.es}</span>
+      )}
       {g.nuevo && g.id !== "consultorio" && (
         <span className="absolute left-3 top-3 rounded-full bg-[#F6C445] px-2.5 py-0.5 text-[11px] font-bold text-[#3A1A05]">{tr("nuevo")}</span>
       )}

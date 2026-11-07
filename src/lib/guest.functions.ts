@@ -135,3 +135,44 @@ export const getMostradorAudioGuest = createServerFn({ method: "POST" })
     }
     return { urls, limited: false };
   });
+
+/* ------------------- Palabra del día y «Pronunciá» sin cuenta ------------------- */
+
+function hoyAsuncion(): string {
+  return new Date().toLocaleDateString("en-CA", { timeZone: "America/Asuncion" });
+}
+
+/** La palabra de hoy (la misma para todos). La respuesta NO viaja: se corrige en el servidor. */
+export const getWordOfDayGuest = createServerFn({ method: "GET" }).handler(async () => {
+  await guard("wotd");
+  const { wordOfDay } = await import("@/lib/games.functions");
+  const day = hoyAsuncion();
+  const w = await wordOfDay(day);
+  return { day, word: w ? { gn: w.gn, options: w.options } : null, played: null };
+});
+
+/** Corrige la respuesta de quien juega sin cuenta. Los puntos quedan en su celular (como en los otros juegos). */
+export const answerWordOfDayGuest = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ choice: z.string().trim().max(300) }).parse(d))
+  .handler(async ({ data }) => {
+    await guard("wotd");
+    const { wordOfDay } = await import("@/lib/games.functions");
+    const w = await wordOfDay(hoyAsuncion());
+    if (!w) throw new Error("No hay palabra del día");
+    return { correct: data.choice === w.es, answer: w.es };
+  });
+
+/** Palabras publicadas con voz grabada, para «Pronunciá» sin cuenta. */
+export const listPalabrasConVozGuest = createServerFn({ method: "GET" }).handler(async () => {
+  await guard("voz");
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("corpus_words")
+    .select("gn, es")
+    .eq("status", "published")
+    .eq("has_audio", true)
+    .order("gn")
+    .limit(5000);
+  if (error) throw new Error(error.message);
+  return { items: (data ?? []) as { gn: string; es: string }[] };
+});

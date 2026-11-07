@@ -5,9 +5,11 @@ type BrandLogoProps = {
   className?: string;
   size?: number;
   withWordmark?: boolean;
+  /** En celulares angostos (o con letra grande) el nombre se oculta y queda solo el ícono. */
+  wordmarkFromSm?: boolean;
 };
 
-export function BrandLogo({ className = "", size = 36, withWordmark = true }: BrandLogoProps) {
+export function BrandLogo({ className = "", size = 36, withWordmark = true, wordmarkFromSm = false }: BrandLogoProps) {
   return (
     <span className={cn("inline-flex items-center gap-2 font-display font-bold text-primary", className)}>
       <img
@@ -19,7 +21,7 @@ export function BrandLogo({ className = "", size = 36, withWordmark = true }: Br
         className="rounded-[22%] object-contain"
         draggable={false}
       />
-      {withWordmark && <span className="text-xl tracking-tight">Jaikuaa</span>}
+      {withWordmark && <span className={cn("text-xl tracking-tight", wordmarkFromSm && "hidden sm:inline")}>Jaikuaa</span>}
     </span>
   );
 }

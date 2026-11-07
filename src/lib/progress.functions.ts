@@ -32,7 +32,9 @@ export function allowedXp(requested: number, source: string, alreadyToday: numbe
 }
 
 /** Juegos que se registran con recordActivity (la Palabra del día tiene su propio flujo). */
-const GAME_REFS = new Set(["ahorcado", "sopa-de-letras", "memoria", "penales", "duelo", "trivia-duelo", "nee-rape", "tembiu", "karaoke", "tekojoja", "taanga", "consultorio"]);
+// Chacra y Ventanilla faltaban: sus puntos se rechazaban y desaparecían del celular.
+// (Un test revisa que todo juego que manda puntos esté en esta lista.)
+export const GAME_REFS = new Set(["ahorcado", "sopa-de-letras", "memoria", "penales", "duelo", "trivia-duelo", "nee-rape", "tembiu", "karaoke", "tekojoja", "taanga", "consultorio", "chacra", "ventanilla"]);
 
 const BADGE_IDS = ["primer-paso", "guaranihablante", "estudiante-estrella", "racha-fuego"] as const;
 

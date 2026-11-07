@@ -13,16 +13,18 @@ export function DisplayToggles() {
     saveDisplayPrefs(p);
   };
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
       <Button
         variant="ghost"
         size="sm"
         aria-label={prefs.dark ? "Usar modo claro" : "Usar modo oscuro"}
         title={prefs.dark ? "Modo claro" : "Modo oscuro"}
         onClick={() => update({ ...prefs, dark: !prefs.dark })}
+        className="px-2 sm:px-3"
       >
         {prefs.dark ? <Sun className="h-4 w-4" aria-hidden /> : <Moon className="h-4 w-4" aria-hidden />}
-        <span className="text-xs">{prefs.dark ? "Claro" : "Oscuro"}</span>
+        {/* En el celular, solo el ícono: con la palabra el encabezado no entraba y se encimaba. */}
+        <span className="hidden text-xs sm:inline">{prefs.dark ? "Claro" : "Oscuro"}</span>
       </Button>
       <Button
         variant={prefs.largeText ? "secondary" : "ghost"}
@@ -31,7 +33,7 @@ export function DisplayToggles() {
         aria-label="Letra grande"
         title="Letra grande"
         onClick={() => update({ ...prefs, largeText: !prefs.largeText })}
-        className="font-bold"
+        className="px-2 font-bold sm:px-3"
       >
         A+
       </Button>

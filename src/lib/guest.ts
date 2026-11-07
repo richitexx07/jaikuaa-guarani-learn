@@ -24,6 +24,10 @@ export const GUEST_GAMES = [
   "/juegos/tembiu",
   "/juegos/taanga",
   "/juegos/tekojoja",
+  // Ñe'ẽ Rape se manda por WhatsApp: quien recibe el desafío juega sin crear cuenta.
+  "/juegos/nee-rape",
+  "/juegos/palabra-del-dia",
+  "/pronunciar",
   "/trivia",
 ] as const;
 

@@ -14,7 +14,9 @@ import { localWotdPlay, queueWotdAnswer, rememberWotdPlay } from "@/lib/offline-
 import { logAnswer } from "@/lib/answer-log";
 import { ShareResult } from "@/components/games/share-result";
 import { StayCard } from "@/components/stay-card";
-import { syncStats } from "@/lib/gamification";
+import { recordCompletion, syncStats } from "@/lib/gamification";
+import { answerWordOfDayGuest, getWordOfDayGuest } from "@/lib/guest.functions";
+import { hasSessionNow, useIsGuest } from "@/lib/guest";
 
 export const Route = createFileRoute("/_authenticated/juegos/palabra-del-dia")({
   head: () => ({
@@ -111,12 +113,29 @@ async function loadWordOfDay(getFn: () => Promise<WotdView>): Promise<WotdView> 
 function WordOfDayContent() {
   const feedback = useGameFeedback();
   const { g: tr } = useGT();
-  const getFn = useServerFn(getWordOfDay);
-  const answerFn = useServerFn(answerWordOfDay);
+  const getFnCuenta = useServerFn(getWordOfDay);
+  const answerFnCuenta = useServerFn(answerWordOfDay);
+  const getFnInvitado = useServerFn(getWordOfDayGuest);
+  const answerFnInvitado = useServerFn(answerWordOfDayGuest);
+  const invitado = useIsGuest();
+  // Sin cuenta: la palabra y la corrección salen del servidor igual, y la jugada y los puntos quedan en el celular.
+  const getFn = async (): Promise<WotdView> => {
+    if (await hasSessionNow()) return (await getFnCuenta()) as WotdView;
+    const d = (await getFnInvitado()) as WotdView;
+    const local = localWotdPlay(d.day);
+    return local ? { ...d, played: { choice: local.choice, correct: local.correct, answer: local.answer } } : d;
+  };
+  const answerFn = async (a: { data: { choice: string } }) => {
+    if (await hasSessionNow()) return answerFnCuenta(a);
+    const r = await answerFnInvitado(a);
+    if (d) rememberWotdPlay({ day: d.day, choice: a.data.choice, correct: r.correct, answer: r.answer });
+    if (r.correct) recordCompletion({ source: "game", sourceRef: "palabra-del-dia", xp: 5 });
+    return { ...r, duplicate: false };
+  };
   const qc = useQueryClient();
   const q = useQuery({
-    queryKey: ["word-of-day"],
-    queryFn: () => loadWordOfDay(() => getFn() as Promise<WotdView>),
+    queryKey: ["word-of-day", invitado ? "invitado" : "cuenta"],
+    queryFn: () => loadWordOfDay(getFn),
   });
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ choice: string; correct: boolean; answer: string } | null>(null);

@@ -11,6 +11,8 @@ import { withOfflineCache } from "@/lib/offline-data";
 import { PageHero } from "@/components/page-hero";
 import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 import { listPalabrasConVoz, type PalabraConVoz } from "@/lib/voz.functions";
+import { listPalabrasConVozGuest } from "@/lib/guest.functions";
+import { hasSessionNow, useIsGuest } from "@/lib/guest";
 
 export const Route = createFileRoute("/_authenticated/pronunciar")({
   head: () => ({
@@ -38,11 +40,16 @@ function plano(s: string) {
 function Pronunciar() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  const listFn = useServerFn(listPalabrasConVoz);
+  const listFnCuenta = useServerFn(listPalabrasConVoz);
+  const listFnInvitado = useServerFn(listPalabrasConVozGuest);
+  const invitado = useIsGuest();
+  // Sin cuenta también se puede: son las mismas palabras publicadas con voz grabada.
+  const listFn = async () => ((await hasSessionNow()) ? listFnCuenta() : listFnInvitado());
   const { data, isLoading, error } = useQuery({
     queryKey: ["palabras-con-voz"],
     queryFn: () => withOfflineCache("palabras-con-voz", () => listFn(), { label: "Las palabras" }),
   });
+  const inicio = invitado ? "/" : "/dashboard";
   const items = useMemo(() => data?.items ?? [], [data]);
   const [q, setQ] = useState("");
 
@@ -73,11 +80,11 @@ function Pronunciar() {
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border/50">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-4 sm:px-6">
-          <Link to="/dashboard" className="flex items-center gap-2">
+          <Link to={inicio} className="flex items-center gap-2">
             <BrandLogo withWordmark={false} />
           </Link>
           <Button asChild variant="outline" size="sm">
-            <Link to="/dashboard">← Volver</Link>
+            <Link to={inicio}>← Volver</Link>
           </Button>
         </div>
       </header>

@@ -14,7 +14,11 @@ describe("jugar sin cuenta", () => {
     expect(isGuestPath("/juegos/karaoke")).toBe(true);
     expect(isGuestPath("/trivia/historia")).toBe(true);
     expect(isGuestPath("/trivia/historia/otra")).toBe(false);
-    expect(isGuestPath("/juegos/palabra-del-dia")).toBe(false);
+    // La Palabra del día, Pronunciá y Ñe'ẽ Rape se abrieron sin cuenta (noviembre 2026).
+    expect(isGuestPath("/juegos/palabra-del-dia")).toBe(true);
+    expect(isGuestPath("/juegos/nee-rape")).toBe(true);
+    expect(isGuestPath("/pronunciar")).toBe(true);
+    expect(isGuestPath("/cuaderno")).toBe(false);
     expect(isGuestPath("/dashboard")).toBe(false);
     expect(isGuestPath("/admin/corpus")).toBe(false);
   });
