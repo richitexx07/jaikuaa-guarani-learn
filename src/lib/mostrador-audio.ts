@@ -1,4 +1,5 @@
 import { louderBlob } from "./audio-louder";
+import { callarVoz, pedirTurno, sonarUnico } from "./voz-unica";
 
 /**
  * Audio del Modo mostrador: enlaces firmados del servidor y copia en el teléfono para usar sin señal.
@@ -63,7 +64,6 @@ export async function saveOffline(urls: Record<string, string>): Promise<number>
   return ok;
 }
 
-let current: HTMLAudioElement | null = null;
 
 // Frases ya subidas de volumen en esta sesión (id → enlace local).
 const louder = new Map<string, string>();
@@ -85,7 +85,7 @@ async function louderRemote(id: string, url: string): Promise<string | null> {
 
 /** Hace sonar una frase: primero la copia del teléfono, si no el enlace del servidor. */
 export async function playFrase(id: string, remoteUrl: string | undefined): Promise<boolean> {
-  current?.pause();
+  const t = pedirTurno();
   const ready = louder.get(id);
   const local = ready ? null : await offlineUrl(id);
   const src = ready ?? local ?? remoteUrl;
@@ -94,19 +94,12 @@ export async function playFrase(id: string, remoteUrl: string | undefined): Prom
   // queda lista para la próxima vez.
   if (local) louder.set(id, local);
   else if (!ready && remoteUrl) void louderRemote(id, remoteUrl);
-  const audio = new Audio(src);
-  current = audio;
-  try {
-    await audio.play();
-    return true;
-  } catch {
-    return false;
-  }
+  // Una sola voz a la vez: corta la anterior; si mientras tanto se pidió otra frase, esta ya no suena.
+  return sonarUnico(src, t, true);
 }
 
 export function stopFrase() {
-  current?.pause();
-  current = null;
+  callarVoz();
 }
 
 /** Deja listas (y más fuertes) las frases de la pantalla, para que suenen bien desde el primer toque. */

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { pedirTurno, sonarUnico } from "@/lib/voz-unica";
 import { Loader2, Mic, Play, Repeat, Square, Volume2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -24,12 +25,8 @@ async function ondaDe(blob: Blob): Promise<Onda | null> {
 }
 
 function play(src: string): Promise<void> {
-  return new Promise((resolve) => {
-    const a = new Audio(src);
-    a.onended = () => resolve();
-    a.onerror = () => resolve();
-    a.play().catch(() => resolve());
-  });
+  // Por el mismo canal que las demás voces: nunca se enciman.
+  return sonarUnico(src, pedirTurno()).then(() => undefined);
 }
 
 function Barras({ onda, color, etiqueta }: { onda: Onda | null; color: string; etiqueta: string }) {

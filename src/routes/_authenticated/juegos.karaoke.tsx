@@ -1,4 +1,5 @@
 import { useJU } from "@/lib/i18n-juegos-ui";
+import { callarVoz } from "@/lib/voz-unica";
 import { QuitGameButton } from "@/components/games/quit-game-button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -305,6 +306,7 @@ function Stage({ song, partida, onAgain, onBack }: { song: Song; partida: Partid
   }, [beat]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function empezar() {
+    callarVoz(); // si estaba sonando una palabra, se calla antes de la canción
     sesionDeAudio(micro.current ? "play-and-record" : "playback");
     procesado.current = -1;
     niveles.current = { fondo: [], linea: {} };

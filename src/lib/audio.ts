@@ -10,6 +10,7 @@
 //     desde la memoria. El service worker además guarda una copia para usar sin conexión.
 
 import { useEffect } from "react";
+import { pedirTurno, sigueVigente, sonarUnico } from "./voz-unica";
 import { getAudioSignedUrls } from "./audio.functions";
 import { slugify } from "./slug";
 import { louderBlob } from "./audio-louder";
@@ -223,38 +224,31 @@ function forget(slug: string) {
   persistUrls();
 }
 
-function playSrc(src: string): Promise<boolean> {
-  return new Promise<boolean>((resolve) => {
-    try {
-      const player = new Audio(src);
-      player.onended = () => resolve(true);
-      player.onerror = () => resolve(false);
-      const p = player.play();
-      if (p && typeof p.then === "function") p.catch(() => resolve(false));
-    } catch {
-      resolve(false);
-    }
-  });
+// Una sola voz a la vez: la nueva corta la anterior y un audio que llega tarde ya no suena.
+function playSrc(src: string, t: number): Promise<boolean> {
+  return sonarUnico(src, t);
 }
 
 export async function playGuarani(gn: string): Promise<boolean> {
   if (typeof window === "undefined") return false;
   ensureLoaded();
   const slug = slugify(gn);
+  const t = pedirTurno();
   // Camino rápido y sin esperas: así el toque del usuario habilita el sonido también en iPhone.
   const ready = blobCache.get(slug);
   const known = ready ? undefined : cachedUrl(slug);
   let ok: boolean;
   if (ready) {
-    ok = await playSrc(ready);
+    ok = await playSrc(ready, t);
   } else if (known) {
     void preloadBytes(slug, known);
-    ok = await playSrc(known);
+    ok = await playSrc(known, t);
   } else {
     const url = await getHumanAudioUrl(gn);
     if (!url) return false; // sin grabación: silencio intencional — nunca TTS
     void preloadBytes(slug, url);
-    ok = await playSrc(url);
+    if (!sigueVigente(t)) return true; // ya se pidió otra palabra: esta no suena atrasada
+    ok = await playSrc(url, t);
   }
   if (!ok) forget(slug);
   // Primera voz que suena en este celular: aviso de volumen (una sola vez).

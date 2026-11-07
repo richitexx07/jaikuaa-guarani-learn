@@ -1,9 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { callarVoz } from "@/lib/voz-unica";
 import {
   Outlet,
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -175,6 +177,12 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  // Al cambiar de pantalla se calla la voz que estaba sonando (nunca queda un audio de la pantalla anterior).
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    callarVoz();
+  }, [pathname]);
 
   // Código de invitación del piloto guardado antes de iniciar sesión: se canjea al entrar.
   useEffect(() => {

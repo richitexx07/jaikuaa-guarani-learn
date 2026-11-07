@@ -6,6 +6,7 @@
  *   golazo-1.mp3, golazo-2.mp3… → golazo al ángulo (si no hay, usa los de gol)
  * El texto del relato en guaraní lo escriben y aprueban los docentes; el código no genera ni traduce nada.
  */
+import { pedirTurno, sonarUnico } from "@/lib/voz-unica";
 const RELATOS = import.meta.glob<string>("/src/assets/penales/relato/*.{mp3,m4a,ogg,webm,wav}", { eager: true, import: "default" });
 
 export function relatosDe(tipo: "gol" | "golazo", lista: Record<string, string> = RELATOS): string[] {
@@ -18,17 +19,9 @@ export function hayRelato(): boolean {
   return relatosDe("gol").length > 0;
 }
 
-let sonando: HTMLAudioElement | null = null;
-/** Hace sonar un relato al azar, si hay grabaciones. Si no hay, no hace nada. */
+/** Hace sonar un relato al azar, si hay grabaciones. Si no hay, no hace nada. Nunca se encima con otra voz. */
 export function relatarGol(tipo: "gol" | "golazo"): void {
   const urls = relatosDe(tipo);
-  if (!urls.length || typeof Audio === "undefined") return;
-  try {
-    sonando?.pause();
-    sonando = new Audio(urls[Math.floor(Math.random() * urls.length)]!);
-    sonando.volume = 0.9;
-    void sonando.play().catch(() => undefined);
-  } catch {
-    /* sin audio: el gol se festeja igual */
-  }
+  if (!urls.length) return;
+  void sonarUnico(urls[Math.floor(Math.random() * urls.length)]!, pedirTurno());
 }

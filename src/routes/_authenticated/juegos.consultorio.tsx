@@ -6,7 +6,8 @@ import { Loader2, RotateCcw, Stethoscope, Volume2, ArrowLeft } from "lucide-reac
 import { GameKit, GameSoundButton, useGameKit } from "@/components/games/game-kit";
 import { useGameWords } from "@/components/games/game-shell";
 import { recordCompletion } from "@/lib/gamification";
-import { playGuarani } from "@/lib/audio";
+import { playGuarani, prefetchAudio } from "@/lib/audio";
+import { callarVoz } from "@/lib/voz-unica";
 import { useMostrador } from "@/lib/use-mostrador";
 import { playFrase, prefetchFrases } from "@/lib/mostrador-audio";
 import {
@@ -177,6 +178,8 @@ function Consultorio() {
     const rnd = mulberry32(s);
     const rs = armarTurno(orderedBy(cuerpo, (w) => w.gn), orderedBy(frases, (f) => f.id), rnd);
     if (rs.length === 0) return;
+    // Las voces de todo el turno se bajan ya, así cada paciente habla apenas llega (sin esperar segundos).
+    for (const r of rs) if (r.tipo === "cuerpo") void prefetchAudio(r.palabra.gn);
     setRondas(rs);
     // Con la misma semilla: en un reto, los dos jugadores ven los mismos pacientes.
     setPacientes(rs.map((r, k) => nuevoPaciente(k, rnd, r)));
@@ -242,6 +245,7 @@ function Consultorio() {
   }, [restante, fase, resultado, responder]);
 
   function siguiente() {
+    callarVoz(); // lo que decía el paciente anterior se corta al pasar al siguiente
     if (vidas <= 0 || i + 1 >= rondas.length) {
       setFase("fin");
       return;

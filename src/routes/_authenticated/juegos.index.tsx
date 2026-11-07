@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { precargarOlla } from "@/components/games/tembiu/olla-3d";
 import { LanzamientoBanner } from "@/components/lanzamiento-banner";
 import { RetoCard } from "@/components/games/reto-card";
 import { MetaDiaria } from "@/components/meta-diaria";
@@ -75,7 +76,7 @@ const PRONTO: Record<string, string> = { es: "Muy pronto", pt: "Em breve", en: "
 
 function GamesHome() {
   // Penales es el juego más jugado: sus ilustraciones empiezan a bajar mientras se mira esta página.
-  useEffect(() => { const t = window.setTimeout(precargarPenales, 1200); return () => window.clearTimeout(t); }, []);
+  useEffect(() => { const t = window.setTimeout(() => { precargarPenales(); precargarOlla(); }, 1200); return () => window.clearTimeout(t); }, []);
   useRecordVisit("juegos");
   const guest = useIsGuest();
   const stats = useStats();

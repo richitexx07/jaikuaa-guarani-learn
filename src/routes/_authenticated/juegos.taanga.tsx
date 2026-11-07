@@ -34,6 +34,13 @@ const F = { carbon: "#141318", panel: "#1F1E25", tungsteno: "#F4C04E", rec: "#E5
 
 /** Los fondos ilustrados de cada escena (si están; si no, se dibuja el cielo con colores). */
 const FONDOS = import.meta.glob<string>("/src/assets/taanga/*.webp", { eager: true, import: "default" });
+/** Los planos se bajan apenas se abre el juego: al pasar de escena, la imagen ya está y no se ve el fondo vacío. */
+let fondosPedidos = false;
+function precargarFondos() {
+  if (fondosPedidos || typeof Image === "undefined") return;
+  fondosPedidos = true;
+  for (const u of Object.values(FONDOS)) { const im = new Image(); im.decoding = "async"; im.src = u; }
+}
 const LUGARES: [string, string][] = [["mercado", "mercado"], ["parada", "parada"], ["chacra", "chacra"], ["cancha", "cancha"], ["cocina", "cocina"], ["puerto", "puerto"], ["escuela", "escuela"]];
 function fondoDe(place: string): string | null {
   const p = place.toLowerCase();
@@ -68,6 +75,7 @@ const CSS = `
 `;
 
 function Taanga() {
+  useEffect(precargarFondos, []);
   const partida = useRetoPartida("taanga", { total: ROUNDS });
   const { seed, otra } = partida;
   const { idx, loading } = useJuegoTextos();
