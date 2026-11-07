@@ -7,7 +7,8 @@ import { COVER_TONE, type CoverId } from "@/components/games/game-covers";
 import { COVER_IMAGE } from "@/components/games/game-cover-images";
 import { useRecordVisit, useStats } from "@/lib/gamification";
 import jaiImg from "@/assets/jai-gamer.webp";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { precargarPenales } from "@/components/games/penalties/sprites";
 import { authMode, isGuestPath, useIsGuest } from "@/lib/guest";
 import { GAME_DESC, SHELF_TEXT, gameTitle, useGT } from "@/lib/i18n-games";
 
@@ -73,6 +74,8 @@ const byId = (id: CoverId) => GAMES.find((g) => g.id === id)!;
 const PRONTO: Record<string, string> = { es: "Muy pronto", pt: "Em breve", en: "Coming soon", de: "Demnächst", fr: "Bientôt", zh: "即將推出" };
 
 function GamesHome() {
+  // Penales es el juego más jugado: sus ilustraciones empiezan a bajar mientras se mira esta página.
+  useEffect(() => { const t = window.setTimeout(precargarPenales, 1200); return () => window.clearTimeout(t); }, []);
   useRecordVisit("juegos");
   const guest = useIsGuest();
   const stats = useStats();

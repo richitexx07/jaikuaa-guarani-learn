@@ -62,6 +62,8 @@ export function cargar(src: string | null): Promise<HTMLImageElement | null> {
 /* ------------------------------ la camiseta pintada ------------------------------ */
 
 const pintadas = new Map<string, HTMLCanvasElement | "pintando">();
+/** La última camiseta pintada de cada dibujo: se muestra mientras se pinta la nueva (al escribir el nombre, al cambiar de país). */
+const ultima = new Map<string, HTMLCanvasElement>();
 const esperando = new Map<string, Array<(c: HTMLCanvasElement | null) => void>>();
 
 function claveKit(src: string, k: Kit) {
@@ -76,7 +78,7 @@ export function pateadorPintado(k: Kit, pose: "listo" | "patea"): HTMLCanvasElem
   const hecho = pintadas.get(clave);
   if (hecho && hecho !== "pintando") return hecho;
   if (!hecho) void pintarCuandoCargue(src, k, clave);
-  return null;
+  return ultima.get(src) ?? null;
 }
 
 export function pateadorPintadoAsync(k: Kit, pose: "listo" | "patea"): Promise<HTMLCanvasElement | null> {
@@ -104,7 +106,7 @@ async function pintarCuandoCargue(src: string, k: Kit, clave: string) {
     } catch { /* sin fuentes */ }
     try { lienzo = pintarCamiseta(im, k); } catch { lienzo = null; }
   }
-  if (lienzo) pintadas.set(clave, lienzo);
+  if (lienzo) { pintadas.set(clave, lienzo); ultima.set(src, lienzo); }
   else pintadas.delete(clave);
   // No guardar demasiadas: cada una es una imagen entera.
   if (pintadas.size > 24) {
@@ -262,4 +264,45 @@ function medir(peso: Float32Array, w: number, x0: number, x1: number, y0: number
   huecos = 0;
   while (der < x1 && huecos < 6) { der++; huecos = peso[yN * w + der] > 0.35 ? 0 : huecos + 1; }
   return { x0, x1, y0, y1, cx, anchoTorso: Math.max(20, der - izq - 12) };
+}
+
+/* ------------------------------ precarga ------------------------------ */
+
+/** Lo que tiene que estar para mostrar el estadio nuevo desde el primer cuadro. */
+const ESENCIALES = [ESTADIO, ARQUERO.listo, PELOTA, pateador("chico", "listo"), pateador("chica", "listo")];
+/** El resto, que se usa recién al patear. */
+const RESTO = [ARQUERO.estirada, ARQUERO.estiradaSinPelota, ARQUERO.atajada, ARQUERO.vencido, pateador("chico", "patea"), pateador("chica", "patea")];
+let precargaDesde = 0;
+/** Desde cuándo el juego está en pantalla esperando las ilustraciones. */
+let esperaDesde = 0;
+
+/** Empieza a bajar todas las ilustraciones de Penales (se llama al abrir Juegos, antes de entrar al juego). */
+export function precargarPenales(): void {
+  if (typeof Image === "undefined") return;
+  if (!precargaDesde) precargaDesde = Date.now();
+  for (const src of [...ESENCIALES, ...RESTO]) imagen(src);
+}
+
+/** Si una imagen ya terminó pero vino rota (sin internet, error del servidor). */
+function rota(src: string | null): boolean {
+  const im = src ? imagenes.get(src) : undefined;
+  return !!im && im.complete && im.naturalWidth === 0;
+}
+
+/**
+ * «listo»: ya se puede dibujar el estadio nuevo. «cargando»: todavía no, se muestra una pantalla de espera
+ * (nunca el dibujo viejo). «respaldo»: falló algo o tardó demasiado; se juega con el dibujo simple antes que dejar esperando.
+ */
+/** Pasaron demasiados segundos esperando la camiseta pintada: mejor jugar igual. */
+export function pintadoTarde(): boolean {
+  return !!esperaDesde && Date.now() - esperaDesde > 9000;
+}
+
+export function estadoEstadio(): "listo" | "cargando" | "respaldo" {
+  precargarPenales();
+  if (!esperaDesde) esperaDesde = Date.now();
+  const faltan = ESENCIALES.filter((src) => src && !imagen(src));
+  if (faltan.length === 0) return "listo";
+  if (faltan.some(rota) || Date.now() - esperaDesde > 9000) return "respaldo";
+  return "cargando";
 }

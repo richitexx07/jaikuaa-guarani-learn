@@ -1,5 +1,5 @@
 import { G, POST, W, H, powerAt, powerZone, type Scene } from './physics';
-import { ARCO_EN_ESTADIO, ARQUERO, ESTADIO, PELOTA, imagen, pateadorPintado } from './sprites';
+import { ARCO_EN_ESTADIO, ARQUERO, ESTADIO, PELOTA, estadoEstadio, imagen, pateadorPintado, pintadoTarde } from './sprites';
 import { CAMISETAS, KIT_INICIAL } from './camisetas';
 export function drawStadium(ctx: CanvasRenderingContext2D, S: Scene, now: number, ledText: string, reduce: boolean, palette: Record<string,string>) {
 const alpha=(role: string, opacity: number)=>`color-mix(in srgb, ${palette[role]} ${opacity*100}%, transparent)`;
@@ -141,5 +141,14 @@ function draw(now: number){
   if(S.banner){const q=(now-S.banner.t)/1400;if(q>1)S.banner=null;else{const s=reduce?1:Math.min(1,q*5)*(1+.08*Math.sin(q*20));ctx.save();ctx.translate(400,300);ctx.scale(s,s);ctx.globalAlpha=q>.8?(1-q)/.2:1;ctx.font='800 54px sans-serif';ctx.textAlign='center';ctx.lineWidth=10;ctx.strokeStyle=palette['black'];ctx.strokeText(S.banner.txt,0,20,720);ctx.fillStyle=S.banner.c;ctx.fillText(S.banner.txt,0,20,720);ctx.restore();}}
   }
 
-draw(now);
+/** Mientras bajan las ilustraciones: estadio de noche con reflectores, sin mostrar el dibujo viejo. */
+function cargando(now:number){ctx.fillStyle=palette['night'];ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.globalCompositeOperation='lighter';[[110,26],[690,26]].forEach(([lx,ly])=>{const g=ctx.createRadialGradient(lx,ly,2,lx,ly,300);g.addColorStop(0,alpha('white',.22));g.addColorStop(1,alpha('white',0));ctx.fillStyle=g;ctx.fillRect(lx-300,0,600,340);});ctx.restore();
+  const gr=ctx.createLinearGradient(0,H*.62,0,H);gr.addColorStop(0,alpha('grass',.0));gr.addColorStop(1,alpha('grass',.55));ctx.fillStyle=gr;ctx.fillRect(0,H*.62,W,H*.38);
+  ctx.fillStyle=palette['white'];ctx.font='800 34px sans-serif';ctx.textAlign='center';ctx.fillText('Preparando el estadio…',400,H/2-6);
+  for(let i=0;i<3;i++){const on=reduce?1:(Math.floor(now/260)%3===i?1:.35);ctx.globalAlpha=on;ctx.fillStyle=[palette['red'],palette['white'],palette['blue']][i];ctx.beginPath();ctx.arc(370+i*30,H/2+36,9,0,7);ctx.fill();}ctx.globalAlpha=1;}
+
+// También espera al pateador con su camiseta pintada, así nunca asoma el dibujo viejo.
+const est=estadoEstadio(),pintado=!!pateadorPintado(S.kit??KIT_INICIAL,'listo');
+if(est==='cargando'||(est==='listo'&&!pintado&&!S.spectator&&S.phase!=='shot'&&S.phase!=='result'&&!pintadoTarde()))cargando(now);else draw(now);
 }
