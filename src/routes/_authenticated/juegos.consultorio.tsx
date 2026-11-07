@@ -291,7 +291,7 @@ function Consultorio() {
       </header>
 
       <main className="mx-auto max-w-3xl px-4">
-        {fase === "intro" && <RetoBanner partida={partida} className="mt-4" />}
+        {fase === "intro" && <RetoBanner partida={partida} className="mt-4" onJugar={empezar} />}
         {fase === "intro" && (
           <Intro
             idioma={idioma}

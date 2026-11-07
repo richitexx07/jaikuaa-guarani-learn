@@ -233,7 +233,7 @@ function Tabla({ r, max = 5 }: { r: RetoActivo; max?: number }) {
  * Arriba del juego: si entraste por un reto, de quién es y cómo va la tabla; si no, el botón
  * para retar a tus amigos ANTES de jugar.
  */
-export function RetoBanner({ partida, extra, total, coincide = true, className = "" }: { partida: Partida; extra?: string; total?: number; coincide?: boolean; className?: string }) {
+export function RetoBanner({ partida, extra, total, coincide = true, className = "", onJugar }: { partida: Partida; extra?: string; total?: number; coincide?: boolean; className?: string; onJugar?: () => void }) {
   const [abierto, setAbierto] = useState(false);
   const [url, setUrl] = useState<string | null>(null);
   const [creando, setCreando] = useState(false);
@@ -254,7 +254,7 @@ export function RetoBanner({ partida, extra, total, coincide = true, className =
   if (r) {
     const link = r.id ? retoLink(partida.juego, r.id, r.x) : null;
     return (
-      <div className={`mx-auto max-w-xl rounded-2xl bg-white p-3 shadow-lg ${className}`} style={{ color: INK }} role="status">
+      <div data-reto-banner className={`mx-auto max-w-xl rounded-2xl bg-white p-3 shadow-lg ${className}`} style={{ color: INK }} role="status">
         <div className="flex items-center gap-3">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full" style={{ background: "#F6C445" }} aria-hidden>
             <Swords className="h-5 w-5" />
@@ -272,6 +272,17 @@ export function RetoBanner({ partida, extra, total, coincide = true, className =
             </button>
           )}
         </div>
+        {/* Quien llega por un reto entra a jugar con un toque (en los juegos que tienen pantalla de inicio). */}
+        {onJugar && (
+        <button
+          type="button"
+          onClick={onJugar}
+          className="mt-3 flex h-14 w-full items-center justify-center gap-2 rounded-2xl font-display text-lg font-bold text-white shadow-lg transition active:scale-[.98]"
+          style={{ background: "#0B2545" }}
+        >
+          <Swords className="h-5 w-5" aria-hidden /> {r.creadorEsYo ? "Jugar la partida" : `Aceptar el reto de ${r.n}`}
+        </button>
+        )}
         {r.id && (r.resultados?.length ?? 0) > 0 && (
           <div className="mt-2">
             <p className="mb-1 flex items-center gap-1 text-xs font-semibold opacity-70"><Users className="h-3.5 w-3.5" aria-hidden /> {r.resultados!.length} ya jugaron</p>
