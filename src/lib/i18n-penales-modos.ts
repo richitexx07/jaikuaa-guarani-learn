@@ -1,0 +1,68 @@
+import { useAppLang, type AppLang } from "./i18n";
+
+/** Textos de los modos nuevos de Penales (penal del día, copa y atajar). de/fr/zh preliminares. Nunca toca guaraní. */
+type L = Record<AppLang, string>;
+const T = {
+  diaTitulo: { es: "El penal del día", pt: "O pênalti do dia", en: "Penalty of the day", de: "Elfmeter des Tages", fr: "Le tir du jour", zh: "每日點球" },
+  diaBajada: { es: "5 palabras, las mismas para todo el país. Un intento por día.", pt: "5 palavras, as mesmas para todo o país. Uma tentativa por dia.", en: "5 words, the same for the whole country. One try a day.", de: "5 Wörter, gleich fürs ganze Land. Ein Versuch pro Tag.", fr: "5 mots, les mêmes pour tout le pays. Un essai par jour.", zh: "全國同樣的 5 個詞，每天一次。" },
+  diaJugar: { es: "⚽ Patear el de hoy", pt: "⚽ Chutar o de hoje", en: "⚽ Take today's", de: "⚽ Heute schießen", fr: "⚽ Tirer celui du jour", zh: "⚽ 踢今天的" },
+  diaHecho: { es: "Ya pateaste el de hoy", pt: "Você já chutou o de hoje", en: "You already took today's", de: "Heute schon geschossen", fr: "Déjà tiré aujourd'hui", zh: "今天已經踢過了" },
+  diaVuelve: { es: "El próximo, en {h} h {m} min", pt: "O próximo em {h} h {m} min", en: "Next one in {h} h {m} min", de: "Der nächste in {h} Std. {m} Min.", fr: "Le prochain dans {h} h {m} min", zh: "下一個還有 {h} 小時 {m} 分" },
+  compartir: { es: "Compartir", pt: "Compartilhar", en: "Share", de: "Teilen", fr: "Partager", zh: "分享" },
+  copiar: { es: "Copiar", pt: "Copiar", en: "Copy", de: "Kopieren", fr: "Copier", zh: "複製" },
+  copiado: { es: "¡Copiado!", pt: "Copiado!", en: "Copied!", de: "Kopiert!", fr: "Copié !", zh: "已複製！" },
+  diaReto: { es: "¿Vos cuántos hacés? Probá gratis:", pt: "Quantos você faz? Teste grátis:", en: "How many can you score? Try it free:", de: "Wie viele schaffst du? Kostenlos testen:", fr: "Et vous, combien ? Essayez gratuitement :", zh: "你能進幾球？免費試試：" },
+  deCinco: { es: "{n} de 5", pt: "{n} de 5", en: "{n} of 5", de: "{n} von 5", fr: "{n} sur 5", zh: "5 中 {n}" },
+  penNof: { es: "Penal {n} de {t}", pt: "Pênalti {n} de {t}", en: "Penalty {n} of {t}", de: "Elfmeter {n} von {t}", fr: "Tir {n} sur {t}", zh: "第 {n} / {t} 球" },
+  copa: { es: "Copa", pt: "Copa", en: "Cup", de: "Pokal", fr: "Coupe", zh: "盃賽" },
+  copaD: { es: "De los departamentos", pt: "Dos departamentos", en: "Departments' cup", de: "Der Departamentos", fr: "Des départements", zh: "各省盃" },
+  atajar: { es: "Atajá", pt: "Defenda", en: "Save it", de: "Halte ihn", fr: "Arrêtez-le", zh: "撲救" },
+  atajarD: { es: "Escuchá y atajá", pt: "Ouça e defenda", en: "Listen and save", de: "Hören und halten", fr: "Écoutez et arrêtez", zh: "聽了再撲" },
+  copaTitulo: { es: "Copa de los Departamentos", pt: "Copa dos Departamentos", en: "Departments' Cup", de: "Pokal der Departamentos", fr: "Coupe des départements", zh: "巴拉圭各省盃" },
+  copaElegi: { es: "Elegí tu departamento", pt: "Escolha seu departamento", en: "Pick your department", de: "Wähle dein Departamento", fr: "Choisissez votre département", zh: "選擇你的省份" },
+  copaBajada: { es: "Octavos, cuartos, semi y final contra los otros departamentos. ¡Llevá la copa a tu tierra!", pt: "Oitavas, quartas, semi e final contra os outros departamentos. Leve a copa para a sua terra!", en: "Round of 16, quarters, semis and final against the other departments. Bring the cup home!", de: "Achtel-, Viertel-, Halbfinale und Finale gegen die anderen Departamentos. Hol den Pokal nach Hause!", fr: "Huitièmes, quarts, demie et finale contre les autres départements. Ramenez la coupe chez vous !", zh: "與其他省份打十六強、八強、四強和決賽，把獎盃帶回家！" },
+  octavos: { es: "Octavos de final", pt: "Oitavas de final", en: "Round of 16", de: "Achtelfinale", fr: "Huitièmes de finale", zh: "十六強" },
+  cuartos: { es: "Cuartos de final", pt: "Quartas de final", en: "Quarter-final", de: "Viertelfinale", fr: "Quart de finale", zh: "八強" },
+  semi: { es: "Semifinal", pt: "Semifinal", en: "Semi-final", de: "Halbfinale", fr: "Demi-finale", zh: "四強" },
+  final: { es: "Final", pt: "Final", en: "Final", de: "Finale", fr: "Finale", zh: "決賽" },
+  copaRival: { es: "{r} ya pateó: hizo {g} de 5.", pt: "{r} já chutou: fez {g} de 5.", en: "{r} already shot: {g} of 5.", de: "{r} hat schon geschossen: {g} von 5.", fr: "{r} a déjà tiré : {g} sur 5.", zh: "{r} 已踢完：5 中 {g}。" },
+  copaNecesitas: { es: "Hacé {n} o más para pasar.", pt: "Faça {n} ou mais para passar.", en: "Score {n} or more to go through.", de: "Triff {n} oder mehr, um weiterzukommen.", fr: "Marquez {n} ou plus pour passer.", zh: "進 {n} 球以上就晉級。" },
+  copaCancha: { es: "⚽ A la cancha", pt: "⚽ Para o campo", en: "⚽ On to the pitch", de: "⚽ Aufs Feld", fr: "⚽ Sur le terrain", zh: "⚽ 上場" },
+  copaPaso: { es: "¡{d} pasa de ronda!", pt: "{d} passa de fase!", en: "{d} goes through!", de: "{d} ist weiter!", fr: "{d} passe au tour suivant !", zh: "{d} 晉級！" },
+  copaEmpate: { es: "¡Empate! Un penal de desempate: si es gol, pasás.", pt: "Empate! Um pênalti de desempate: se for gol, você passa.", en: "A draw! One tie-break penalty: score and you go through.", de: "Unentschieden! Ein Entscheidungselfmeter: Tor, und du bist weiter.", fr: "Égalité ! Un tir de départage : but, et vous passez.", zh: "平手！加踢一球：進了就晉級。" },
+  copaDesempate: { es: "⚽ Patear el desempate", pt: "⚽ Chutar o desempate", en: "⚽ Take the tie-break", de: "⚽ Entscheidung schießen", fr: "⚽ Tirer le départage", zh: "⚽ 踢決勝球" },
+  copaEliminado: { es: "{d} quedó afuera en {r}", pt: "{d} caiu nas {r}", en: "{d} went out in the {r}", de: "{d} ist im {r} ausgeschieden", fr: "{d} éliminé en {r}", zh: "{d} 在{r}出局" },
+  copaCampeon: { es: "¡{d} campeón!", pt: "{d} campeão!", en: "{d} are champions!", de: "{d} ist Meister!", fr: "{d} champion !", zh: "{d} 奪冠！" },
+  copaCampeonD: { es: "Ganaste la Copa de los Departamentos.", pt: "Você ganhou a Copa dos Departamentos.", en: "You won the Departments' Cup.", de: "Du hast den Pokal der Departamentos gewonnen.", fr: "Vous avez gagné la Coupe des départements.", zh: "你贏得了各省盃。" },
+  copaOtra: { es: "Jugar otra copa", pt: "Jogar outra copa", en: "Play another cup", de: "Noch ein Pokal", fr: "Rejouer une coupe", zh: "再玩一屆" },
+  copaCambiar: { es: "Cambiar de departamento", pt: "Mudar de departamento", en: "Change department", de: "Departamento wechseln", fr: "Changer de département", zh: "更換省份" },
+  copaTextoCampeon: { es: "🏆 ¡{d} campeón de la Copa de los Departamentos en Jaikuaa! ¿Y tu departamento?", pt: "🏆 {d} campeão da Copa dos Departamentos no Jaikuaa! E o seu departamento?", en: "🏆 {d} won the Departments' Cup on Jaikuaa! What about yours?", de: "🏆 {d} gewinnt den Pokal der Departamentos auf Jaikuaa! Und deins?", fr: "🏆 {d} remporte la Coupe des départements sur Jaikuaa ! Et le vôtre ?", zh: "🏆 {d} 在 Jaikuaa 贏得各省盃！你的省份呢？" },
+  copaTextoElim: { es: "⚽ {d} llegó a {r} en la Copa de los Departamentos de Jaikuaa. ¿Llegás más lejos?", pt: "⚽ {d} chegou às {r} na Copa dos Departamentos do Jaikuaa. Você vai mais longe?", en: "⚽ {d} reached the {r} in Jaikuaa's Departments' Cup. Can you go further?", de: "⚽ {d} hat es ins {r} geschafft. Kommst du weiter?", fr: "⚽ {d} a atteint les {r} de la Coupe des départements de Jaikuaa. Irez-vous plus loin ?", zh: "⚽ {d} 在 Jaikuaa 各省盃打進{r}。你能走得更遠嗎？" },
+  copaSeguir: { es: "Seguir", pt: "Continuar", en: "Continue", de: "Weiter", fr: "Continuer", zh: "繼續" },
+  copaHiciste: { es: "Hiciste {n} de 5.", pt: "Você fez {n} de 5.", en: "You scored {n} of 5.", de: "Du hast {n} von 5 getroffen.", fr: "Vous avez marqué {n} sur 5.", zh: "你 5 中 {n}。" },
+  desempate: { es: "Penal de desempate", pt: "Pênalti de desempate", en: "Tie-break penalty", de: "Entscheidungselfmeter", fr: "Tir de départage", zh: "決勝點球" },
+  atajarTitulo: { es: "Vos sos el Jai arquero", pt: "Você é o Jai goleiro", en: "You are Jai, the keeper", de: "Du bist Jai, der Torwart", fr: "Vous êtes Jai, le gardien", zh: "你就是守門員 Jai" },
+  atajarBajada: { es: "Escuchá la palabra en guaraní y elegí qué significa. Si entendés, adivinás el tiro.", pt: "Ouça a palavra em guarani e escolha o que significa. Se entender, adivinha o chute.", en: "Listen to the Guarani word and pick its meaning. Understand it and you read the shot.", de: "Hör das Guaraní-Wort und wähle seine Bedeutung. Verstehst du es, liest du den Schuss.", fr: "Écoutez le mot en guarani et choisissez son sens. Si vous comprenez, vous devinez le tir.", zh: "聽瓜拉尼語單字並選出意思。聽懂了，就能猜中射門方向。" },
+  atajarEscucha: { es: "Escuchá: ¿qué significa?", pt: "Ouça: o que significa?", en: "Listen: what does it mean?", de: "Hör zu: Was bedeutet es?", fr: "Écoutez : que signifie-t-il ?", zh: "聽：這是什麼意思？" },
+  atajarRepetir: { es: "Escuchar de nuevo", pt: "Ouvir de novo", en: "Listen again", de: "Nochmal hören", fr: "Réécouter", zh: "再聽一次" },
+  atajarResultado: { es: "{n} de 5 atajadas", pt: "{n} de 5 defesas", en: "{n} of 5 saves", de: "{n} von 5 gehalten", fr: "{n} arrêts sur 5", zh: "5 球撲出 {n} 球" },
+  atajarFalta: { es: "Para atajar hacen falta al menos 5 palabras con audio de voz real.", pt: "Para defender são necessárias pelo menos 5 palavras com áudio de voz real.", en: "Saving needs at least 5 words with real-voice audio.", de: "Zum Halten braucht es mindestens 5 Wörter mit echter Sprachaufnahme.", fr: "Il faut au moins 5 mots avec un audio de voix réelle.", zh: "撲救模式至少需要 5 個有真人語音的詞。" },
+  atajarEmpezar: { es: "🧤 Empezar a atajar", pt: "🧤 Começar a defender", en: "🧤 Start saving", de: "🧤 Halten starten", fr: "🧤 Commencer à arrêter", zh: "🧤 開始撲救" },
+  atajaste: { es: "¡Atajaste!", pt: "Defendeu!", en: "Saved!", de: "Gehalten!", fr: "Arrêté !", zh: "撲出！" },
+  teHicieron: { es: "Gol del rival", pt: "Gol do adversário", en: "They scored", de: "Tor für den Gegner", fr: "But adverse", zh: "對手進球" },
+  eraLa: { es: "Era «{gn}»: {es}", pt: "Era «{gn}»: {es}", en: "It was «{gn}»: {es}", de: "Es war «{gn}»: {es}", fr: "C'était «{gn}» : {es}", zh: "是「{gn}」：{es}" },
+  siguiente: { es: "Siguiente penal", pt: "Próximo pênalti", en: "Next penalty", de: "Nächster Elfmeter", fr: "Tir suivant", zh: "下一球" },
+  verResultado: { es: "Ver el resultado", pt: "Ver o resultado", en: "See the result", de: "Ergebnis ansehen", fr: "Voir le résultat", zh: "看結果" },
+  otraVez: { es: "Atajar otra vez", pt: "Defender de novo", en: "Save again", de: "Nochmal halten", fr: "Recommencer", zh: "再撲一次" },
+  volverModos: { es: "Cambiar modo", pt: "Mudar modo", en: "Change mode", de: "Modus wechseln", fr: "Changer de mode", zh: "切換模式" },
+  rachaKit: { es: "Camisetas especiales por racha", pt: "Camisas especiais por sequência", en: "Streak shirts", de: "Trikots für deine Serie", fr: "Maillots de série", zh: "連續紀錄限定球衣" },
+  rachaKitD: { es: "Se ganan jugando todos los días.", pt: "Ganhas jogando todos os dias.", en: "Earned by playing every day.", de: "Verdient durch tägliches Spielen.", fr: "Gagnés en jouant chaque jour.", zh: "每天玩就能解鎖。" },
+  rachaFalta: { es: "{n} días de racha", pt: "{n} dias de sequência", en: "{n}-day streak", de: "{n} Tage Serie", fr: "{n} jours de série", zh: "連續 {n} 天" },
+} satisfies Record<string, L>;
+
+export type MKey = keyof typeof T;
+
+export function usePM() {
+  const lang = useAppLang();
+  return (k: MKey, v?: Record<string, string | number>) => (T[k][lang] ?? T[k].es).replace(/\{(\w+)\}/g, (_, x) => String(v?.[x] ?? ""));
+}
