@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Maximize2, Minimize2 } from "lucide-react";
+import { ArrowLeft, Maximize2, Minimize2 } from "lucide-react";
 import { GameKit, GameSoundButton } from "./game-kit";
 import { GameHelp } from "./game-help";
 import { SponsorLine } from "./sponsor-line";
@@ -45,8 +45,9 @@ export function GameStage({
       <div className="game-stage min-h-screen pb-28" style={{ background, color: ink, "--stage-ink": ink } as CSSProperties}>
         <style>{STAGE_CSS + (css ?? "")}</style>
         <header className={`mx-auto flex items-center justify-between gap-2 px-4 py-3 ${wide ? "max-w-6xl" : "max-w-3xl"}`}>
-          <Link to={b.to} className="rounded-md px-2 py-1 text-sm font-medium opacity-80 hover:opacity-100">
-            {b.label}
+          <Link to={b.to} className="game-stage-back inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border px-4 text-sm font-bold">
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            {b.label.replace(/^←\s*/, "")}
           </Link>
           <div className="game-stage-tools flex items-center gap-2">
             {extra}
@@ -97,6 +98,8 @@ function FullscreenButton() {
 
 /** Estilos comunes del marco: botones de la barra con el color del juego. */
 const STAGE_CSS = `
+.game-stage-back { color: var(--stage-ink); border-color: color-mix(in srgb, var(--stage-ink) 35%, transparent); background: color-mix(in srgb, var(--stage-ink) 10%, transparent); }
+.game-stage-back:hover { background: color-mix(in srgb, var(--stage-ink) 18%, transparent); }
 .game-stage-tools button { background: transparent; color: var(--stage-ink); border-color: color-mix(in srgb, var(--stage-ink) 30%, transparent); }
 .game-stage-tools button:hover { background: color-mix(in srgb, var(--stage-ink) 10%, transparent); color: var(--stage-ink); }
 .game-stage-sponsor p, .game-stage-sponsor p span { color: color-mix(in srgb, var(--stage-ink) 75%, transparent) !important; }

@@ -21,7 +21,11 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,
   const el=canvas.current,ctx=el?.getContext('2d');if(!el||!ctx)return;
   const css=getComputedStyle(el),palette:Record<string,string>={};for(const k of ['night','sky','grass','grass-dark','stripe','white','black','kit-dark','red','blue','gold','green','miss','skin'])palette[k]=css.getPropertyValue(`--stadium-${k}`).trim();
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let frame=0,last=0;
-  function tick(now:number){if(!ctx)return;animation.current?.(now);if(now-last>30){drawStadium(ctx,scene.current,now,settings.current.ledText,reduce,palette);last=now;}frame=requestAnimationFrame(tick);}
+  // El ciclo nunca se corta: si un dibujo falla en algún celular, se sigue con el próximo cuadro (antes, un error dejaba la pelota «disparada» para siempre).
+  function tick(now:number){if(!ctx)return;try{animation.current?.(now);}catch{}try{if(now-last>30){drawStadium(ctx,scene.current,now,settings.current.ledText,reduce,palette);last=now;}}catch{last=now;}
+   // Mientras se apunta, el dedo es para el arco; el resto del tiempo, deslizar sobre la cancha mueve la página.
+   const ta=scene.current.phase==='aim'||scene.current.phase==='power'?'none':'pan-y';if(el&&el.style.touchAction!==ta)el.style.touchAction=ta;
+   frame=requestAnimationFrame(tick);}
   frame=requestAnimationFrame(tick);return()=>{cancelAnimationFrame(frame);sound.current.dispose();};
  },[]);
  function kick(){
@@ -32,17 +36,21 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,
  }
  function animate(shot:Shot,now:number){
   const s=scene.current,reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;s.phase='shot';sound.current.muted=settings.current.muted;sound.current.play('kick');
-  animation.current=(t)=>{
-   const q=Math.min(1,(t-now)/shot.duration),e=1-Math.pow(1-q,2.2);
+  const dur=shot.duration>0&&Number.isFinite(shot.duration)?shot.duration:900;
+  // Respaldo: si el celular frena la animación (ahorro de batería, pestaña en segundo plano), el resultado igual llega.
+  const respaldo=window.setTimeout(()=>{if(animation.current===paso)paso(now+dur);},dur+1500);
+  const paso=(t:number)=>{
+   const r=(t-now)/dur,q=Number.isFinite(r)?Math.max(0,Math.min(1,r)):1,e=1-Math.pow(1-q,2.2);
    s.ball={x:400+(shot.end.x-400)*e,y:520+(shot.end.y-520)*e-Math.sin(q*Math.PI)*50,r:16-6*e};
    const kq=reduce?q:Math.max(0,Math.min(1,((t-now)/1000-shot.react)/Math.max(.05,shot.T-shot.react))),ke=1-Math.pow(1-kq,2);
    s.keeper={x:400+(shot.keeper.x-400)*ke,y:278+(shot.keeper.y-278)*ke,ang:Math.sign(shot.keeper.x-400)*Math.min(1.2,Math.abs(shot.keeper.x-400)/170)*ke,stretch:ke};
-   if(q>=1){animation.current=null;s.phase='result';s.outcome=shot.outcome;const goal=shot.outcome==='goal'||shot.outcome==='angle';s.banner={t,txt:labels[shot.outcome],c:getComputedStyle(canvas.current??document.documentElement).getPropertyValue(goal?'--stadium-gold':'--stadium-miss')};
+   if(q>=1){window.clearTimeout(respaldo);animation.current=null;s.phase='result';s.outcome=shot.outcome;const goal=shot.outcome==='goal'||shot.outcome==='angle';s.banner={t,txt:labels[shot.outcome],c:getComputedStyle(canvas.current??document.documentElement).getPropertyValue(goal?'--stadium-gold':'--stadium-miss')};
     if(goal){s.cheer=t;s.net={...shot.end,t};celebrate(shot.outcome==='angle'?'big':'small');}sound.current.play(goal?'cheer':shot.outcome==='post'?'post':'hit');if(shot.outcome==='post')s.shake=t;
     if(!reduce)try{navigator.vibrate?.(goal?[40,30,60]:30);}catch{}
     callback.current(shot.outcome);
    }
   };
+  animation.current=paso;
  }
  function activate(point?:{x:number;y:number}){if(spectator)return;const s=scene.current;if(s.phase==='aim'){const p=point??s.aim;if(!p)return;if(p.x<G.x-40||p.x>G.x+G.w+40||p.y<G.y-40||p.y>G.y+G.h)return;s.aim=p;s.powerStart=performance.now();s.phase='power';aimCb.current?.(p,'power');}else if(s.phase==='power')kick();}
  const lastAimSent=useRef(0);
@@ -54,5 +62,5 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,
  function move(e:PointerEvent<HTMLCanvasElement>){if(spectator)return;const s=scene.current;if(s.phase!=='aim')return;if(dragging.current||e.pointerType==='mouse'){s.aim=clamp(pt(e));sendAim(s.aim);}}
  function up(e:PointerEvent<HTMLCanvasElement>){if(!dragging.current)return;dragging.current=false;const s=scene.current;if(s.phase==='aim'){const p=clamp(pt(e));try{navigator.vibrate?.(15);}catch{}activate(p);}}
  function keyboard(e:KeyboardEvent<HTMLCanvasElement>){if(spectator)return;const s=scene.current;const delta:Record<string,[number,number]>={ArrowLeft:[-25,0],ArrowRight:[25,0],ArrowUp:[0,-20],ArrowDown:[0,20]};const d=delta[e.key];if(d&&s.phase==='aim'){e.preventDefault();const p=s.aim??{x:400,y:225};s.aim={x:Math.max(120,Math.min(680,p.x+d[0])),y:Math.max(80,Math.min(330,p.y+d[1]))};sendAim(s.aim);}if(e.key==='Enter'||e.key===' '){e.preventDefault();activate();}}
- return <canvas ref={canvas} width={W} height={H} tabIndex={0} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={()=>{dragging.current=false;}} onKeyDown={keyboard} className="mx-auto block aspect-[4/3] w-full max-h-[42vh] max-w-[56vh] touch-none rounded-lg focus-visible:outline-2 focus-visible:outline-accent" aria-label="Arco: deslizá el dedo para apuntar con la flecha, soltá y tocá otra vez para patear"/>;
+ return <canvas ref={canvas} width={W} height={H} tabIndex={0} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={()=>{dragging.current=false;}} onKeyDown={keyboard} className="mx-auto block aspect-[4/3] w-full max-h-[42vh] max-w-[56vh] rounded-lg focus-visible:outline-2 focus-visible:outline-accent" aria-label="Arco: deslizá el dedo para apuntar con la flecha, soltá y tocá otra vez para patear"/>;
 }
