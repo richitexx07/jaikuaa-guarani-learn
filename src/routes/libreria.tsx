@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SUPPORT_WHATSAPP } from "@/lib/contact";
 import jaiProfe from "@/assets/jai-profe.webp";
 import coverConsultorio from "@/assets/covers/cover-consultorio.webp";
+import { MarketingHeader } from "@/components/marketing/page-parts";
 import {
   BookOpen, Headphones, Globe2, HandCoins, Stethoscope, Scale, Languages,
   Feather, GraduationCap, Send, FileText, Mic, CheckCircle2, Building2, PenLine, ArrowRight,
@@ -136,16 +136,7 @@ function LibreriaPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <style>{CSS}</style>
-      <header className="border-b border-border/50 bg-background">
-        <div className="mx-auto flex h-16 max-w-5xl items-center px-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-primary">
-            <BrandLogo />
-          </Link>
-          <a href="#postular" className="ml-auto">
-            <Button size="sm">Postular mi obra</Button>
-          </a>
-        </div>
-      </header>
+      <MarketingHeader accion={<a href="#postular" className="shrink-0"><Button size="sm">Postular mi obra</Button></a>} />
 
       <main className="flex-1">
         {/* Portada: de noche, con encaje de ñandutí, el Jai lector y un libro que habla */}

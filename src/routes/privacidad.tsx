@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { usePubTx } from "@/lib/i18n-public";
-import { AppLanguageToggle } from "@/components/app-language-toggle";
-import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
+import { MarketingHeader } from "@/components/marketing/page-parts";
 
 export const Route = createFileRoute("/privacidad")({
   head: () => ({
@@ -102,13 +101,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function LegalHeader() {
   return (
-    <header className="border-b border-border/50">
-      <div className="mx-auto flex h-16 max-w-5xl items-center px-4 sm:px-6">
-        <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-primary">
-          <BrandLogo />
-        </Link>
-          <AppLanguageToggle className="ml-auto" />
-      </div>
-    </header>
+    <MarketingHeader />
   );
 }

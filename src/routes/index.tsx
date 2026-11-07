@@ -1,13 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LanzamientoBanner } from "@/components/lanzamiento-banner";
-import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getFoundingSponsors } from "@/lib/sponsors.functions";
-import { DisplayToggles } from "@/components/display-toggles";
 import { EarlyAccessBadge } from "@/components/early-access-badge";
 import { LanguageSwitcher } from "@/components/marketing/language-switcher";
 import { NandutiDisc } from "@/components/nanduti-disc";
@@ -18,6 +16,7 @@ import bannerEscolar from "@/assets/banners/banner-escolar.webp";
 import coverKaraoke from "@/assets/covers/cover-karaoke.webp";
 import { RetoCard } from "@/components/games/reto-card";
 import { useIsGuest } from "@/lib/guest";
+import { MarketingHeader } from "@/components/marketing/page-parts";
 
 
 
@@ -44,7 +43,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <Header />
+      <MarketingHeader idioma={<LanguageSwitcher current="es" />} />
       <main className="flex-1">
         <div className="px-4 pt-3 sm:px-6">
           <LanzamientoBanner className="mx-auto max-w-5xl" />
@@ -76,28 +75,6 @@ function RetoPortada() {
   );
 }
 
-function Header() {
-  return (
-    <header className="w-full border-b border-border/50 bg-background">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-2 px-3 sm:px-6">
-        <a
-          href="/"
-          aria-label="Jaikuaa, inicio"
-          className="flex shrink-0 items-center gap-2 font-display text-xl font-bold tracking-tight text-primary transition-opacity hover:opacity-80"
-        >
-          <BrandLogo wordmarkFromSm />
-        </a>
-        <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
-          <Link to="/libreria" className="shrink-0 whitespace-nowrap rounded-full border border-primary/30 px-2.5 py-1.5 text-sm font-semibold sm:px-3 text-primary hover:bg-primary/5">
-            Librería
-          </Link>
-          <LanguageSwitcher current="es" />
-          <DisplayToggles />
-        </div>
-      </div>
-    </header>
-  );
-}
 
 const HERO_CSS = `
 .hero-jai { animation: hero-rise .9s cubic-bezier(.2,.8,.2,1) both .1s; }

@@ -7,46 +7,63 @@ import { BrandLogo } from "@/components/brand-logo";
 import type { LucideIcon } from "lucide-react";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import { SUPPORT_WHATSAPP } from "@/lib/contact";
+import { DisplayToggles } from "@/components/display-toggles";
 
 const NAV_LINKS = [
+  { to: "/juegos", label: "navJuegos" },
+  { to: "/libreria", label: "navLibreria" },
   { to: "/teclado", label: "navTeclado" },
   { to: "/turismo", label: "navTurismo" },
   { to: "/instituciones", label: "navInst" },
   { to: "/auspiciantes", label: "navAusp" },
 ] as const;
 
-export function MarketingHeader() {
+/**
+ * El encabezado de todas las páginas públicas (el mismo en todas, así Jaikuaa se siente una sola app):
+ * logo, «Jugar», idioma y «Menú». En la computadora los enlaces se ven en línea.
+ * En el celular angosto queda solo el ícono del logo, para que nada se encime (también con letra grande).
+ * `idioma`: otro selector de idioma (la portada usa el que cambia de página por idioma).
+ * `accion`: el botón principal de esa página, en lugar de «Jugar» (p. ej. «Postular mi obra» en la Librería).
+ */
+export function MarketingHeader({ idioma, accion }: { idioma?: ReactNode; accion?: ReactNode } = {}) {
   const [open, setOpen] = useState(false);
   const t = usePubTx();
   return (
-    <header className="relative border-b border-border/50">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-3 px-4 sm:px-6">
-        <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2 font-display text-xl font-bold text-primary">
-          <BrandLogo />
+    <header className="relative w-full border-b border-border/50 bg-background">
+      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-1.5 px-3 sm:gap-3 sm:px-6">
+        <Link to="/" aria-label="Jaikuaa, inicio" className="flex shrink-0 items-center gap-2 font-display text-xl font-bold text-primary">
+          <BrandLogo wordmarkFromSm />
         </Link>
-        <nav className="hidden items-center gap-4 text-sm md:flex">
+        <nav className="hidden items-center gap-4 text-sm lg:flex">
           {NAV_LINKS.map((l) => (
             <Link key={l.to} to={l.to} className="text-muted-foreground hover:text-foreground">
               {t(l.label)}
             </Link>
           ))}
         </nav>
-        <AppLanguageToggle className="ml-auto md:ml-0" />
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? t("menuClose") : t("menuOpen")}
-          aria-expanded={open}
-          className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-border px-3 text-sm font-semibold text-foreground md:hidden"
-        >
-          {open ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
-          {open ? "Cerrar" : "Menú"}
-        </button>
+        <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+          {accion ?? (
+            <Link to="/juegos" className="shrink-0 whitespace-nowrap rounded-full bg-accent px-3 py-1.5 text-sm font-bold text-accent-foreground shadow-sm lg:hidden">
+              {t("navJugar")}
+            </Link>
+          )}
+          {idioma ?? <AppLanguageToggle />}
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? t("menuClose") : t("menuOpen")}
+            aria-expanded={open}
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-border px-2.5 text-sm font-semibold text-foreground"
+          >
+            {open ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
+            <span className="hidden min-[400px]:inline">{open ? t("navCerrar") : t("navMenu")}</span>
+          </button>
+        </div>
       </div>
       {open && (
-        <nav className="absolute inset-x-0 top-16 z-50 border-b border-border bg-background shadow-lg md:hidden">
-          <ul className="flex flex-col px-4 py-2">
-            {NAV_LINKS.map((l) => (
+        <nav className="absolute inset-x-0 top-16 z-50 border-b border-border bg-background shadow-lg">
+          <ul className="mx-auto flex max-w-5xl flex-col px-4 py-2">
+            {[...NAV_LINKS, { to: "/sobre", label: "navSobre" } as const].map((l) => (
               <li key={l.to}>
                 <Link
                   to={l.to}
@@ -57,6 +74,10 @@ export function MarketingHeader() {
                 </Link>
               </li>
             ))}
+            <li className="flex items-center justify-between gap-3 border-t border-border px-3 py-3">
+              <span className="text-sm text-muted-foreground">Aa</span>
+              <DisplayToggles />
+            </li>
           </ul>
         </nav>
       )}

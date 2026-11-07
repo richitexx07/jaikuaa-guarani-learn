@@ -21,7 +21,8 @@ import { JaiLauncher } from "@/components/jai-launcher";
 // En los juegos y en el panel de administración el botón molestaría, así que no se muestra.
 // En /validar los botones de decisión van abajo: Jai no debe taparlos.
 // /ficha-auspiciantes es una hoja comercial para imprimir: Jai no debe flotar sobre ella.
-const HIDDEN_PREFIXES = ["/juegos", "/admin", "/piloto-ateneo", "/certificado", "/validar", "/docente/juegos", "/ficha-auspiciantes", "/bienvenida"];
+// También en la trivia, el teclado y «Pronunciá»: ahí abajo están los botones de la actividad y el Jai flotante los tapaba.
+const HIDDEN_PREFIXES = ["/juegos", "/trivia/", "/teclado", "/pronunciar", "/admin", "/piloto-ateneo", "/certificado", "/validar", "/docente/juegos", "/ficha-auspiciantes", "/bienvenida"];
 
 
 type Msg =
@@ -47,7 +48,7 @@ let nextId = 1;
 const greeting = (): Msg => ({
   id: nextId++,
   from: "jai",
-  text: "Soy Jai, el jaguareté de Jaikuaa. Te acompaño a aprender, jugar y sumar XP. Tus puntos no vencen: muy pronto vas a poder canjearlos por premios, descuentos y sorteos.",
+  text: "Soy Jai, el jaguareté de Jaikuaa. Te acompaño a aprender, jugar y sumar XP. Tus puntos no vencen: suman a tu racha, a tus medallas y al ranking de tu grupo.",
   lead: "¡Hola! ¡Qué lindo que estés por acá!",
 });
 
@@ -454,7 +455,7 @@ export function SupportWhatsApp() {
           <button type="button" onClick={() => setTeaser(false)} aria-label="Cerrar saludo" className="float-right -mr-1 -mt-1 ml-2 rounded-full p-0.5 text-muted-foreground hover:text-foreground">
             <X className="h-3.5 w-3.5" />
           </button>
-          <p>¡Hola! Soy Jai. Cada lección suma XP, y muy pronto vas a poder canjearlos por premios y sorteos.</p>
+          <p>¡Hola! Soy Jai. Cada lección suma puntos y cuida tu racha. Si tenés una duda, tocame y te ayudo.</p>
         </div>
       )}
 

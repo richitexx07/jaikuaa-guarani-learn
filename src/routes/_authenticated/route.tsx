@@ -9,7 +9,6 @@ import { showsBottomNav } from "@/lib/bottom-nav";
 import { rememberAfterLogin } from "@/lib/after-login";
 import { PreLaunchBanner } from "@/components/validation-notice";
 import { authMode, isGuestPath, markHadAccount, useIsGuest } from "@/lib/guest";
-import { GuestBar } from "@/components/guest-bar";
 import { AppLoading } from "@/components/app-loading";
 import { decodeReto } from "@/lib/reto";
 
@@ -68,8 +67,7 @@ function AuthenticatedLayout() {
   return (
     <>
       <OfflineStatusBar />
-      {guest && <GuestBar />}
-      <PreLaunchBanner />
+      <PreLaunchBanner invitado={guest} />
       <div key={key} className={`page-in ${withNav ? "pb-20 md:pb-0" : ""}`}>
         <Outlet />
       </div>

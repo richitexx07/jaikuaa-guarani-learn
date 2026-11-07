@@ -1,5 +1,8 @@
 import { ShieldCheck } from "lucide-react";
-import { PRELIMINARY_LANGS, useT } from "@/lib/i18n";
+import { Link } from "@tanstack/react-router";
+import { PRELIMINARY_LANGS, useT, type AppLang } from "@/lib/i18n";
+import { rememberAfterLogin } from "@/lib/after-login";
+import { authMode } from "@/lib/guest";
 
 /**
  * Aviso para secciones cuyo contenido en guaraní todavía no fue validado.
@@ -18,8 +21,41 @@ export function ValidationNotice() {
  * Aviso de pre-lanzamiento, arriba de todas las pantallas con sesión (lo monta el layout).
  * Deja claro que la plataforma no se lanzó y que el guaraní está en revisión por especialistas.
  */
-export function PreLaunchBanner() {
+const GUARDAR: Record<AppLang, string> = {
+  es: "Guardá tus puntos",
+  pt: "Salve seus pontos",
+  en: "Save your points",
+  de: "Punkte sichern",
+  fr: "Gardez vos points",
+  zh: "儲存分數",
+};
+
+export function PreLaunchBanner({ invitado = false }: { invitado?: boolean }) {
   const { t, lang } = useT();
+  // Sin cuenta: UNA sola franja fina (antes eran dos apiladas —«Jugás sin cuenta» y «Acceso anticipado»—
+  // y en el celular se comían media pantalla antes del juego). El aviso de puntos lo da «¡Ganaste N puntos!».
+  if (invitado) {
+    return (
+      <>
+        <div role="note" className="flex items-center justify-center gap-2 border-b border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary sm:text-sm">
+          <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          <span className="min-w-0 truncate">
+            <strong>{t("pl.strong")}</strong> <span className="hidden sm:inline">{t("pl.short")}</span>
+            <span className="sm:hidden">{lang === "es" ? "en revisión docente." : t("pl.short")}</span>
+          </span>
+          <Link
+            to="/auth"
+            search={{ mode: authMode() }}
+            onClick={() => rememberAfterLogin(window.location.pathname + window.location.search)}
+            className="shrink-0 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-primary-foreground sm:text-xs"
+          >
+            {GUARDAR[lang as AppLang] ?? GUARDAR.es}
+          </Link>
+        </div>
+        {PRELIMINARY_LANGS.includes(lang) && <PreliminaryLangBanner />}
+      </>
+    );
+  }
   return (
     <>
       <div

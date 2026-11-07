@@ -95,7 +95,7 @@ const DICT = {
   "dash.inviteDesc": { es: "Invitá a un amigo o familiar", pt: "Convide um amigo ou familiar", en: "Invite a friend or family member" },
   "dash.share": { es: "Compartir", pt: "Compartilhar", en: "Share" },
   "dash.xpStrong": { es: "Tus puntos no vencen.", pt: "Seus pontos não expiram.", en: "Your points never expire." },
-  "dash.xpRest": { es: "Muy pronto vas a poder canjear tus XP por premios y descuentos con marcas y comercios paraguayos.", pt: "Em breve você poderá trocar seus XP por prêmios e descontos com marcas e lojas paraguaias.", en: "Soon you will be able to redeem your XP for rewards and discounts with Paraguayan brands and shops." },
+  "dash.xpRest": { es: "Muy pronto vas a poder usar tus XP en beneficios con marcas y comercios paraguayos.", pt: "Em breve você poderá usar seus XP em benefícios com marcas e lojas paraguaias.", en: "Soon you will be able to use your XP for benefits with Paraguayan brands and shops." },
   "dash.explore": { es: "Más cosas para explorar", pt: "Mais coisas para explorar", en: "More to explore" },
   "dash.tools": { es: "Herramientas", pt: "Ferramentas", en: "Tools" },
   "dash.news": { es: "Noticias", pt: "Notícias", en: "News" },

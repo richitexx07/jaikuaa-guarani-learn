@@ -1,7 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { usePubTx } from "@/lib/i18n-public";
-import { AppLanguageToggle } from "@/components/app-language-toggle";
-import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Gamepad2, Gift, Home, Mic, type LucideIcon } from "lucide-react";
@@ -9,6 +7,7 @@ import { HeroJai } from "@/components/marketing/page-parts";
 import jaiSaluda from "@/assets/jai/jai-saluda.webp";
 import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
 import { Mail } from "lucide-react";
+import { MarketingHeader } from "@/components/marketing/page-parts";
 
 export const Route = createFileRoute("/sobre")({
   head: () => ({
@@ -28,14 +27,7 @@ function SobrePage() {
   const t = usePubTx();
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="border-b border-border/50">
-        <div className="mx-auto flex h-16 max-w-5xl items-center px-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-primary">
-            <BrandLogo />
-          </Link>
-          <AppLanguageToggle className="ml-auto" />
-        </div>
-      </header>
+      <MarketingHeader />
 
       <main className="flex-1">
         {/* Título e intro */}

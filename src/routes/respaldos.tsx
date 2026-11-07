@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { HeroJai } from "@/components/marketing/page-parts";
 import jaiGraduado from "@/assets/jai/jai-graduado.webp";
 import { FileText } from "lucide-react";
+import { MarketingHeader } from "@/components/marketing/page-parts";
 
 export const Route = createFileRoute("/respaldos")({
   head: () => ({
@@ -58,13 +58,7 @@ const RESPALDOS: Respaldo[] = [
 function RespaldosPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="border-b border-border/50">
-        <div className="mx-auto flex h-16 max-w-5xl items-center px-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-primary">
-            <BrandLogo />
-          </Link>
-        </div>
-      </header>
+      <MarketingHeader />
 
       <main className="flex-1 px-4 pb-16 pt-8 sm:px-6 sm:pb-20 sm:pt-14">
         <div className="mx-auto max-w-3xl">

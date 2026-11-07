@@ -66,6 +66,12 @@ const T = {
   legalNote: ["", "Este texto legal está disponível apenas em espanhol, que é a versão oficial.", "This legal text is available only in Spanish, which is the official version.", "Dieser Rechtstext ist nur auf Spanisch verfügbar; das ist die offizielle Fassung.", "Ce texte juridique n'est disponible qu'en espagnol, qui est la version officielle.", "本法律文本僅提供西班牙語版本，該版本為正式版本。"],
   // Cabecera y respaldos
   navTeclado: ["Teclado", "Teclado", "Keyboard", "Tastatur", "Clavier", "鍵盤"],
+  navJuegos: ["Juegos", "Jogos", "Games", "Spiele", "Jeux", "遊戲"],
+  navLibreria: ["Librería", "Livraria", "Bookstore", "Buchhandlung", "Librairie", "書店"],
+  navSobre: ["Sobre Jaikuaa", "Sobre o Jaikuaa", "About Jaikuaa", "Über Jaikuaa", "À propos", "關於 Jaikuaa"],
+  navJugar: ["Jugar", "Jogar", "Play", "Spielen", "Jouer", "開玩"],
+  navMenu: ["Menú", "Menu", "Menu", "Menü", "Menu", "選單"],
+  navCerrar: ["Cerrar", "Fechar", "Close", "Schließen", "Fermer", "關閉"],
   navTurismo: ["Turismo", "Turismo", "Tourism", "Tourismus", "Tourisme", "旅遊"],
   navInst: ["Instituciones", "Instituições", "Institutions", "Institutionen", "Institutions", "機構"],
   navAusp: ["Auspiciantes", "Patrocinadores", "Sponsors", "Sponsoren", "Partenaires", "贊助商"],

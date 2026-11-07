@@ -32,7 +32,7 @@ export const JAI_FAQS: JaiFaq[] = [
     category: "Empezar",
     question: "¿Para qué me sirven mis XP?",
     answer:
-      "¡Tus puntos no vencen! Cada lección, cada juego y cada amigo que traés suma XP a tu cuenta. Mientras la comunidad crece, estamos preparando alianzas con marcas y comercios paraguayos para que puedas canjear tus XP por premios, descuentos y participar en sorteos. Todavía no están habilitados: por ahora, acumulá todo lo que puedas.",
+      "¡Tus puntos no vencen! Cada lección, cada juego y cada amigo que traés suma XP a tu cuenta. Suman a tu racha, a tus medallas y al ranking de tu grupo. Estamos preparando beneficios con marcas y comercios paraguayos para que puedas usar tus XP; todavía no están habilitados.",
     keywords: ["xp", "puntos", "premio", "premios", "sorteo", "sorteos", "descuento", "descuentos", "canjear", "canje", "regalo", "beneficio", "beneficios", "para que sirven"],
     link: { label: "Ver mis logros", to: "/logros" },
     related: ["invitar", "empezar"],
