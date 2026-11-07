@@ -11,6 +11,7 @@ import { newSeed, orderedBy, shufflerFor } from "@/lib/reto";
 import { useSala } from "@/lib/use-sala";
 import type { GameWord } from "@/lib/games.functions";
 import { kitSeguro, useMiKit, type Kit } from "@/components/games/penalties/camisetas";
+import { BarraEmojis, EmojisFlotando, esEmoji, useReacciones, type Emoji } from "@/components/games/penalties/reacciones";
 
 /**
  * Penales a distancia, cada uno en su celular. Se turnan: uno patea (responde la palabra y
@@ -22,7 +23,7 @@ import { kitSeguro, useMiKit, type Kit } from "@/components/games/penalties/cami
  */
 
 const P = { noche: "#071A33", led: "#FFB23E", gol: "#3BE38A", mal: "#FF5A4E", blanco: "#F4F7FB", host: "#2F6FDE", guest: "#D9452B" };
-const EVENTS = ["start", "dive", "answer", "aim", "kick", "shot", "sync", "hello", "ended", "llena", "rematch", "kit"] as const;
+const EVENTS = ["start", "dive", "answer", "aim", "kick", "shot", "sync", "hello", "ended", "llena", "rematch", "kit", "emo"] as const;
 const GRACE_RIVAL_MS = 30000;
 const GRACE_ME_MS = 45000;
 const NEXT_MS = 2600;
@@ -47,6 +48,8 @@ export function armarTanda(words: GameWord[], hostUid: string, guestUid: string)
 
 export function PenalesLive({ code, host, words, ledText, muted, onExit }: { code: string; host: boolean; words: GameWord[]; ledText: string; muted: boolean; onExit: () => void }) {
   const feedback = useGameFeedback();
+  const { flotan, mostrar } = useReacciones();
+  const rivalNameRef = useRef("tu rival");
   const [match, setMatch] = useState<Match | null>(null);
   const [results, setResults] = useState<Results>({ host: [], guest: [] });
   const [dive, setDive] = useState<Dive | null>(null);
@@ -180,6 +183,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
         else window.setTimeout(() => applyShot(tt, p.outcome as Outcome), 3000);
       }
       else if (e === "kit") setRivalKit(kitSeguro(p.kit));
+      else if (e === "emo" && esEmoji(p.e)) mostrar(p.e, rivalNameRef.current, false);
       else if (e === "rematch" && role === "host") startMatch();
       else if (e === "hello" && m && from && (from === m.hostUid || from === m.guestUid)) {
         if (endRef.current) send("ended");
@@ -275,6 +279,8 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
 
   const myName = sala.me?.name ?? "Vos";
   const rivalName = sala.rival.name ?? lastRivalName.current ?? "tu rival";
+  rivalNameRef.current = rivalName;
+  const mandarEmoji = (e: Emoji) => { send("emo", { e }); mostrar(e, myName, true); };
   const link = typeof window !== "undefined" ? `${window.location.origin}/juegos/penales?sala=${code}` : "";
   const invite = `¡Te desafío a una tanda de penales en guaraní en Jaikuaa! Cada uno en su celular: uno patea, el otro ataja.\nCódigo de sala: ${code}\n${link}`;
   const card = "rounded-3xl bg-white p-5 text-center shadow-2xl text-[#071A33]";
@@ -330,6 +336,8 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
           )}
           <button type="button" onClick={salir} className="h-12 rounded-2xl px-5 font-semibold ring-1 ring-white/40">Salir</button>
         </div>
+        {sala.rival.present && <BarraEmojis onMandar={mandarEmoji} />}
+        <EmojisFlotando flotan={flotan} />
       </div>
     );
   }
@@ -490,8 +498,10 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
               </div>
             </div>
           )}
+          <BarraEmojis onMandar={mandarEmoji} />
         </>
       )}
+      <EmojisFlotando flotan={flotan} />
     </div>
   );
 }
