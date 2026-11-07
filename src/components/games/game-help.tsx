@@ -11,7 +11,7 @@ export function GameHelp({title}:{title:string}) {
  const {lang,g}=useGT();
  const help=GAME_HELP[title];
  // Quien llega desde un anuncio (?de=) o el reto de un amigo (?reto=) va directo a jugar: la ayuda queda en el botón «Ayuda».
- useEffect(()=>{if(!help)return;try{if(/[?&](de|reto|utm_source)=/.test(window.location.search))return;if(localStorage.getItem(`jaikuaa:game-help:${title}`)!=='seen')setOpen(true);}catch{setOpen(true);}},[title,help]);
+ useEffect(()=>{if(!help)return;try{if(/[?&](de|reto|sala|utm_source)=/.test(window.location.search))return;if(localStorage.getItem(`jaikuaa:game-help:${title}`)!=='seen')setOpen(true);}catch{setOpen(true);}},[title,help]);
  if(!help)return null;
  function change(value:boolean){setOpen(value);if(!value)try{localStorage.setItem(`jaikuaa:game-help:${title}`,'seen');}catch{}}
  return <Dialog open={open} onOpenChange={change}><Button variant="outline" size="sm" className="h-10 gap-1.5 px-3 font-semibold" title={g("howTo")} aria-label={g("howTo")} onClick={()=>change(true)}><CircleHelp aria-hidden/>{g("helpShort")}</Button><DialogContent className="game-help max-h-[85dvh] w-[calc(100%-2rem)] overflow-y-auto rounded-lg"><DialogTitle className="tracking-normal">{g("howTo")}</DialogTitle><DialogDescription>{gameTitle(title,lang)}</DialogDescription><ol className="space-y-4">{help.steps.map(step=><li key={step.es} className="text-sm leading-relaxed text-foreground">{step[lang]}</li>)}</ol><p className="border-t border-border pt-4 text-sm font-semibold text-accent">{help.xp[lang]}</p><Button onClick={()=>change(false)}>{g("letsPlay")}</Button></DialogContent></Dialog>;
