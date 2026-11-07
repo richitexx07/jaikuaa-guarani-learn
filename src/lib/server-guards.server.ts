@@ -83,3 +83,19 @@ export function clientIp(headers: Headers): string {
     "unknown"
   );
 }
+
+/**
+ * El correo solo cuenta como comprobado si un proveedor externo (Google) confirmó
+ * que la persona es dueña de esa casilla. El registro por correo no lo prueba.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function hasProvenEmail(supabaseAdmin: any, userId: string, email: string): Promise<boolean> {
+  const { data, error } = await supabaseAdmin.auth.admin.getUserById(userId);
+  if (error || !data?.user) return false;
+  const want = email.trim().toLowerCase();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data.user.identities ?? []).some((i: any) => {
+    const d = i.identity_data ?? {};
+    return i.provider !== "email" && d.email_verified === true && String(d.email ?? "").toLowerCase() === want;
+  });
+}

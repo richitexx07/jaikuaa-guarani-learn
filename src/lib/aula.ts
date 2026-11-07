@@ -37,7 +37,13 @@ export type Avance = { userId: string; source: "lesson" | "game"; ref: string; a
 /** Letras sin O/0 ni I/1 para que el código se dicte sin confusiones. */
 const ALFABETO = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-export function nuevoCodigo(rand: () => number = Math.random): string {
+function azarSeguro(): number {
+  const a = new Uint32Array(1);
+  globalThis.crypto.getRandomValues(a);
+  return a[0]! / 2 ** 32;
+}
+
+export function nuevoCodigo(rand: () => number = azarSeguro): string {
   let c = "";
   for (let i = 0; i < 6; i++) c += ALFABETO[Math.floor(rand() * ALFABETO.length)];
   return c;

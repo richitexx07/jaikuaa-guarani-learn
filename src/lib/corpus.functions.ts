@@ -548,6 +548,11 @@ export const addValidator = createServerFn({ method: "POST" })
       .ilike("email", data.email)
       .maybeSingle();
     if (!prof) return { ok: false as const, error: "Primero tiene que crear su cuenta en Jaikuaa" };
+    {
+      const { hasProvenEmail } = await import("@/lib/server-guards.server");
+      if (!(await hasProvenEmail(supabaseAdmin, prof.id, data.email)))
+        return { ok: false as const, error: "Esa persona tiene que entrar a Jaikuaa con su cuenta de Google de ese correo." };
+    }
     const { data: existing } = await supabaseAdmin
       .from("user_roles")
       .select("id")
@@ -622,6 +627,11 @@ export const setUserCohort = createServerFn({ method: "POST" })
       .ilike("email", data.email)
       .maybeSingle();
     if (!prof) return { ok: false as const, error: "Primero tiene que crear su cuenta en Jaikuaa" };
+    {
+      const { hasProvenEmail } = await import("@/lib/server-guards.server");
+      if (!(await hasProvenEmail(supabaseAdmin, prof.id, data.email)))
+        return { ok: false as const, error: "Esa persona tiene que entrar a Jaikuaa con su cuenta de Google de ese correo." };
+    }
     const { error } = await supabaseAdmin
       .from("profiles")
       .update({ cohort: data.cohort })
