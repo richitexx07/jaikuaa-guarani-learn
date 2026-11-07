@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/jaikuaa-logo.png.asset.json";
+import logoUrl from "@/assets/jaikuaa-logo.webp";
 
 /**
  * Pantalla de carga de las secciones que se arman en el celular (juegos, panel, lecciones).
@@ -8,7 +8,7 @@ import logoAsset from "@/assets/jaikuaa-logo.png.asset.json";
 export function AppLoading() {
   return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-background px-6 text-center" role="status" aria-live="polite">
-      <img src={logoAsset.url} alt="" width={96} height={96} className="h-24 w-24 rounded-3xl shadow-lg motion-safe:animate-pulse" />
+      <img src={logoUrl} alt="" width={96} height={96} className="h-24 w-24 rounded-3xl shadow-lg motion-safe:animate-pulse" />
       <p className="font-display text-lg font-bold text-primary">Jaikuaa</p>
       <div className="flex gap-1.5" aria-hidden>
         <span className="h-2 w-2 rounded-full bg-[#D52B1E] motion-safe:animate-bounce" />

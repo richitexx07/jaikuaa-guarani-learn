@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/jaikuaa-logo.png.asset.json";
+import logoUrl from "@/assets/jaikuaa-logo.webp";
 import { cn } from "@/lib/utils";
 
 type BrandLogoProps = {
@@ -13,7 +13,7 @@ export function BrandLogo({ className = "", size = 36, withWordmark = true, word
   return (
     <span className={cn("inline-flex items-center gap-2 font-display font-bold text-primary", className)}>
       <img
-        src={logoAsset.url}
+        src={logoUrl}
         alt="Jaikuaa"
         width={size}
         height={size}

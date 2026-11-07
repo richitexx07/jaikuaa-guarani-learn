@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import logoAsset from "@/assets/jaikuaa-logo.png.asset.json";
+import logoUrl from "@/assets/jaikuaa-logo.webp";
 
 const DURATION_MS = 2600;
 const FADE_MS = 500;
@@ -47,7 +47,7 @@ export function SplashScreen() {
       </div>
       <div className="jk-center">
         <div className="jk-logo-wrap">
-          <img src={logoAsset.url} alt="" width={200} height={200} loading="eager" draggable={false} className="jk-logo" />
+          <img src={logoUrl} alt="" width={200} height={200} loading="eager" draggable={false} className="jk-logo" />
           <div className="jk-shine" />
         </div>
         <div className="jk-word">
