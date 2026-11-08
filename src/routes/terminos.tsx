@@ -12,7 +12,7 @@ export const Route = createFileRoute("/terminos")({
       { property: "og:description", content: "Condiciones de uso, cuentas y contenido educativo de Jaikuaa." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://www.jaikuaa.com/terminos" },
-      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" }, { property: "og:image:width", content: "1200" }, { property: "og:image:height", content: "630" }, { name: "twitter:card", content: "summary_large_image" }, { name: "twitter:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" },
+      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg?v=2" }, { property: "og:image:width", content: "1200" }, { property: "og:image:height", content: "630" }, { name: "twitter:card", content: "summary_large_image" }, { name: "twitter:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg?v=2" },
     ],
     links: [{ rel: "canonical", href: "https://www.jaikuaa.com/terminos" }],
   }),

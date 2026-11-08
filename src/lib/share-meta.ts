@@ -43,5 +43,5 @@ export function shareMetaFor(pathname: string): ShareMeta {
   const p = pathname.replace(/\/+$/, "") || "/";
   const m = BY_PATH[p] ?? DEFAULT;
   const juego = p.startsWith("/juegos/") ? p.slice("/juegos/".length) : "";
-  return CON_IMAGEN.has(juego) ? { ...m, image: `https://www.jaikuaa.com/og/${juego}.jpg` } : m;
+  return CON_IMAGEN.has(juego) ? { ...m, image: `https://www.jaikuaa.com/og/${juego}.jpg?v=2` } : m;
 }

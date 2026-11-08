@@ -18,7 +18,7 @@ export const Route = createFileRoute("/respaldos")({
       { property: "og:title", content: "Respaldos institucionales de Jaikuaa" },
       { property: "og:description", content: "Declaraciones y resoluciones oficiales que respaldan a Jaikuaa." },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" },
+      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg?v=2" },
     ],
     links: [{ rel: "canonical", href: "https://www.jaikuaa.com/respaldos" }],
   }),

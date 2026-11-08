@@ -20,7 +20,7 @@ export const Route = createFileRoute("/piloto-ateneo")({
       { property: "og:title", content: "Plan piloto | Jaikuaa" },
       { property: "og:description", content: "Información del plan piloto de Jaikuaa." },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" }, { property: "og:image:width", content: "1200" }, { property: "og:image:height", content: "630" }, { name: "twitter:card", content: "summary_large_image" }, { name: "twitter:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" },
+      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg?v=2" }, { property: "og:image:width", content: "1200" }, { property: "og:image:height", content: "630" }, { name: "twitter:card", content: "summary_large_image" }, { name: "twitter:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg?v=2" },
     ],
   }),
   component: PilotPage,

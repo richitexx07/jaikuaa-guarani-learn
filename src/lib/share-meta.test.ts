@@ -3,8 +3,8 @@ import { shareMetaFor } from "./share-meta";
 
 describe("vista previa de los enlaces", () => {
   it("cada juego con portada muestra su propia imagen", () => {
-    expect(shareMetaFor("/juegos/penales").image).toBe("https://www.jaikuaa.com/og/penales.jpg");
-    expect(shareMetaFor("/juegos/karaoke/").image).toBe("https://www.jaikuaa.com/og/karaoke.jpg");
+    expect(shareMetaFor("/juegos/penales").image).toBe("https://www.jaikuaa.com/og/penales.jpg?v=2");
+    expect(shareMetaFor("/juegos/karaoke/").image).toBe("https://www.jaikuaa.com/og/karaoke.jpg?v=2");
     expect(shareMetaFor("/juegos/consultorio").title).toContain("Consultorio");
   });
   it("las demás páginas usan la imagen general", () => {

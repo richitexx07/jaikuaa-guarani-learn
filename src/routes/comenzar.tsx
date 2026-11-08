@@ -28,7 +28,7 @@ export const Route = createFileRoute("/comenzar")({
       { property: "og:description", content: "Conocé a Jai y elegí cómo empezar tu aprendizaje de guaraní." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://www.jaikuaa.com/comenzar" },
-      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" }, { property: "og:image:width", content: "1200" }, { property: "og:image:height", content: "630" }, { name: "twitter:card", content: "summary_large_image" }, { name: "twitter:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg" },
+      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg?v=2" }, { property: "og:image:width", content: "1200" }, { property: "og:image:height", content: "630" }, { name: "twitter:card", content: "summary_large_image" }, { name: "twitter:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg?v=2" },
     ],
     links: [{ rel: "canonical", href: "https://www.jaikuaa.com/comenzar" }],
   }),
