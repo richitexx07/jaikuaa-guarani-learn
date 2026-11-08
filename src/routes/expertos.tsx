@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SUPPORT_WHATSAPP } from "@/lib/contact";
-import jaiProfe from "@/assets/jai-profe.webp";
-import jaiAtencion from "@/assets/jai-atencion-pro.webp";
+import jaiDocente from "@/assets/ejecutivos/jai-ejecutivo-docente.webp";
+import mimbiTraductora from "@/assets/ejecutivos/mimbi-ejecutiva-traductora.webp";
 import { MarketingHeader } from "@/components/marketing/page-parts";
 import { LIB_COLORES, Nanduti } from "@/components/libreria/arte";
 import {
@@ -109,8 +109,8 @@ function ExpertosPage() {
               </div>
             </div>
             <div className="relative mx-auto flex items-end justify-center gap-2">
-              <img src={jaiProfe} alt="Jai docente con un libro" width={537} height={720} className="h-48 w-auto drop-shadow-2xl sm:h-60" />
-              <img src={jaiAtencion} alt="Jai traductor con auriculares" width={600} height={720} className="h-44 w-auto drop-shadow-2xl sm:h-56" />
+              <img src={jaiDocente} alt="Jai, docente, de traje y con un libro" width={704} height={944} className="h-56 w-auto drop-shadow-2xl sm:h-72" />
+              <img src={mimbiTraductora} alt="Mimbi, traductora e intérprete, con auriculares y una tablet" width={704} height={944} className="h-56 w-auto drop-shadow-2xl sm:h-72" />
             </div>
           </div>
           <div className="absolute inset-x-0 bottom-0 flex h-2" aria-hidden>

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SUPPORT_WHATSAPP } from "@/lib/contact";
 import logo from "@/assets/jaikuaa-logo.webp";
-import jaiAtencion from "@/assets/jai-atencion-pro.webp";
+import mimbiSaluda from "@/assets/ejecutivos/mimbi-ejecutiva-saluda.webp";
 import coverConsultorio from "@/assets/covers/cover-consultorio.webp";
 import coverVentanilla from "@/assets/covers/cover-ventanilla.webp";
 import coverChacra from "@/assets/covers/cover-chacra.webp";
@@ -133,7 +133,7 @@ function AtendemosPage() {
             </div>
             <div className="relative mx-auto w-full max-w-[250px] -translate-x-10 sm:max-w-[290px] sm:-translate-x-12">
               <Distintivo className="rotate-[-3deg]" />
-              <img src={jaiAtencion} alt="" width={600} height={720} className="absolute -bottom-8 -right-[7.5rem] h-40 w-auto drop-shadow-2xl sm:-right-36 sm:h-52" />
+              <img src={mimbiSaluda} alt="" width={704} height={944} className="absolute -bottom-10 -right-[7.5rem] h-48 w-auto drop-shadow-2xl sm:-right-40 sm:h-64" />
             </div>
           </div>
           <div className="absolute inset-x-0 bottom-0 flex h-2" aria-hidden>
