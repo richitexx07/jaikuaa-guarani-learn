@@ -308,6 +308,7 @@ function LibreriaPage() {
               </p>
             </form>
           </div>
+          <p className="mx-auto mt-6 max-w-xl text-center text-sm text-muted-foreground">¿Sos docente o traductor de guaraní? Sumate a <Link to="/expertos" className="font-semibold text-primary underline">Expertos Jaikuaa</Link>.</p>
         </section>
       </main>
       <SiteFooter />

@@ -12,12 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as ArRouteImport } from './routes/ar'
+import { Route as AtendemosRouteImport } from './routes/atendemos'
 import { Route as AuspiciantesRouteImport } from './routes/auspiciantes'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CineRouteImport } from './routes/cine'
 import { Route as ComenzarRouteImport } from './routes/comenzar'
 import { Route as DeRouteImport } from './routes/de'
 import { Route as EnRouteImport } from './routes/en'
+import { Route as ExpertosRouteImport } from './routes/expertos'
 import { Route as FichaAuspiciantesRouteImport } from './routes/ficha-auspiciantes'
 import { Route as FichaTecnicaRouteImport } from './routes/ficha-tecnica'
 import { Route as FrRouteImport } from './routes/fr'
@@ -123,6 +125,11 @@ const ArRoute = ArRouteImport.update({
   path: '/ar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AtendemosRoute = AtendemosRouteImport.update({
+  id: '/atendemos',
+  path: '/atendemos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuspiciantesRoute = AuspiciantesRouteImport.update({
   id: '/auspiciantes',
   path: '/auspiciantes',
@@ -151,6 +158,11 @@ const DeRoute = DeRouteImport.update({
 const EnRoute = EnRouteImport.update({
   id: '/en',
   path: '/en',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExpertosRoute = ExpertosRouteImport.update({
+  id: '/expertos',
+  path: '/expertos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FichaAuspiciantesRoute = FichaAuspiciantesRouteImport.update({
@@ -649,12 +661,14 @@ const AuthenticatedCursoLangLeccionNRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ar': typeof ArRoute
+  '/atendemos': typeof AtendemosRoute
   '/auspiciantes': typeof AuspiciantesRoute
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
   '/comenzar': typeof ComenzarRoute
   '/de': typeof DeRoute
   '/en': typeof EnRoute
+  '/expertos': typeof ExpertosRoute
   '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/ficha-tecnica': typeof FichaTecnicaRoute
   '/fr': typeof FrRoute
@@ -749,12 +763,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ar': typeof ArRoute
+  '/atendemos': typeof AtendemosRoute
   '/auspiciantes': typeof AuspiciantesRoute
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
   '/comenzar': typeof ComenzarRoute
   '/de': typeof DeRoute
   '/en': typeof EnRoute
+  '/expertos': typeof ExpertosRoute
   '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/ficha-tecnica': typeof FichaTecnicaRoute
   '/fr': typeof FrRoute
@@ -848,12 +864,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/ar': typeof ArRoute
+  '/atendemos': typeof AtendemosRoute
   '/auspiciantes': typeof AuspiciantesRoute
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
   '/comenzar': typeof ComenzarRoute
   '/de': typeof DeRoute
   '/en': typeof EnRoute
+  '/expertos': typeof ExpertosRoute
   '/ficha-auspiciantes': typeof FichaAuspiciantesRoute
   '/ficha-tecnica': typeof FichaTecnicaRoute
   '/fr': typeof FrRoute
@@ -950,12 +968,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/ar'
+    | '/atendemos'
     | '/auspiciantes'
     | '/auth'
     | '/cine'
     | '/comenzar'
     | '/de'
     | '/en'
+    | '/expertos'
     | '/ficha-auspiciantes'
     | '/ficha-tecnica'
     | '/fr'
@@ -1050,12 +1070,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/ar'
+    | '/atendemos'
     | '/auspiciantes'
     | '/auth'
     | '/cine'
     | '/comenzar'
     | '/de'
     | '/en'
+    | '/expertos'
     | '/ficha-auspiciantes'
     | '/ficha-tecnica'
     | '/fr'
@@ -1148,12 +1170,14 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/ar'
+    | '/atendemos'
     | '/auspiciantes'
     | '/auth'
     | '/cine'
     | '/comenzar'
     | '/de'
     | '/en'
+    | '/expertos'
     | '/ficha-auspiciantes'
     | '/ficha-tecnica'
     | '/fr'
@@ -1250,12 +1274,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   ArRoute: typeof ArRoute
+  AtendemosRoute: typeof AtendemosRoute
   AuspiciantesRoute: typeof AuspiciantesRoute
   AuthRoute: typeof AuthRoute
   CineRoute: typeof CineRoute
   ComenzarRoute: typeof ComenzarRoute
   DeRoute: typeof DeRoute
   EnRoute: typeof EnRoute
+  ExpertosRoute: typeof ExpertosRoute
   FichaAuspiciantesRoute: typeof FichaAuspiciantesRoute
   FichaTecnicaRoute: typeof FichaTecnicaRoute
   FrRoute: typeof FrRoute
@@ -1312,6 +1338,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/atendemos': {
+      id: '/atendemos'
+      path: '/atendemos'
+      fullPath: '/atendemos'
+      preLoaderRoute: typeof AtendemosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auspiciantes': {
       id: '/auspiciantes'
       path: '/auspiciantes'
@@ -1352,6 +1385,13 @@ declare module '@tanstack/react-router' {
       path: '/en'
       fullPath: '/en'
       preLoaderRoute: typeof EnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/expertos': {
+      id: '/expertos'
+      path: '/expertos'
+      fullPath: '/expertos'
+      preLoaderRoute: typeof ExpertosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ficha-auspiciantes': {
@@ -2163,12 +2203,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   ArRoute: ArRoute,
+  AtendemosRoute: AtendemosRoute,
   AuspiciantesRoute: AuspiciantesRoute,
   AuthRoute: AuthRoute,
   CineRoute: CineRoute,
   ComenzarRoute: ComenzarRoute,
   DeRoute: DeRoute,
   EnRoute: EnRoute,
+  ExpertosRoute: ExpertosRoute,
   FichaAuspiciantesRoute: FichaAuspiciantesRoute,
   FichaTecnicaRoute: FichaTecnicaRoute,
   FrRoute: FrRoute,
