@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Printer, Trophy, Gift, Megaphone, ShieldCheck, BarChart3, ArrowLeft } from "lucide-react";
+import { Printer, Trophy, Megaphone, ShieldCheck, BarChart3, ArrowLeft } from "lucide-react";
 import { PrivateGate } from "@/components/private-gate";
 import { BrandLogo } from "@/components/brand-logo";
 
@@ -35,9 +35,9 @@ const FORMATOS = [
     texto: "«Este desafío llega gracias a [tu marca]». Tu nombre acompaña el juego de la semana con tus colores.",
   },
   {
-    icon: Gift,
-    titulo: "Premios por XP",
-    texto: "La gente canjea sus puntos de estudio por un beneficio o descuento de tu marca. Llegás como el que premia el esfuerzo.",
+    icon: Trophy,
+    titulo: "La Copa presentada por tu marca",
+    texto: "«Copa de los Departamentos, presentada por [tu marca]». Acompañás a cada departamento hasta la final, sin sorteos ni premios.",
   },
 ] as const;
 
