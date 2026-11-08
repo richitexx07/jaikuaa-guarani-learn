@@ -60,7 +60,7 @@ const PASOS = [
   { icon: UserPlus, t: "Te sumás", d: "Completás el formulario de abajo. Te respondemos por WhatsApp." },
   { icon: ShieldCheck, t: "Revisamos tus datos", d: "Tus títulos y tu experiencia, antes de mostrar tu perfil. Cada experto responde por su trabajo." },
   { icon: CalendarCheck, t: "Te encuentran", d: "Tu perfil aparece con tu especialidad, tus horarios y tu precio." },
-  { icon: HandCoins, t: "Cobrás", d: "En las clases, el docente se queda con el 70 %. En las traducciones, el reparto se firma con cada traductor." },
+  { icon: HandCoins, t: "Cobrás", d: "Las condiciones de cada clase y de cada traducción se acuerdan por escrito con cada experto." },
 ];
 
 function ExpertosPage() {
