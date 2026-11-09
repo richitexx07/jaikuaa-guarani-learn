@@ -25,7 +25,8 @@ export const Route = createFileRoute("/_authenticated")({
     // Los enlaces de reto (?reto=) sí piden cuenta: el reto guarda nombre y puntaje de cada uno.
     // Los retos de la base (con tabla) piden cuenta; los que viajan en el enlace (los que manda un invitado), no.
     const retoRaw = new URL(location.href, "https://www.jaikuaa.com").searchParams.get("reto");
-    const retoSinCuenta = !retoRaw || decodeReto(retoRaw) !== null;
+    // Quien recibe un reto por WhatsApp entra a jugar la misma partida sin crear cuenta.
+    const retoSinCuenta = !retoRaw || decodeReto(retoRaw) !== null || /^[A-Za-z0-9]{6,12}$/.test(retoRaw);
     const guest = isGuestPath(location.pathname) && retoSinCuenta ? { user: null as User | null } : null;
     if (isOffline()) {
       const ok = offlineUser();

@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { crearReto, guardarResultadoReto, verReto, type RetoGuardado, type RetoResultado } from "@/lib/reto.functions";
+import { crearReto, guardarResultadoReto, verReto, verRetoPublico, type RetoGuardado, type RetoResultado } from "@/lib/reto.functions";
 import { useIsGuest } from "@/lib/guest";
 import { rememberAfterLogin } from "@/lib/after-login";
 import { decodeReto, newSeed, RETO_NOMBRE, RETO_RUTA, retoUrl, veredicto, type RetoJuego } from "@/lib/reto";
@@ -94,7 +94,10 @@ export function puntajeDe(r: Pick<RetoActivo, "t" | "u">, p: number) {
  */
 export function useRetoPartida(juego: RetoJuego, meta: MetaReto) {
   const qc = useQueryClient();
-  const verFn = useServerFn(verReto);
+  const verConCuenta = useServerFn(verReto);
+  const verSinCuenta = useServerFn(verRetoPublico);
+  const esInvitado = useIsGuest();
+  const verFn = esInvitado ? verSinCuenta : verConCuenta;
   const crearFn = useServerFn(crearReto);
   const inicial = useRef(retoParam());
   const legacy = inicial.current && !ID_RE.test(inicial.current) ? decodeReto(inicial.current) : null;
@@ -105,7 +108,7 @@ export function useRetoPartida(juego: RetoJuego, meta: MetaReto) {
   const [seedLocal, setSeedLocal] = useState<number>(() => viejo?.s ?? newSeed());
 
   const q = useQuery({
-    queryKey: ["reto", id],
+    queryKey: ["reto", id, esInvitado],
     enabled: !!id,
     queryFn: () => verFn({ data: { id: id! } }),
     refetchInterval: 20_000,
@@ -156,7 +159,7 @@ export function useRetoPartida(juego: RetoJuego, meta: MetaReto) {
     [crearFn, juego, meta.total, meta.unidad, meta.menosEsMejor, qc, seed],
   );
 
-  const actualizar = useCallback((r: RetoGuardado) => qc.setQueryData(["reto", r.id], { reto: r }), [qc]);
+  const actualizar = useCallback((r: RetoGuardado) => qc.setQueryData(["reto", r.id, false], { reto: r }), [qc]);
 
   return { juego, meta, reto, seed, cargando, noExiste, otra, crear, actualizar };
 }
@@ -241,7 +244,7 @@ export function RetoBanner({ partida, extra, total, coincide = true, className =
   const guest = useIsGuest();
 
   // Sin cuenta: no se arman tablas, pero si llegó por el reto de un amigo, se le muestra quién lo retó.
-  if (guest && !(r && !r.id)) return null;
+  if (guest && !r && !partida.cargando) return null;
 
   if (partida.cargando) {
     return (

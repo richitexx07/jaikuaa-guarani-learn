@@ -126,6 +126,14 @@ export const verReto = createServerFn({ method: "GET" })
     return { reto: await cargar(db, data.id, context.userId) };
   });
 
+/** Ver un reto sin cuenta: quien recibe el enlace por WhatsApp entra a la misma partida. */
+export const verRetoPublico = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({ id: z.string().regex(/^[A-Za-z0-9]{6,12}$/) }).parse(d))
+  .handler(async ({ data }) => {
+    const db = await admin();
+    return { reto: await cargar(db, data.id, "00000000-0000-0000-0000-000000000000") };
+  });
+
 export const guardarResultadoReto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
