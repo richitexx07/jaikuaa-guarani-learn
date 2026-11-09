@@ -12,6 +12,8 @@ export function showsBackButton(pathname: string): boolean {
   if (p === "/juegos" || p.startsWith("/juegos/")) return false;
   // Trivia, teclado y «Pronunciá» ya tienen su «Volver»/«Salir» arriba, y abajo sus botones de acción.
   if (p.startsWith("/trivia/") || p === "/teclado" || p === "/pronunciar") return false;
+  // El lector de libros tiene «←» arriba y sus botones de página abajo.
+  if (p.startsWith("/leer/")) return false;
   return !HIDDEN.has(p);
 }
 

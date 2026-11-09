@@ -56,6 +56,7 @@ import { staffStatusRefreshInterval } from "@/lib/staff-status-refresh";
 import { OfflinePackCard } from "@/components/offline/offline-pack-card";
 import { AulaPendientes } from "@/components/aula/aula-pendientes";
 import { NovedadLibreria } from "@/components/libreria/novedad-libreria";
+import { MisLibrosAcceso } from "@/components/libreria/mis-libros-acceso";
 import { RetoCard } from "@/components/games/reto-card";
 import jaiImg from "@/assets/jai/jai-saluda.webp";
 import { NandutiDisc } from "@/components/nanduti-disc";
@@ -129,6 +130,7 @@ function StaffShortcuts() {
         {data.isAdmin && <StaffLink href="/admin/corpus?tab=tablero" icon={BarChart3} label="Analíticas en vivo" />}
         {data.isAdmin && <StaffLink href="/studio" icon={FlaskConical} label="Jaikuaa Studio · motor en desarrollo" />}
         {data.isAdmin && <StaffLink to="/admin/noticias" icon={Newspaper} label="Noticias para aprobar" />}
+        {data.isAdmin && <StaffLink to="/admin/libros" icon={BookOpen} label="Librería: libros y accesos" />}
         {data.isAdmin && <StaffLink to="/admin/jai" icon={MessageCircleQuestion} label="Qué le preguntan a Jai" />}
       </div>
     </section>
@@ -506,6 +508,7 @@ function Dashboard() {
 
           {/* NOVEDAD — Librería Jaikuaa */}
           <NovedadLibreria />
+          <MisLibrosAcceso />
 
           {/* RETAR — la tarjeta de «¿Quién sabe más guaraní?», con su código de embajador */}
           <RetoCard guest={false} />

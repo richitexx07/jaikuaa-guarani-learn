@@ -56,6 +56,7 @@ import { Route as AuthenticatedGlosarioRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedGuaraniEscolarRouteImport } from './routes/_authenticated/guarani-escolar'
 import { Route as AuthenticatedLaboratorioRouteImport } from './routes/_authenticated/laboratorio'
 import { Route as AuthenticatedLogrosRouteImport } from './routes/_authenticated/logros'
+import { Route as AuthenticatedMisLibrosRouteImport } from './routes/_authenticated/mis-libros'
 import { Route as AuthenticatedNheMbytepeRouteImport } from './routes/_authenticated/nhe-mbytepe'
 import { Route as AuthenticatedPronunciarRouteImport } from './routes/_authenticated/pronunciar'
 import { Route as AuthenticatedRankingRouteImport } from './routes/_authenticated/ranking'
@@ -71,6 +72,7 @@ import { Route as VerificarCodeRouteImport } from './routes/verificar.$code'
 import { Route as AuthenticatedAdminCorpusRouteImport } from './routes/_authenticated/admin.corpus'
 import { Route as AuthenticatedAdminInformeAuspicianteRouteImport } from './routes/_authenticated/admin.informe-auspiciante'
 import { Route as AuthenticatedAdminJaiRouteImport } from './routes/_authenticated/admin.jai'
+import { Route as AuthenticatedAdminLibrosRouteImport } from './routes/_authenticated/admin.libros'
 import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
 import { Route as AuthenticatedAulaIndexRouteImport } from './routes/_authenticated/aula.index'
 import { Route as AuthenticatedAulaIdRouteImport } from './routes/_authenticated/aula.$id'
@@ -99,6 +101,7 @@ import { Route as AuthenticatedJuegosTekojojaRouteImport } from './routes/_authe
 import { Route as AuthenticatedJuegosTembiuRouteImport } from './routes/_authenticated/juegos.tembiu'
 import { Route as AuthenticatedJuegosTriviaDueloRouteImport } from './routes/_authenticated/juegos.trivia-duelo'
 import { Route as AuthenticatedJuegosVentanillaRouteImport } from './routes/_authenticated/juegos.ventanilla'
+import { Route as AuthenticatedLeerIdRouteImport } from './routes/_authenticated/leer.$id'
 import { Route as AuthenticatedMostradorIndexRouteImport } from './routes/_authenticated/mostrador.index'
 import { Route as AuthenticatedMostradorEditarRouteImport } from './routes/_authenticated/mostrador.editar'
 import { Route as AuthenticatedPracticaIndexRouteImport } from './routes/_authenticated/practica.index'
@@ -349,6 +352,11 @@ const AuthenticatedLogrosRoute = AuthenticatedLogrosRouteImport.update({
   path: '/logros',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMisLibrosRoute = AuthenticatedMisLibrosRouteImport.update({
+  id: '/mis-libros',
+  path: '/mis-libros',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedNheMbytepeRoute = AuthenticatedNheMbytepeRouteImport.update({
   id: '/nhe-mbytepe',
   path: '/nhe-mbytepe',
@@ -426,6 +434,12 @@ const AuthenticatedAdminJaiRoute = AuthenticatedAdminJaiRouteImport.update({
   path: '/admin/jai',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminLibrosRoute =
+  AuthenticatedAdminLibrosRouteImport.update({
+    id: '/admin/libros',
+    path: '/admin/libros',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminNoticiasRoute =
   AuthenticatedAdminNoticiasRouteImport.update({
     id: '/admin/noticias',
@@ -591,6 +605,11 @@ const AuthenticatedJuegosVentanillaRoute =
     path: '/juegos/ventanilla',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLeerIdRoute = AuthenticatedLeerIdRouteImport.update({
+  id: '/leer/$id',
+  path: '/leer/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMostradorIndexRoute =
   AuthenticatedMostradorIndexRouteImport.update({
     id: '/mostrador/',
@@ -705,6 +724,7 @@ export interface FileRoutesByFullPath {
   '/guarani-escolar': typeof AuthenticatedGuaraniEscolarRouteWithChildren
   '/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/logros': typeof AuthenticatedLogrosRoute
+  '/mis-libros': typeof AuthenticatedMisLibrosRoute
   '/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
   '/pronunciar': typeof AuthenticatedPronunciarRoute
   '/ranking': typeof AuthenticatedRankingRoute
@@ -720,6 +740,7 @@ export interface FileRoutesByFullPath {
   '/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
+  '/admin/libros': typeof AuthenticatedAdminLibrosRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/aula/$id': typeof AuthenticatedAulaIdRoute
   '/aula/docente': typeof AuthenticatedAulaDocenteRoute
@@ -744,6 +765,7 @@ export interface FileRoutesByFullPath {
   '/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
   '/juegos/ventanilla': typeof AuthenticatedJuegosVentanillaRoute
+  '/leer/$id': typeof AuthenticatedLeerIdRoute
   '/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
@@ -806,6 +828,7 @@ export interface FileRoutesByTo {
   '/glosario': typeof AuthenticatedGlosarioRoute
   '/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/logros': typeof AuthenticatedLogrosRoute
+  '/mis-libros': typeof AuthenticatedMisLibrosRoute
   '/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
   '/pronunciar': typeof AuthenticatedPronunciarRoute
   '/ranking': typeof AuthenticatedRankingRoute
@@ -821,6 +844,7 @@ export interface FileRoutesByTo {
   '/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
+  '/admin/libros': typeof AuthenticatedAdminLibrosRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/aula/$id': typeof AuthenticatedAulaIdRoute
   '/aula/docente': typeof AuthenticatedAulaDocenteRoute
@@ -843,6 +867,7 @@ export interface FileRoutesByTo {
   '/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
   '/juegos/ventanilla': typeof AuthenticatedJuegosVentanillaRoute
+  '/leer/$id': typeof AuthenticatedLeerIdRoute
   '/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
@@ -908,6 +933,7 @@ export interface FileRoutesById {
   '/_authenticated/guarani-escolar': typeof AuthenticatedGuaraniEscolarRouteWithChildren
   '/_authenticated/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/_authenticated/logros': typeof AuthenticatedLogrosRoute
+  '/_authenticated/mis-libros': typeof AuthenticatedMisLibrosRoute
   '/_authenticated/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
   '/_authenticated/pronunciar': typeof AuthenticatedPronunciarRoute
   '/_authenticated/ranking': typeof AuthenticatedRankingRoute
@@ -923,6 +949,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/_authenticated/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/_authenticated/admin/jai': typeof AuthenticatedAdminJaiRoute
+  '/_authenticated/admin/libros': typeof AuthenticatedAdminLibrosRoute
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/_authenticated/aula/$id': typeof AuthenticatedAulaIdRoute
   '/_authenticated/aula/docente': typeof AuthenticatedAulaDocenteRoute
@@ -947,6 +974,7 @@ export interface FileRoutesById {
   '/_authenticated/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/_authenticated/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
   '/_authenticated/juegos/ventanilla': typeof AuthenticatedJuegosVentanillaRoute
+  '/_authenticated/leer/$id': typeof AuthenticatedLeerIdRoute
   '/_authenticated/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
   '/_authenticated/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/_authenticated/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
@@ -1012,6 +1040,7 @@ export interface FileRouteTypes {
     | '/guarani-escolar'
     | '/laboratorio'
     | '/logros'
+    | '/mis-libros'
     | '/nhe-mbytepe'
     | '/pronunciar'
     | '/ranking'
@@ -1027,6 +1056,7 @@ export interface FileRouteTypes {
     | '/admin/corpus'
     | '/admin/informe-auspiciante'
     | '/admin/jai'
+    | '/admin/libros'
     | '/admin/noticias'
     | '/aula/$id'
     | '/aula/docente'
@@ -1051,6 +1081,7 @@ export interface FileRouteTypes {
     | '/juegos/tembiu'
     | '/juegos/trivia-duelo'
     | '/juegos/ventanilla'
+    | '/leer/$id'
     | '/mostrador/editar'
     | '/practica/registro'
     | '/trivia/$category'
@@ -1113,6 +1144,7 @@ export interface FileRouteTypes {
     | '/glosario'
     | '/laboratorio'
     | '/logros'
+    | '/mis-libros'
     | '/nhe-mbytepe'
     | '/pronunciar'
     | '/ranking'
@@ -1128,6 +1160,7 @@ export interface FileRouteTypes {
     | '/admin/corpus'
     | '/admin/informe-auspiciante'
     | '/admin/jai'
+    | '/admin/libros'
     | '/admin/noticias'
     | '/aula/$id'
     | '/aula/docente'
@@ -1150,6 +1183,7 @@ export interface FileRouteTypes {
     | '/juegos/tembiu'
     | '/juegos/trivia-duelo'
     | '/juegos/ventanilla'
+    | '/leer/$id'
     | '/mostrador/editar'
     | '/practica/registro'
     | '/trivia/$category'
@@ -1214,6 +1248,7 @@ export interface FileRouteTypes {
     | '/_authenticated/guarani-escolar'
     | '/_authenticated/laboratorio'
     | '/_authenticated/logros'
+    | '/_authenticated/mis-libros'
     | '/_authenticated/nhe-mbytepe'
     | '/_authenticated/pronunciar'
     | '/_authenticated/ranking'
@@ -1229,6 +1264,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/corpus'
     | '/_authenticated/admin/informe-auspiciante'
     | '/_authenticated/admin/jai'
+    | '/_authenticated/admin/libros'
     | '/_authenticated/admin/noticias'
     | '/_authenticated/aula/$id'
     | '/_authenticated/aula/docente'
@@ -1253,6 +1289,7 @@ export interface FileRouteTypes {
     | '/_authenticated/juegos/tembiu'
     | '/_authenticated/juegos/trivia-duelo'
     | '/_authenticated/juegos/ventanilla'
+    | '/_authenticated/leer/$id'
     | '/_authenticated/mostrador/editar'
     | '/_authenticated/practica/registro'
     | '/_authenticated/trivia/$category'
@@ -1646,6 +1683,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLogrosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mis-libros': {
+      id: '/_authenticated/mis-libros'
+      path: '/mis-libros'
+      fullPath: '/mis-libros'
+      preLoaderRoute: typeof AuthenticatedMisLibrosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/nhe-mbytepe': {
       id: '/_authenticated/nhe-mbytepe'
       path: '/nhe-mbytepe'
@@ -1749,6 +1793,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/jai'
       fullPath: '/admin/jai'
       preLoaderRoute: typeof AuthenticatedAdminJaiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/libros': {
+      id: '/_authenticated/admin/libros'
+      path: '/admin/libros'
+      fullPath: '/admin/libros'
+      preLoaderRoute: typeof AuthenticatedAdminLibrosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/noticias': {
@@ -1947,6 +1998,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJuegosVentanillaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/leer/$id': {
+      id: '/_authenticated/leer/$id'
+      path: '/leer/$id'
+      fullPath: '/leer/$id'
+      preLoaderRoute: typeof AuthenticatedLeerIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/mostrador/': {
       id: '/_authenticated/mostrador/'
       path: '/mostrador'
@@ -2096,6 +2154,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGuaraniEscolarRoute: typeof AuthenticatedGuaraniEscolarRouteWithChildren
   AuthenticatedLaboratorioRoute: typeof AuthenticatedLaboratorioRoute
   AuthenticatedLogrosRoute: typeof AuthenticatedLogrosRoute
+  AuthenticatedMisLibrosRoute: typeof AuthenticatedMisLibrosRoute
   AuthenticatedNheMbytepeRoute: typeof AuthenticatedNheMbytepeRoute
   AuthenticatedPronunciarRoute: typeof AuthenticatedPronunciarRoute
   AuthenticatedRankingRoute: typeof AuthenticatedRankingRoute
@@ -2106,6 +2165,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminCorpusRoute: typeof AuthenticatedAdminCorpusRoute
   AuthenticatedAdminInformeAuspicianteRoute: typeof AuthenticatedAdminInformeAuspicianteRoute
   AuthenticatedAdminJaiRoute: typeof AuthenticatedAdminJaiRoute
+  AuthenticatedAdminLibrosRoute: typeof AuthenticatedAdminLibrosRoute
   AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
   AuthenticatedAulaIdRoute: typeof AuthenticatedAulaIdRoute
   AuthenticatedAulaDocenteRoute: typeof AuthenticatedAulaDocenteRoute
@@ -2127,6 +2187,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedJuegosTembiuRoute: typeof AuthenticatedJuegosTembiuRoute
   AuthenticatedJuegosTriviaDueloRoute: typeof AuthenticatedJuegosTriviaDueloRoute
   AuthenticatedJuegosVentanillaRoute: typeof AuthenticatedJuegosVentanillaRoute
+  AuthenticatedLeerIdRoute: typeof AuthenticatedLeerIdRoute
   AuthenticatedMostradorEditarRoute: typeof AuthenticatedMostradorEditarRoute
   AuthenticatedPracticaRegistroRoute: typeof AuthenticatedPracticaRegistroRoute
   AuthenticatedTriviaCategoryRoute: typeof AuthenticatedTriviaCategoryRoute
@@ -2151,6 +2212,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedGuaraniEscolarRouteWithChildren,
   AuthenticatedLaboratorioRoute: AuthenticatedLaboratorioRoute,
   AuthenticatedLogrosRoute: AuthenticatedLogrosRoute,
+  AuthenticatedMisLibrosRoute: AuthenticatedMisLibrosRoute,
   AuthenticatedNheMbytepeRoute: AuthenticatedNheMbytepeRoute,
   AuthenticatedPronunciarRoute: AuthenticatedPronunciarRoute,
   AuthenticatedRankingRoute: AuthenticatedRankingRoute,
@@ -2162,6 +2224,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminInformeAuspicianteRoute:
     AuthenticatedAdminInformeAuspicianteRoute,
   AuthenticatedAdminJaiRoute: AuthenticatedAdminJaiRoute,
+  AuthenticatedAdminLibrosRoute: AuthenticatedAdminLibrosRoute,
   AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
   AuthenticatedAulaIdRoute: AuthenticatedAulaIdRoute,
   AuthenticatedAulaDocenteRoute: AuthenticatedAulaDocenteRoute,
@@ -2183,6 +2246,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedJuegosTembiuRoute: AuthenticatedJuegosTembiuRoute,
   AuthenticatedJuegosTriviaDueloRoute: AuthenticatedJuegosTriviaDueloRoute,
   AuthenticatedJuegosVentanillaRoute: AuthenticatedJuegosVentanillaRoute,
+  AuthenticatedLeerIdRoute: AuthenticatedLeerIdRoute,
   AuthenticatedMostradorEditarRoute: AuthenticatedMostradorEditarRoute,
   AuthenticatedPracticaRegistroRoute: AuthenticatedPracticaRegistroRoute,
   AuthenticatedTriviaCategoryRoute: AuthenticatedTriviaCategoryRoute,

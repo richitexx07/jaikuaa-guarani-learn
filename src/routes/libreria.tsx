@@ -9,6 +9,7 @@ import jaiProfe from "@/assets/jai-profe.webp";
 import coverConsultorio from "@/assets/covers/cover-consultorio.webp";
 import { MarketingHeader } from "@/components/marketing/page-parts";
 import { LIB_COLORES, Nanduti } from "@/components/libreria/arte";
+import { CatalogoLibreria } from "@/components/libreria/catalogo";
 import {
   BookOpen, Headphones, Globe2, HandCoins, Stethoscope, Scale, Languages,
   Feather, GraduationCap, Send, FileText, Mic, CheckCircle2, Building2, PenLine, ArrowRight,
@@ -169,6 +170,9 @@ function LibreriaPage() {
             </div>
           </div>
         </section>
+
+        {/* Libros ya publicados (si hay) */}
+        <CatalogoLibreria />
 
         {/* Estantería de verdad: lomos de libros sobre una tabla de madera */}
         <section className="px-4 pb-16 pt-4 sm:px-6" style={{ background: C.papel }}>
