@@ -44,7 +44,9 @@ const RESPALDOS: Respaldo[] = [
     who: "Honorable Cámara de Diputados",
     doc: "Declaración N.° 2001",
     what: "De interés nacional y educativo",
-    detail: "Aprobada por la Cámara de Diputados en octubre de 2026.",
+    detail:
+      "Dada en sesión del 20 de octubre de 2026 y remitida por nota NHCD N.° 5140 del 9 de noviembre de 2026. Insta al Ministerio de Educación y Ciencias, a la Secretaría de Políticas Lingüísticas y a las instituciones educativas a difundir y aprovechar pedagógicamente la plataforma.",
+    pdf: "/respaldos/diputados-declaracion-2001-2026.pdf",
   },
   {
     who: "Secretaría de Políticas Lingüísticas",
