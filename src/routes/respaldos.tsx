@@ -37,7 +37,7 @@ const RESPALDOS: Respaldo[] = [
     doc: "Declaración N.° 547/2026",
     what: "De interés nacional y educativo",
     detail:
-      "Dictada en sesión del 26 de agosto de 2026. Insta al Ministerio de Educación y Ciencias, a la Secretaría de Políticas Lingüísticas y a las instituciones educativas a difundir y aprovechar pedagógicamente la plataforma.",
+      "Dictada en sesión del 26 de agosto de 2026 y remitida por nota MHCS N.° 3867 del 27 de agosto de 2026. Insta al Ministerio de Educación y Ciencias, a la Secretaría de Políticas Lingüísticas y a las instituciones educativas a difundir y aprovechar pedagógicamente la plataforma.",
     pdf: "/respaldos/senado-declaracion-547-2026.pdf",
   },
   {
