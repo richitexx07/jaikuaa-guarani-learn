@@ -87,7 +87,7 @@ function ExpertosPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <MarketingHeader accion={<a href="#sumate" className="shrink-0"><Button size="sm">Sumarme</Button></a>} />
-      <main className="flex-1">
+      <main className="flex-1 pb-24 md:pb-0">
         {/* Portada */}
         <section className="relative overflow-hidden px-4 pb-16 pt-10 text-white sm:px-6 sm:pt-14" style={{ background: `radial-gradient(90% 70% at 50% 25%, #1E5A62 0%, ${C.azul} 45%, ${C.noche} 100%)` }}>
           <Nanduti className="pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] text-white/10 sm:h-[560px] sm:w-[560px]" />

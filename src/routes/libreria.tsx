@@ -111,7 +111,7 @@ function LibreriaPage() {
       <style>{CSS}</style>
       <MarketingHeader accion={<a href="#postular" className="shrink-0"><Button size="sm">Postular mi obra</Button></a>} />
 
-      <main className="flex-1">
+      <main className="flex-1 pb-24 md:pb-0">
         {/* Portada: de noche, con encaje de ñandutí, el Jai lector y un libro que habla */}
         <section className="relative overflow-hidden px-4 pb-16 pt-10 text-white sm:px-6 sm:pt-14" style={{ background: `radial-gradient(90% 70% at 50% 30%, #24497A 0%, ${C.azul} 40%, ${C.noche} 100%)` }}>
           <Nanduti className="pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] text-white/10 sm:h-[560px] sm:w-[560px]" />
@@ -290,7 +290,7 @@ function LibreriaPage() {
               <div>
                 <label className="text-sm font-medium" htmlFor="lb-area">Área</label>
                 <select id="lb-area" value={area} onChange={(e) => setArea(e.target.value)}
-                  className="mt-1 h-11 w-full rounded-md border border-input bg-background px-3 text-sm">
+                  className="mt-1 h-11 w-full rounded-md border border-input bg-background px-3 text-base md:text-sm">
                   {AREAS.map((a) => <option key={a.name}>{a.name}</option>)}
                   <option>Otra</option>
                 </select>
