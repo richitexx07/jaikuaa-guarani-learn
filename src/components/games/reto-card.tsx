@@ -10,10 +10,6 @@ import { Copy, MessageCircle, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppLang, type AppLang } from "@/lib/i18n";
 import { getAmbassadorInfo } from "@/lib/ambassador.functions";
-import { crearReto } from "@/lib/reto.functions";
-import { newSeed } from "@/lib/reto";
-
-const TOTAL = { penales: 5, consultorio: 8, karaoke: 20 } as const;
 import { COVER_IMAGE } from "@/components/games/game-cover-images";
 import jaiEmbajador from "@/assets/jai/jai-embajador.webp";
 import jaiGamer from "@/assets/jai-gamer.webp";
@@ -121,30 +117,16 @@ export function RetoCard({ guest }: { guest: boolean }) {
   const fetchInfo = useServerFn(getAmbassadorInfo);
   const { data } = useQuery({ queryKey: ["ambassador"], queryFn: () => fetchInfo(), enabled: !guest, retry: false, staleTime: 10 * 60 * 1000 });
   const codigo = !guest && data?.code && /^[A-F0-9]{8}$/i.test(data.code) ? data.code.toUpperCase() : null;
-  // Con cuenta: se arma un reto de verdad (misma partida para los dos) apenas se elige el juego.
-  const crearFn = useServerFn(crearReto);
-  const juegoReto = op.id === "todos" ? null : op.id;
-  const retoQ = useQuery({
-    queryKey: ["reto-card", juegoReto],
-    enabled: !guest && !!juegoReto,
-    staleTime: 30 * 60 * 1000,
-    retry: 1,
-    queryFn: () => crearFn({ data: { juego: juegoReto!, semilla: newSeed(), total: TOTAL[juegoReto!] } }),
-  });
-  const retoId = juegoReto && !guest ? retoQ.data?.id ?? null : null;
-  const preparando = !guest && !!juegoReto && !retoId;
+  // Un juego elegido: primero jugás vos; al terminar, el juego arma el reto con tu puntaje y la misma partida.
+  const juegoReto = op.id !== "todos";
+  const preparando = false;
+  const entrarYo = () => {};
   const enlace = useMemo(() => {
     const ps = new URLSearchParams();
-    if (retoId) ps.set("reto", retoId);
     ps.set("de", "reto");
     if (codigo) ps.set("ref", codigo);
     return `https://www.jaikuaa.com${op.ruta}?${ps.toString()}`;
-  }, [op.ruta, codigo, retoId]);
-  const entrarYo = () => {
-    if (!retoId) return;
-    const ruta = `${op.ruta}?reto=${retoId}`;
-    window.setTimeout(() => { window.location.href = ruta; }, 600);
-  };
+  }, [op.ruta, codigo]);
   const texto = `${op.mensaje[lang] ?? op.mensaje.es} ${enlace}`;
   const [nativo, setNativo] = useState(false);
   useEffect(() => setNativo(typeof navigator !== "undefined" && typeof navigator.share === "function"), []);
@@ -201,6 +183,19 @@ export function RetoCard({ guest }: { guest: boolean }) {
         })}
       </div>
 
+      {juegoReto ? (
+        <>
+          <a
+            href={op.ruta}
+            className="rc-pulse relative mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 font-display text-lg font-bold text-[#0E7A3D] shadow-xl transition active:scale-[.98]"
+          >
+            Jugar mi partida de {op.nombre[lang] ?? op.nombre.es}
+          </a>
+          <p className="relative mt-2 text-center text-sm text-white/90">
+            Al terminar, tocás «Retar con esta partida» y le mandás tu puntaje por WhatsApp. Tu amigo juega la misma partida, sin crear cuenta.
+          </p>
+        </>
+      ) : (<>
       <a
         href={preparando ? undefined : `https://wa.me/?text=${encodeURIComponent(texto)}`}
         aria-disabled={preparando}
@@ -230,12 +225,7 @@ export function RetoCard({ guest }: { guest: boolean }) {
           <Copy className="h-4 w-4" /> {t("copiar")}
         </button>
       </div>
-      {retoId && (
-        <a href={`${op.ruta}?reto=${retoId}`} className="relative mt-2 flex h-11 items-center justify-center rounded-xl bg-[#F6C445] text-sm font-bold text-[#3A1A05]">
-          Entrar yo a la partida
-        </a>
-      )}
-      {preparando && <p className="relative mt-2 text-center text-xs text-white/80">Preparando la partida…</p>}
+      </>)}
       {codigo && <p className="relative mt-3 text-center text-xs text-white/80">{t("embajador")}</p>}
     </section>
   );

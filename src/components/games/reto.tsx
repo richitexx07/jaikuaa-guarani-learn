@@ -379,7 +379,7 @@ export function RetoFinal({
   const v = r && !r.id && r.p !== undefined ? veredicto(puntaje, { p: r.p, m: r.m ? 1 : undefined }) : null;
 
   if (guest) {
-    return <RetoInvitado partida={partida} puntaje={puntaje} total={t} extra={extra} legado={r && !r.id ? r : null} className={className} />;
+    return <RetoInvitado partida={partida} puntaje={puntaje} total={t} extra={extra} legado={r && !r.id ? r : r?.id ? (() => { const c = r.resultados?.find((x) => x.nombre === r.n); return c ? { ...r, p: c.puntaje } : null; })() : null} className={className} />;
   }
 
   return (
