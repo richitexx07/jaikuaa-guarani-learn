@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Librería y Expertos: corregir contraste de formularios y comprobar escritura móvil en ambos modos.
 - [x] Tembi'u: dibujos propios de los platos
 - [x] Botón grande «Jugar de nuevo» al terminar (pantalla final compartida)
 - [x] La Chacra: ilustraciones de cada visita

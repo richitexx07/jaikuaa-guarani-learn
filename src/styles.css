@@ -126,6 +126,32 @@
   --sidebar-ring: oklch(0.53037 0.2074 22.317 / 50%);
 }
 
+/* Fixed light surfaces must not inherit dark form tokens from the page. */
+.postulation-light {
+  color-scheme: only light;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.34618 0.07355 256.04);
+  --primary: oklch(0.34618 0.07355 256.04);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.96 0.008 260);
+  --secondary-foreground: oklch(0.34618 0.07355 256.04);
+  --muted-foreground: oklch(0.5 0.05 260);
+  --border: oklch(0.34618 0.07355 256.04 / 25%);
+  --input: oklch(0.34618 0.07355 256.04 / 35%);
+  --ring: oklch(0.53037 0.2074 22.317 / 50%);
+  --postulation-notice: #FFF3D1;
+  color: var(--foreground);
+}
+.postulation-light :is(input, textarea, select) {
+  background-color: var(--background);
+  color: var(--foreground);
+  caret-color: var(--foreground);
+}
+.postulation-voice-notice {
+  background-color: var(--postulation-notice);
+  color: var(--foreground);
+}
+
 @layer base {
   * {
     border-color: var(--color-border);

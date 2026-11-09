@@ -182,7 +182,7 @@ function ExpertosPage() {
         </section>
 
         {/* Formulario */}
-        <section id="sumate" className="scroll-mt-4 px-4 pb-16 pt-4 sm:px-6" style={{ background: C.papel }}>
+        <section id="sumate" className="postulation-light scroll-mt-4 px-4 pb-16 pt-4 sm:px-6" style={{ background: C.papel }}>
           <div className="mx-auto max-w-xl overflow-hidden rounded-3xl bg-white shadow-elegant ring-1 ring-black/5">
             <div className="grid grid-cols-2">
               {(["busco", "soy"] as const).map((k) => (

@@ -261,7 +261,7 @@ function LibreriaPage() {
         </section>
 
         {/* Formulario */}
-        <section id="postular" className="scroll-mt-4 px-4 pb-16 pt-4 sm:px-6" style={{ background: C.papel }}>
+        <section id="postular" className="postulation-light scroll-mt-4 px-4 pb-16 pt-4 sm:px-6" style={{ background: C.papel }}>
           <div className="mx-auto max-w-xl overflow-hidden rounded-3xl bg-white shadow-elegant ring-1 ring-black/5">
             <div className="flex items-center gap-4 px-6 py-5 text-white sm:px-8" style={{ background: `linear-gradient(135deg, ${C.azul}, ${C.noche})` }}>
               <img src={jaiProfe} alt="" width={537} height={720} loading="lazy" className="h-16 w-auto" />
@@ -295,7 +295,7 @@ function LibreriaPage() {
                   <option>Otra</option>
                 </select>
               </div>
-              <label className="flex cursor-pointer items-center gap-3 rounded-xl p-3 text-sm" style={{ background: "#FFF3D1" }}>
+              <label className="postulation-voice-notice flex cursor-pointer items-center gap-3 rounded-xl p-3 text-sm">
                 <input type="checkbox" checked={voz} onChange={(e) => setVoz(e.target.checked)} className="h-5 w-5 accent-[var(--primary)]" />
                 Me interesa que mi libro también hable (voz humana)
               </label>
