@@ -794,6 +794,115 @@ export type Database = {
           },
         ]
       }
+      libro_accesos: {
+        Row: {
+          created_at: string
+          id: string
+          libro_id: string
+          nota: string
+          otorgado_por: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          libro_id: string
+          nota?: string
+          otorgado_por?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          libro_id?: string
+          nota?: string
+          otorgado_por?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "libro_accesos_libro_id_fkey"
+            columns: ["libro_id"]
+            isOneToOne: false
+            referencedRelation: "libros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      libro_paginas: {
+        Row: {
+          audio_path: string | null
+          created_at: string
+          id: string
+          imagen_path: string | null
+          libro_id: string
+          n: number
+          texto: string
+        }
+        Insert: {
+          audio_path?: string | null
+          created_at?: string
+          id?: string
+          imagen_path?: string | null
+          libro_id: string
+          n: number
+          texto?: string
+        }
+        Update: {
+          audio_path?: string | null
+          created_at?: string
+          id?: string
+          imagen_path?: string | null
+          libro_id?: string
+          n?: number
+          texto?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "libro_paginas_libro_id_fkey"
+            columns: ["libro_id"]
+            isOneToOne: false
+            referencedRelation: "libros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      libros: {
+        Row: {
+          autor: string
+          creado_por: string | null
+          created_at: string
+          descripcion: string
+          id: string
+          portada_path: string | null
+          publicado: boolean
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          autor?: string
+          creado_por?: string | null
+          created_at?: string
+          descripcion?: string
+          id?: string
+          portada_path?: string | null
+          publicado?: boolean
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          autor?: string
+          creado_por?: string | null
+          created_at?: string
+          descripcion?: string
+          id?: string
+          portada_path?: string | null
+          publicado?: boolean
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mec_capacities: {
         Row: {
           axis: string
