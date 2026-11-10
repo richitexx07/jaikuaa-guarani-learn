@@ -13,6 +13,7 @@ import { useSala } from "@/lib/use-sala";
 import { toast } from "sonner";
 import type { GameWord } from "@/lib/games.functions";
 import { kitSeguro, useMiKit, type Kit } from "@/components/games/penalties/camisetas";
+import { guardarClasico, Hinchada, leerClasico, sumarClasico, textoCargada, type Clasico } from "@/components/games/penalties/hinchada";
 import { BarraEmojis, EmojisFlotando, esEmoji, useReacciones, type Emoji } from "@/components/games/penalties/reacciones";
 
 /**
@@ -52,6 +53,9 @@ export function armarTanda(words: GameWord[], hostUid: string, guestUid: string)
 
 export function PenalesLive({ code, host, words, ledText, muted, onExit }: { code: string; host: boolean; words: GameWord[]; ledText: string; muted: boolean; onExit: () => void }) {
   const feedback = useGameFeedback();
+  const hinchada = useRef(new Hinchada());
+  hinchada.current.muted = muted;
+  useEffect(() => () => hinchada.current.dispose(), []);
   const { flotan, mostrar } = useReacciones();
   const rivalNameRef = useRef("tu rival");
   const [match, setMatch] = useState<Match | null>(null);
@@ -122,6 +126,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
     resultsRef.current = next;
     setResults(next);
     setLast(outcome);
+    hinchada.current.reaccion(outcome);
     const mine = roleOf(matchRef.current);
     if (isGoal(outcome) === (shooter === mine)) feedback("success");
     else feedback("error");
@@ -269,6 +274,8 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
   useEffect(() => {
     if (!corre) return;
     setRestan(TURNO_S);
+    hinchada.current.silbato();
+    hinchada.current.tension(true);
     try { navigator.vibrate?.(120); } catch { /* sin vibración */ }
     const id = window.setInterval(() => setRestan((s) => Math.max(0, s - 1)), 1000);
     return () => window.clearInterval(id);
@@ -295,6 +302,25 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
     const xp = Math.min(20, xpFor(mine) + (!end && myGoals > theirGoals ? 5 : 0));
     if (xp > 0) recordCompletion({ source: "game", sourceRef: "penales", xp });
   }, [doneNow]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Tribuna: suena mientras se juega la tanda y se calla al terminar o si se silencia.
+  const tribuna = inMatch && !showFinal && !muted;
+  useEffect(() => {
+    if (tribuna) hinchada.current.empezar(); else hinchada.current.parar();
+  }, [tribuna]);
+  useEffect(() => { if (last) hinchada.current.tension(false); }, [last]);
+
+  // Historial del clásico contra este rival (se suma una vez por tanda terminada).
+  const rivalId = sala.rival.uid ?? "";
+  const [clasico, setClasico] = useState<Clasico | null>(null);
+  const contado = useRef<Match | null>(null);
+  useEffect(() => {
+    if (!showFinal || !doneNow || end || !rivalId || !match || contado.current === match) return;
+    contado.current = match;
+    const c = sumarClasico(leerClasico(rivalId), myGoals, theirGoals);
+    guardarClasico(rivalId, c);
+    setClasico(c);
+  }, [showFinal, doneNow, end, rivalId, match]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function salir() {
     sala.leave();
@@ -369,7 +395,18 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
           <p className="font-display text-3xl font-bold">{titulo}</p>
           <p className="mt-2 font-display text-6xl font-bold tabular-nums">{myGoals} — {theirGoals}</p>
           <p className="mt-1 text-sm opacity-85">{bajada}</p>
+          {clasico && !end && (
+            <p className="mt-3 rounded-2xl bg-black/20 px-3 py-2 text-sm font-semibold">
+              El clásico: {myName} {clasico.yo} — {clasico.rival} {rivalName}{clasico.empates ? ` · ${clasico.empates} empate${clasico.empates > 1 ? "s" : ""}` : ""}
+            </p>
+          )}
         </div>
+        {!end && (
+          <div className="text-left">
+            <p className="mb-2 text-center text-sm font-bold text-white">Mandá la cargada al grupo</p>
+            <Compartir oscuro url={`${typeof window !== "undefined" ? window.location.origin : ""}/juegos/penales`} texto={textoCargada(myName, rivalName, myGoals, theirGoals, `${typeof window !== "undefined" ? window.location.origin : ""}/juegos/penales?de=reto`)} titulo="Penales en Jaikuaa" />
+          </div>
+        )}
         <div className="flex flex-wrap justify-center gap-2">
           {revancha && (
             <button type="button" onClick={() => (role === "host" ? startMatch() : send("rematch"))} className="inline-flex h-12 items-center gap-2 rounded-2xl px-6 font-bold" style={{ background: P.led, color: P.noche }}>

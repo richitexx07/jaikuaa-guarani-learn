@@ -34,7 +34,8 @@ export function tiroDelRival(seed: number, n: number): { x: number; y: number } 
 /** El tiro ya resuelto: si entendiste, el arquero va al lado del tiro; si no, al otro. */
 export function tiroResuelto(aim: { x: number; y: number }, entendio: boolean, now: number, reduce: boolean): { shot: Shot; dive: Dive } {
   const lado = zoneOf(aim.x);
-  const dive = entendio ? lado : LADOS.filter((l) => l !== lado)[now % 2]!;
+  const alto = aim.y < G.y + G.h * 0.5;
+  const dive: Dive = entendio ? (alto ? (`${lado}-high` as Dive) : lado) : LADOS.filter((l) => l !== lado)[now % 2]!;
   return { shot: resolveShot(aim, 0.7, true, now, reduce, dive), dive };
 }
 
