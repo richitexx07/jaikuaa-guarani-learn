@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import type { GameWord } from "@/lib/games.functions";
 import { kitSeguro, useMiKit, type Kit } from "@/components/games/penalties/camisetas";
 import { guardarClasico, Hinchada, leerClasico, sumarClasico, textoCargada, type Clasico } from "@/components/games/penalties/hinchada";
+import { MonedaJai, type Lado } from "@/components/games/penalties/moneda-jai";
 import { BarraEmojis, EmojisFlotando, esEmoji, useReacciones, type Emoji } from "@/components/games/penalties/reacciones";
 
 /**
@@ -26,7 +27,7 @@ import { BarraEmojis, EmojisFlotando, esEmoji, useReacciones, type Emoji } from 
  */
 
 const P = { noche: "#071A33", led: "#FFB23E", gol: "#3BE38A", mal: "#FF5A4E", blanco: "#F4F7FB", host: "#2F6FDE", guest: "#D9452B" };
-const EVENTS = ["start", "dive", "answer", "aim", "kick", "shot", "sync", "hello", "ended", "llena", "rematch", "kit", "emo"] as const;
+const EVENTS = ["start", "dive", "answer", "aim", "kick", "shot", "sync", "hello", "ended", "llena", "rematch", "kit", "emo", "lado"] as const;
 const GRACE_RIVAL_MS = 30000;
 const GRACE_ME_MS = 45000;
 /** Segundos que tiene el arquero para elegir mientras el pateador responde. */
@@ -43,7 +44,6 @@ export function pateadorEn(primero: Role | undefined, t: number): Role {
   const otro: Role = p === "host" ? "guest" : "host";
   return t % 2 === 0 ? p : otro;
 }
-const MONEDA_MS = 3200;
 type Results = { host: Outcome[]; guest: Outcome[] };
 type End = null | "abandono" | "sin-conexion" | "tarde";
 
@@ -81,6 +81,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
   const [rivalKit, setRivalKit] = useState<Kit | null>(null);
   const [last, setLast] = useState<Outcome | null>(null);
   const [moneda, setMoneda] = useState(false);
+  const [lado, setLado] = useState<Lado | null>(null);
   const [end, setEnd] = useState<End>(null);
   const [llena, setLlena] = useState(false);
   const [confirmExit, setConfirmExit] = useState(false);
@@ -112,7 +113,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
     nextTimer.current = null;
     matchRef.current = m;
     resultsRef.current = r;
-    if (fresh) { recorded.current = false; setMoneda(true); window.setTimeout(() => setMoneda(false), MONEDA_MS); }
+    if (fresh) { recorded.current = false; setLado(null); setMoneda(true); }
     setMatch(m);
     setResults(r);
     setDive(null);
@@ -200,6 +201,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
         // Por las dudas: si mi animación no termina (celular lento), igual se cuenta el penal.
         else window.setTimeout(() => applyShot(tt, p.outcome as Outcome), 3000);
       }
+      else if (e === "lado" && (p.lado === "cara" || p.lado === "cruz")) setLado((x) => x ?? (p.lado as Lado));
       else if (e === "kit") setRivalKit(kitSeguro(p.kit));
       else if (e === "emo" && esEmoji(p.e)) mostrar(p.e, rivalNameRef.current, false);
       else if (e === "rematch" && role === "host") startMatch();
@@ -448,19 +450,16 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
 
   return (
     <div className="space-y-4">
-      {moneda && t === 0 && (
-        <div role="status" aria-live="polite" className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-black/85 p-6 text-center text-white">
-          <style>{`@keyframes jk-moneda{0%{transform:rotateY(0) translateY(0)}50%{transform:rotateY(1440deg) translateY(-90px)}100%{transform:rotateY(2880deg) translateY(0)}}@keyframes jk-aparece{0%,55%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}`}</style>
-          <p className="font-display text-lg font-bold uppercase tracking-wide opacity-85">Sorteo con moneda</p>
-          <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 font-display text-2xl font-black" style={{ background: P.led, color: P.noche, borderColor: P.noche, animation: "jk-moneda 1.8s ease-out forwards" }}>
-            {match.primero === role ? "CARA" : "CRUZ"}
-          </div>
-          <div style={{ animation: "jk-aparece 2s ease-out forwards" }}>
-            <p className="font-display text-2xl font-black">{match.primero === role ? "¡Ganaste el sorteo!" : `Ganó ${rivalName}`}</p>
-            <p className="mt-2 text-base opacity-85">{match.primero === role ? "Arrancás pateando y después te toca el arco." : "Arrancás en el arco: ¡a atajar!"}</p>
-            <p className="mt-1 text-sm opacity-70">Se turnan: uno patea y el otro ataja.</p>
-          </div>
-        </div>
+      {moneda && t === 0 && (role === "host" || role === "guest") && (
+        <MonedaJai
+          role={role}
+          primero={match.primero}
+          lado={lado}
+          rivalName={rivalName}
+          muted={muted}
+          onElegir={(l) => { if (lado) return; setLado(l); if (role === "host") send("lado", { lado: l }); }}
+          onFin={() => setMoneda(false)}
+        />
       )}
       {/* Marcador */}
       <div className="flex items-center gap-2 rounded-2xl border-4 border-[#1C2B44] bg-black p-2">
