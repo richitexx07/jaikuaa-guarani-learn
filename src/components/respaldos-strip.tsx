@@ -1,15 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import { Landmark } from "lucide-react";
 
-// Solo respaldos públicos vigentes (Senado, Diputados, SPL). El Ateneo y el ISL se suman cuando estén firmados.
+// Solo declaraciones públicas documentadas (Senado, Diputados, MEC, SPL).
 const RESPALDOS = [
   { who: "Cámara de Senadores", what: "Declaración N.° 547/2026" },
   { who: "Cámara de Diputados", what: "Declaración N.° 2001" },
+  { who: "Ministerio de Educación y Ciencias", what: "Resolución N.° 1572/2026" },
   { who: "Secretaría de Políticas Lingüísticas", what: "Resolución N.° 116/2026" },
 ];
 
 /**
- * Los tres respaldos juntos, uno al lado del otro, con el enlace a la página de respaldos.
+ * Los respaldos documentados juntos, con el enlace a sus copias oficiales.
  * Va al final de la portada y de la pantalla de ingreso para que se vean bien.
  */
 export function RespaldosStrip({ className = "" }: { className?: string }) {
@@ -18,7 +19,7 @@ export function RespaldosStrip({ className = "" }: { className?: string }) {
       <h2 id="respaldos-title" className="text-center font-display text-lg font-bold text-foreground sm:text-xl">
         Declarada de interés nacional, educativo y lingüístico
       </h2>
-      <ul className="mt-4 grid grid-cols-3 gap-2 sm:gap-4">
+      <ul className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
         {RESPALDOS.map((r) => (
           <li
             key={r.who}

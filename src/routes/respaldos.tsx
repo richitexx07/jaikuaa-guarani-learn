@@ -5,6 +5,7 @@ import { HeroJai } from "@/components/marketing/page-parts";
 import jaiGraduado from "@/assets/jai/jai-graduado.webp";
 import { FileText } from "lucide-react";
 import { MarketingHeader } from "@/components/marketing/page-parts";
+import mecDocumento from "@/assets/respaldos/mec-resolucion-1572-2026.pdf.asset.json";
 
 export const Route = createFileRoute("/respaldos")({
   head: () => ({
@@ -13,12 +14,12 @@ export const Route = createFileRoute("/respaldos")({
       {
         name: "description",
         content:
-          "Jaikuaa fue declarada de interés nacional y educativo por el Senado y la Cámara de Diputados, y de interés lingüístico por la Secretaría de Políticas Lingüísticas.",
+          "Declaraciones oficiales de Jaikuaa: interés nacional y educativo por ambas cámaras, interés educativo por el MEC e interés lingüístico por la SPL.",
       },
       { property: "og:title", content: "Respaldos institucionales de Jaikuaa" },
       { property: "og:description", content: "Declaraciones y resoluciones oficiales que respaldan a Jaikuaa." },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://www.jaikuaa.com/og-jaikuaa.jpg?v=2" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://www.jaikuaa.com/respaldos" }],
   }),
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/respaldos")({
 
 /**
  * Solo respaldos vigentes y comprobables. Convenios en trámite o pilotos sin validar no van acá.
- * Cuando llegue la copia oficial de un documento, se guarda en public/respaldos y se completa `pdf`.
+ * Las copias recibidas se enlazan en `pdf`; nuevas fotografías se sirven como documentos desde Lovable Assets.
  */
 type Respaldo = { who: string; doc: string; what: string; detail: string; pdf?: string };
 
@@ -47,6 +48,14 @@ const RESPALDOS: Respaldo[] = [
     detail:
       "Dada en sesión del 20 de octubre de 2026 y remitida por nota NHCD N.° 5140 del 9 de noviembre de 2026. Insta al Ministerio de Educación y Ciencias, a la Secretaría de Políticas Lingüísticas y a las instituciones educativas a difundir y aprovechar pedagógicamente la plataforma.",
     pdf: "/respaldos/diputados-declaracion-2001-2026.pdf",
+  },
+  {
+    who: "Ministerio de Educación y Ciencias",
+    doc: "Resolución N.° 1572/2026",
+    what: "De interés educativo",
+    detail:
+      "Dictada el 9 de noviembre de 2026. Declara de interés educativo el proyecto Jaikuaa, organizado por Guaraní Global Tech E.A.S. Reconoce su aporte como herramienta pedagógica digital para la enseñanza y el aprendizaje de la lengua guaraní; no constituye un software especializado de corrección ortográfica o gramatical.",
+    pdf: mecDocumento.url,
   },
   {
     who: "Secretaría de Políticas Lingüísticas",
