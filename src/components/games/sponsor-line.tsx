@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getSlotSponsor, recordSponsorImpression } from "@/lib/sponsors.functions";
 import type { SponsorSlot } from "@/lib/sponsor-slots";
-import { useDemoBrand } from "@/lib/demo-brand";
+import { useDemoBrands } from "@/lib/demo-brand";
+import { SEGUNDOS_POR_MARCA } from "@/lib/valla-led";
 import { useIsGuest } from "@/lib/guest";
 
 function todayPy() {
@@ -17,12 +18,19 @@ export function SponsorLine({ slot }: { slot: SponsorSlot }) {
   const guest = useIsGuest();
   // Sin cuenta no se consulta ni se cuenta la impresión (el conteo es por persona registrada).
   const q = useQuery({ queryKey: ["slot-sponsor", slot], enabled: !guest, queryFn: () => fn({ data: { slot } }), staleTime: 5 * 60_000 });
-  const demo = useDemoBrand();
+  const marcas = useDemoBrands();
+  const demo = slot === "penales" && marcas.length > 0;
+  const [vuelta, setVuelta] = useState(0);
+  useEffect(() => {
+    if (!demo || marcas.length < 2) return;
+    const id = window.setInterval(() => setVuelta((v) => v + 1), SEGUNDOS_POR_MARCA * 1000);
+    return () => window.clearInterval(id);
+  }, [demo, marcas.length]);
   const realName = q.data?.name ?? "";
-  const name = demo && slot === "penales" ? demo.name : realName;
+  const name = demo ? marcas[vuelta % marcas.length].name : realName;
 
   useEffect(() => {
-    if (!realName || (demo && slot === "penales")) return;
+    if (!realName || demo) return;
     const key = `jaikuaa:sponsor-imp:${slot}`;
     const day = todayPy();
     try {

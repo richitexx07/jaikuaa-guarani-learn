@@ -28,7 +28,7 @@ import { celebrate } from '@/lib/confetti';
 import type { GameWord } from '@/lib/games.functions';
 import { usePT } from '@/lib/i18n-penales';
 import { DemoBrandPanel } from '@/components/games/demo-brand-panel';
-import { demoLedText, useDemoBrand } from '@/lib/demo-brand';
+import { demoLedText, useDemoBrands } from '@/lib/demo-brand';
 import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from '@/components/games/reto';
 import { leccionDeReto, orderedBy, shufflerFor } from '@/lib/reto';
 import { PauseButton, RefereeMenu, useEndTitle, type DuelEnd } from '@/components/games/duel-referee';
@@ -66,7 +66,7 @@ function PenaltiesContent(){
  const [lesson,setLesson]=useState<number|null>(()=>leccionDeReto(reto)),q=useGameWords(lesson);
  useEffect(()=>{if(reto)setLesson(leccionDeReto(reto));},[reto?.id]);// eslint-disable-line react-hooks/exhaustive-deps
  const guest=useIsGuest(),fn=useServerFn(getPenaltiesLed),led=useQuery({queryKey:['penales-led'],enabled:!guest,queryFn:()=>fn()});
- const demo=useDemoBrand(),ledText=demo?demoLedText(demo):(led.data?.text??'JAIKUAA · TU MARCA AQUÍ');
+ const demo=useDemoBrands(),ledText=demo.length?demoLedText(demo):(led.data?.text??'JAIKUAA · TU MARCA AQUÍ');
  const [remote,setRemote]=useState<{code:string;host:boolean}|null>(()=>{const c=salaDeLaUrl();return c?{code:c,host:false}:null;}),[joinCode,setJoinCode]=useState('');
  const [miKit]=useMiKit(),lang=useAppLang(),[paisesDuelo,setPaisesDuelo]=useState<[Pais,Pais]>(['PY','PY']);
  const [mode,setMode]=useState<'solo'|'duel'|'remote'>('solo'),[names,setNames]=useState<[string,string]>(['','']),[started,setStarted]=useState(false),[round,setRound]=useState(0);

@@ -1,3 +1,4 @@
+import { vallaEn } from '@/lib/valla-led';
 import { G, POST, W, H, powerAt, powerZone, type Scene } from './physics';
 import { ARCO_EN_ESTADIO, arqueroDe, ESTADIO, PELOTA, estadoEstadio, imagen, pateadorPintado, pintadoTarde } from './sprites';
 import { KIT_INICIAL, disenoDe } from './camisetas';
@@ -70,7 +71,7 @@ function fondoVector(now: number){
   [[120,30],[680,30]].forEach(([lx,ly])=>{const g=ctx.createRadialGradient(lx,ly,2,lx,ly,180);g.addColorStop(0,alpha('white', .35));g.addColorStop(1,alpha('white', 0));ctx.fillStyle=g;ctx.fillRect(lx-180,0,360,220);});
   const hype=Math.max(0,1-(now-S.cheer)/1800);crowd.forEach(p=>{const j=reduce?0:Math.sin(now/180+p.ph)*1.2-hype*Math.abs(Math.sin(now/90+p.ph))*10;ctx.fillStyle=p.c===0?palette['red']:p.c===1?palette['white']:palette['blue'];ctx.globalAlpha=.45+hype*.45;ctx.beginPath();ctx.arc(p.x,p.y+j,3,0,7);ctx.fill();});ctx.globalAlpha=1;
   if(hype>0&&!reduce){[90,250,550,710].forEach((fx,i)=>{const fy=40+(i%2)*18,r=26+Math.sin(now/60+i)*6;const g=ctx.createRadialGradient(fx,fy,1,fx,fy,r*2.4);g.addColorStop(0,alpha(i%2?'gold':'red',.9*hype));g.addColorStop(1,alpha('red',0));ctx.fillStyle=g;ctx.fillRect(fx-r*2.4,fy-r*2.4,r*4.8,r*4.8);for(let k=0;k<6;k++){ctx.fillStyle=alpha('white',.5*hype);ctx.beginPath();ctx.arc(fx+Math.sin(now/120+k*2)*14,fy-((now/8+k*20)%70),2,0,7);ctx.fill();}});}
-  const led=[ledText,'JAIKUAA · EL ESTADIO DE LAS PALABRAS','APRENDÉ JUGANDO · AUDIO DE VOCES REALES'][Math.floor(now/9000)%3];ledText=led;ctx.font='800 16px sans-serif';const ledWidth=Math.max(420,ctx.measureText(ledText).width+90);const off=reduce?0:(now/12)%ledWidth;ctx.fillStyle=palette['black'];ctx.fillRect(0,92,W,24);ctx.save();ctx.beginPath();ctx.rect(0,92,W,24);ctx.clip();ctx.fillStyle=palette['gold'];for(let x=-ledWidth;x<W+ledWidth;x+=ledWidth)ctx.fillText(ledText + "  ·  ",x-off+20,110);ctx.restore();
+  const vv=vallaEn(ledText,now);ledText=vv.texto;ctx.font='800 16px sans-serif';const ledWidth=Math.max(420,ctx.measureText(ledText).width+90);const off=reduce?0:(now/12)%ledWidth;ctx.fillStyle=palette['black'];ctx.fillRect(0,92,W,24);ctx.save();ctx.beginPath();ctx.rect(0,92,W,24);ctx.clip();ctx.fillStyle=palette['gold'];for(let x=-ledWidth;x<W+ledWidth;x+=ledWidth)ctx.fillText(ledText + "  ·  ",x-off+20,110);ctx.restore();
   for(let i=0;i<6;i++){ctx.fillStyle=i%2?palette['grass']:palette['stripe'];ctx.fillRect(0,216+i*64,W,64);}
   {const gl=ctx.createRadialGradient(400,330,20,400,330,420);gl.addColorStop(0,alpha('white',.14));gl.addColorStop(1,alpha('white',0));ctx.fillStyle=gl;ctx.fillRect(0,216,W,H-216);}
   ctx.fillStyle=alpha('black',.35);ctx.fillRect(0,84,W,8);ctx.fillStyle=alpha('white',.08);for(let r=0;r<4;r++)ctx.fillRect(0,18+r*18,W,2);
@@ -79,8 +80,8 @@ function fondoVector(now: number){
 
 /* ---------- Estadio ilustrado: Jai arquero, pateador con su camiseta y estadio de noche ---------- */
 function estadioListo(){return !!imagen(ESTADIO);}
-function cartelLed(now:number,y:number,h:number){const led=[ledText,'JAIKUAA · EL ESTADIO DE LAS PALABRAS','APRENDÉ JUGANDO · AUDIO DE VOCES REALES'][Math.floor(now/9000)%3];ctx.font=`800 ${Math.round(h*.68)}px sans-serif`;const ledWidth=Math.max(420,ctx.measureText(led).width+90);const off=reduce?0:(now/12)%ledWidth;
-  ctx.fillStyle=alpha('black',.85);ctx.fillRect(0,y,W,h);ctx.save();ctx.beginPath();ctx.rect(0,y,W,h);ctx.clip();ctx.fillStyle=palette['gold'];ctx.shadowColor=palette['gold'];ctx.shadowBlur=8;for(let x=-ledWidth;x<W+ledWidth;x+=ledWidth)ctx.fillText(led+"  ·  ",x-off+20,y+h*.78);ctx.restore();
+function cartelLed(now:number,y:number,h:number){const vv=vallaEn(ledText,now),led=vv.texto;ctx.font=`800 ${Math.round(h*.68)}px sans-serif`;const ledWidth=Math.max(420,ctx.measureText(led).width+90);const off=reduce?0:(now/12)%ledWidth;
+  ctx.fillStyle=alpha('black',.85);ctx.fillRect(0,y,W,h);ctx.save();ctx.beginPath();ctx.rect(0,y,W,h);ctx.clip();ctx.fillStyle=vv.color;ctx.shadowColor=vv.color;ctx.shadowBlur=8;for(let x=-ledWidth;x<W+ledWidth;x+=ledWidth)ctx.fillText(led+"  ·  ",x-off+20,y+h*.78);if(vv.cambio>0){ctx.globalAlpha=vv.cambio*.8;ctx.fillStyle='#fff';ctx.fillRect((1-vv.cambio)*W-60,y,120,h);ctx.globalAlpha=1;}ctx.restore();
   ctx.fillStyle=alpha('white',.18);ctx.fillRect(0,y,W,1);ctx.fillRect(0,y+h-1,W,1);}
 function fondoIlustrado(now:number){const im=imagen(ESTADIO);if(!im)return false;const A=ARCO_EN_ESTADIO,sx=G.w/A.w,sy=G.h/A.h;
   ctx.fillStyle=palette['night'];ctx.fillRect(0,0,W,H);ctx.drawImage(im,G.x-A.x*sx,G.y-A.y*sy,im.naturalWidth*sx,im.naturalHeight*sy);

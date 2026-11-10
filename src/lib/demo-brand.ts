@@ -1,24 +1,32 @@
 import { useEffect, useState } from "react";
+import { MAX_MARCAS, SEPARADOR_MARCAS } from "./valla-led";
 
-/** Marca de demostración para reuniones: vive solo en esta pestaña (sessionStorage), nunca en la base. */
+/** Marcas de demostración para reuniones: viven solo en esta pestaña (sessionStorage), nunca en la base. */
 export type DemoBrand = { name: string; slogan: string };
 const KEY = "jaikuaa:demo-brand";
 const EVT = "jaikuaa:demo-brand";
 
-export function readDemoBrand(): DemoBrand | null {
+export function limpiarMarcas(v: unknown): DemoBrand[] {
+  const lista = Array.isArray(v) ? v : v && typeof v === "object" ? [v] : [];
+  return lista
+    .map((b) => ({ name: String((b as DemoBrand)?.name ?? "").trim().slice(0, 40), slogan: String((b as DemoBrand)?.slogan ?? "").trim().slice(0, 60) }))
+    .filter((b) => b.name)
+    .slice(0, MAX_MARCAS);
+}
+
+export function readDemoBrands(): DemoBrand[] {
   try {
     const raw = sessionStorage.getItem(KEY);
-    if (!raw) return null;
-    const v = JSON.parse(raw) as DemoBrand;
-    return v?.name?.trim() ? { name: v.name.trim().slice(0, 40), slogan: (v.slogan ?? "").trim().slice(0, 60) } : null;
+    return raw ? limpiarMarcas(JSON.parse(raw)) : [];
   } catch {
-    return null;
+    return [];
   }
 }
 
-export function setDemoBrand(v: DemoBrand | null) {
+export function setDemoBrands(v: DemoBrand[]) {
+  const l = limpiarMarcas(v);
   try {
-    if (v && v.name.trim()) sessionStorage.setItem(KEY, JSON.stringify(v));
+    if (l.length) sessionStorage.setItem(KEY, JSON.stringify(l));
     else sessionStorage.removeItem(KEY);
   } catch {
     /* sin almacenamiento: no hay demo */
@@ -26,19 +34,20 @@ export function setDemoBrand(v: DemoBrand | null) {
   window.dispatchEvent(new Event(EVT));
 }
 
-/** Texto de la valla LED con la marca de demostración. */
-export function demoLedText(b: DemoBrand) {
-  const name = b.name.toUpperCase();
-  return b.slogan ? `${name} · ${b.slogan.toUpperCase()}` : `${name} · PRESENTA EL ESTADIO JAIKUAA`;
+/** Texto de la valla LED: una línea por marca; la valla las va rotando. */
+export function demoLedText(marcas: DemoBrand[]) {
+  return marcas
+    .map((b) => (b.slogan ? `${b.name.toUpperCase()} · ${b.slogan.toUpperCase()}` : `${b.name.toUpperCase()} · PRESENTA EL ESTADIO JAIKUAA`))
+    .join(SEPARADOR_MARCAS);
 }
 
-export function useDemoBrand() {
-  const [brand, setBrand] = useState<DemoBrand | null>(null);
+export function useDemoBrands() {
+  const [marcas, setMarcas] = useState<DemoBrand[]>([]);
   useEffect(() => {
-    const sync = () => setBrand(readDemoBrand());
+    const sync = () => setMarcas(readDemoBrands());
     sync();
     window.addEventListener(EVT, sync);
     return () => window.removeEventListener(EVT, sync);
   }, []);
-  return brand;
+  return marcas;
 }

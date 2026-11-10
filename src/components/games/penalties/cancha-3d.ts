@@ -1,3 +1,4 @@
+import { vallaEn } from '@/lib/valla-led';
 /**
  * La cancha de Penales en 3D (three.js, se carga aparte solo al jugar).
  * Lee el mismo estado que el dibujo plano: arco, pelota y Jai se ubican con las
@@ -106,8 +107,32 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
   const tribMat = guardar(new THREE.MeshStandardMaterial({ map: texTrib, roughness: 1, emissive: '#ffffff', emissiveMap: texTrib, emissiveIntensity: 0.25 }));
   const trib = new THREE.Mesh(guardar(new THREE.PlaneGeometry(70, 12)), tribMat); trib.position.set(0, 7, -14); trib.rotation.x = -0.35; escena.add(trib);
   for (const s of [-1, 1]) { const t = new THREE.Mesh(trib.geometry, tribMat); t.position.set(s * 26, 7, 2); t.rotation.set(0, -s * Math.PI / 2.4, 0); escena.add(t); }
-  const cartel = new THREE.Mesh(guardar(new THREE.BoxGeometry(50, 0.9, 0.2)), guardar(new THREE.MeshStandardMaterial({ color: '#0b0f18', emissive: '#C8102E', emissiveIntensity: 0.55 })));
+  const cartel = new THREE.Mesh(guardar(new THREE.BoxGeometry(50, 0.9, 0.2)), guardar(new THREE.MeshStandardMaterial({ color: '#05070c' })));
   cartel.position.set(0, 0.45, -9); escena.add(cartel);
+  // Pantalla LED rotativa: varias marcas en tanda, con puntitos de diodo, texto que corre y barrido de luz al cambiar.
+  const ledCv = document.createElement('canvas'); ledCv.width = barato ? 1024 : 2048; ledCv.height = barato ? 32 : 64;
+  const ledCtx = ledCv.getContext('2d');
+  const ledTex = guardar(new THREE.CanvasTexture(ledCv)); ledTex.colorSpace = THREE.SRGBColorSpace;
+  const ledMat = guardar(new THREE.MeshBasicMaterial({ map: ledTex, toneMapped: false }));
+  const pantalla = new THREE.Mesh(guardar(new THREE.PlaneGeometry(49.6, 0.78)), ledMat); pantalla.position.set(0, 0.45, -8.89); escena.add(pantalla);
+  const ledLuz = new THREE.PointLight('#FFB23E', barato ? 0 : 6, 9, 2); ledLuz.position.set(0, 0.8, -8.2); escena.add(ledLuz);
+  let ledUlt = 0;
+  function dibujarLed(texto: string, now: number) {
+    if (!ledCtx || now - ledUlt < (barato ? 60 : 33)) return; ledUlt = now;
+    const v = vallaEn(texto, now), W = ledCv.width, H = ledCv.height;
+    ledCtx.fillStyle = '#030509'; ledCtx.fillRect(0, 0, W, H);
+    ledCtx.font = `800 ${Math.round(H * 0.7)}px sans-serif`; ledCtx.textBaseline = 'middle';
+    const frase = v.texto + '   ·   ', ancho = Math.max(W / 3, ledCtx.measureText(frase).width), off = (now / 6) % ancho;
+    ledCtx.fillStyle = v.color; ledCtx.shadowColor = v.color; ledCtx.shadowBlur = H * 0.25;
+    for (let x = -off; x < W; x += ancho) ledCtx.fillText(frase, x, H * 0.54);
+    ledCtx.shadowBlur = 0;
+    if (v.cambio > 0) { ledCtx.globalAlpha = v.cambio; ledCtx.fillStyle = '#fff'; ledCtx.fillRect((1 - v.cambio) * W - W * 0.08, 0, W * 0.16, H); ledCtx.globalAlpha = 1; }
+    // rejilla de diodos
+    ledCtx.fillStyle = 'rgba(0,0,0,.55)'; const paso = Math.max(3, Math.round(H / 12));
+    for (let x = 0; x < W; x += paso) ledCtx.fillRect(x, 0, 1, H);
+    for (let y = 0; y < H; y += paso) ledCtx.fillRect(0, y, W, 1);
+    ledTex.needsUpdate = true; ledLuz.color.set(v.color);
+  }
 
   // Hinchada con vida: hinchas que se mueven (una sola figura repetida, liviana) y flashes de fotos.
   // barato: el mismo celular-barato de arriba
@@ -188,6 +213,7 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
   }
 
   function render(s: Scene, now: number) {
+    try { dibujarLed(s.led ?? 'JAIKUAA · TU MARCA AQUÍ', now); } catch { /* la valla nunca corta el partido */ }
     // Jai según la jugada (las mismas poses que el dibujo plano)
     const k = s.keeper, dx = k.x - 400, res = s.phase === 'result' ? s.outcome : undefined;
     const am = s.phase === 'aim' || s.phase === 'power' ? amague(now, s.knew) : { x: 0, y: 0 }, idle = am.x;

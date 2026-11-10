@@ -47,7 +47,7 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,
   const css=getComputedStyle(el),palette:Record<string,string>={};for(const k of ['night','sky','grass','grass-dark','stripe','white','black','kit-dark','red','blue','gold','green','miss','skin'])palette[k]=css.getPropertyValue(`--stadium-${k}`).trim();
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let frame=0,last=0;
   // El ciclo nunca se corta: si un dibujo falla en algún celular, se sigue con el próximo cuadro (antes, un error dejaba la pelota «disparada» para siempre).
-  function tick(now:number){if(!ctx)return;try{animation.current?.(now);}catch{}const c3=cancha3d.current;if(c3)try{c3.render(scene.current,now);}catch{cancha3d.current=null;fallo3D=true;setEn3d(false);}
+  function tick(now:number){if(!ctx)return;try{animation.current?.(now);}catch{}const c3=cancha3d.current;scene.current.led=settings.current.ledText;if(c3)try{c3.render(scene.current,now);}catch{cancha3d.current=null;fallo3D=true;setEn3d(false);}
    try{if(now-last>30||c3){drawStadium(ctx,scene.current,now,settings.current.ledText,reduce,palette,!!cancha3d.current);last=now;}}catch{last=now;}
    // Mientras se apunta, el dedo es para el arco; el resto del tiempo, deslizar sobre la cancha mueve la página.
    const ta=scene.current.phase==='aim'||scene.current.phase==='power'?'none':'pan-y';if(el&&el.style.touchAction!==ta)el.style.touchAction=ta;
