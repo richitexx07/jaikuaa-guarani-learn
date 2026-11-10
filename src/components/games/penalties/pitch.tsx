@@ -71,7 +71,7 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,
    const kq=reduce?q:Math.max(0,Math.min(1,((t-now)/1000-shot.react)/Math.max(.05,shot.T-shot.react))),ke=1-Math.pow(1-kq,2);
    s.keeper={x:400+(shot.keeper.x-400)*ke,y:278+(shot.keeper.y-278)*ke,ang:Math.sign(shot.keeper.x-400)*Math.min(1.2,Math.abs(shot.keeper.x-400)/170)*ke,stretch:ke};
    if(q>=1){window.clearTimeout(respaldo);animation.current=null;s.phase='result';s.outcome=shot.outcome;const goal=shot.outcome==='goal'||shot.outcome==='angle';s.banner={t,txt:labels[shot.outcome],c:getComputedStyle(canvas.current??document.documentElement).getPropertyValue(goal?'--stadium-gold':'--stadium-miss')};
-    if(goal){s.cheer=t;s.net={...shot.end,t};celebrate(shot.outcome==='angle'?'big':'small');}sound.current.play(goal?'cheer':shot.outcome==='post'?'post':'hit');if(shot.outcome==='post')s.shake=t;
+    if(goal){s.cheer=t;s.net={...shot.end,t};celebrate(shot.outcome==='angle'?'big':'small');}const snd=sound.current;if(goal){snd.play('net');window.setTimeout(()=>snd.play('cheer'),120);}else{snd.play(shot.outcome==='save'?'gloves':shot.outcome==='post'?'post':'hit');window.setTimeout(()=>snd.play('groan'),250);}if(shot.outcome==='post')s.shake=t;
     if(!reduce)try{navigator.vibrate?.(goal?[40,30,60]:30);}catch{}
     callback.current(shot.outcome);
     caer(t,shot.outcome==='post'&&!reduce?shot.end:undefined);

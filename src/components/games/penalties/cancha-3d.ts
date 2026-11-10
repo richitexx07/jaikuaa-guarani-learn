@@ -251,13 +251,15 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
       pelota.position.set(s.outcome === 'post' && s.phase === 'result' ? mundoX(s.ball.x) : mundoX(fin.x) * e + mundoX(s.ball.x) - mundoX(400 + (fin.x - 400) * e), 0.11 + (Math.max(0.11, mundoY(fin.y)) - 0.11) * e + Math.sin(e * Math.PI) * 0.5, SPOT_Z + (zFin - SPOT_Z) * e);
       if (e < 1) { pelota.rotation.x -= 0.35; pelota.rotation.y += 0.12; }
     } else pelota.position.set(0, 0.11, SPOT_Z);
+    // Gol: la pelota frena en la red y cae al césped dentro del arco
+    if (s.phase === 'result' && s.net && (s.outcome === 'goal' || s.outcome === 'angle')) { const dt = Math.min(0.7, (now - s.net.t) / 1000); pelota.position.y = Math.max(0.11, pelota.position.y - 4.9 * dt * dt); pelota.position.z = -0.3 - 0.35 * Math.min(1, dt * 4); }
     if (s.phase === 'result' && s.outcome === 'save') pelota.position.set(jai.position.x, Math.max(0.11, jai.position.y), 0.6);
     sombraBola.position.set(pelota.position.x, 0.015, pelota.position.z); sombraBola.scale.setScalar(Math.max(0.4, 1 - pelota.position.y / 4));
 
     // La red se sacude con el gol
-    const kRed = s.net ? Math.max(0, 1 - (now - s.net.t) / 900) : 0;
+    const tRed = s.net ? (now - s.net.t) / 1000 : 9, kRed = tRed < 1.6 ? Math.exp(-tRed * 2.6) * Math.cos(tRed * 14) : 0; // empuje y rebote amortiguado de la red
     const arr = redPos.array as Float32Array, nx = s.net ? mundoX(s.net.x) : 0, ny = s.net ? mundoY(s.net.y) : 0;
-    for (let i = 0; i < arr.length; i += 3) { const d = Math.hypot(redBase[i] - nx, redBase[i + 1] + altoArco / 2 - ny); arr[i + 2] = redBase[i + 2] - (kRed ? Math.max(0, 1 - d / 2.8) * kRed * 1.6 * (1 + Math.sin(now / 40) * 0.2) : 0); }
+    for (let i = 0; i < arr.length; i += 3) { const d = Math.hypot(redBase[i] - nx, redBase[i + 1] + altoArco / 2 - ny); arr[i + 2] = redBase[i + 2] - (kRed ? Math.max(0, 1 - d / 2.4) ** 1.5 * kRed * 2.2 : 0); }
     redPos.needsUpdate = true;
 
     // Cámara: quieta mientras se apunta; acompaña el remate y vibra con el palo
@@ -268,8 +270,8 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
     } else {
       if (enTv) { enTv = false; cam.position.copy(camBase); cam.quaternion.copy(camQuat); cam.setViewOffset(W, H, 0, ALTO_CAM / S - (PISO_Y - H / 2), W, H); }
       const enJugada = s.phase === 'shot' || s.phase === 'result';
-      const objetivoZ = DIST, objetivoX = 0; void enJugada; // cámara fija detrás del pateador, como en la TV: no marea
-      cam.position.z += (objetivoZ - cam.position.z) * 0.08; cam.position.x += (objetivoX - cam.position.x) * 0.08;
+      const objetivoZ = enJugada ? DIST - 0.6 : DIST; // acercamiento suave hacia el arco, sin giros ni saltos
+      cam.position.z += (objetivoZ - cam.position.z) * 0.03; cam.position.x += (0 - cam.position.x) * 0.08;
       const temblor = s.shake ? Math.max(0, 1 - (now - s.shake) / 500) : 0;
       cam.position.y = camBase.y + (temblor ? Math.sin(now / 30) * 0.015 * temblor : 0);
     }
