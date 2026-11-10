@@ -28,6 +28,8 @@ const P = { noche: "#071A33", led: "#FFB23E", gol: "#3BE38A", mal: "#FF5A4E", bl
 const EVENTS = ["start", "dive", "answer", "aim", "kick", "shot", "sync", "hello", "ended", "llena", "rematch", "kit", "emo"] as const;
 const GRACE_RIVAL_MS = 30000;
 const GRACE_ME_MS = 45000;
+/** Segundos que tiene el arquero para elegir mientras el pateador responde. */
+const TURNO_S = 10;
 const NEXT_MS = 2600;
 
 type Role = "host" | "guest";
@@ -261,6 +263,26 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
 
   useEffect(() => () => { if (nextTimer.current) window.clearTimeout(nextTimer.current); }, []);
 
+  // En vivo: silbato y reloj para los dos a la vez. Si el arquero no elige a tiempo, se tira solo.
+  const [restan, setRestan] = useState(TURNO_S);
+  const corre = inMatch && !last && !paused;
+  useEffect(() => {
+    if (!corre) return;
+    setRestan(TURNO_S);
+    try { navigator.vibrate?.(120); } catch { /* sin vibración */ }
+    const id = window.setInterval(() => setRestan((s) => Math.max(0, s - 1)), 1000);
+    return () => window.clearInterval(id);
+  }, [t, corre]);
+  useEffect(() => {
+    if (restan !== 0 || !corre || myDive) return;
+    const pateador: Role = t % 2 === 0 ? "host" : "guest";
+    if (role === pateador) return;
+    const todas: Dive[] = ["left", "center", "right", "left-high", "center-high", "right-high"];
+    const d = todas[Math.floor(Math.random() * todas.length)]!;
+    setMyDive(d);
+    send("dive", { t, dive: d });
+  }, [restan, corre]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const mine = role === "guest" ? results.guest : results.host;
   const theirs = role === "guest" ? results.host : results.guest;
   const myGoals = mine.filter(isGoal).length;
@@ -427,14 +449,15 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
               <p className="mt-1 text-sm opacity-75">{word.gn} — {word.es}</p>
             </div>
           ) : iShoot ? (
-            !dive ? (
-              <div className={card}>
-                <Loader2 className="mx-auto h-8 w-8 animate-spin opacity-60" aria-hidden />
-                <p className="mt-2 font-display text-xl font-bold">{rivalName} se prepara para atajar…</p>
-                <p className="text-sm opacity-70">Está eligiendo en secreto hacia dónde tirarse.</p>
-              </div>
-            ) : (
+            (
               <>
+                {!dive ? (
+                  <div className={card} aria-live="polite">
+                    <p className="font-display text-5xl font-bold tabular-nums" style={{ color: restan <= 3 ? P.mal : P.noche }}>{restan}</p>
+                    <p className="mt-1 font-display text-lg font-bold">¡Silbato! {rivalName} ya está en el arco</p>
+                    <p className="text-sm opacity-70">Respondé rápido: el arco se abre apenas se acomode.</p>
+                  </div>
+                ) : (
                 <div className="overflow-hidden rounded-2xl ring-4 ring-black/40">
                   <PenaltyPitch
                     key={t}
@@ -449,6 +472,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
                     onKick={(shotData) => send("kick", { t, shot: shotData })}
                   />
                 </div>
+                )}
                 <div className="space-y-3 text-center">
                   <p className="text-sm text-white/70">¿Cómo se dice en guaraní?</p>
                   <h2 className="break-words font-display text-3xl font-bold text-white">{word.es}</h2>
@@ -482,7 +506,8 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
             <section className={card} aria-label="Turno del arquero">
               <p className="text-xs font-semibold uppercase tracking-widest">🧤 Te toca atajar</p>
               <h2 className="mt-1 font-display text-2xl font-bold">Elegí en secreto hacia dónde te tirás</h2>
-              <p className="text-sm opacity-75">{rivalName} no ve tu elección. Elegí lado y altura: si adivinás, ¡lo atajás!</p>
+              <p className="mt-1 font-display text-4xl font-bold tabular-nums" style={{ color: restan <= 3 ? P.mal : P.noche }} aria-live="polite">{restan}</p>
+              <p className="text-sm opacity-75">{rivalName} ya está respondiendo. Si no elegís a tiempo, te tirás a cualquier lado.</p>
               <ElegirEstirada onElegir={(d) => { setMyDive(d); send("dive", { t, dive: d }); }} />
             </section>
           ) : (
