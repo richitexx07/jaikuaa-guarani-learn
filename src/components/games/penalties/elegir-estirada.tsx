@@ -1,83 +1,114 @@
 /**
- * El arquero elige en secreto dónde tirarse tocando directamente el arco:
- * Jai se mueve hacia la zona tocada (lado y altura) antes de confirmar.
+ * El arquero elige en secreto dónde tirarse con la misma mecánica del que patea:
+ * desliza el dedo sobre el arco (flecha), suelta, y la barra de fuerza decide
+ * qué tan lejos se estira: poca fuerza se queda cerca del centro, mucha llega hasta el palo.
  */
-import { useState } from "react";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 import jaiArquero from "@/assets/penales/jai-arquero-listo.webp";
 import type { Dive } from "./physics";
 
-const ZONAS: { d: Dive; col: number; fila: number; l: string }[] = [
-  { d: "left-high", col: 0, fila: 0, l: "Arriba a la izquierda" },
-  { d: "center-high", col: 1, fila: 0, l: "Arriba al centro" },
-  { d: "right-high", col: 2, fila: 0, l: "Arriba a la derecha" },
-  { d: "left", col: 0, fila: 1, l: "Abajo a la izquierda" },
-  { d: "center", col: 1, fila: 1, l: "Abajo al centro" },
-  { d: "right", col: 2, fila: 1, l: "Abajo a la derecha" },
-];
-
-/** Hacia dónde se estira Jai según la zona (desplazamiento y giro). */
-function pose(z?: (typeof ZONAS)[number]) {
-  if (!z) return "translate(-50%, 0) rotate(0deg) scale(1)";
-  const x = (z.col - 1) * 95;
-  const y = z.fila === 0 ? -38 : 8;
-  const r = (z.col - 1) * (z.fila === 0 ? 55 : 75);
-  return `translate(calc(-50% + ${x}%), ${y}%) rotate(${r}deg) scale(1.05)`;
-}
+type P = { x: number; y: number };
+const DIVES: Dive[][] = [["left-high", "center-high", "right-high"], ["left", "center", "right"]];
+const NOMBRE = [["arriba a la izquierda", "arriba al centro", "arriba a la derecha"], ["abajo a la izquierda", "abajo al centro", "abajo a la derecha"]];
 
 export function ElegirEstirada({ onElegir }: { onElegir: (d: Dive) => void }) {
-  const [sel, setSel] = useState<Dive | null>(null);
-  const zona = ZONAS.find((z) => z.d === sel);
+  const [fase, setFase] = useState<"aim" | "power" | "done">("aim");
+  const [aim, setAim] = useState<P>({ x: 50, y: 40 });
+  const [fuerza, setFuerza] = useState(0);
+  const [final, setFinal] = useState<{ x: number; y: number; l: string } | null>(null);
+  const caja = useRef<HTMLDivElement>(null);
+  const drag = useRef(false);
+  const inicio = useRef(0);
+  const valor = useRef(0);
 
-  const tocar = (d: Dive) => {
-    if (sel) return;
-    setSel(d);
-    try { navigator.vibrate?.([15, 30, 25]); } catch { /* sin vibración */ }
-    window.setTimeout(() => onElegir(d), 650);
+  useEffect(() => {
+    if (fase !== "power") return;
+    let f = 0;
+    const tick = (t: number) => {
+      const v = (Math.sin(((t - inicio.current) / 550) * Math.PI - Math.PI / 2) + 1) / 2;
+      valor.current = v; setFuerza(v); f = requestAnimationFrame(tick);
+    };
+    f = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(f);
+  }, [fase]);
+
+  const pt = (e: PointerEvent<HTMLDivElement>): P => {
+    const r = caja.current!.getBoundingClientRect();
+    return { x: Math.max(2, Math.min(98, ((e.clientX - r.left) / r.width) * 100)), y: Math.max(5, Math.min(95, ((e.clientY - r.top) / r.height) * 100)) };
   };
+
+  const confirmar = () => {
+    const p = valor.current;
+    const x = 50 + (aim.x - 50) * p;
+    const col = x < 36 ? 0 : x > 64 ? 2 : 1;
+    const fila = aim.y < 50 ? 0 : 1;
+    setFinal({ x, y: fila === 0 ? 30 : 70, l: NOMBRE[fila][col] });
+    setFase("done");
+    try { navigator.vibrate?.([15, 30, 25]); } catch { /* sin vibración */ }
+    window.setTimeout(() => onElegir(DIVES[fila][col]), 700);
+  };
+
+  const down = (e: PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (fase === "aim") { drag.current = true; try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* */ } setAim(pt(e)); }
+    else if (fase === "power") confirmar();
+  };
+  const move = (e: PointerEvent<HTMLDivElement>) => { if (fase === "aim" && drag.current) setAim(pt(e)); };
+  const up = (e: PointerEvent<HTMLDivElement>) => {
+    if (!drag.current || fase !== "aim") return;
+    drag.current = false; setAim(pt(e));
+    try { navigator.vibrate?.(15); } catch { /* */ }
+    inicio.current = performance.now(); setFase("power");
+  };
+
+  const jx = final ? final.x : 50;
+  const dx = jx - 50;
+  const rot = final ? Math.sign(dx) * Math.min(80, Math.abs(dx) * 2.2) : 0;
+  const jy = final ? (final.y < 50 ? -35 : 6) : 0;
+  const verde = fuerza > 0.8;
 
   return (
     <div className="mt-3">
       <div
-        className="relative mx-auto aspect-[2/1] w-full max-w-md overflow-hidden rounded-t-lg"
+        ref={caja}
+        onPointerDown={down}
+        onPointerMove={move}
+        onPointerUp={up}
+        onPointerCancel={() => { drag.current = false; }}
+        role="application"
+        aria-label="Arco: deslizá el dedo para apuntar hacia dónde tirarte, soltá y tocá otra vez para elegir qué tan lejos"
+        className="relative mx-auto aspect-[2/1] w-full max-w-md select-none overflow-hidden rounded-t-lg"
         style={{
+          touchAction: fase === "done" ? "pan-y" : "none",
           background:
             "repeating-linear-gradient(0deg, rgba(255,255,255,.14) 0 1px, transparent 1px 14px), repeating-linear-gradient(90deg, rgba(255,255,255,.14) 0 1px, transparent 1px 14px), linear-gradient(180deg, #0b2440, #1E3A5F 70%, #2f7d3a 70%)",
           boxShadow: "inset 0 0 0 6px #f5f5f5",
         }}
       >
-        <div className="absolute inset-[6px] grid grid-cols-3 grid-rows-2">
-          {ZONAS.map((z) => {
-            const activa = sel === z.d;
-            return (
-              <button
-                key={z.d}
-                type="button"
-                aria-label={`Tirarme ${z.l.toLowerCase()}`}
-                disabled={!!sel}
-                onClick={() => tocar(z.d)}
-                className="group relative z-10 border border-dashed border-white/15 transition active:scale-95"
-                style={activa ? { background: "rgba(200,16,46,.45)", boxShadow: "inset 0 0 24px rgba(255,255,255,.6)" } : undefined}
-              >
-                <span
-                  className={`absolute inset-2 rounded-xl transition ${sel ? "" : "animate-pulse group-hover:bg-white/15"}`}
-                  style={{ boxShadow: activa ? "none" : "inset 0 0 0 2px rgba(255,255,255,.25)" }}
-                  aria-hidden
-                />
-              </button>
-            );
-          })}
-        </div>
+        {fase !== "done" && (
+          <svg className="pointer-events-none absolute inset-0 z-30 h-full w-full" viewBox="0 0 100 50" preserveAspectRatio="none" aria-hidden>
+            <line x1="50" y1="48" x2={aim.x} y2={aim.y / 2} stroke="#FFD23F" strokeWidth="1.2" strokeDasharray="2 1.5" />
+            <circle cx={aim.x} cy={aim.y / 2} r="2.4" fill="none" stroke="#FFD23F" strokeWidth="0.9" />
+          </svg>
+        )}
         <img
           src={jaiArquero}
           alt=""
           aria-hidden
           draggable={false}
-          className="pointer-events-none absolute bottom-0 left-1/2 z-20 h-[78%] w-auto select-none drop-shadow-[0_6px_10px_rgba(0,0,0,.5)]"
-          style={{ transform: pose(zona), transition: "transform .5s cubic-bezier(.2,1.4,.4,1)" }}
+          className="pointer-events-none absolute bottom-0 z-20 h-[78%] w-auto select-none drop-shadow-[0_6px_10px_rgba(0,0,0,.5)]"
+          style={{ left: `${jx}%`, transform: `translate(-50%, ${jy}%) rotate(${rot}deg)`, transition: "left .5s cubic-bezier(.2,1.4,.4,1), transform .5s cubic-bezier(.2,1.4,.4,1)" }}
         />
       </div>
+      {fase === "power" && (
+        <button type="button" onClick={confirmar} className="mx-auto mt-2 block h-5 w-full max-w-md overflow-hidden rounded-full bg-muted" aria-label="Tocá para elegir qué tan lejos te tirás">
+          <span className="block h-full rounded-full" style={{ width: `${fuerza * 100}%`, background: verde ? "#2f9e44" : "#FFD23F" }} />
+        </button>
+      )}
       <p className="mt-2 text-center text-sm font-semibold">
-        {zona ? `¡Te tirás ${zona.l.toLowerCase()}!` : "Tocá el arco donde querés tirarte"}
+        {fase === "aim" && "Deslizá el dedo y soltá para apuntar hacia dónde te tirás"}
+        {fase === "power" && "¡Tocá! Más fuerza = más cerca del palo"}
+        {fase === "done" && final && `¡Te tirás ${final.l}!`}
       </p>
     </div>
   );
