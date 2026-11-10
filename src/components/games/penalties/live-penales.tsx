@@ -9,6 +9,7 @@ import { playGuarani } from "@/lib/audio";
 import { recordCompletion } from "@/lib/gamification";
 import { newSeed, orderedBy, shufflerFor } from "@/lib/reto";
 import { useSala } from "@/lib/use-sala";
+import { toast } from "sonner";
 import type { GameWord } from "@/lib/games.functions";
 import { kitSeguro, useMiKit, type Kit } from "@/components/games/penalties/camisetas";
 import { BarraEmojis, EmojisFlotando, esEmoji, useReacciones, type Emoji } from "@/components/games/penalties/reacciones";
@@ -277,6 +278,24 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
     onExit();
   }
 
+  // Aviso fuerte cuando el amigo entra a la sala (aunque estés en WhatsApp).
+  const avisado = useRef(false);
+  useEffect(() => {
+    if (match || !sala.rival.present || avisado.current) return;
+    avisado.current = true;
+    const nombre = sala.rival.name ?? "Tu amigo";
+    toast.success(`¡${nombre} entró a la sala! Arrancamos…`);
+    try { navigator.vibrate?.([200, 100, 200]); } catch { /* sin vibración */ }
+    const antes = document.title;
+    document.title = `¡${nombre} te espera! · Jaikuaa`;
+    window.setTimeout(() => { document.title = antes; }, 8000);
+    try {
+      if (document.visibilityState === "hidden" && "Notification" in window && Notification.permission === "granted") new Notification("Jaikuaa", { body: `¡${nombre} entró a tu sala de penales!` });
+    } catch { /* sin avisos */ }
+  }, [sala.rival.present, match]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    try { if (host && "Notification" in window && Notification.permission === "default") void Notification.requestPermission(); } catch { /* sin avisos */ }
+  }, [host]);
   const myName = sala.me?.name ?? "Vos";
   const rivalName = sala.rival.name ?? lastRivalName.current ?? "tu rival";
   rivalNameRef.current = rivalName;
@@ -462,10 +481,10 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
             <section className={card} aria-label="Turno del arquero">
               <p className="text-xs font-semibold uppercase tracking-widest">🧤 Te toca atajar</p>
               <h2 className="mt-1 font-display text-2xl font-bold">Elegí en secreto hacia dónde te tirás</h2>
-              <p className="text-sm opacity-75">{rivalName} no ve tu elección. Si adivinás el lado, ¡lo atajás! Los tiros al ángulo no se atajan.</p>
+              <p className="text-sm opacity-75">{rivalName} no ve tu elección. Elegí lado y altura: si adivinás, ¡lo atajás!</p>
               <div className="mt-3 grid grid-cols-3 gap-2">
-                {([["left", "⬅", "Izquierda"], ["center", "⬆", "Centro"], ["right", "➡", "Derecha"]] as [Dive, string, string][]).map(([d, i, l]) => (
-                  <button key={d} type="button" onClick={() => { setMyDive(d); send("dive", { t, dive: d }); try { navigator.vibrate?.(20); } catch { /* sin vibración */ } }} className="flex h-20 flex-col items-center justify-center gap-1 rounded-2xl font-bold ring-1 ring-black/15">
+                {([["left-high", "↖", "Arriba izq."], ["center-high", "⬆", "Arriba"], ["right-high", "↗", "Arriba der."], ["left", "↙", "Abajo izq."], ["center", "⬇", "Abajo"], ["right", "↘", "Abajo der."]] as [Dive, string, string][]).map(([d, i, l]) => (
+                  <button key={d} type="button" onClick={() => { setMyDive(d); send("dive", { t, dive: d }); try { navigator.vibrate?.(20); } catch { /* sin vibración */ } }} className="flex h-16 flex-col items-center justify-center gap-0.5 rounded-2xl text-sm font-bold ring-1 ring-black/15">
                     <span className="text-2xl" aria-hidden>{i}</span>{l}
                   </button>
                 ))}
@@ -487,7 +506,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
                 />
               </div>
               <div className="rounded-2xl bg-white/[.07] p-3 text-center text-white">
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/70">🧤 Te tiraste {myDive === "left" ? "a la izquierda" : myDive === "right" ? "a la derecha" : "al centro"}</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-white/70">🧤 Te tiraste {myDive.startsWith("left") ? "a la izquierda" : myDive.startsWith("right") ? "a la derecha" : "al centro"}{myDive.endsWith("-high") ? ", arriba" : ", abajo"}</p>
                 <p className="mt-1 font-display text-lg font-bold">{watchShot ? "¡Pateó!" : watchAim ? `${rivalName} está apuntando…` : `${rivalName} está respondiendo…`}</p>
                 <p className="mt-1 text-sm text-white/75">La palabra: «{word.es}»</p>
                 {rivalChoice && (

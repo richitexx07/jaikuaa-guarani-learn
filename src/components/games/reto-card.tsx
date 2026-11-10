@@ -10,6 +10,7 @@ import { Copy, MessageCircle, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppLang, type AppLang } from "@/lib/i18n";
 import { getAmbassadorInfo } from "@/lib/ambassador.functions";
+import { nuevoCodigoSala } from "@/lib/use-sala";
 import { COVER_IMAGE } from "@/components/games/game-cover-images";
 import jaiEmbajador from "@/assets/jai/jai-embajador.webp";
 import jaiGamer from "@/assets/jai-gamer.webp";
@@ -112,7 +113,7 @@ const CSS = `
 export function RetoCard({ guest }: { guest: boolean }) {
   const lang = useAppLang();
   const t = (k: keyof typeof T) => T[k][lang] ?? T[k].es;
-  const [elegido, setElegido] = useState<Opcion["id"]>("todos");
+  const [elegido, setElegido] = useState<Opcion["id"]>("penales");
   const op = OPCIONES.find((o) => o.id === elegido)!;
   const fetchInfo = useServerFn(getAmbassadorInfo);
   const { data } = useQuery({ queryKey: ["ambassador"], queryFn: () => fetchInfo(), enabled: !guest, retry: false, staleTime: 10 * 60 * 1000 });
@@ -183,7 +184,28 @@ export function RetoCard({ guest }: { guest: boolean }) {
         })}
       </div>
 
-      {juegoReto ? (
+      {op.id === "penales" ? (
+        <>
+          <button
+            type="button"
+            onClick={() => {
+              const c = nuevoCodigoSala();
+              const ps = new URLSearchParams({ sala: c, de: "reto" });
+              if (codigo) ps.set("ref", codigo);
+              const url = `https://www.jaikuaa.com/juegos/penales?${ps.toString()}`;
+              const msg = `¡Te desafío a una tanda de penales en guaraní en Jaikuaa! Te estoy esperando en la cancha, cada uno en su celular. Código de sala: ${c}\n${url}`;
+              window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+              window.location.href = `/juegos/penales?sala=${c}`;
+            }}
+            className="rc-pulse relative mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 font-display text-lg font-bold text-[#0E7A3D] shadow-xl transition active:scale-[.98]"
+          >
+            <MessageCircle className="h-6 w-6" fill="#25D366" stroke="#0E7A3D" /> {t("whatsapp")}
+          </button>
+          <p className="relative mt-2 text-center text-sm text-white/90">
+            Se abre tu sala y te avisamos apenas tu amigo entre. Juegan en vivo, cada uno en su celular, sin crear cuenta.
+          </p>
+        </>
+      ) : juegoReto ? (
         <>
           <a
             href={op.ruta}
