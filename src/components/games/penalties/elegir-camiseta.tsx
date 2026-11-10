@@ -4,7 +4,7 @@ import { usePM } from "@/lib/i18n-penales-modos";
 import { useStats } from "@/lib/gamification";
 import { useAppLang } from "@/lib/i18n";
 import { usePT } from "@/lib/i18n-penales";
-import { ESPECIALES, LISTA_ESPECIALES, disenoDe, rachaMaxima, PAISES, PAISES_MICSUR, bandera, nombrePais, useMiKit, type Kit, type Pais } from "./camisetas";
+import { CLUBES, LISTA_CLUBES, ESPECIALES, LISTA_ESPECIALES, disenoDe, rachaMaxima, PAISES, PAISES_MICSUR, bandera, nombrePais, useMiKit, type Kit, type Pais } from "./camisetas";
 
 /** La espalda de la camiseta dibujada (nombre y número), para ver cómo queda antes de patear. */
 export function EspaldaCamiseta({ kit, className = "", mini = false }: { kit: Kit; className?: string; mini?: boolean }) {
@@ -140,6 +140,27 @@ export function ElegirCamiseta() {
                 {!ganada && <Lock className="absolute right-1.5 top-1.5 h-3.5 w-3.5 text-white/80" aria-hidden />}
                 <span className="text-[11px] font-bold leading-tight">{pm(`kit_${e}` as const)}</span>
                 {!ganada && <span className="text-[10px] leading-tight opacity-70">{pm("rachaFalta", { n: ESPECIALES[e].racha })}</span>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div className="space-y-1.5" role="group" aria-label="Colores de tu club">
+        <p className="text-xs font-semibold text-white/80">Colores de tu club</p>
+        <div className="grid grid-cols-4 gap-1.5">
+          {LISTA_CLUBES.map((c) => {
+            const puesta = kit.especial === c;
+            return (
+              <button
+                key={c}
+                type="button"
+                aria-pressed={puesta}
+                onClick={() => guardar({ especial: puesta ? undefined : c })}
+                className="flex flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-center transition active:scale-95"
+                style={puesta ? { background: "#F4F7FB", color: "#071A33", boxShadow: "0 0 0 3px #FFB23E" } : { background: "rgba(255,255,255,.08)", boxShadow: "inset 0 0 0 2px rgba(255,255,255,.14)" }}
+              >
+                <EspaldaCamiseta mini kit={{ ...kit, especial: c }} className="h-10 w-10" />
+                <span className="text-[10px] font-bold leading-tight">{CLUBES[c].nombre}</span>
               </button>
             );
           })}

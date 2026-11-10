@@ -278,7 +278,12 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
     hinchada.current.tension(true);
     try { navigator.vibrate?.(120); } catch { /* sin vibración */ }
     const id = window.setInterval(() => setRestan((s) => Math.max(0, s - 1)), 1000);
-    return () => window.clearInterval(id);
+    // Muerte súbita: late el corazón cada segundo y vibra como un pulso.
+    const latir = t >= 10 ? window.setInterval(() => {
+      hinchada.current.latido();
+      try { navigator.vibrate?.([30, 120, 20]); } catch { /* sin vibración */ }
+    }, 1000) : null;
+    return () => { window.clearInterval(id); if (latir) window.clearInterval(latir); };
   }, [t, corre]);
   useEffect(() => {
     if (restan !== 0 || !corre || myDive) return;
@@ -476,7 +481,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
         </div>
       ) : (
         <>
-          <p className="text-center text-xs font-bold uppercase tracking-wide" style={{ color: P.led }}>
+          <p className={`text-center font-bold uppercase tracking-wide ${sudden ? "animate-pulse text-base" : "text-xs"}`} style={{ color: sudden ? P.mal : P.led }}>
             {sudden ? `Muerte súbita · ${shooterName} patea` : `Penal ${Math.floor(tv / 2) + 1} de 5 · ${shooterName} patea`}
           </p>
 

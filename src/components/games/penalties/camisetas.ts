@@ -63,10 +63,30 @@ export const ESPECIALES = {
   fuego: { racha: 15, diseno: { base: "#D9480F", banda: "#FFB23E", numero: "#FFFFFF" } },
   leyenda: { racha: 30, diseno: { base: "#121212", rayas: "#2B2B2B", vivo: "#E7B53C", numero: "#E7B53C" } },
 } satisfies Record<string, { racha: number; diseno: Diseno }>;
-export type Especial = keyof typeof ESPECIALES;
-export const LISTA_ESPECIALES = Object.keys(ESPECIALES) as Especial[];
+/**
+ * Colores de club: diseños propios de Jaikuaa, libres para todos, SIN nombres de clubes, escudos ni marcas.
+ * Cada uno elige "sus colores"; los nombres son genéricos (colores y rayas).
+ */
+export const CLUBES = {
+  franja: { nombre: "Blanco y negro", diseno: { base: "#FFFFFF", banda: "#111111", numero: "#111111" } },
+  azulgrana: { nombre: "Azul y rojo", diseno: { base: "#B5121B", rayas: "#123A8C", numero: "#FFFFFF" } },
+  aurinegra: { nombre: "Amarillo y negro", diseno: { base: "#FFD200", rayas: "#111111", numero: "#111111" } },
+  blancanegra: { nombre: "Rayas blanco y negro", diseno: { base: "#FFFFFF", rayas: "#111111", numero: "#C8102E" } },
+  celeste: { nombre: "Celeste", diseno: { base: "#6EC1E4", vivo: "#FFFFFF", numero: "#0B2E7A" } },
+  rojiblanca: { nombre: "Rojo y blanco", diseno: { base: "#D52B1E", vivo: "#FFFFFF", numero: "#FFFFFF" } },
+  verdeblanca: { nombre: "Verde y blanco", diseno: { base: "#0E7A3B", rayas: "#FFFFFF", numero: "#0E7A3B" } },
+  violeta: { nombre: "Violeta", diseno: { base: "#5B2A86", vivo: "#FFFFFF", numero: "#FFFFFF" } },
+} satisfies Record<string, { nombre: string; diseno: Diseno }>;
+export type Club = keyof typeof CLUBES;
+export const LISTA_CLUBES = Object.keys(CLUBES) as Club[];
+
+export type Especial = keyof typeof ESPECIALES | Club;
+export const LISTA_ESPECIALES = Object.keys(ESPECIALES) as (keyof typeof ESPECIALES)[];
 export function esEspecial(v: unknown): v is Especial {
-  return typeof v === "string" && v in ESPECIALES;
+  return typeof v === "string" && (v in ESPECIALES || v in CLUBES);
+}
+export function esClub(v: unknown): v is Club {
+  return typeof v === "string" && v in CLUBES;
 }
 
 export type Figura = "chico" | "chica";
@@ -74,7 +94,9 @@ export type Kit = { pais: Pais; figura: Figura; nombre: string; numero: number; 
 
 /** Los colores con los que se pinta la camiseta: la especial si la eligió, si no la de su país. */
 export function disenoDe(k: Kit): Diseno {
-  return k.especial && esEspecial(k.especial) ? ESPECIALES[k.especial].diseno : CAMISETAS[k.pais];
+  if (esClub(k.especial)) return CLUBES[k.especial].diseno;
+  if (k.especial && k.especial in ESPECIALES) return ESPECIALES[k.especial as keyof typeof ESPECIALES].diseno;
+  return CAMISETAS[k.pais];
 }
 
 /* ---------------- la mejor racha vista en este celular ---------------- */

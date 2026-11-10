@@ -48,9 +48,28 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,
     if(goal){s.cheer=t;s.net={...shot.end,t};celebrate(shot.outcome==='angle'?'big':'small');}sound.current.play(goal?'cheer':shot.outcome==='post'?'post':'hit');if(shot.outcome==='post')s.shake=t;
     if(!reduce)try{navigator.vibrate?.(goal?[40,30,60]:30);}catch{}
     callback.current(shot.outcome);
+    if(!reduce)repetir(shot);
    }
   };
   animation.current=paso;
+ }
+ /** Repetición en cámara lenta del gol o la atajada; se corta sola si arranca el próximo penal. */
+ function repetir(shot:Shot){
+  const s=scene.current,ESPERA=1100,LENTO=2.6,dur=(shot.duration>0&&Number.isFinite(shot.duration)?shot.duration:900)*LENTO;
+  window.setTimeout(()=>{
+   if(s.phase!=='result'||animation.current)return;
+   const t0=performance.now(),fin={...shot.end},kf={...shot.keeper};
+   const color=getComputedStyle(canvas.current??document.documentElement).getPropertyValue('--stadium-gold');
+   const paso=(t:number)=>{
+    if(s.phase!=='result'){animation.current=null;return;}
+    const q=Math.max(0,Math.min(1,(t-t0)/dur)),e=1-Math.pow(1-q,2.2),ke=1-Math.pow(1-Math.min(1,q*1.15),2);
+    s.ball={x:400+(fin.x-400)*e,y:520+(fin.y-520)*e-Math.sin(q*Math.PI)*50,r:16-6*e};
+    s.keeper={x:400+(kf.x-400)*ke,y:278+(kf.y-278)*ke,ang:Math.sign(kf.x-400)*Math.min(1.2,Math.abs(kf.x-400)/170)*ke,stretch:ke};
+    if(!s.banner||s.banner.txt!=='REPETICIÓN')s.banner={t,txt:'REPETICIÓN',c:color};
+    if(q>=1){animation.current=null;s.banner=null;}
+   };
+   animation.current=paso;
+  },ESPERA);
  }
  function activate(point?:{x:number;y:number}){if(spectator)return;const s=scene.current;if(s.phase==='aim'){const p=point??s.aim;if(!p)return;if(p.x<G.x-40||p.x>G.x+G.w+40||p.y<G.y-40||p.y>G.y+G.h)return;s.aim=p;s.powerStart=performance.now();s.phase='power';aimCb.current?.(p,'power');}else if(s.phase==='power')kick();}
  const lastAimSent=useRef(0);

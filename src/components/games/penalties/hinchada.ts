@@ -65,6 +65,18 @@ export class Hinchada {
     this.murmullo.gain.gain.setTargetAtTime(alta ? 0.1 : 0.06, a.currentTime, 0.4);
   }
 
+  /** Latido del corazón (muerte súbita): dos golpes graves. */
+  latido() {
+    const a = this.a(); if (!a) return;
+    const t = a.currentTime;
+    [0, 0.22].forEach((d, i) => {
+      const o = a.createOscillator(), g = a.createGain();
+      o.frequency.setValueAtTime(70, t + d); o.frequency.exponentialRampToValueAtTime(38, t + d + 0.15);
+      g.gain.setValueAtTime(i === 0 ? 0.22 : 0.14, t + d); g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.2);
+      o.connect(g).connect(a.destination); o.start(t + d); o.stop(t + d + 0.21);
+    });
+  }
+
   silbato() {
     const a = this.a(); if (!a) return;
     const t = a.currentTime;
