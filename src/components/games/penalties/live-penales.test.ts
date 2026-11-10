@@ -15,3 +15,15 @@ describe("penales a distancia", () => {
     expect(m.guestUid).toBe("b");
   });
 });
+
+describe("sorteo con moneda", () => {
+  it("el ganador patea primero y después se alternan", async () => {
+    const { pateadorEn } = await import("./live-penales");
+    expect([0, 1, 2, 3].map((t) => pateadorEn("guest", t))).toEqual(["guest", "host", "guest", "host"]);
+    expect([0, 1, 2, 3].map((t) => pateadorEn("host", t))).toEqual(["host", "guest", "host", "guest"]);
+  });
+  it("la tanda trae quién ganó la moneda", () => {
+    const m = armarTanda(palabras as never, "a", "b");
+    expect(["host", "guest"]).toContain(m.primero);
+  });
+});
