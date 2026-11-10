@@ -2,7 +2,7 @@ import type { Kit } from './camisetas';
 export const W=800,H=600,G={x:150,y:110,w:500,h:230},POST=12,BR=16;
 export type Outcome='goal'|'angle'|'save'|'post'|'over'|'wide';
 export type Point={x:number;y:number};
-export type Scene={phase:'ask'|'aim'|'power'|'shot'|'result'; knew:boolean; spectator?:boolean; aim:Point|null; powerStart:number; ball:Point & {r:number}; keeper:Point & {ang:number;stretch:number}; net:(Point & {t:number})|null; cheer:number; banner:{t:number;txt:string;c:string}|null; shake?:number; outcome?:Outcome; kit?:Kit};
+export type Scene={phase:'ask'|'aim'|'power'|'shot'|'result'; knew:boolean; spectator?:boolean; aim:Point|null; powerStart:number; ball:Point & {r:number}; keeper:Point & {ang:number;stretch:number}; net:(Point & {t:number})|null; cheer:number; banner:{t:number;txt:string;c:string}|null; shake?:number; outcome?:Outcome; kit?:Kit; objetivo?:Point};
 export const labels:Record<Outcome,string>={goal:'¡GOOOL!',angle:'¡GOLAZO AL ÁNGULO!',save:'¡ATAJÓ!',post:'¡PALO!',over:'¡POR ARRIBA!',wide:'¡AFUERA!'};
 export function freshScene():Scene {return {phase:'ask',knew:false,aim:{x:400,y:225},powerStart:0,ball:{x:400,y:520,r:BR},keeper:{x:400,y:278,ang:0,stretch:0},net:null,cheer:0,banner:null};}
 export function powerZone(knew:boolean):[number,number]{return knew?[.52,.86]:[.62,.8];}

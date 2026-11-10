@@ -1,7 +1,7 @@
 import { G, POST, W, H, powerAt, powerZone, type Scene } from './physics';
 import { ARCO_EN_ESTADIO, ARQUERO, ESTADIO, PELOTA, estadoEstadio, imagen, pateadorPintado, pintadoTarde } from './sprites';
 import { KIT_INICIAL, disenoDe } from './camisetas';
-export function drawStadium(ctx: CanvasRenderingContext2D, S: Scene, now: number, ledText: string, reduce: boolean, palette: Record<string,string>) {
+export function drawStadium(ctx: CanvasRenderingContext2D, S: Scene, now: number, ledText: string, reduce: boolean, palette: Record<string,string>, capa3d=false) {
 const alpha=(role: string, opacity: number)=>`color-mix(in srgb, ${palette[role]} ${opacity*100}%, transparent)`;
 const crowd=Array.from({length:240},(_,i)=>({x:(i*53)%W,y:14+((i*37)%70),c:i%3,ph:i*1.7}));
 const inGoal=(p: {x:number;y:number})=>p.x>G.x-40&&p.x<G.x+G.w+40&&p.y>G.y-40&&p.y<G.y+G.h;
@@ -113,12 +113,12 @@ function drawBall(){const b=S.ball;if(S.phase==='result'&&S.outcome==='save'&&im
   if(pel){ctx.save();ctx.translate(b.x,b.y);ctx.rotate(reduce?0:b.y/25);ctx.drawImage(pel,-b.r*1.1,-b.r*1.1,b.r*2.2,b.r*2.2);ctx.restore();return;}
   ctx.fillStyle=palette['white'];ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,7);ctx.fill();ctx.save();ctx.translate(b.x,b.y);ctx.rotate(reduce?0:b.y/25);ctx.fillStyle=palette['kit-dark'];ctx.beginPath();for(let i=0;i<5;i++){const a=i/5*Math.PI*2;ctx.lineTo(Math.cos(a)*b.r*.42,Math.sin(a)*b.r*.42);}ctx.fill();ctx.restore();}
 function draw(now: number){
-  if(!fondoIlustrado(now))fondoVector(now);
-  if(!estadioListo()||(S.net&&now-S.net.t<900))drawNet(now);
+  if(capa3d)ctx.clearRect(0,0,W,H);else{if(!fondoIlustrado(now))fondoVector(now);
+  if(!estadioListo()||(S.net&&now-S.net.t<900))drawNet(now);}
   // target hint: corners glow
-  if(S.phase==='aim'){ctx.fillStyle=alpha('gold', .12);[[G.x,G.y],[G.x+G.w-110,G.y]].forEach(([x,y])=>{ctx.beginPath();ctx.roundRect(x+POST,y+POST,110-POST,70,10);ctx.fill();});}
-  const sh=S.shake?Math.max(0,1-(now-S.shake)/500):0;if(!estadioListo()||sh>0){ctx.save();if(sh&&!reduce)ctx.translate(Math.sin(now/18)*5*sh,0);ctx.strokeStyle=palette['white'];ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(G.x,G.y+G.h);ctx.lineTo(G.x,G.y);ctx.lineTo(G.x+G.w,G.y);ctx.lineTo(G.x+G.w,G.y+G.h);ctx.stroke();ctx.restore();}
-  drawKeeper(now);
+  if(S.phase==='aim'&&!capa3d){ctx.fillStyle=alpha('gold', .12);[[G.x,G.y],[G.x+G.w-110,G.y]].forEach(([x,y])=>{ctx.beginPath();ctx.roundRect(x+POST,y+POST,110-POST,70,10);ctx.fill();});}
+  const sh=S.shake?Math.max(0,1-(now-S.shake)/500):0;if(!capa3d&&(!estadioListo()||sh>0)){ctx.save();if(sh&&!reduce)ctx.translate(Math.sin(now/18)*5*sh,0);ctx.strokeStyle=palette['white'];ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(G.x,G.y+G.h);ctx.lineTo(G.x,G.y);ctx.lineTo(G.x+G.w,G.y);ctx.lineTo(G.x+G.w,G.y+G.h);ctx.stroke();ctx.restore();}
+  if(!capa3d)drawKeeper(now);
   // aim reticle
   const showAim=S.phase==='aim'?(hover&&inGoal(hover)?hover:{x:400,y:225}):S.phase==='power'?S.aim:null;
   if(showAim){const w=S.phase==='power'?wobble(now):{x:0,y:0};const ax=showAim.x+w.x,ay=showAim.y+w.y;
@@ -135,7 +135,7 @@ function draw(now: number){
   if((S.phase==='aim'||S.phase==='power')&&!S.spectator){ctx.fillStyle=palette['gold'];ctx.font='800 32px sans-serif, sans-serif';ctx.textAlign='center';ctx.fillText(S.phase==='aim'?'Deslizá el dedo y soltá para apuntar':'¡Tocá cuando esté en verde!',400,G.y+G.h+46);}
   if((S.phase==='aim'||S.phase==='power')&&S.spectator){ctx.fillStyle=palette['gold'];ctx.font='800 32px sans-serif, sans-serif';ctx.textAlign='center';ctx.fillText(S.phase==='aim'?'Está apuntando…':'¡Va a patear!',400,G.y+G.h+46);}
   ctx.textAlign='start';
-  drawBall();
+  if(!capa3d)drawBall();
   // Generic striped shirt: no crest, sponsor or team identifier.
   drawShooter(now);
   if(S.banner){const q=(now-S.banner.t)/1400;if(q>1)S.banner=null;else{const s=reduce?1:Math.min(1,q*5)*(1+.08*Math.sin(q*20));ctx.save();ctx.translate(400,300);ctx.scale(s,s);ctx.globalAlpha=q>.8?(1-q)/.2:1;ctx.font='800 54px sans-serif';ctx.textAlign='center';ctx.lineWidth=10;ctx.strokeStyle=palette['black'];ctx.strokeText(S.banner.txt,0,20,720);ctx.fillStyle=S.banner.c;ctx.fillText(S.banner.txt,0,20,720);ctx.restore();}}
@@ -150,5 +150,5 @@ function cargando(now:number){ctx.fillStyle=palette['night'];ctx.fillRect(0,0,W,
 
 // También espera al pateador con su camiseta pintada, así nunca asoma el dibujo viejo.
 const est=estadoEstadio(),pintado=!!pateadorPintado(S.kit??KIT_INICIAL,'listo');
-if(est==='cargando'||(est==='listo'&&!pintado&&!S.spectator&&S.phase!=='shot'&&S.phase!=='result'&&!pintadoTarde()))cargando(now);else draw(now);
+if(!capa3d&&(est==='cargando'||(est==='listo'&&!pintado&&!S.spectator&&S.phase!=='shot'&&S.phase!=='result'&&!pintadoTarde())))cargando(now);else draw(now);
 }
