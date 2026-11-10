@@ -8,6 +8,8 @@ import type { Cancha3D } from './cancha-3d';
 
 /** Se recuerda entre penales: si el 3D falló una vez en este celular, se queda en el dibujo plano. */
 let fallo3D=false;
+/** Altura del arquero parado (coordenadas del juego) y gravedad de la caída en puntos/s². */
+export const PISO_ARQUERO=278,GRAVEDAD_ARQUERO=2600;
 /** Baja la cancha 3D antes de entrar al juego. */
 export function precargarCancha3D(){void import('./cancha-3d').catch(()=>undefined);}
 
@@ -65,9 +67,19 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,
     if(goal){s.cheer=t;s.net={...shot.end,t};celebrate(shot.outcome==='angle'?'big':'small');}sound.current.play(goal?'cheer':shot.outcome==='post'?'post':'hit');if(shot.outcome==='post')s.shake=t;
     if(!reduce)try{navigator.vibrate?.(goal?[40,30,60]:30);}catch{}
     callback.current(shot.outcome);
+    caer(t);
     if(!reduce)repetir(shot);
    }
   };
+  animation.current=paso;
+ }
+ /** Gravedad: después de la estirada el arquero cae al césped (nunca queda flotando). */
+ function caer(t0:number){
+  const s=scene.current,y0=s.keeper.y,x0=s.keeper.x,st0=s.keeper.stretch;if(y0>=PISO_ARQUERO-1)return;
+  const g=GRAVEDAD_ARQUERO/1e6,dur=Math.sqrt(2*(PISO_ARQUERO-y0)/g);
+  const paso=(t:number)=>{const dt=Math.max(0,t-t0),y=Math.min(PISO_ARQUERO,y0+.5*g*dt*dt),q=Math.min(1,dt/dur);
+   s.keeper={x:x0,y,ang:s.keeper.ang,stretch:st0*(1-q*.5)};
+   if(y>=PISO_ARQUERO){animation.current=null;try{navigator.vibrate?.(12);}catch{}}};
   animation.current=paso;
  }
  /** Repetición en cámara lenta del gol o la atajada; se corta sola si arranca el próximo penal. */
@@ -83,7 +95,7 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,
     s.ball={x:400+(fin.x-400)*e,y:520+(fin.y-520)*e-Math.sin(q*Math.PI)*50,r:16-6*e};
     s.keeper={x:400+(kf.x-400)*ke,y:278+(kf.y-278)*ke,ang:Math.sign(kf.x-400)*Math.min(1.2,Math.abs(kf.x-400)/170)*ke,stretch:ke};
     if(!s.banner||s.banner.txt!=='REPETICIÓN')s.banner={t,txt:'REPETICIÓN',c:color};
-    if(q>=1){animation.current=null;s.banner=null;}
+    if(q>=1){animation.current=null;s.banner=null;caer(t);}
    };
    animation.current=paso;
   },ESPERA);
