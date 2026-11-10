@@ -4,6 +4,9 @@ import { ArrowLeft, Maximize2, Minimize2 } from "lucide-react";
 import { GameKit, GameSoundButton } from "./game-kit";
 import { GameHelp } from "./game-help";
 import { SponsorLine } from "./sponsor-line";
+import { VitrinaMarcas } from "./vitrina-marcas";
+import { DemoBrandPanel } from "./demo-brand-panel";
+import { esVitrina } from "@/lib/vitrina";
 import type { SponsorSlot } from "@/lib/sponsor-slots";
 import { useRememberPlace } from "@/lib/last-place";
 import { useGT } from "@/lib/i18n-games";
@@ -56,7 +59,12 @@ export function GameStage({
             <FullscreenButton />
           </div>
         </header>
-        {sponsorSlot && (
+        {sponsorSlot && esVitrina(sponsorSlot) ? (
+          <div className="game-stage-sponsor -mt-2 mb-1">
+            <VitrinaMarcas slot={sponsorSlot} />
+            <div className="mx-auto max-w-3xl px-4"><DemoBrandPanel /></div>
+          </div>
+        ) : sponsorSlot && (
           <div className="game-stage-sponsor -mt-2 mb-1">
             <SponsorLine slot={sponsorSlot} />
           </div>
