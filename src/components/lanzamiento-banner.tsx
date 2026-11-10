@@ -2,38 +2,42 @@ import { useEffect, useState } from "react";
 import { useAppLang, type AppLang } from "@/lib/i18n";
 
 /**
- * Franja del lanzamiento oficial (23 de noviembre de 2026, hora de Paraguay).
- * Cuenta los días que faltan; el día del lanzamiento dice «Hoy» y desde el 24 desaparece sola.
- * La cuenta se calcula en el navegador (no en el servidor) para no chocar con la hora de cada uno.
+ * Franja del lanzamiento oficial.
+ * Mientras la fecha no está confirmada (LANZAMIENTO = null) muestra «Muy pronto», sin cuenta regresiva.
+ * Con fecha: cuenta los días; el día dice «Hoy» y desde el siguiente desaparece sola.
+ * Para fijar la fecha: LANZAMIENTO = Date.UTC(año, mes-1, día, 3) (medianoche de Paraguay, UTC−3) y completar FECHA.
  */
-const LANZAMIENTO = Date.UTC(2026, 10, 23, 3, 0, 0); // 23/11/2026 00:00 en Paraguay (UTC−3)
+export const LANZAMIENTO: number | null = null;
+const FECHA: Record<AppLang, string> | null = null;
 const DIA = 24 * 60 * 60 * 1000;
 
 type L = Record<AppLang, string>;
-const T: Record<"titulo" | "fecha" | "hoy" | "manana" | "faltan", L> = {
+const T: Record<"titulo" | "pronto" | "hoy" | "manana" | "faltan", L> = {
   titulo: { es: "Lanzamiento oficial", pt: "Lançamento oficial", en: "Official launch", de: "Offizieller Start", fr: "Lancement officiel", zh: "正式上線" },
-  fecha: { es: "23 de noviembre", pt: "23 de novembro", en: "November 23", de: "23. November", fr: "23 novembre", zh: "11 月 23 日" },
+  pronto: { es: "Muy pronto", pt: "Em breve", en: "Coming soon", de: "Demnächst", fr: "Bientôt", zh: "即將推出" },
   hoy: { es: "¡Es hoy!", pt: "É hoje!", en: "It's today!", de: "Heute!", fr: "C'est aujourd'hui !", zh: "就是今天！" },
   manana: { es: "¡Es mañana!", pt: "É amanhã!", en: "It's tomorrow!", de: "Morgen!", fr: "C'est demain !", zh: "就在明天！" },
   faltan: { es: "Faltan {n} días", pt: "Faltam {n} dias", en: "{n} days to go", de: "Noch {n} Tage", fr: "J-{n}", zh: "還有 {n} 天" },
 };
 
-export function diasParaLanzamiento(ahora: number): number {
-  return Math.ceil((LANZAMIENTO - ahora) / DIA) + 0; // + 0 evita el «-0»
+export function diasParaLanzamiento(ahora: number, fecha: number | null = LANZAMIENTO): number | null {
+  if (fecha === null) return null;
+  return Math.ceil((fecha - ahora) / DIA) + 0; // + 0 evita el «-0»
 }
 
 export function LanzamientoBanner({ oscuro = false, className = "" }: { oscuro?: boolean; className?: string }) {
   const lang = useAppLang();
   const [dias, setDias] = useState<number | null>(null);
   useEffect(() => {
+    if (LANZAMIENTO === null) return;
     const calc = () => setDias(diasParaLanzamiento(Date.now()));
     calc();
     const id = window.setInterval(calc, 60 * 60 * 1000);
     return () => window.clearInterval(id);
   }, []);
-  // Desde el 24/11 ya no se muestra.
   if (dias !== null && dias < 0) return null;
   const t = (k: keyof typeof T) => T[k][lang] ?? T[k].es;
+  const fecha = FECHA ? (FECHA[lang] ?? FECHA.es) : t("pronto");
   const cuenta = dias === null ? "" : dias === 0 ? t("hoy") : dias === 1 ? t("manana") : t("faltan").replace("{n}", String(dias));
 
   return (
@@ -52,7 +56,7 @@ export function LanzamientoBanner({ oscuro = false, className = "" }: { oscuro?:
         <i className="block h-1.5 w-4 rounded-full bg-[#2F62C9]" />
       </span>
       <span className="text-sm font-semibold">
-        {t("titulo")} · <span className="font-display font-bold text-[#F6C445]">{t("fecha")}</span>
+        {t("titulo")} · <span className="font-display font-bold text-[#F6C445]">{fecha}</span>
       </span>
       {cuenta && (
         <span className="rounded-full bg-[#F6C445] px-2.5 py-0.5 font-display text-xs font-bold text-[#0D1B33]">{cuenta}</span>
