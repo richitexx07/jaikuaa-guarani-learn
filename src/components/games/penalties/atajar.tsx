@@ -15,7 +15,9 @@ import { SpeakerButton } from "@/components/audio/speaker-button";
 import { PenaltyPitch } from "./pitch";
 import { G, resolveShot, zoneOf, type Dive, type Shot } from "./physics";
 import { PAISES_MICSUR, type Kit } from "./camisetas";
-import jaiArquero from "@/assets/penales/jai-arquero-listo.webp";
+import jaiArqueroImg from "@/assets/penales/jai-arquero-listo.webp";
+import mimbiArqueraImg from "@/assets/penales/mimbi-arquera-listo.webp";
+import { useMiKit } from "./camisetas";
 
 const C = { noche: "#071A33", led: "#FFB23E", gol: "#3BE38A", mal: "#FF5A4E" };
 const TOTAL = 5;
@@ -40,6 +42,8 @@ export function tiroResuelto(aim: { x: number; y: number }, entendio: boolean, n
 }
 
 export function Atajar({ words, seed, muted, ledText, onModes, onAgain }: { words: GameWord[]; seed: number; muted: boolean; ledText: string; onModes: () => void; onAgain: () => void }) {
+  const [miKit] = useMiKit();
+  const jaiArquero = miKit.figura === "chica" ? mimbiArqueraImg : jaiArqueroImg;
   const pm = usePM();
   const conAudio = useMemo(() => words.filter((w) => w.hasAudio), [words]);
   const deck = useMemo(() => shufflerFor(seed)(orderedBy(conAudio, (w) => w.gn)).slice(0, TOTAL), [conAudio, seed]);
@@ -158,6 +162,7 @@ export function Atajar({ words, seed, muted, ledText, onModes, onAgain }: { word
       </div>
       <div className="overflow-hidden rounded-2xl ring-4 ring-black/40">
         <PenaltyPitch
+          arquera={miKit.figura}
           key={`atajar-${turn}`}
           kit={kitRival}
           knew

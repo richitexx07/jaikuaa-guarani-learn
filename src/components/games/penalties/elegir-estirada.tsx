@@ -4,7 +4,9 @@
  * qué tan lejos se estira: poca fuerza se queda cerca del centro, mucha llega hasta el palo.
  */
 import { useEffect, useRef, useState, type PointerEvent } from "react";
-import jaiArquero from "@/assets/penales/jai-arquero-listo.webp";
+import jaiArqueroImg from "@/assets/penales/jai-arquero-listo.webp";
+import mimbiArqueraImg from "@/assets/penales/mimbi-arquera-listo.webp";
+import { useMiKit } from "./camisetas";
 import type { Dive } from "./physics";
 
 type P = { x: number; y: number };
@@ -15,6 +17,8 @@ const NOMBRE = [["arriba a la izquierda", "arriba al centro", "arriba a la derec
 export function esManotazo(a: P, b: P, ms: number): boolean { return ms > 0 && ms < 260 && Math.hypot(b.x - a.x, b.y - a.y) >= 25; }
 
 export function ElegirEstirada({ onElegir }: { onElegir: (d: Dive) => void }) {
+  const [miKit] = useMiKit();
+  const jaiArquero = miKit.figura === "chica" ? mimbiArqueraImg : jaiArqueroImg;
   const [fase, setFase] = useState<"aim" | "power" | "done">("aim");
   const [aim, setAim] = useState<P>({ x: 50, y: 40 });
   const [fuerza, setFuerza] = useState(0);

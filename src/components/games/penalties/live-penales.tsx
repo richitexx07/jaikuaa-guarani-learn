@@ -529,6 +529,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
                   <PenaltyPitch
                     key={t}
                     kit={kitPropio}
+                    arquera={rivalKit?.figura}
                     guess={dive}
                     knew={knew}
                     ready={choice !== null}
@@ -583,6 +584,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
                 <PenaltyPitch
                   key={`ver-${t}`}
                   kit={rivalKit ?? { ...miKit, pais: "PY", nombre: "" }}
+                  arquera={miKit.figura}
                   guess={myDive}
                   knew={rivalChoice === word.gn}
                   ready={false}

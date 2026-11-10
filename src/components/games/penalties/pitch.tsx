@@ -14,13 +14,13 @@ export const PISO_ARQUERO=278,GRAVEDAD_ARQUERO=2600;
 export function precargarCancha3D(){void import('./cancha-3d').catch(()=>undefined);}
 
 /** watch: modo espectador (el arquero a distancia ve en vivo cómo apunta y patea el otro). onAim/onKick: el que patea avisa lo que hace. */
-export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,onKick,kit}:{kit?:Kit;knew:boolean;ready:boolean;ledText:string;muted:boolean;onShot:(o:Outcome)=>void;guess?:Dive;watch?:{aim?:Point|null;phase?:'aim'|'power'|null;shot?:Shot|null};onAim?:(p:Point,phase:'aim'|'power')=>void;onKick?:(shot:Shot)=>void}){
+export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,onKick,kit,arquera}:{kit?:Kit;arquera?:Kit['figura'];knew:boolean;ready:boolean;ledText:string;muted:boolean;onShot:(o:Outcome)=>void;guess?:Dive;watch?:{aim?:Point|null;phase?:'aim'|'power'|null;shot?:Shot|null};onAim?:(p:Point,phase:'aim'|'power')=>void;onKick?:(shot:Shot)=>void}){
  const canvas=useRef<HTMLCanvasElement>(null),scene=useRef<Scene>(freshScene()),animation=useRef<((now:number)=>void)|null>(null),sound=useRef(new StadiumSound());
  const callback=useRef(onShot);callback.current=onShot;
  const settings=useRef({ledText,muted});settings.current={ledText,muted};
  const aimCb=useRef(onAim);aimCb.current=onAim;const kickCb=useRef(onKick);kickCb.current=onKick;
  const spectator=!!watch;scene.current.spectator=spectator;
- const [miKit]=useMiKit();scene.current.kit=kit??miKit;
+ const [miKit]=useMiKit();scene.current.kit=kit??miKit;scene.current.arquera=arquera;
  const lienzo3d=useRef<HTMLCanvasElement>(null),cancha3d=useRef<Cancha3D|null>(null),[en3d,setEn3d]=useState(false),[carga3d,setCarga3d]=useState(!fallo3D);
  // Cancha 3D: se carga aparte; si el celular no puede o tarda más de 8 s, queda el estadio plano de siempre.
  useEffect(()=>{if(fallo3D)return;let vivo=true;const corte=window.setTimeout(()=>{vivo=false;setCarga3d(false);},8000);

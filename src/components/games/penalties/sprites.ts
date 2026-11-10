@@ -19,6 +19,18 @@ export const ARQUERO = {
   atajada: url("jai-arquero-atajada"),
   vencido: url("jai-arquero-vencido"),
 };
+/** Mimbi en el arco: las mismas cinco poses que Jai, para cuando ataja una chica. */
+export const ARQUERA = {
+  listo: url("mimbi-arquera-listo"),
+  estirada: url("mimbi-arquera-estirada"),
+  estiradaSinPelota: url("mimbi-arquera-estirada-sin-pelota"),
+  atajada: url("mimbi-arquera-atajada"),
+  vencido: url("mimbi-arquera-vencido"),
+};
+/** Quién está en el arco: Mimbi si ataja una chica; si falta algún dibujo de Mimbi, Jai. */
+export function arqueroDe(f?: Figura): typeof ARQUERO {
+  return f === "chica" && ARQUERA.listo ? ARQUERA : ARQUERO;
+}
 export const PELOTA = url("pelota");
 export const ESTADIO = url("estadio-noche");
 export function pateador(f: Figura, pose: "listo" | "patea"): string | null {
@@ -271,7 +283,7 @@ function medir(peso: Float32Array, w: number, x0: number, x1: number, y0: number
 /** Lo que tiene que estar para mostrar el estadio nuevo desde el primer cuadro. */
 const ESENCIALES = [ESTADIO, ARQUERO.listo, PELOTA, pateador("chico", "listo"), pateador("chica", "listo")];
 /** El resto, que se usa recién al patear. */
-const RESTO = [ARQUERO.estirada, ARQUERO.estiradaSinPelota, ARQUERO.atajada, ARQUERO.vencido, pateador("chico", "patea"), pateador("chica", "patea")];
+const RESTO = [...Object.values(ARQUERA), ARQUERO.estirada, ARQUERO.estiradaSinPelota, ARQUERO.atajada, ARQUERO.vencido, pateador("chico", "patea"), pateador("chica", "patea")];
 let precargaDesde = 0;
 /** Desde cuándo el juego está en pantalla esperando las ilustraciones. */
 let esperaDesde = 0;

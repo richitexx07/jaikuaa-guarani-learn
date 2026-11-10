@@ -2,7 +2,7 @@ import type { Kit } from './camisetas';
 export const W=800,H=600,G={x:150,y:110,w:500,h:230},POST=12,BR=16;
 export type Outcome='goal'|'angle'|'save'|'post'|'over'|'wide';
 export type Point={x:number;y:number};
-export type Scene={phase:'ask'|'aim'|'power'|'shot'|'result'; knew:boolean; spectator?:boolean; aim:Point|null; powerStart:number; ball:Point & {r:number}; keeper:Point & {ang:number;stretch:number}; net:(Point & {t:number})|null; cheer:number; banner:{t:number;txt:string;c:string}|null; shake?:number; outcome?:Outcome; kit?:Kit; objetivo?:Point; aterrizo?:number; tv?:boolean};
+export type Scene={phase:'ask'|'aim'|'power'|'shot'|'result'; knew:boolean; spectator?:boolean; aim:Point|null; powerStart:number; ball:Point & {r:number}; keeper:Point & {ang:number;stretch:number}; net:(Point & {t:number})|null; cheer:number; banner:{t:number;txt:string;c:string}|null; shake?:number; outcome?:Outcome; kit?:Kit; arquera?:Kit['figura']; objetivo?:Point; aterrizo?:number; tv?:boolean};
 /** Comba de la pelota (puntos del juego): los tiros cruzados abren hacia afuera y se cierran al palo. */
 export function combaDe(end:Point):number{const dx=end.x-400;return -Math.sign(dx)*Math.min(1,Math.abs(dx)/250)*42;}
 /** Amague del arquero mientras se apunta: balanceo y un paso falso cada ~1,7 s. Devuelve corrimiento x e y (salto). */

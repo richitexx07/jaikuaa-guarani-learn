@@ -1,5 +1,5 @@
 import { G, POST, W, H, powerAt, powerZone, type Scene } from './physics';
-import { ARCO_EN_ESTADIO, ARQUERO, ESTADIO, PELOTA, estadoEstadio, imagen, pateadorPintado, pintadoTarde } from './sprites';
+import { ARCO_EN_ESTADIO, arqueroDe, ESTADIO, PELOTA, estadoEstadio, imagen, pateadorPintado, pintadoTarde } from './sprites';
 import { KIT_INICIAL, disenoDe } from './camisetas';
 export function drawStadium(ctx: CanvasRenderingContext2D, S: Scene, now: number, ledText: string, reduce: boolean, palette: Record<string,string>, capa3d=false) {
 const alpha=(role: string, opacity: number)=>`color-mix(in srgb, ${palette[role]} ${opacity*100}%, transparent)`;
@@ -92,7 +92,7 @@ function fondoIlustrado(now:number){const im=imagen(ESTADIO);if(!im)return false
   return true;}
 function sprite(im:CanvasImageSource,cx:number,pie:number,alto:number,ancho:number,espejo=false,giro=0){ctx.save();ctx.translate(cx,pie-alto/2);if(giro)ctx.rotate(giro);if(espejo)ctx.scale(-1,1);ctx.drawImage(im,-ancho/2,-alto/2,ancho,alto);ctx.restore();}
 function sombra(cx:number,y:number,r:number){ctx.fillStyle=alpha('black',.3);ctx.beginPath();ctx.ellipse(cx,y,r,r*.2,0,0,7);ctx.fill();}
-function drawKeeper(now:number){
+function drawKeeper(now:number){const ARQUERO=arqueroDe(S.arquera);
   const k=S.keeper,piso=G.y+G.h+6,dx=k.x-400,arriba=Math.min(0,k.y-278),res=S.phase==='result'?S.outcome:undefined;
   const listo=imagen(ARQUERO.listo);if(!listo){drawKeeperVector(now);return;}
   const idle=(S.phase==='aim'||S.phase==='power')&&!reduce?Math.sin(now/(S.knew?420:200))*(S.knew?6:16):0;
@@ -108,7 +108,7 @@ function drawShooter(now:number){const kit=S.kit??KIT_INICIAL,kick=S.phase==='sh
   // Los dibujos vienen recortados al cuerpo: la misma escala para todas las poses, con los pies en el piso.
   const alto=im.height*.27,ancho=im.width*.27,sway=reduce||kick?0:Math.sin(now/400)*1.5;
   sombra(kick?372:330,H-6,56);sprite(im,(kick?372:330)+sway,H+10,alto,ancho);}
-function drawBall(){const b=S.ball;if(S.phase==='result'&&S.outcome==='save'&&imagen(ARQUERO.atajada))return;
+function drawBall(){const b=S.ball;if(S.phase==='result'&&S.outcome==='save'&&imagen(arqueroDe(S.arquera).atajada))return;
   const pel=imagen(PELOTA);ctx.fillStyle=alpha('black', .25);ctx.beginPath();ctx.ellipse(b.x,Math.max(b.y+b.r,G.y+G.h-10)+4,b.r,b.r*.35,0,0,7);ctx.fill();
   if(pel){ctx.save();ctx.translate(b.x,b.y);ctx.rotate(reduce?0:b.y/25);ctx.drawImage(pel,-b.r*1.1,-b.r*1.1,b.r*2.2,b.r*2.2);ctx.restore();return;}
   ctx.fillStyle=palette['white'];ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,7);ctx.fill();ctx.save();ctx.translate(b.x,b.y);ctx.rotate(reduce?0:b.y/25);ctx.fillStyle=palette['kit-dark'];ctx.beginPath();for(let i=0;i<5;i++){const a=i/5*Math.PI*2;ctx.lineTo(Math.cos(a)*b.r*.42,Math.sin(a)*b.r*.42);}ctx.fill();ctx.restore();}

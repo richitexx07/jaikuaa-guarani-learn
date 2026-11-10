@@ -6,7 +6,7 @@
  */
 import * as THREE from 'three';
 import { amague, G, H, W, type Scene } from './physics';
-import { ARQUERO, imagen } from './sprites';
+import { arqueroDe, imagen } from './sprites';
 
 /** Metros por punto del juego: el arco (500 puntos) mide 7,32 m. */
 const S = 7.32 / 500;
@@ -144,6 +144,7 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
     // Jai según la jugada (las mismas poses que el dibujo plano)
     const k = s.keeper, dx = k.x - 400, res = s.phase === 'result' ? s.outcome : undefined;
     const am = s.phase === 'aim' || s.phase === 'power' ? amague(now, s.knew) : { x: 0, y: 0 }, idle = am.x;
+    const ARQUERO = arqueroDe(s.arquera);
     let src: string | null = ARQUERO.listo, alto = 180, volando = false;
     if (res === 'save') { const t = s.banner ? now - s.banner.t : 1e9; if (t < 380 && Math.abs(dx) > 24) { src = ARQUERO.estirada; alto = 200; volando = true; } else { src = ARQUERO.atajada ?? ARQUERO.listo; alto = 190; } }
     else if (res && Math.abs(dx) > 40) { src = ARQUERO.vencido ?? ARQUERO.listo; alto = 160; }
