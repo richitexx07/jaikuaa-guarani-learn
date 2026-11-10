@@ -67,9 +67,10 @@ export type LibroCard = {
   paginas: number;
   publicado: boolean;
   tengo: boolean;
+  precioGs: number | null;
 };
 
-type LibroRow = { id: string; titulo: string; autor: string; descripcion: string; portada_path: string | null; publicado: boolean; created_at: string };
+type LibroRow = { id: string; titulo: string; autor: string; descripcion: string; portada_path: string | null; publicado: boolean; precio_gs: number | null; created_at: string };
 
 async function contarPaginas(ids: string[]): Promise<Map<string, number>> {
   const out = new Map<string, number>();
@@ -91,6 +92,7 @@ async function aTarjetas(rows: LibroRow[], tengo: Set<string> | "todos"): Promis
     paginas: paginas.get(r.id) ?? 0,
     publicado: r.publicado,
     tengo: tengo === "todos" || tengo.has(r.id),
+    precioGs: r.precio_gs ?? null,
   }));
 }
 
@@ -99,7 +101,7 @@ export const catalogoLibros = createServerFn({ method: "GET" }).handler(async ()
   const db = await admin();
   const { data, error } = await db
     .from("libros")
-    .select("id, titulo, autor, descripcion, portada_path, publicado, created_at")
+    .select("id, titulo, autor, descripcion, portada_path, publicado, precio_gs, created_at")
     .eq("publicado", true)
     .order("created_at", { ascending: false })
     .limit(60);
@@ -115,7 +117,7 @@ export const misLibros = createServerFn({ method: "GET" })
     const soyAdmin = await esAdmin(context.supabase, context.userId);
     const { data: acc } = await db.from("libro_accesos").select("libro_id").eq("user_id", context.userId).limit(500);
     const ids = new Set(((acc ?? []) as { libro_id: string }[]).map((a) => a.libro_id));
-    let q = db.from("libros").select("id, titulo, autor, descripcion, portada_path, publicado, created_at").order("created_at", { ascending: false }).limit(200);
+    let q = db.from("libros").select("id, titulo, autor, descripcion, portada_path, publicado, precio_gs, created_at").order("created_at", { ascending: false }).limit(200);
     if (!soyAdmin) {
       if (ids.size === 0) return { libros: [] as LibroCard[], esAdmin: false };
       q = q.in("id", [...ids]);
@@ -185,7 +187,7 @@ export const adminLibros = createServerFn({ method: "GET" })
     const db = await admin();
     const { data, error } = await db
       .from("libros")
-      .select("id, titulo, autor, descripcion, portada_path, publicado, created_at")
+      .select("id, titulo, autor, descripcion, portada_path, publicado, precio_gs, created_at")
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw new Error(error.message);
@@ -252,6 +254,7 @@ export const actualizarLibro = createServerFn({ method: "POST" })
         id: z.string().uuid(),
         publicado: z.boolean().optional(),
         portadaPath: z.string().max(300).nullable().optional(),
+        precioGs: z.number().int().min(1000).max(10000000).nullable().optional(),
       })
       .parse(d),
   )
@@ -262,6 +265,7 @@ export const actualizarLibro = createServerFn({ method: "POST" })
     if (data.autor !== undefined) cambios.autor = data.autor;
     if (data.descripcion !== undefined) cambios.descripcion = data.descripcion;
     if (data.publicado !== undefined) cambios.publicado = data.publicado;
+    if (data.precioGs !== undefined) cambios.precio_gs = data.precioGs;
     if (data.portadaPath !== undefined) {
       if (data.portadaPath !== null && !partirRuta(data.portadaPath)) throw new Error("Ruta inválida");
       cambios.portada_path = data.portadaPath;

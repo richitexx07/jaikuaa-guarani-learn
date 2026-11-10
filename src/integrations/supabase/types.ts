@@ -875,6 +875,7 @@ export type Database = {
           descripcion: string
           id: string
           portada_path: string | null
+          precio_gs: number | null
           publicado: boolean
           titulo: string
           updated_at: string
@@ -886,6 +887,7 @@ export type Database = {
           descripcion?: string
           id?: string
           portada_path?: string | null
+          precio_gs?: number | null
           publicado?: boolean
           titulo: string
           updated_at?: string
@@ -897,6 +899,7 @@ export type Database = {
           descripcion?: string
           id?: string
           portada_path?: string | null
+          precio_gs?: number | null
           publicado?: boolean
           titulo?: string
           updated_at?: string
@@ -1076,6 +1079,51 @@ export type Database = {
           revisada_por?: string | null
           titulo?: string
           url?: string
+        }
+        Relationships: []
+      }
+      pagos: {
+        Row: {
+          created_at: string
+          descripcion: string
+          estado: string
+          hash_pedido: string | null
+          id: string
+          modo: string
+          monto_gs: number
+          pagado_at: string | null
+          ref_id: string
+          tipo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          descripcion?: string
+          estado?: string
+          hash_pedido?: string | null
+          id?: string
+          modo?: string
+          monto_gs: number
+          pagado_at?: string | null
+          ref_id: string
+          tipo?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          descripcion?: string
+          estado?: string
+          hash_pedido?: string | null
+          id?: string
+          modo?: string
+          monto_gs?: number
+          pagado_at?: string | null
+          ref_id?: string
+          tipo?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

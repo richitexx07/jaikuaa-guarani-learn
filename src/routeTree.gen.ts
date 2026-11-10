@@ -104,10 +104,12 @@ import { Route as AuthenticatedJuegosVentanillaRouteImport } from './routes/_aut
 import { Route as AuthenticatedLeerIdRouteImport } from './routes/_authenticated/leer.$id'
 import { Route as AuthenticatedMostradorIndexRouteImport } from './routes/_authenticated/mostrador.index'
 import { Route as AuthenticatedMostradorEditarRouteImport } from './routes/_authenticated/mostrador.editar'
+import { Route as AuthenticatedPagosRefRouteImport } from './routes/_authenticated/pagos.$ref'
 import { Route as AuthenticatedPracticaIndexRouteImport } from './routes/_authenticated/practica.index'
 import { Route as AuthenticatedPracticaRegistroRouteImport } from './routes/_authenticated/practica.registro'
 import { Route as AuthenticatedTriviaIndexRouteImport } from './routes/_authenticated/trivia.index'
 import { Route as AuthenticatedTriviaCategoryRouteImport } from './routes/_authenticated/trivia.$category'
+import { Route as ApiPublicPagoparRouteImport } from './routes/api/public/pagopar'
 import { Route as AuthenticatedCursoLangIndexRouteImport } from './routes/_authenticated/curso.$lang.index'
 import { Route as AuthenticatedGuaraniEscolarTemaIndexRouteImport } from './routes/_authenticated/guarani-escolar.tema.index'
 import { Route as AuthenticatedGuaraniEscolarTemaTopicRouteImport } from './routes/_authenticated/guarani-escolar.tema.$topic'
@@ -622,6 +624,11 @@ const AuthenticatedMostradorEditarRoute =
     path: '/mostrador/editar',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPagosRefRoute = AuthenticatedPagosRefRouteImport.update({
+  id: '/pagos/$ref',
+  path: '/pagos/$ref',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPracticaIndexRoute =
   AuthenticatedPracticaIndexRouteImport.update({
     id: '/practica/',
@@ -646,6 +653,11 @@ const AuthenticatedTriviaCategoryRoute =
     path: '/trivia/$category',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicPagoparRoute = ApiPublicPagoparRouteImport.update({
+  id: '/api/public/pagopar',
+  path: '/api/public/pagopar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCursoLangIndexRoute =
   AuthenticatedCursoLangIndexRouteImport.update({
     id: '/',
@@ -767,8 +779,10 @@ export interface FileRoutesByFullPath {
   '/juegos/ventanilla': typeof AuthenticatedJuegosVentanillaRoute
   '/leer/$id': typeof AuthenticatedLeerIdRoute
   '/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
+  '/pagos/$ref': typeof AuthenticatedPagosRefRoute
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
+  '/api/public/pagopar': typeof ApiPublicPagoparRoute
   '/aula/': typeof AuthenticatedAulaIndexRoute
   '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/guarani-escolar/': typeof AuthenticatedGuaraniEscolarIndexRoute
@@ -869,8 +883,10 @@ export interface FileRoutesByTo {
   '/juegos/ventanilla': typeof AuthenticatedJuegosVentanillaRoute
   '/leer/$id': typeof AuthenticatedLeerIdRoute
   '/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
+  '/pagos/$ref': typeof AuthenticatedPagosRefRoute
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
+  '/api/public/pagopar': typeof ApiPublicPagoparRoute
   '/aula': typeof AuthenticatedAulaIndexRoute
   '/docente': typeof AuthenticatedDocenteIndexRoute
   '/guarani-escolar': typeof AuthenticatedGuaraniEscolarIndexRoute
@@ -976,8 +992,10 @@ export interface FileRoutesById {
   '/_authenticated/juegos/ventanilla': typeof AuthenticatedJuegosVentanillaRoute
   '/_authenticated/leer/$id': typeof AuthenticatedLeerIdRoute
   '/_authenticated/mostrador/editar': typeof AuthenticatedMostradorEditarRoute
+  '/_authenticated/pagos/$ref': typeof AuthenticatedPagosRefRoute
   '/_authenticated/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/_authenticated/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
+  '/api/public/pagopar': typeof ApiPublicPagoparRoute
   '/_authenticated/aula/': typeof AuthenticatedAulaIndexRoute
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/guarani-escolar/': typeof AuthenticatedGuaraniEscolarIndexRoute
@@ -1083,8 +1101,10 @@ export interface FileRouteTypes {
     | '/juegos/ventanilla'
     | '/leer/$id'
     | '/mostrador/editar'
+    | '/pagos/$ref'
     | '/practica/registro'
     | '/trivia/$category'
+    | '/api/public/pagopar'
     | '/aula/'
     | '/docente/'
     | '/guarani-escolar/'
@@ -1185,8 +1205,10 @@ export interface FileRouteTypes {
     | '/juegos/ventanilla'
     | '/leer/$id'
     | '/mostrador/editar'
+    | '/pagos/$ref'
     | '/practica/registro'
     | '/trivia/$category'
+    | '/api/public/pagopar'
     | '/aula'
     | '/docente'
     | '/guarani-escolar'
@@ -1291,8 +1313,10 @@ export interface FileRouteTypes {
     | '/_authenticated/juegos/ventanilla'
     | '/_authenticated/leer/$id'
     | '/_authenticated/mostrador/editar'
+    | '/_authenticated/pagos/$ref'
     | '/_authenticated/practica/registro'
     | '/_authenticated/trivia/$category'
+    | '/api/public/pagopar'
     | '/_authenticated/aula/'
     | '/_authenticated/docente/'
     | '/_authenticated/guarani-escolar/'
@@ -1350,6 +1374,7 @@ export interface RootRouteChildren {
   StudioSplatRoute: typeof StudioSplatRoute
   VerificarCodeRoute: typeof VerificarCodeRoute
   StudioIndexRoute: typeof StudioIndexRoute
+  ApiPublicPagoparRoute: typeof ApiPublicPagoparRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2019,6 +2044,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMostradorEditarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/pagos/$ref': {
+      id: '/_authenticated/pagos/$ref'
+      path: '/pagos/$ref'
+      fullPath: '/pagos/$ref'
+      preLoaderRoute: typeof AuthenticatedPagosRefRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/practica/': {
       id: '/_authenticated/practica/'
       path: '/practica'
@@ -2046,6 +2078,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/trivia/$category'
       preLoaderRoute: typeof AuthenticatedTriviaCategoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/pagopar': {
+      id: '/api/public/pagopar'
+      path: '/api/public/pagopar'
+      fullPath: '/api/public/pagopar'
+      preLoaderRoute: typeof ApiPublicPagoparRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/curso/$lang/': {
       id: '/_authenticated/curso/$lang/'
@@ -2189,6 +2228,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedJuegosVentanillaRoute: typeof AuthenticatedJuegosVentanillaRoute
   AuthenticatedLeerIdRoute: typeof AuthenticatedLeerIdRoute
   AuthenticatedMostradorEditarRoute: typeof AuthenticatedMostradorEditarRoute
+  AuthenticatedPagosRefRoute: typeof AuthenticatedPagosRefRoute
   AuthenticatedPracticaRegistroRoute: typeof AuthenticatedPracticaRegistroRoute
   AuthenticatedTriviaCategoryRoute: typeof AuthenticatedTriviaCategoryRoute
   AuthenticatedAulaIndexRoute: typeof AuthenticatedAulaIndexRoute
@@ -2248,6 +2288,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedJuegosVentanillaRoute: AuthenticatedJuegosVentanillaRoute,
   AuthenticatedLeerIdRoute: AuthenticatedLeerIdRoute,
   AuthenticatedMostradorEditarRoute: AuthenticatedMostradorEditarRoute,
+  AuthenticatedPagosRefRoute: AuthenticatedPagosRefRoute,
   AuthenticatedPracticaRegistroRoute: AuthenticatedPracticaRegistroRoute,
   AuthenticatedTriviaCategoryRoute: AuthenticatedTriviaCategoryRoute,
   AuthenticatedAulaIndexRoute: AuthenticatedAulaIndexRoute,
@@ -2306,6 +2347,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudioSplatRoute: StudioSplatRoute,
   VerificarCodeRoute: VerificarCodeRoute,
   StudioIndexRoute: StudioIndexRoute,
+  ApiPublicPagoparRoute: ApiPublicPagoparRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

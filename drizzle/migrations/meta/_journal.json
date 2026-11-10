@@ -134,6 +134,13 @@
       "when": 1793969431178,
       "tag": "0018_consultorio_frases_remedios_cuerpo",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794268852127,
+      "tag": "0019_pagos_pagopar",
+      "breakpoints": true
     }
   ]
 }

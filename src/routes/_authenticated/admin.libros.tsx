@@ -226,6 +226,19 @@ function LibroPanel({ libro, onCambio }: { libro: LibroAdmin; onCambio: () => vo
               {libro.publicado ? "Publicado en el catálogo" : "Sin publicar"}
             </span>
           </p>
+          <form
+            className="mt-2 flex flex-wrap items-center gap-2 text-sm"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const v = String(new FormData(e.currentTarget).get("precio") ?? "").replace(/\D/g, "");
+              const precioGs = v ? Number(v) : null;
+              void correr("Guardando precio…", async () => { await actualizar({ data: { id: libro.id, precioGs } }); });
+            }}
+          >
+            <label htmlFor={`precio-${libro.id}`} className="font-semibold text-foreground">Precio en línea (Gs.)</label>
+            <input id={`precio-${libro.id}`} name="precio" inputMode="numeric" defaultValue={libro.precioGs ?? ""} placeholder="Vacío = solo por WhatsApp" className="h-9 w-44 rounded-lg border border-input bg-background px-2 text-base" />
+            <Button type="submit" size="sm" variant="secondary">Guardar</Button>
+          </form>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button asChild size="sm" variant="outline">
               <Link to="/leer/$id" params={{ id: libro.id }}>

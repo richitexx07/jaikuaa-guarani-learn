@@ -10,6 +10,7 @@ import { BookOpen, MessageCircle } from "lucide-react";
 import { catalogoLibros } from "@/lib/libros.functions";
 import { SUPPORT_WHATSAPP } from "@/lib/contact";
 import { Portada } from "@/components/libreria/portada";
+import { ComprarLibro } from "@/components/libreria/comprar-libro";
 import { LIB_COLORES as C } from "@/components/libreria/arte";
 
 export function CatalogoLibreria() {
@@ -40,6 +41,7 @@ export function CatalogoLibreria() {
                   {l.autor && <p className="mt-0.5 text-sm text-muted-foreground">{l.autor}</p>}
                   {l.descripcion && <p className="mt-2 line-clamp-4 text-sm text-foreground/80">{l.descripcion}</p>}
                   <div className="mt-auto flex flex-wrap gap-2 pt-3">
+                    {l.precioGs && !l.tengo && <ComprarLibro libroId={l.id} precioGs={l.precioGs} />}
                     <a
                       href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent(texto)}`}
                       target="_blank"
