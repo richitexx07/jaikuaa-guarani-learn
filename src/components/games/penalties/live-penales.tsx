@@ -465,7 +465,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
       {/* Marcador */}
       <div className="flex items-center gap-2 rounded-2xl border-4 border-[#1C2B44] bg-black p-2">
         <button type="button" onClick={() => setConfirmExit(true)} aria-label="Salir de la tanda" className="inline-flex h-9 shrink-0 items-center gap-1 rounded-full px-2.5 text-xs font-bold text-white/85 ring-1 ring-white/25 hover:bg-white/10"><X className="h-4 w-4" aria-hidden />Salir</button>
-        {[{ n: myName, r: mine, c: P.host }, { n: rivalName, r: theirs, c: P.guest }].map((x, k) => (
+        {[{ n: `Vos (${myName})`, r: mine, c: P.host }, { n: rivalName, r: theirs, c: P.guest }].map((x, k) => (
           <div key={k} className="min-w-0 flex-1 px-1">
             <div className="flex items-center justify-between gap-1">
               <span className="truncate text-xs font-bold uppercase text-white/75">{x.n}</span>
@@ -505,13 +505,16 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
       ) : (
         <>
           <p className={`text-center font-bold uppercase tracking-wide ${sudden ? "animate-pulse text-base" : "text-xs"}`} style={{ color: sudden ? P.mal : P.led }}>
-            {sudden ? `Muerte súbita · ${shooterName} patea` : `Penal ${Math.floor(tv / 2) + 1} de 5 · ${shooterName} patea`}
+            {sudden ? "Muerte súbita" : `Penal ${Math.floor(tv / 2) + 1} de 5`} · {iShoot ? "Te toca patear" : `Te toca atajar (${shooterName} patea)`}
           </p>
 
           {last ? (
             <div className={card} aria-live="polite">
               <p className="font-display text-3xl font-bold" style={{ color: isGoal(last) ? "#1E9E5A" : P.mal }}>{labels[last]}</p>
               <p className="mt-1 text-sm opacity-75">{word.gn} — {word.es}</p>
+              {!duelFinished(results.host, results.guest) && t < 16 && (
+                <p className="mt-2 font-display text-base font-bold">{pateadorEn(match.primero, t) === role ? "Ahora te toca patear" : "Ahora te toca el arco"}</p>
+              )}
             </div>
           ) : iShoot ? (
             (
