@@ -132,7 +132,7 @@ function draw(now: number){
   if(S.phase==='power'){const p=power(now),[lo,hi]=zone(),mx=740,my=170,mh=300;ctx.fillStyle=alpha('black', .7);ctx.beginPath();ctx.roundRect(mx-6,my-6,40,mh+12,12);ctx.fill();
     ctx.fillStyle=palette['red'];ctx.fillRect(mx,my,28,mh*(1-hi));ctx.fillStyle=palette['green'];ctx.fillRect(mx,my+mh*(1-hi),28,mh*(hi-lo));ctx.fillStyle=palette['gold'];ctx.fillRect(mx,my+mh*(1-lo),28,mh*lo);
     ctx.fillStyle=palette['white'];ctx.fillRect(mx-8,my+mh*(1-p)-3,44,6);ctx.font='800 20px sans-serif,sans-serif';ctx.textAlign='center';ctx.fillText('FUERZA',mx+14,my+mh+28);}
-  if((S.phase==='aim'||S.phase==='power')&&!S.spectator){ctx.fillStyle=palette['gold'];ctx.font='800 32px sans-serif, sans-serif';ctx.textAlign='center';ctx.fillText(S.phase==='aim'?'Deslizá el dedo y soltá para apuntar':'¡Tocá cuando esté en verde!',400,G.y+G.h+46);}
+  if((S.phase==='aim'||S.phase==='power')&&!S.spectator){ctx.fillStyle=palette['gold'];ctx.font='800 32px sans-serif, sans-serif';ctx.textAlign='center';ctx.fillText(S.phase==='aim'?'':'¡Tocá cuando esté en verde!',400,G.y+G.h+46);}
   if((S.phase==='aim'||S.phase==='power')&&S.spectator){ctx.fillStyle=palette['gold'];ctx.font='800 32px sans-serif, sans-serif';ctx.textAlign='center';ctx.fillText(S.phase==='aim'?'Está apuntando…':'¡Va a patear!',400,G.y+G.h+46);}
   ctx.textAlign='start';
   if(!capa3d)drawBall();

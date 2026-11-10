@@ -38,7 +38,7 @@ const T = {
   penN: { es: "Penal {n} de 5", pt: "Pênalti {n} de 5", en: "Penalty {n} of 5", de: "Elfmeter {n} von 5", fr: "Tir {n} sur 5", zh: "第 {n} / 5 球" },
   howSay: { es: "¿Cómo se dice en guaraní?", pt: "Como se diz em guarani?", en: "How do you say it in Guarani?", de: "Wie sagt man das auf Guaraní?", fr: "Comment le dit-on en guarani ?", zh: "瓜拉尼語怎麼說？" },
   answer: { es: "Respuesta:", pt: "Resposta:", en: "Answer:", de: "Antwort:", fr: "Réponse :", zh: "答案：" },
-  aim: { es: "Ahora deslizá sobre el arco para apuntar y tocá para patear.", pt: "Agora deslize sobre o gol para mirar e toque para chutar.", en: "Now slide over the goal to aim and tap to shoot.", de: "Wische jetzt über das Tor zum Zielen und tippe zum Schießen.", fr: "Glissez sur le but pour viser, puis touchez pour tirer.", zh: "在球門上滑動瞄準，點一下射門。" },
+  aim: { es: "¡Ahora tocá en el arco adonde querés patear!", pt: "Agora toque no gol onde quer chutar!", en: "Now tap the spot in the goal where you want to shoot!", de: "Tippe jetzt auf die Stelle im Tor, wohin du schießen willst!", fr: "Touchez maintenant l'endroit du but où vous voulez tirer !", zh: "現在點擊球門中你想射的位置！" },
   result: { es: "Ver resultado", pt: "Ver resultado", en: "See result", de: "Ergebnis ansehen", fr: "Voir le résultat", zh: "查看結果" },
   nextPen: { es: "Siguiente penal", pt: "Próximo pênalti", en: "Next penalty", de: "Nächster Elfmeter", fr: "Tir suivant", zh: "下一球" },
   keeperTurn: { es: "Turno del arquero", pt: "Vez do goleiro", en: "Keeper's turn", de: "Der Torwart ist dran", fr: "Au tour du gardien", zh: "輪到守門員" },

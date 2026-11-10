@@ -97,6 +97,22 @@ export function ElegirEstirada({ onElegir }: { onElegir: (d: Dive) => void }) {
           boxShadow: "inset 0 0 0 6px #f5f5f5",
         }}
       >
+        {fase === "aim" && (
+          <div className="absolute inset-[6px] z-40 grid grid-cols-3 grid-rows-2 gap-1" role="group" aria-label="Tocá adonde te tirás">
+            {DIVES.map((fila, f) => fila.map((d, c) => (
+              <button
+                key={d}
+                type="button"
+                aria-label={`Tirarme ${NOMBRE[f][c]}`}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={() => { valor.current = 1; aimRef.current = { x: [12, 50, 88][c]!, y: f === 0 ? 25 : 75 }; confirmar(); }}
+                className="grid place-items-center rounded-lg border-2 border-dashed border-white/60 bg-white/5 transition active:scale-90 active:bg-white/40"
+              >
+                <span className="h-6 w-6 rounded-full bg-white/85 ring-4 ring-amber-400/70" />
+              </button>
+            )))}
+          </div>
+        )}
         {fase !== "done" && (
           <svg className="pointer-events-none absolute inset-0 z-30 h-full w-full" viewBox="0 0 100 50" preserveAspectRatio="none" aria-hidden>
             <line x1="50" y1="48" x2={aim.x} y2={aim.y / 2} stroke="#FFD23F" strokeWidth="1.2" strokeDasharray="2 1.5" />
@@ -118,7 +134,7 @@ export function ElegirEstirada({ onElegir }: { onElegir: (d: Dive) => void }) {
         </button>
       )}
       <p className="mt-2 text-center text-sm font-semibold">
-        {fase === "aim" && "Deslizá y soltá para apuntar, o manotazo rápido para tirarte a fondo"}
+        {fase === "aim" && "¡Tocá adonde te tirás!"}
         {fase === "power" && "¡Tocá! Más fuerza = más cerca del palo"}
         {fase === "done" && final && `¡Te tirás ${final.l}!`}
       </p>

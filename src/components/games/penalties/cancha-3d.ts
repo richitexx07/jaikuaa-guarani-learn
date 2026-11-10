@@ -109,6 +109,53 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
   const cartel = new THREE.Mesh(guardar(new THREE.BoxGeometry(50, 0.9, 0.2)), guardar(new THREE.MeshStandardMaterial({ color: '#0b0f18', emissive: '#C8102E', emissiveIntensity: 0.55 })));
   cartel.position.set(0, 0.45, -9); escena.add(cartel);
 
+  // Hinchada con vida: hinchas que se mueven (una sola figura repetida, liviana) y flashes de fotos.
+  // barato: el mismo celular-barato de arriba
+  const FILAS = barato ? 4 : 6, POR_FILA = barato ? 40 : 60, NH = FILAS * POR_FILA;
+  const hinchas = new THREE.InstancedMesh(guardar(new THREE.BoxGeometry(0.55, 0.9, 0.3)), guardar(new THREE.MeshBasicMaterial({ color: '#ffffff' })), NH);
+  const coloresH = ['#D52B1E', '#FFFFFF', '#0038A8', '#F2C14E', '#D52B1E', '#FFFFFF'];
+  const baseH: { x: number; y: number; z: number; ph: number; sp: number }[] = [];
+  const colTmp = new THREE.Color();
+  for (let f = 0; f < FILAS; f++) for (let i = 0; i < POR_FILA; i++) {
+    const ly = -4.5 + f * (9 / FILAS), x = -32 + (i + (f % 2) * 0.5) * (64 / POR_FILA);
+    baseH.push({ x, y: 7 + ly * Math.cos(0.35), z: -14 - ly * Math.sin(0.35) + 0.5, ph: (i * 1.7 + f * 2.3) % 6.28, sp: 0.8 + ((i * 37 + f * 11) % 10) / 20 });
+    hinchas.setColorAt(f * POR_FILA + i, colTmp.set(coloresH[(i + f * 3) % coloresH.length]!));
+  }
+  escena.add(hinchas);
+  const flashes = new THREE.InstancedMesh(guardar(new THREE.SphereGeometry(0.16, 6, 4)), guardar(new THREE.MeshBasicMaterial({ color: '#fffbe6' })), 10);
+  escena.add(flashes);
+  // Banderas que flamean en la tribuna
+  const banderas: THREE.Mesh[] = [];
+  for (let b = 0; b < (barato ? 3 : 6); b++) {
+    const c = document.createElement('canvas'); c.width = 48; c.height = 32; const g = c.getContext('2d')!;
+    ['#D52B1E', '#FFFFFF', '#0038A8'].forEach((cl, k) => { g.fillStyle = cl; g.fillRect(0, k * 11, 48, 11); });
+    const tex = guardar(new THREE.CanvasTexture(c)); tex.colorSpace = THREE.SRGBColorSpace;
+    const m = new THREE.Mesh(guardar(new THREE.PlaneGeometry(2.4, 1.5, 8, 1)), guardar(new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide })));
+    m.position.set(-25 + b * (50 / Math.max(1, (barato ? 3 : 6) - 1)), 10.5, -15.2); escena.add(m); banderas.push(m);
+  }
+  const banderaBase = banderas.map((m) => Float32Array.from((m.geometry as THREE.PlaneGeometry).attributes.position.array as Float32Array));
+  const tmp = new THREE.Object3D();
+  function animarHinchada(s: Scene, now: number) {
+    const hype = Math.max(0, 1 - (now - s.cheer) / 2200), tension = s.phase === 'power' ? 1 : 0;
+    for (let n = 0; n < NH; n++) {
+      const h = baseH[n]!, salto = Math.abs(Math.sin(now / (150 / h.sp) + h.ph)) * (0.08 + hype * 0.75) + tension * Math.abs(Math.sin(now / 90 + h.ph)) * 0.12;
+      tmp.position.set(h.x, h.y + salto, h.z); tmp.rotation.set(0, 0, Math.sin(now / 400 + h.ph) * 0.12); tmp.scale.set(1, 1 + hype * 0.25, 1); tmp.updateMatrix();
+      hinchas.setMatrixAt(n, tmp.matrix);
+    }
+    hinchas.instanceMatrix.needsUpdate = true;
+    for (let k = 0; k < 10; k++) {
+      const ciclo = Math.floor(now / 230) + k * 7, on = ((ciclo * 2654435761) >>> 0) % (hype > 0 ? 3 : 9) === 0;
+      const hx = baseH[(ciclo * 31) % NH]!;
+      tmp.position.set(hx.x, hx.y + 0.5, hx.z + 0.2); tmp.rotation.set(0, 0, 0); tmp.scale.setScalar(on ? 1 : 0.0001); tmp.updateMatrix(); flashes.setMatrixAt(k, tmp.matrix);
+    }
+    flashes.instanceMatrix.needsUpdate = true;
+    banderas.forEach((m, b) => {
+      const pos = (m.geometry as THREE.PlaneGeometry).attributes.position as THREE.BufferAttribute, base = banderaBase[b]!;
+      for (let v = 0; v < pos.count; v++) { const x = base[v * 3]!; pos.setZ(v, Math.sin(now / 160 + x * 2.2 + b) * 0.18 * (x + 1.2)); }
+      pos.needsUpdate = true; m.position.y = 10.5 + hype * Math.abs(Math.sin(now / 120 + b)) * 0.8;
+    });
+  }
+
   // Reflectores
   const luzMat = guardar(new THREE.MeshBasicMaterial({ color: '#fffbe6' }));
   for (const s of [-1, 1]) {
@@ -202,6 +249,7 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
     }
     const hype = Math.max(0, 1 - (now - s.cheer) / 1800);
     tribMat.emissiveIntensity = 0.25 + hype * 0.6 * (0.6 + 0.4 * Math.sin(now / 60));
+    animarHinchada(s, now);
     renderer.render(escena, cam);
   }
   function resize(w: number, h: number) { renderer.setSize(w, h, false); }

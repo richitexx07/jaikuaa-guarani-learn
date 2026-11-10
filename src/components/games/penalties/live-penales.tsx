@@ -297,10 +297,16 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
     return () => { window.clearInterval(id); if (latir) window.clearInterval(latir); };
   }, [t, corre]);
   useEffect(() => {
-    if (restan !== 0 || !corre || myDive) return;
+    if (restan !== 0 || !corre) return;
     const pateador: Role = pateadorEn(match?.primero, t);
-    if (role === pateador) return;
     const todas: Dive[] = ["left", "center", "right", "left-high", "center-high", "right-high"];
+    if (role === pateador) {
+      // Nunca se traba: si el aviso del arquero no llega (señal lenta), el árbitro lo tira a un lado y se patea igual.
+      if (dive) return;
+      const tm = window.setTimeout(() => setDive((cur) => cur ?? todas[Math.floor(Math.random() * todas.length)]!), 1500);
+      return () => window.clearTimeout(tm);
+    }
+    if (myDive) return;
     const d = todas[Math.floor(Math.random() * todas.length)]!;
     setMyDive(d);
     send("dive", { t, dive: d });
@@ -518,21 +524,19 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
           ) : iShoot ? (
             (
               <>
-                {!dive ? (
-                  <div className={card} aria-live="polite">
-                    <p className="font-display text-5xl font-bold tabular-nums" style={{ color: restan <= 3 ? P.mal : P.noche }}>{restan}</p>
-                    <p className="mt-1 font-display text-lg font-bold">¡Silbato! {rivalName} ya está en el arco</p>
-                    <p className="text-sm opacity-70">Respondé rápido: el arco se abre apenas se acomode.</p>
-                  </div>
-                ) : (
+                {!dive && (
+                  <p className="text-center font-display text-sm font-bold text-white/85" aria-live="polite">
+                    <span className="tabular-nums" style={{ color: restan <= 3 ? P.mal : P.led }}>{restan}</span> · ¡Silbato! {rivalName} se acomoda en el arco
+                  </p>
+                )}
                 <div className="overflow-hidden rounded-2xl ring-4 ring-black/40">
                   <PenaltyPitch
                     key={t}
                     kit={kitPropio}
                     arquera={rivalKit?.figura}
-                    guess={dive}
+                    guess={dive ?? undefined}
                     knew={knew}
-                    ready={choice !== null}
+                    ready={choice !== null && !!dive}
                     muted={muted}
                     ledText={ledText}
                     onShot={(o) => { send("shot", { t, outcome: o }); applyShot(t, o); }}
@@ -540,7 +544,6 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
                     onKick={(shotData) => send("kick", { t, shot: shotData })}
                   />
                 </div>
-                )}
                 <div className="space-y-3 text-center">
                   <p className="text-sm text-white/70">¿Cómo se dice en guaraní?</p>
                   <h2 className="break-words font-display text-3xl font-bold text-white">{word.es}</h2>
@@ -566,7 +569,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
                       );
                     })}
                   </div>
-                  {choice !== null && <p className="text-sm font-semibold" style={{ color: P.led }}>{knew ? "¡Bien! Ahora deslizá sobre el arco para apuntar y tocá para patear." : "Esta vez no. Igual podés patear: apuntá y tocá."}</p>}
+                  {choice !== null && <p className="text-sm font-semibold" style={{ color: P.led }}>{!dive ? "¡Bien! El arquero se está acomodando…" : knew ? "¡Bien! Ahora tocá en el arco adonde querés patear." : "Esta vez no. Igual podés patear: tocá en el arco."}</p>}
                 </div>
               </>
             )
