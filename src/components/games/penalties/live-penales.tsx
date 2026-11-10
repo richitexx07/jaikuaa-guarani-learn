@@ -1,3 +1,4 @@
+import { ElegirEstirada } from "./elegir-estirada";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, RotateCcw, Users, WifiOff, X } from "lucide-react";
 import { SpeakerButton } from "@/components/audio/speaker-button";
@@ -482,13 +483,7 @@ export function PenalesLive({ code, host, words, ledText, muted, onExit }: { cod
               <p className="text-xs font-semibold uppercase tracking-widest">🧤 Te toca atajar</p>
               <h2 className="mt-1 font-display text-2xl font-bold">Elegí en secreto hacia dónde te tirás</h2>
               <p className="text-sm opacity-75">{rivalName} no ve tu elección. Elegí lado y altura: si adivinás, ¡lo atajás!</p>
-              <div className="mt-3 grid grid-cols-3 gap-2">
-                {([["left-high", "↖", "Arriba izq."], ["center-high", "⬆", "Arriba"], ["right-high", "↗", "Arriba der."], ["left", "↙", "Abajo izq."], ["center", "⬇", "Abajo"], ["right", "↘", "Abajo der."]] as [Dive, string, string][]).map(([d, i, l]) => (
-                  <button key={d} type="button" onClick={() => { setMyDive(d); send("dive", { t, dive: d }); try { navigator.vibrate?.(20); } catch { /* sin vibración */ } }} className="flex h-16 flex-col items-center justify-center gap-0.5 rounded-2xl text-sm font-bold ring-1 ring-black/15">
-                    <span className="text-2xl" aria-hidden>{i}</span>{l}
-                  </button>
-                ))}
-              </div>
+              <ElegirEstirada onElegir={(d) => { setMyDive(d); send("dive", { t, dive: d }); }} />
             </section>
           ) : (
             <div className="space-y-3">
