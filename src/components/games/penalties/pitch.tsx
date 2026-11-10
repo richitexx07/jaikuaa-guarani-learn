@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { drawStadium } from './stadium';
-import { freshScene, G, H, W, labels, powerAt, resolveShot, type Dive, type Outcome, type Point, type Scene, type Shot } from './physics';
+import { combaDe, reboteDe, freshScene, G, H, W, labels, powerAt, resolveShot, type Dive, type Outcome, type Point, type Scene, type Shot } from './physics';
 import { StadiumSound } from '../game-sound';
 import { celebrate } from '@/lib/confetti';
 import { useMiKit, type Kit } from './camisetas';
@@ -60,26 +60,30 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,
   const respaldo=window.setTimeout(()=>{if(animation.current===paso)paso(now+dur);},dur+1500);
   const paso=(t:number)=>{
    const r=(t-now)/dur,q=Number.isFinite(r)?Math.max(0,Math.min(1,r)):1,e=1-Math.pow(1-q,2.2);
-   s.ball={x:400+(shot.end.x-400)*e,y:520+(shot.end.y-520)*e-Math.sin(q*Math.PI)*50,r:16-6*e};
+   s.ball={x:400+(shot.end.x-400)*e+Math.sin(q*Math.PI)*combaDe(shot.end),y:520+(shot.end.y-520)*e-Math.sin(q*Math.PI)*50,r:16-6*e};
    const kq=reduce?q:Math.max(0,Math.min(1,((t-now)/1000-shot.react)/Math.max(.05,shot.T-shot.react))),ke=1-Math.pow(1-kq,2);
    s.keeper={x:400+(shot.keeper.x-400)*ke,y:278+(shot.keeper.y-278)*ke,ang:Math.sign(shot.keeper.x-400)*Math.min(1.2,Math.abs(shot.keeper.x-400)/170)*ke,stretch:ke};
    if(q>=1){window.clearTimeout(respaldo);animation.current=null;s.phase='result';s.outcome=shot.outcome;const goal=shot.outcome==='goal'||shot.outcome==='angle';s.banner={t,txt:labels[shot.outcome],c:getComputedStyle(canvas.current??document.documentElement).getPropertyValue(goal?'--stadium-gold':'--stadium-miss')};
     if(goal){s.cheer=t;s.net={...shot.end,t};celebrate(shot.outcome==='angle'?'big':'small');}sound.current.play(goal?'cheer':shot.outcome==='post'?'post':'hit');if(shot.outcome==='post')s.shake=t;
     if(!reduce)try{navigator.vibrate?.(goal?[40,30,60]:30);}catch{}
     callback.current(shot.outcome);
-    caer(t);
+    caer(t,shot.outcome==='post'&&!reduce?shot.end:undefined);
     if(!reduce)repetir(shot);
    }
   };
   animation.current=paso;
  }
  /** Gravedad: después de la estirada el arquero cae al césped (nunca queda flotando). */
- function caer(t0:number){
-  const s=scene.current,y0=s.keeper.y,x0=s.keeper.x,st0=s.keeper.stretch;if(y0>=PISO_ARQUERO-1)return;
-  const g=GRAVEDAD_ARQUERO/1e6,dur=Math.sqrt(2*(PISO_ARQUERO-y0)/g);
-  const paso=(t:number)=>{const dt=Math.max(0,t-t0),y=Math.min(PISO_ARQUERO,y0+.5*g*dt*dt),q=Math.min(1,dt/dur);
-   s.keeper={x:x0,y,ang:s.keeper.ang,stretch:st0*(1-q*.5)};
-   if(y>=PISO_ARQUERO){animation.current=null;try{navigator.vibrate?.(12);}catch{}}};
+ function caer(t0:number,rebote?:Point){
+  const s=scene.current,y0=s.keeper.y,x0=s.keeper.x,st0=s.keeper.stretch;
+  const g=GRAVEDAD_ARQUERO/1e6,dur=y0>=PISO_ARQUERO-1?0:Math.sqrt(2*(PISO_ARQUERO-y0)/g),REB=650;
+  if(!dur&&!rebote)return;
+  let cayo=!dur;
+  const paso=(t:number)=>{const dt=Math.max(0,t-t0);
+   if(rebote&&dt<=REB+16)s.ball=reboteDe(rebote,Math.min(1,dt/REB));
+   if(!cayo){const y=Math.min(PISO_ARQUERO,y0+.5*g*dt*dt),q=Math.min(1,dt/dur);s.keeper={x:x0,y,ang:s.keeper.ang,stretch:st0*(1-q*.5)};
+    if(y>=PISO_ARQUERO){cayo=true;s.aterrizo=t;try{navigator.vibrate?.(12);}catch{}}}
+   if(cayo&&(!rebote||dt>REB))animation.current=null;};
   animation.current=paso;
  }
  /** Repetición en cámara lenta del gol o la atajada; se corta sola si arranca el próximo penal. */
@@ -90,12 +94,13 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,
    s.objetivo=shot.end;const t0=performance.now(),fin={...shot.end},kf={...shot.keeper};
    const color=getComputedStyle(canvas.current??document.documentElement).getPropertyValue('--stadium-gold');
    const paso=(t:number)=>{
-    if(s.phase!=='result'){animation.current=null;return;}
+    if(s.phase!=='result'){s.tv=false;animation.current=null;return;}
+    s.tv=true;
     const q=Math.max(0,Math.min(1,(t-t0)/dur)),e=1-Math.pow(1-q,2.2),ke=1-Math.pow(1-Math.min(1,q*1.15),2);
-    s.ball={x:400+(fin.x-400)*e,y:520+(fin.y-520)*e-Math.sin(q*Math.PI)*50,r:16-6*e};
+    s.ball={x:400+(fin.x-400)*e+Math.sin(q*Math.PI)*combaDe(fin),y:520+(fin.y-520)*e-Math.sin(q*Math.PI)*50,r:16-6*e};
     s.keeper={x:400+(kf.x-400)*ke,y:278+(kf.y-278)*ke,ang:Math.sign(kf.x-400)*Math.min(1.2,Math.abs(kf.x-400)/170)*ke,stretch:ke};
     if(!s.banner||s.banner.txt!=='REPETICIÓN')s.banner={t,txt:'REPETICIÓN',c:color};
-    if(q>=1){animation.current=null;s.banner=null;caer(t);}
+    if(q>=1){animation.current=null;s.banner=null;window.setTimeout(()=>{s.tv=false;},700);caer(t);}
    };
    animation.current=paso;
   },ESPERA);

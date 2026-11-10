@@ -11,6 +11,9 @@ type P = { x: number; y: number };
 const DIVES: Dive[][] = [["left-high", "center-high", "right-high"], ["left", "center", "right"]];
 const NOMBRE = [["arriba a la izquierda", "arriba al centro", "arriba a la derecha"], ["abajo a la izquierda", "abajo al centro", "abajo a la derecha"]];
 
+/** Manotazo: deslizar al menos 25 % del arco en menos de 260 ms. */
+export function esManotazo(a: P, b: P, ms: number): boolean { return ms > 0 && ms < 260 && Math.hypot(b.x - a.x, b.y - a.y) >= 25; }
+
 export function ElegirEstirada({ onElegir }: { onElegir: (d: Dive) => void }) {
   const [fase, setFase] = useState<"aim" | "power" | "done">("aim");
   const [aim, setAim] = useState<P>({ x: 50, y: 40 });
@@ -37,11 +40,13 @@ export function ElegirEstirada({ onElegir }: { onElegir: (d: Dive) => void }) {
     return { x: Math.max(2, Math.min(98, ((e.clientX - r.left) / r.width) * 100)), y: Math.max(5, Math.min(95, ((e.clientY - r.top) / r.height) * 100)) };
   };
 
+  const toque = useRef({ x: 50, y: 40, t: 0 });
+  const aimRef = useRef<P | null>(null);
   const confirmar = () => {
-    const p = valor.current;
-    const x = 50 + (aim.x - 50) * p;
+    const p = valor.current, a = aimRef.current ?? aim; aimRef.current = null;
+    const x = 50 + (a.x - 50) * p;
     const col = x < 36 ? 0 : x > 64 ? 2 : 1;
-    const fila = aim.y < 50 ? 0 : 1;
+    const fila = a.y < 50 ? 0 : 1;
     setFinal({ x, y: fila === 0 ? 30 : 70, l: NOMBRE[fila][col] });
     setFase("done");
     try { navigator.vibrate?.([15, 30, 25]); } catch { /* sin vibración */ }
@@ -50,13 +55,16 @@ export function ElegirEstirada({ onElegir }: { onElegir: (d: Dive) => void }) {
 
   const down = (e: PointerEvent<HTMLDivElement>) => {
     e.preventDefault();
-    if (fase === "aim") { drag.current = true; try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* */ } setAim(pt(e)); }
+    if (fase === "aim") { drag.current = true; try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* */ } const p = pt(e); toque.current = { ...p, t: performance.now() }; setAim(p); }
     else if (fase === "power") confirmar();
   };
   const move = (e: PointerEvent<HTMLDivElement>) => { if (fase === "aim" && drag.current) setAim(pt(e)); };
   const up = (e: PointerEvent<HTMLDivElement>) => {
     if (!drag.current || fase !== "aim") return;
-    drag.current = false; setAim(pt(e));
+    drag.current = false; const p = pt(e); setAim(p);
+    // Reflejos: un manotazo rápido (deslizar fuerte y soltar) es estirada a fondo, sin barra.
+    const ini = toque.current, dt = performance.now() - ini.t;
+    if (esManotazo(ini, p, dt)) { valor.current = 1; aimRef.current = p; confirmar(); return; }
     try { navigator.vibrate?.(15); } catch { /* */ }
     inicio.current = performance.now(); setFase("power");
   };
@@ -106,7 +114,7 @@ export function ElegirEstirada({ onElegir }: { onElegir: (d: Dive) => void }) {
         </button>
       )}
       <p className="mt-2 text-center text-sm font-semibold">
-        {fase === "aim" && "Deslizá el dedo y soltá para apuntar hacia dónde te tirás"}
+        {fase === "aim" && "Deslizá y soltá para apuntar, o manotazo rápido para tirarte a fondo"}
         {fase === "power" && "¡Tocá! Más fuerza = más cerca del palo"}
         {fase === "done" && final && `¡Te tirás ${final.l}!`}
       </p>

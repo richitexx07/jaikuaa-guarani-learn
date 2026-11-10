@@ -5,7 +5,7 @@
  * Pensada para celulares baratos: pocas figuras, sin sombras en tiempo real y resolución limitada.
  */
 import * as THREE from 'three';
-import { G, H, W, type Scene } from './physics';
+import { amague, G, H, W, type Scene } from './physics';
 import { ARQUERO, imagen } from './sprites';
 
 /** Metros por punto del juego: el arco (500 puntos) mide 7,32 m. */
@@ -127,6 +127,11 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
   const jaiMat = guardar(new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.05, depthWrite: false, side: THREE.DoubleSide }));
   const jai = new THREE.Mesh(guardar(new THREE.PlaneGeometry(1, 1)), jaiMat); jai.position.z = 0.4; escena.add(jai);
   const sombraJai = new THREE.Mesh(guardar(new THREE.CircleGeometry(0.5, 20)), sombraMat); sombraJai.rotation.x = -Math.PI / 2; sombraJai.position.z = 0.4; escena.add(sombraJai);
+  // Briznas de pasto (pocas, para celulares baratos)
+  const pastoGeo = guardar(new THREE.BoxGeometry(0.05, 0.02, 0.05)), pastoMat = guardar(new THREE.MeshBasicMaterial({ color: '#3f8f3a' }));
+  const pasto = Array.from({ length: barato ? 8 : 16 }, () => { const m = new THREE.Mesh(pastoGeo, pastoMat); m.visible = false; escena.add(m); return { m, v: new THREE.Vector3() }; });
+  let ultimoAterrizaje = 0, ultimoCuadro = 0, enTv = false;
+  const camQuat = cam.quaternion.clone(), tvPos = new THREE.Vector3(7, 1.7, 3.5);
   const texturas = new Map<string, THREE.Texture>();
   function tex(src: string | null): THREE.Texture | null {
     if (!src) return null;
@@ -138,7 +143,7 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
   function render(s: Scene, now: number) {
     // Jai según la jugada (las mismas poses que el dibujo plano)
     const k = s.keeper, dx = k.x - 400, res = s.phase === 'result' ? s.outcome : undefined;
-    const idle = s.phase === 'aim' || s.phase === 'power' ? Math.sin(now / (s.knew ? 420 : 200)) * (s.knew ? 6 : 16) : 0;
+    const am = s.phase === 'aim' || s.phase === 'power' ? amague(now, s.knew) : { x: 0, y: 0 }, idle = am.x;
     let src: string | null = ARQUERO.listo, alto = 180, volando = false;
     if (res === 'save') { const t = s.banner ? now - s.banner.t : 1e9; if (t < 380 && Math.abs(dx) > 24) { src = ARQUERO.estirada; alto = 200; volando = true; } else { src = ARQUERO.atajada ?? ARQUERO.listo; alto = 190; } }
     else if (res && Math.abs(dx) > 40) { src = ARQUERO.vencido ?? ARQUERO.listo; alto = 160; }
@@ -150,8 +155,18 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
     jai.scale.set(hm * asp * (volando && dx < 0 ? -1 : 1), hm, 1);
     const cy = volando ? Math.max(hm * 0.32, Math.min(altoArco - hm * 0.2, mundoY(k.y))) : hm / 2 + Math.max(0, mundoY(k.y) - mundoY(278)) * 0.6;
     jai.position.x = mundoX(k.x + idle) + (volando ? Math.sign(dx) * 20 * S : 0);
-    jai.position.y = cy;
-    jai.rotation.z = volando ? -Math.max(-0.5, Math.min(0.25, (k.y - 278) / -220)) * Math.sign(dx) : 0;
+    jai.position.y = cy + Math.max(0, -am.y) * S;
+    if (s.tv) jai.quaternion.copy(cam.quaternion);
+    else jai.rotation.set(0, 0, volando ? -Math.max(-0.5, Math.min(0.25, (k.y - 278) / -220)) * Math.sign(dx) : 0);
+    if (!volando && !res && am.y < -1) jai.scale.y *= 1 + am.y * 0.004; // flexiona las piernas en el amague
+
+    // Pasto que salta cuando Jai cae al césped
+    if (s.aterrizo && s.aterrizo !== ultimoAterrizaje) {
+      ultimoAterrizaje = s.aterrizo;
+      for (const p of pasto) { p.m.visible = true; p.m.position.set(jai.position.x + (Math.random() - 0.5) * 0.9, 0.05, 0.4 + (Math.random() - 0.5) * 0.4); p.v.set((Math.random() - 0.5) * 2.2, 1.5 + Math.random() * 2, (Math.random() - 0.2) * 1.2); }
+    }
+    const dtP = Math.min(0.05, Math.max(0, (now - ultimoCuadro) / 1000)); ultimoCuadro = now;
+    for (const p of pasto) { if (!p.m.visible) continue; p.v.y -= 9.8 * dtP; p.m.position.addScaledVector(p.v, dtP); p.m.rotation.x += 0.3; if (p.m.position.y < 0.01) p.m.visible = false; }
     sombraJai.position.x = jai.position.x; sombraJai.scale.setScalar(volando ? 1.6 : 1);
 
     // Pelota: del punto penal al arco, con comba, giro y sombra
@@ -159,7 +174,7 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
     const fin = s.objetivo;
     if ((s.phase === 'shot' || s.phase === 'result') && fin) {
       const zFin = s.outcome === 'over' || s.outcome === 'wide' ? -1.2 : -0.3;
-      pelota.position.set(mundoX(fin.x) * e, 0.11 + (Math.max(0.11, mundoY(fin.y)) - 0.11) * e + Math.sin(e * Math.PI) * 0.5, SPOT_Z + (zFin - SPOT_Z) * e);
+      pelota.position.set(s.outcome === 'post' && s.phase === 'result' ? mundoX(s.ball.x) : mundoX(fin.x) * e + mundoX(s.ball.x) - mundoX(400 + (fin.x - 400) * e), 0.11 + (Math.max(0.11, mundoY(fin.y)) - 0.11) * e + Math.sin(e * Math.PI) * 0.5, SPOT_Z + (zFin - SPOT_Z) * e);
       if (e < 1) { pelota.rotation.x -= 0.35; pelota.rotation.y += 0.12; }
     } else pelota.position.set(0, 0.11, SPOT_Z);
     if (s.phase === 'result' && s.outcome === 'save') pelota.position.set(jai.position.x, Math.max(0.11, jai.position.y), 0.6);
@@ -168,15 +183,22 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
     // La red se sacude con el gol
     const kRed = s.net ? Math.max(0, 1 - (now - s.net.t) / 900) : 0;
     const arr = redPos.array as Float32Array, nx = s.net ? mundoX(s.net.x) : 0, ny = s.net ? mundoY(s.net.y) : 0;
-    for (let i = 0; i < arr.length; i += 3) { const d = Math.hypot(redBase[i] - nx, redBase[i + 1] + altoArco / 2 - ny); arr[i + 2] = redBase[i + 2] - (kRed ? Math.max(0, 1 - d / 2.2) * kRed * 0.9 * (1 + Math.sin(now / 40) * 0.2) : 0); }
+    for (let i = 0; i < arr.length; i += 3) { const d = Math.hypot(redBase[i] - nx, redBase[i + 1] + altoArco / 2 - ny); arr[i + 2] = redBase[i + 2] - (kRed ? Math.max(0, 1 - d / 2.8) * kRed * 1.6 * (1 + Math.sin(now / 40) * 0.2) : 0); }
     redPos.needsUpdate = true;
 
     // Cámara: quieta mientras se apunta; acompaña el remate y vibra con el palo
-    const enJugada = s.phase === 'shot' || s.phase === 'result';
-    const objetivoZ = enJugada ? DIST - 1.4 : DIST, objetivoX = enJugada ? pelota.position.x * 0.15 : 0;
-    cam.position.z += (objetivoZ - cam.position.z) * 0.08; cam.position.x += (objetivoX - cam.position.x) * 0.08;
-    const temblor = s.shake ? Math.max(0, 1 - (now - s.shake) / 500) : 0;
-    cam.position.y = camBase.y + (temblor ? Math.sin(now / 18) * 0.06 * temblor : 0);
+    // Cámara de TV en la repetición: toma lateral corta desde el costado del arco.
+    if (s.tv) {
+      if (!enTv) { enTv = true; cam.clearViewOffset(); }
+      cam.position.lerp(tvPos, 0.06); cam.lookAt(0, 1, 0.3);
+    } else {
+      if (enTv) { enTv = false; cam.position.copy(camBase); cam.quaternion.copy(camQuat); cam.setViewOffset(W, H, 0, ALTO_CAM / S - (PISO_Y - H / 2), W, H); }
+      const enJugada = s.phase === 'shot' || s.phase === 'result';
+      const objetivoZ = enJugada ? DIST - 1.4 : DIST, objetivoX = enJugada ? pelota.position.x * 0.15 : 0;
+      cam.position.z += (objetivoZ - cam.position.z) * 0.08; cam.position.x += (objetivoX - cam.position.x) * 0.08;
+      const temblor = s.shake ? Math.max(0, 1 - (now - s.shake) / 500) : 0;
+      cam.position.y = camBase.y + (temblor ? Math.sin(now / 18) * 0.06 * temblor : 0);
+    }
     const hype = Math.max(0, 1 - (now - s.cheer) / 1800);
     tribMat.emissiveIntensity = 0.25 + hype * 0.6 * (0.6 + 0.4 * Math.sin(now / 60));
     renderer.render(escena, cam);

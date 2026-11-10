@@ -2,7 +2,13 @@ import type { Kit } from './camisetas';
 export const W=800,H=600,G={x:150,y:110,w:500,h:230},POST=12,BR=16;
 export type Outcome='goal'|'angle'|'save'|'post'|'over'|'wide';
 export type Point={x:number;y:number};
-export type Scene={phase:'ask'|'aim'|'power'|'shot'|'result'; knew:boolean; spectator?:boolean; aim:Point|null; powerStart:number; ball:Point & {r:number}; keeper:Point & {ang:number;stretch:number}; net:(Point & {t:number})|null; cheer:number; banner:{t:number;txt:string;c:string}|null; shake?:number; outcome?:Outcome; kit?:Kit; objetivo?:Point};
+export type Scene={phase:'ask'|'aim'|'power'|'shot'|'result'; knew:boolean; spectator?:boolean; aim:Point|null; powerStart:number; ball:Point & {r:number}; keeper:Point & {ang:number;stretch:number}; net:(Point & {t:number})|null; cheer:number; banner:{t:number;txt:string;c:string}|null; shake?:number; outcome?:Outcome; kit?:Kit; objetivo?:Point; aterrizo?:number; tv?:boolean};
+/** Comba de la pelota (puntos del juego): los tiros cruzados abren hacia afuera y se cierran al palo. */
+export function combaDe(end:Point):number{const dx=end.x-400;return -Math.sign(dx)*Math.min(1,Math.abs(dx)/250)*42;}
+/** Amague del arquero mientras se apunta: balanceo y un paso falso cada ~1,7 s. Devuelve corrimiento x e y (salto). */
+export function amague(now:number,knew:boolean):{x:number;y:number}{const base=Math.sin(now/(knew?420:260))*(knew?6:12),ciclo=(now%1700)/1700,lado=Math.floor(now/1700)%2?1:-1;const f=ciclo>.7?Math.sin((ciclo-.7)/.3*Math.PI):0;return {x:base+lado*f*(knew?14:28),y:-f*10};}
+/** Rebote en el palo: la pelota vuelve hacia la cancha. q de 0 a 1. */
+export function reboteDe(end:Point,q:number):Point & {r:number}{const lado=end.x<400?1:-1;return {x:end.x+lado*q*90,y:end.y+q*150-Math.sin(q*Math.PI)*60,r:10+q*4};}
 export const labels:Record<Outcome,string>={goal:'¡GOOOL!',angle:'¡GOLAZO AL ÁNGULO!',save:'¡ATAJÓ!',post:'¡PALO!',over:'¡POR ARRIBA!',wide:'¡AFUERA!'};
 export function freshScene():Scene {return {phase:'ask',knew:false,aim:{x:400,y:225},powerStart:0,ball:{x:400,y:520,r:BR},keeper:{x:400,y:278,ang:0,stretch:0},net:null,cheer:0,banner:null};}
 export function powerZone(knew:boolean):[number,number]{return knew?[.52,.86]:[.62,.8];}
