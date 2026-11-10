@@ -268,10 +268,10 @@ export function crearCancha(canvas: HTMLCanvasElement): Cancha3D {
     } else {
       if (enTv) { enTv = false; cam.position.copy(camBase); cam.quaternion.copy(camQuat); cam.setViewOffset(W, H, 0, ALTO_CAM / S - (PISO_Y - H / 2), W, H); }
       const enJugada = s.phase === 'shot' || s.phase === 'result';
-      const objetivoZ = enJugada ? DIST - 1.4 : DIST, objetivoX = enJugada ? pelota.position.x * 0.15 : 0;
+      const objetivoZ = DIST, objetivoX = 0; void enJugada; // cámara fija detrás del pateador, como en la TV: no marea
       cam.position.z += (objetivoZ - cam.position.z) * 0.08; cam.position.x += (objetivoX - cam.position.x) * 0.08;
       const temblor = s.shake ? Math.max(0, 1 - (now - s.shake) / 500) : 0;
-      cam.position.y = camBase.y + (temblor ? Math.sin(now / 18) * 0.06 * temblor : 0);
+      cam.position.y = camBase.y + (temblor ? Math.sin(now / 30) * 0.015 * temblor : 0);
     }
     const hype = Math.max(0, 1 - (now - s.cheer) / 1800);
     tribMat.emissiveIntensity = 0.25 + hype * 0.6 * (0.6 + 0.4 * Math.sin(now / 60));

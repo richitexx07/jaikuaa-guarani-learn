@@ -75,7 +75,7 @@ export function PenaltyPitch({knew,ready,ledText,muted,onShot,guess,watch,onAim,
     if(!reduce)try{navigator.vibrate?.(goal?[40,30,60]:30);}catch{}
     callback.current(shot.outcome);
     caer(t,shot.outcome==='post'&&!reduce?shot.end:undefined);
-    if(!reduce)repetir(shot);
+    /* sin repetición con cambio de cámara: mareaba */void repetir;
    }
   };
   animation.current=paso;
