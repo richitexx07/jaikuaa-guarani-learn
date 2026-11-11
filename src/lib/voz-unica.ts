@@ -43,7 +43,7 @@ function cortar() {
  * Devuelve una promesa que termina cuando el audio termina (o lo corta otro). `false` solo si falló al reproducir.
  * Con `alEmpezar`, la promesa termina apenas arranca (para quien no necesita esperar el final).
  */
-export function sonarUnico(src: string, t: number, alEmpezar = false): Promise<boolean> {
+export function sonarUnico(src: string, t: number, alEmpezar = false, rate = 1): Promise<boolean> {
   if (typeof Audio === "undefined" || !sigueVigente(t)) return Promise.resolve(true);
   cortar();
   return new Promise<boolean>((resolve) => {
@@ -58,6 +58,17 @@ export function sonarUnico(src: string, t: number, alEmpezar = false): Promise<b
       resolve(ok);
     };
     const audio = new Audio(src);
+    if (rate && rate !== 1) {
+      audio.playbackRate = rate;
+      const pitched = audio as HTMLAudioElement & {
+        preservesPitch?: boolean;
+        mozPreservesPitch?: boolean;
+        webkitPreservesPitch?: boolean;
+      };
+      if ("preservesPitch" in pitched) pitched.preservesPitch = true;
+      if ("mozPreservesPitch" in pitched) pitched.mozPreservesPitch = true;
+      if ("webkitPreservesPitch" in pitched) pitched.webkitPreservesPitch = true;
+    }
     actual = audio;
     soltarActual = () => fin(true);
     audio.onended = () => fin(true);

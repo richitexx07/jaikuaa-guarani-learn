@@ -10,9 +10,10 @@ type Props = {
   gn: string;
   size?: "sm" | "md";
   className?: string;
+  rate?: number;
 };
 
-export function SpeakerButton({ gn, size = "sm", className }: Props) {
+export function SpeakerButton({ gn, size = "sm", className, rate }: Props) {
   // Más grande para el dedo: es el botón más importante de la app (las voces reales).
   const dims = size === "md" ? "h-11 w-11" : "h-10 w-10";
   const icon = size === "md" ? "h-5 w-5" : "h-4 w-4";
@@ -74,10 +75,12 @@ export function SpeakerButton({ gn, size = "sm", className }: Props) {
       aria-busy={loading || playing}
       onFocus={() => void prefetchAudio(gn)}
       onTouchStart={() => void prefetchAudio(gn)}
-      onClick={async () => {
+      onClick={async (e) => {
         const hadRecording = !!url || failed;
         setPlaying(true);
-        const ok = await playGuarani(gn);
+        // Si el usuario toca con Shift, o si viene rate especificado, escucha con velocidad ajustada
+        const targetRate = rate ?? (e.shiftKey ? 0.75 : 1);
+        const ok = await playGuarani(gn, targetRate !== 1 ? { rate: targetRate } : undefined);
         setPlaying(false);
         setFailed(!ok && hadRecording);
         if (!ok) setUrl(null);

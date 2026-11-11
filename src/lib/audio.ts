@@ -225,33 +225,43 @@ function forget(slug: string) {
 }
 
 // Una sola voz a la vez: la nueva corta la anterior y un audio que llega tarde ya no suena.
-function playSrc(src: string, t: number): Promise<boolean> {
-  return sonarUnico(src, t);
+function playSrc(src: string, t: number, rate = 1): Promise<boolean> {
+  return sonarUnico(src, t, false, rate);
 }
 
-export async function playGuarani(gn: string): Promise<boolean> {
+export type PlayGuaraniOptions = {
+  rate?: number;
+};
+
+export async function playGuarani(gn: string, options?: PlayGuaraniOptions): Promise<boolean> {
   if (typeof window === "undefined") return false;
   ensureLoaded();
   const slug = slugify(gn);
   const t = pedirTurno();
+  const rate = options?.rate ?? 1;
   // Camino rápido y sin esperas: así el toque del usuario habilita el sonido también en iPhone.
   const ready = blobCache.get(slug);
   const known = ready ? undefined : cachedUrl(slug);
   let ok: boolean;
   if (ready) {
-    ok = await playSrc(ready, t);
+    ok = await playSrc(ready, t, rate);
   } else if (known) {
     void preloadBytes(slug, known);
-    ok = await playSrc(known, t);
+    ok = await playSrc(known, t, rate);
   } else {
     const url = await getHumanAudioUrl(gn);
     if (!url) return false; // sin grabación: silencio intencional — nunca TTS
     void preloadBytes(slug, url);
     if (!sigueVigente(t)) return true; // ya se pidió otra palabra: esta no suena atrasada
-    ok = await playSrc(url, t);
+    ok = await playSrc(url, t, rate);
   }
   if (!ok) forget(slug);
   // Primera voz que suena en este celular: aviso de volumen (una sola vez).
   else void import("./volume-tip").then((m) => m.maybeVolumeTip()).catch(() => {});
   return ok;
+}
+
+/** Reproducción pausada (0.75x) con voz humana real y tono conservado para aprender la pronunciación. */
+export function playGuaraniSlow(gn: string): Promise<boolean> {
+  return playGuarani(gn, { rate: 0.75 });
 }

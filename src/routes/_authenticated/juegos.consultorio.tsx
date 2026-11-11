@@ -423,8 +423,8 @@ function Niveles({ idioma }: { idioma: Idioma }) {
           {!n.listo && (
             <p className="mt-3 text-[#FBE3A6]">
               {L === "es"
-                ? "Basado en la obra Tesãirã del Dr. Carlos Ferreira. Revisión del autor y grabación con voces reales en curso."
-                : "Baseado na obra Tesãirã do Dr. Carlos Ferreira. Revisão do autor e gravação com vozes reais em andamento."}
+                ? "Basado en la obra Tesãirã Guaraní-Médico del Prof. Carlos Ferreira. Revisión del autor y grabación con voces humanas reales en curso."
+                : "Baseado na obra Tesãirã Guaraní-Médico do Prof. Carlos Ferreira. Revisão do autor e gravação com vozes humanas reais em andamento."}
             </p>
           )}
         </div>
