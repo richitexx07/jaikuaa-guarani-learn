@@ -46,10 +46,10 @@ export const VOICE_RULES: VoiceRule[] = [
   {
     id: "voz-coactiva",
     forms: ["mbo", "mo"],
-    meaning: "Voz coactiva",
+    meaning: "Voz coactiva (Causativo directo)",
     page: 119,
     examples: ["amboguata", "amoñe'ẽ"],
-    note: "El sujeto manda a realizar la acción a otra persona. «mbo» para verbos orales y «mo» para verbos nasales.",
+    note: "El sujeto hace o manda realizar la acción (causativo directo). «mbo» para verbos orales y «mo» para verbos nasales. En combinación con la voz pasiva/refleja «je/ñe» produce las formas causativas compuestas «ñembo/ñemo» (pág. 123: oñembotavy, oñemohenda). El causativo indirecto o mediado se expresa con el sufijo «-uka» (modo mediativo, pág. 145).",
     status: pending,
   },
   {
