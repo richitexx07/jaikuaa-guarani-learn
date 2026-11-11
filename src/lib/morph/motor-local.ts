@@ -102,7 +102,19 @@ function nominalToReading(n: NominalAnalysis, index: number): MotorReading {
   };
 }
 
-export function analyzeLocalMotor(text: string): MotorResponse {
+/**
+ * Fuentes con las que el motor confirma que una palabra o una raíz existe. Solo fuentes hechas por
+ * personas: el vocabulario de Jaikuaa que cargaron los docentes, el Diccionario de la Academia (SPL)
+ * y las formas que imprime la Gramática ALG 2020. Devuelve el nombre de la fuente o null.
+ * Sin fuentes, el motor solo descompone y nunca da una palabra por reconocida.
+ */
+export interface FuentesMotor {
+  conoce(palabra: string): string | null;
+}
+
+const sinTilde = (s: string) => s.normalize("NFD").replace(/\u0301/g, "").normalize("NFC");
+
+export function analyzeLocalMotor(text: string, fuentes?: FuentesMotor): MotorResponse {
   const matches = Array.from(text.matchAll(WORD_RE));
   const tokens: MotorToken[] = [];
 
@@ -113,73 +125,97 @@ export function analyzeLocalMotor(text: string): MotorResponse {
 
     const lecturas: MotorReading[] = [];
 
-    // 1. Clases cerradas (pronombres, partículas, posposiciones sueltas de la Academia)
-    const closed = lookupClosed(norm);
-    if (closed) {
+    // 1. Clases cerradas impresas en la Gramática (pronombres, partículas, posposiciones sueltas).
+    for (const c of lookupClosed(norm)) {
+      lecturas.push({
+        raiz: norm,
+        lema: c.entry.form,
+        categoria: c.entry.cls,
+        persona: c.entry.person ?? null,
+        negacion: false,
+        prefijos: [],
+        sufijos: [],
+        analisis_crudo: `${norm}[${c.entry.cls}]`,
+        rango: lecturas.length + 1,
+        peso: null,
+        paginas: [c.entry.page],
+        procedencia: "gramatica-alg-2020",
+      });
+    }
+    const cerrada = lecturas.length > 0;
+
+    // 2. La palabra entera en una fuente hecha por personas.
+    const fuenteEntera = cerrada ? null : (fuentes?.conoce(norm) ?? null);
+    if (fuenteEntera) {
       lecturas.push({
         raiz: norm,
         lema: norm,
-        categoria: closed.meaning,
+        categoria: "palabra_atestiguada",
         persona: null,
         negacion: false,
         prefijos: [],
         sufijos: [],
-        analisis_crudo: `${norm}[${closed.meaning}]`,
-        rango: 1,
+        analisis_crudo: `${norm}[${fuenteEntera}]`,
+        rango: lecturas.length + 1,
         peso: null,
-        paginas: [closed.page],
-        procedencia: "jaikuaa-nativo",
+        paginas: [],
+        procedencia: fuenteEntera,
       });
     }
 
-    // 2. Análisis verbal (prefijos de persona, negación, voces causativas/pasivas, sufijos)
-    const verbales = analyze(norm);
-    for (const v of verbales) {
-      lecturas.push(verbalToReading(v, lecturas.length));
+    // 3. Descomposición por reglas (verbal y nominal), quedándose solo con las de raíz atestiguada.
+    const candidatas: MotorReading[] = [];
+    if (!cerrada) {
+      for (const v of analyze(norm)) candidatas.push(verbalToReading(v, candidatas.length));
+      for (const n of analyzeNominal(norm)) candidatas.push(nominalToReading(n, candidatas.length));
     }
-
-    // 3. Análisis nominal (posesión, multiformes, sufijos de plural/tiempo/posposición)
-    if (lecturas.length === 0) {
-      const nominales = analyzeNominal(norm);
-      for (const n of nominales) {
-        lecturas.push(nominalToReading(n, lecturas.length));
-      }
+    const conRaiz: MotorReading[] = [];
+    for (const l of candidatas) {
+      if (!fuentes || l.raiz === norm) continue; // sin prefijos ni sufijos no hay nada que descomponer
+      const f = fuentes.conoce(l.raiz) ?? fuentes.conoce(sinTilde(l.raiz));
+      if (f) conRaiz.push({ ...l, procedencia: `raiz:${f}`, rango: lecturas.length + conRaiz.length + 1 });
     }
 
     // Deduplicación de lecturas equivalentes
-    const uniqueLecturas: MotorReading[] = [];
+    const unicas: MotorReading[] = [];
     const seen = new Set<string>();
-    for (const l of lecturas) {
+    for (const l of [...lecturas, ...conRaiz]) {
       const k = `${l.categoria}|${l.raiz}|${l.analisis_crudo}`;
       if (!seen.has(k)) {
         seen.add(k);
-        uniqueLecturas.push(l);
+        unicas.push({ ...l, rango: unicas.length + 1 });
       }
     }
 
-    const estado: ReadingStatus =
-      uniqueLecturas.length === 0
-        ? "sin_analisis"
-        : uniqueLecturas.length === 1
-          ? "una_lectura"
-          : "sin_resolver";
+    // Si la palabra entera está en una fuente o es de clase cerrada, eso decide (evidencia, no adivinanza).
+    let estado: ReadingStatus;
+    let seleccion: number | null = null;
+    let metodo: string;
+    if (unicas.length === 0) {
+      estado = "sin_analisis";
+      metodo = "sin-fuente";
+    } else if (unicas.length === 1) {
+      estado = "una_lectura";
+      seleccion = 0;
+      metodo = cerrada ? "clase-cerrada" : fuenteEntera ? "palabra-atestiguada" : "raiz-atestiguada";
+    } else if (cerrada || fuenteEntera) {
+      estado = "resuelta";
+      seleccion = 0;
+      metodo = cerrada ? "clase-cerrada" : "palabra-atestiguada";
+    } else {
+      estado = "sin_resolver";
+      metodo = "raiz-atestiguada";
+    }
 
-    tokens.push({
-      superficie: surface,
-      normalizada: norm,
-      lecturas: uniqueLecturas,
-      seleccion: uniqueLecturas.length === 1 ? 0 : null,
-      estado,
-      metodo: "reglas-alg-2020",
-    });
+    tokens.push({ superficie: surface, normalizada: norm, lecturas: unicas, seleccion, estado, metodo });
   }
 
   return {
     version_contrato: CONTRACT_VERSION,
     motor: {
       nombre: "jaikuaa-determinista-nativo",
-      version: "1.0",
-      transductor: "gramatica-alg-2020",
+      version: "1.1",
+      transductor: fuentes ? "gramatica-alg-2020+fuentes" : "gramatica-alg-2020",
     },
     tokens,
   };

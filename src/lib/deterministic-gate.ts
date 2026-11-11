@@ -5,7 +5,7 @@
  */
 import type { MotorResponse } from "@/lib/morph/motor-contract";
 
-export type GateResult = { accepted: true } | { accepted: false; reason: string };
+export type GateResult = { accepted: true; fuente?: string } | { accepted: false; reason: string };
 
 export type MotorOutcome =
   | { status: "apagado" }
@@ -29,5 +29,6 @@ export function evaluateGate(text: string, outcome: MotorOutcome): GateResult {
       return { accepted: false, reason: `El motor no aceptó «${t.superficie}» (estado: ${t.estado}).` };
     }
   }
-  return { accepted: true };
+  const fuentes = [...new Set(tokens.map((t) => t.lecturas[t.seleccion ?? 0]?.procedencia).filter((f): f is string => !!f))];
+  return fuentes.length ? { accepted: true, fuente: fuentes.join(", ") } : { accepted: true };
 }

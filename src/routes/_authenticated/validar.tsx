@@ -405,7 +405,7 @@ function QuickValidatePage() {
               {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Check aria-hidden />} Está bien
             </Button>
           </div>
-          <GateNotice accepted={gate.accepted} reason={gate.reason} loading={gate.loading} />
+          <GateNotice accepted={gate.accepted} reason={gate.reason} loading={gate.loading} fuente={gate.fuente} />
           <p className="mt-2 hidden text-center text-xs text-muted-foreground md:block">
             Teclado: → aprobar · ← error · S saltar · Z deshacer
           </p>

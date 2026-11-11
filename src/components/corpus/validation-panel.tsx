@@ -112,7 +112,7 @@ function GatedApprove({ gn, disabled, onApprove }: { gn: string; disabled: boole
         <CheckCircle2 className="mr-2 h-4 w-4" />
         Aprobar y publicar
       </Button>
-      <GateNotice accepted={gate.accepted} reason={gate.reason} loading={gate.loading} />
+      <GateNotice accepted={gate.accepted} reason={gate.reason} loading={gate.loading} fuente={gate.fuente} />
     </div>
   );
 }
