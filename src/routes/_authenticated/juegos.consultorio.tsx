@@ -355,6 +355,84 @@ function Consultorio() {
   );
 }
 
+/* ------------------------------ Niveles ------------------------------ */
+
+const NIVELES = [
+  {
+    id: "basico",
+    es: "Básico", pt: "Básico",
+    sub: { es: "Partes del cuerpo, con voz real", pt: "Partes do corpo, com voz real" },
+    temas: { es: ["Cabeza, ojos, nariz, boca, oído y pie"], pt: ["Cabeça, olhos, nariz, boca, ouvido e pé"] },
+    listo: true,
+  },
+  {
+    id: "intermedio",
+    es: "Intermedio", pt: "Intermediário",
+    sub: { es: "Consulta de guardia", pt: "Consulta de plantão" },
+    temas: {
+      es: ["Saludo y datos del paciente", "Dónde duele y desde cuándo", "Fiebre, tos y presión", "Antecedentes familiares"],
+      pt: ["Saudação e dados do paciente", "Onde dói e desde quando", "Febre, tosse e pressão", "Antecedentes familiares"],
+    },
+    listo: false,
+  },
+  {
+    id: "avanzado",
+    es: "Avanzado", pt: "Avançado",
+    sub: { es: "Especialidades", pt: "Especialidades" },
+    temas: {
+      es: ["Diabetes e hipertensión", "Embarazo y control prenatal", "Pediatría", "Indicaciones y medicamentos"],
+      pt: ["Diabetes e hipertensão", "Gravidez e pré-natal", "Pediatria", "Indicações e medicamentos"],
+    },
+    listo: false,
+  },
+] as const;
+
+function Niveles({ idioma }: { idioma: Idioma }) {
+  const [abierto, setAbierto] = useState<string>("basico");
+  const L = idioma === "es" ? "es" : "pt";
+  return (
+    <div className="mt-5">
+      <h2 className="font-display text-lg font-bold text-white">{L === "es" ? "Elegí tu nivel" : "Escolha seu nível"}</h2>
+      <div className="mt-2 grid gap-2 sm:grid-cols-3">
+        {NIVELES.map((n) => {
+          const activo = abierto === n.id;
+          return (
+            <button
+              key={n.id}
+              type="button"
+              aria-pressed={activo}
+              onClick={() => setAbierto(n.id)}
+              className={`rounded-2xl border p-3 text-left transition ${activo ? "border-white bg-white/15" : "border-white/15 bg-white/5"}`}
+            >
+              <span className="flex items-center justify-between gap-2">
+                <span className="font-semibold text-white">{n[L]}</span>
+                <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${n.listo ? "bg-white text-[#062A2E]" : "bg-[#F2B544]/20 text-[#FBE3A6]"}`}>
+                  {n.listo ? (L === "es" ? "Se juega" : "Disponível") : L === "es" ? "En desarrollo" : "Em desenvolvimento"}
+                </span>
+              </span>
+              <span className="mt-1 block text-sm text-white/75">{n.sub[L]}</span>
+            </button>
+          );
+        })}
+      </div>
+      {NIVELES.filter((n) => n.id === abierto).map((n) => (
+        <div key={n.id} className="mt-3 rounded-2xl bg-white/10 p-4 text-sm text-white/85">
+          <ul className="list-disc space-y-1 pl-5">
+            {n.temas[L].map((tm) => <li key={tm}>{tm}</li>)}
+          </ul>
+          {!n.listo && (
+            <p className="mt-3 text-[#FBE3A6]">
+              {L === "es"
+                ? "Basado en la obra Tesãirã del Dr. Carlos Ferreira. Revisión del autor y grabación con voces reales en curso."
+                : "Baseado na obra Tesãirã do Dr. Carlos Ferreira. Revisão do autor e gravação com vozes reais em andamento."}
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* ------------------------------ Pantallas ------------------------------ */
 
 function Intro({
@@ -396,6 +474,7 @@ function Intro({
           {idioma === "es" ? "un error cuesta una" : "cada erro custa uma"}
         </li>
       </ul>
+      <Niveles idioma={idioma} />
       {pocos && !cargando && <p className="mt-4 rounded-2xl border border-[#F2B544]/50 bg-[#F2B544]/10 p-3 text-sm text-[#FBE3A6]">{t("pocos", idioma)}</p>}
       <button
         type="button"
