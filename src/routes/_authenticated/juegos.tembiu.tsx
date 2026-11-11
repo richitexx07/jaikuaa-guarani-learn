@@ -10,6 +10,7 @@ import { shufflerFor } from "@/lib/reto";
 import { useGameFeedback } from "@/components/games/game-kit";
 import { ValidationNotice } from "@/components/validation-notice";
 import { recordCompletion } from "@/lib/gamification";
+import { playGuarani, prefetchAudio } from "@/lib/audio";
 import { DISHES, ING, type Dish } from "@/lib/juegos-contenido";
 import { applyTembiu } from "@/lib/juego-textos";
 import { useJuegoTextos } from "@/lib/use-juego-textos";
@@ -142,6 +143,16 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
     const wrong = mezclar(Object.keys(ing).filter((x) => !dish.ok.includes(x))).slice(0, 4);
     return mezclar([...dish.ok, ...wrong]);
   }, [dish, ing, seed, i]);
+
+  // Precarga silenciosa en segundo plano de las voces de los ingredientes de la ronda actual
+  useEffect(() => {
+    if (options && options.length) {
+      for (const opt of options) {
+        if (ing[opt]?.gn) void prefetchAudio(ing[opt]!.gn);
+      }
+    }
+  }, [options, ing]);
+
   const done = i >= ROUNDS;
   const xp = Math.min(20, score * 4);
   const recorded = useRef(false);
@@ -195,6 +206,9 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
 
   function toggle(x: string) {
     if (checked) return;
+    if (!picked.includes(x) && ing[x]?.gn) {
+      void playGuarani(ing[x]!.gn);
+    }
     setPicked((p) => (p.includes(x) ? p.filter((y) => y !== x) : p.length < 5 ? [...p, x] : p));
   }
   function check() {
