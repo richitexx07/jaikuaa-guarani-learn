@@ -14,6 +14,8 @@ export function freshScene():Scene {return {phase:'ask',knew:false,aim:{x:400,y:
 export function powerZone(knew:boolean):[number,number]{return knew?[.52,.86]:[.62,.8];}
 export function powerAt(now:number,start:number,knew:boolean){const t=((now-start)%(knew?1300:850))/(knew?1300:850);return t<.5?t*2:2-t*2;}
 export type Dive='left'|'center'|'right'|'left-high'|'center-high'|'right-high';
+/** Same-phone keeper choices, ordered like the shooter's two rows of targets. */
+export const KEEPER_DIVES = ['left-high','center-high','right-high','left','center','right'] as const satisfies readonly Dive[];
 /** Lado del arquero sin la altura. */
 export function ladoDe(d:Dive):'left'|'center'|'right'{return d.replace('-high','') as 'left'|'center'|'right';}
 export function zoneOf(x:number):'left'|'center'|'right'{return x<G.x+G.w/3?'left':x>G.x+G.w*2/3?'right':'center';}

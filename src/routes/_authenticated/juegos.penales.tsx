@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { usePM } from '@/lib/i18n-penales-modos';
 import { useQuery } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
-import { Loader2, UserRound, UsersRound, RotateCcw, Wifi, Trophy, Hand } from 'lucide-react';
+import { Loader2, UserRound, UsersRound, RotateCcw, Wifi, Trophy, Hand, ArrowUpLeft, ArrowUp, ArrowUpRight, ArrowDownLeft, ArrowDown, ArrowDownRight } from 'lucide-react';
 import { FinalDia, TarjetaPenalDia, useResultadoDia } from '@/components/games/penalties/penal-dia';
 import { CopaFlow } from '@/components/games/penalties/copa-flow';
 import { Atajar } from '@/components/games/penalties/atajar';
@@ -20,7 +20,7 @@ import { GameStage } from '@/components/games/game-stage';
 import { PenaltyPitch } from '@/components/games/penalties/pitch';
 import { GameMascot as PenaltyMascot } from '@/components/games/game-mascot';
 import { useGameKit } from '@/components/games/game-kit';
-import { duelFinished, isGoal, xpFor, type Dive, type Outcome } from '@/components/games/penalties/physics';
+import { duelFinished, isGoal, KEEPER_DIVES, ladoDe, xpFor, type Dive, type Outcome } from '@/components/games/penalties/physics';
 import { getPenaltiesLed } from '@/lib/penalties.functions';
 import { playGuarani } from '@/lib/audio';
 import { recordCompletion } from '@/lib/gamification';
@@ -140,12 +140,12 @@ function Match({seed,partida,lesson,words,duel,names,kits,ledText,muted,onAgain,
 
 function KeeperPick({keeper,shooter,onPick}:{keeper:string;shooter:string;onPick:(d:Dive)=>void}){
  const {p}=usePT();
- const opts:[Dive,string,string][]=[['left','⬅',p('left')],['center','⬆',p('center')],['right','➡',p('right')]];
+ const icons={ 'left-high':ArrowUpLeft, 'center-high':ArrowUp, 'right-high':ArrowUpRight, left:ArrowDownLeft, center:ArrowDown, right:ArrowDownRight };
  return <section className="penalties-keeper-pick space-y-4 rounded-2xl p-5 text-center" aria-label={p('keeperTurn')}>
-  <p className="text-xs font-semibold uppercase tracking-widest">🧤 {p('keeperTurn')}</p>
+  <p className="text-xs font-semibold uppercase tracking-widest">{p('keeperTurn')}</p>
   <h2 className="font-display text-2xl font-bold">{p('keeperPick',{k:keeper})}</h2>
   <p className="text-sm opacity-80">{p('keeperInfo',{s:shooter})}</p>
-  <div className="grid grid-cols-3 gap-2">{opts.map(([d,i,l])=><Button key={d} variant="outline" className="h-20 flex-col gap-1 text-base font-bold" onClick={()=>{try{navigator.vibrate?.(20);}catch{}onPick(d);}}><span className="text-2xl" aria-hidden>{i}</span>{l}</Button>)}</div>
+  <div className="grid grid-cols-3 grid-rows-2 gap-2">{KEEPER_DIVES.map(d=>{const Icon=icons[d],side=p(ladoDe(d)),height=p(d.endsWith('-high')?'high':'low');return <Button key={d} variant="outline" aria-label={`${height} · ${side}`} title={`${height} · ${side}`} className="h-24 min-w-0 flex-col gap-1 whitespace-normal px-1 text-sm font-bold" onClick={()=>{try{navigator.vibrate?.(20);}catch{}onPick(d);}}><Icon className="h-6 w-6 shrink-0" aria-hidden/><span>{side}</span><span className="text-xs font-normal">{height}</span></Button>;})}</div>
   <p className="text-xs opacity-70">{p('passPhone',{s:shooter})}</p>
  </section>;
 }
