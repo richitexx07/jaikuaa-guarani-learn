@@ -324,7 +324,7 @@ export function RetoBanner({ partida, extra, total, coincide = true, className =
           </span>
           <span className="min-w-0 flex-1">
             <span className="block font-display text-base font-bold leading-tight">Jugar con amigos</span>
-            <span className="block text-xs opacity-75">Invitalos ahora: todos juegan la misma partida y se arma una tabla.</span>
+            <span className="block text-xs opacity-75">Por turnos: cada uno juega su partida cuando puede y se arma una tabla.</span>
           </span>
           <Share2 className="h-5 w-5 shrink-0 opacity-60" aria-hidden />
         </button>
