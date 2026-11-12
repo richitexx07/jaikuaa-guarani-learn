@@ -17,6 +17,7 @@ import { Route as AtendemosRouteImport } from './routes/atendemos'
 import { Route as AuspiciantesRouteImport } from './routes/auspiciantes'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CineRouteImport } from './routes/cine'
+import { Route as ColaboradoresRouteImport } from './routes/colaboradores'
 import { Route as ComenzarRouteImport } from './routes/comenzar'
 import { Route as DeRouteImport } from './routes/de'
 import { Route as EnRouteImport } from './routes/en'
@@ -75,6 +76,7 @@ import { Route as StudioSplatRouteImport } from './routes/studio.$'
 import { Route as TembiapoIndexRouteImport } from './routes/tembiapo.index'
 import { Route as VerificarConvenioCodigoRouteImport } from './routes/verificar-convenio.$codigo'
 import { Route as VerificarCodeRouteImport } from './routes/verificar.$code'
+import { Route as AuthenticatedAdminColaboradoresRouteImport } from './routes/_authenticated/admin.colaboradores'
 import { Route as AuthenticatedAdminConveniosRouteImport } from './routes/_authenticated/admin.convenios'
 import { Route as AuthenticatedAdminCorpusRouteImport } from './routes/_authenticated/admin.corpus'
 import { Route as AuthenticatedAdminInformeAuspicianteRouteImport } from './routes/_authenticated/admin.informe-auspiciante'
@@ -169,6 +171,11 @@ const AuthRoute = AuthRouteImport.update({
 const CineRoute = CineRouteImport.update({
   id: '/cine',
   path: '/cine',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ColaboradoresRoute = ColaboradoresRouteImport.update({
+  id: '/colaboradores',
+  path: '/colaboradores',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComenzarRoute = ComenzarRouteImport.update({
@@ -465,6 +472,12 @@ const VerificarCodeRoute = VerificarCodeRouteImport.update({
   path: '/verificar/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminColaboradoresRoute =
+  AuthenticatedAdminColaboradoresRouteImport.update({
+    id: '/admin/colaboradores',
+    path: '/admin/colaboradores',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminConveniosRoute =
   AuthenticatedAdminConveniosRouteImport.update({
     id: '/admin/convenios',
@@ -798,6 +811,7 @@ export interface FileRoutesByFullPath {
   '/auspiciantes': typeof AuspiciantesRoute
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
+  '/colaboradores': typeof ColaboradoresRoute
   '/comenzar': typeof ComenzarRoute
   '/de': typeof DeRoute
   '/en': typeof EnRoute
@@ -856,6 +870,7 @@ export interface FileRoutesByFullPath {
   '/purahei/': typeof PuraheiIndexRoute
   '/studio/': typeof StudioIndexRoute
   '/tembiapo/': typeof TembiapoIndexRoute
+  '/admin/colaboradores': typeof AuthenticatedAdminColaboradoresRoute
   '/admin/convenios': typeof AuthenticatedAdminConveniosRoute
   '/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
@@ -921,6 +936,7 @@ export interface FileRoutesByTo {
   '/auspiciantes': typeof AuspiciantesRoute
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
+  '/colaboradores': typeof ColaboradoresRoute
   '/comenzar': typeof ComenzarRoute
   '/de': typeof DeRoute
   '/en': typeof EnRoute
@@ -978,6 +994,7 @@ export interface FileRoutesByTo {
   '/purahei': typeof PuraheiIndexRoute
   '/studio': typeof StudioIndexRoute
   '/tembiapo': typeof TembiapoIndexRoute
+  '/admin/colaboradores': typeof AuthenticatedAdminColaboradoresRoute
   '/admin/convenios': typeof AuthenticatedAdminConveniosRoute
   '/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
@@ -1043,6 +1060,7 @@ export interface FileRoutesById {
   '/auspiciantes': typeof AuspiciantesRoute
   '/auth': typeof AuthRoute
   '/cine': typeof CineRoute
+  '/colaboradores': typeof ColaboradoresRoute
   '/comenzar': typeof ComenzarRoute
   '/de': typeof DeRoute
   '/en': typeof EnRoute
@@ -1101,6 +1119,7 @@ export interface FileRoutesById {
   '/purahei/': typeof PuraheiIndexRoute
   '/studio/': typeof StudioIndexRoute
   '/tembiapo/': typeof TembiapoIndexRoute
+  '/_authenticated/admin/colaboradores': typeof AuthenticatedAdminColaboradoresRoute
   '/_authenticated/admin/convenios': typeof AuthenticatedAdminConveniosRoute
   '/_authenticated/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/_authenticated/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
@@ -1168,6 +1187,7 @@ export interface FileRouteTypes {
     | '/auspiciantes'
     | '/auth'
     | '/cine'
+    | '/colaboradores'
     | '/comenzar'
     | '/de'
     | '/en'
@@ -1226,6 +1246,7 @@ export interface FileRouteTypes {
     | '/purahei/'
     | '/studio/'
     | '/tembiapo/'
+    | '/admin/colaboradores'
     | '/admin/convenios'
     | '/admin/corpus'
     | '/admin/informe-auspiciante'
@@ -1291,6 +1312,7 @@ export interface FileRouteTypes {
     | '/auspiciantes'
     | '/auth'
     | '/cine'
+    | '/colaboradores'
     | '/comenzar'
     | '/de'
     | '/en'
@@ -1348,6 +1370,7 @@ export interface FileRouteTypes {
     | '/purahei'
     | '/studio'
     | '/tembiapo'
+    | '/admin/colaboradores'
     | '/admin/convenios'
     | '/admin/corpus'
     | '/admin/informe-auspiciante'
@@ -1412,6 +1435,7 @@ export interface FileRouteTypes {
     | '/auspiciantes'
     | '/auth'
     | '/cine'
+    | '/colaboradores'
     | '/comenzar'
     | '/de'
     | '/en'
@@ -1470,6 +1494,7 @@ export interface FileRouteTypes {
     | '/purahei/'
     | '/studio/'
     | '/tembiapo/'
+    | '/_authenticated/admin/colaboradores'
     | '/_authenticated/admin/convenios'
     | '/_authenticated/admin/corpus'
     | '/_authenticated/admin/informe-auspiciante'
@@ -1537,6 +1562,7 @@ export interface RootRouteChildren {
   AuspiciantesRoute: typeof AuspiciantesRoute
   AuthRoute: typeof AuthRoute
   CineRoute: typeof CineRoute
+  ColaboradoresRoute: typeof ColaboradoresRoute
   ComenzarRoute: typeof ComenzarRoute
   DeRoute: typeof DeRoute
   EnRoute: typeof EnRoute
@@ -1641,6 +1667,13 @@ declare module '@tanstack/react-router' {
       path: '/cine'
       fullPath: '/cine'
       preLoaderRoute: typeof CineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/colaboradores': {
+      id: '/colaboradores'
+      path: '/colaboradores'
+      fullPath: '/colaboradores'
+      preLoaderRoute: typeof ColaboradoresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/comenzar': {
@@ -2048,6 +2081,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/verificar/$code'
       preLoaderRoute: typeof VerificarCodeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin/colaboradores': {
+      id: '/_authenticated/admin/colaboradores'
+      path: '/admin/colaboradores'
+      fullPath: '/admin/colaboradores'
+      preLoaderRoute: typeof AuthenticatedAdminColaboradoresRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/convenios': {
       id: '/_authenticated/admin/convenios'
@@ -2521,6 +2561,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
   AuthenticatedValidacionRoute: typeof AuthenticatedValidacionRoute
   AuthenticatedValidarRoute: typeof AuthenticatedValidarRoute
+  AuthenticatedAdminColaboradoresRoute: typeof AuthenticatedAdminColaboradoresRoute
   AuthenticatedAdminConveniosRoute: typeof AuthenticatedAdminConveniosRoute
   AuthenticatedAdminCorpusRoute: typeof AuthenticatedAdminCorpusRoute
   AuthenticatedAdminInformeAuspicianteRoute: typeof AuthenticatedAdminInformeAuspicianteRoute
@@ -2585,6 +2626,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
   AuthenticatedValidacionRoute: AuthenticatedValidacionRoute,
   AuthenticatedValidarRoute: AuthenticatedValidarRoute,
+  AuthenticatedAdminColaboradoresRoute: AuthenticatedAdminColaboradoresRoute,
   AuthenticatedAdminConveniosRoute: AuthenticatedAdminConveniosRoute,
   AuthenticatedAdminCorpusRoute: AuthenticatedAdminCorpusRoute,
   AuthenticatedAdminInformeAuspicianteRoute:
@@ -2644,6 +2686,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuspiciantesRoute: AuspiciantesRoute,
   AuthRoute: AuthRoute,
   CineRoute: CineRoute,
+  ColaboradoresRoute: ColaboradoresRoute,
   ComenzarRoute: ComenzarRoute,
   DeRoute: DeRoute,
   EnRoute: EnRoute,

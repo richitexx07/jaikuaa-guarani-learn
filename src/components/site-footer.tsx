@@ -51,6 +51,9 @@ export function SiteFooter() {
             <Link to="/expertos" className="font-semibold text-primary transition-colors hover:text-foreground">
               Expertos
             </Link>
+            <Link to="/colaboradores" className="font-semibold text-primary transition-colors hover:text-foreground">
+              Sumate como colaborador
+            </Link>
             <Link to="/atendemos" className="font-semibold text-primary transition-colors hover:text-foreground">
               Atendemos en guaraní
             </Link>
