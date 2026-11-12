@@ -19,7 +19,8 @@ import {
   armarShow, dificultad, estrellas, guardarRecord, HITOS_RACHA, juzgar, leerRecord, multiplicador, opcionesVisibles,
   pulsoDelHueco, puntajeMaximo, puntosDe, RACHA_FIESTA, rango, TELON, CUENTA, type Nota, type Record_, type Show, type Vuelta,
 } from "@/lib/karaoke-juego";
-import { Aplausometro, Arpa as ArpaDibujo, CSS_ESCENARIO, Escenario, JAI_KARAOKE, K, Reflectores, type PoseJai } from "@/components/games/karaoke/escenario";
+import { Aplausometro, Arpa as ArpaDibujo, CSS_ESCENARIO, JAI_KARAOKE, K, Reflectores, type PoseJai } from "@/components/games/karaoke/escenario";
+import { Escenario3DView, precargarEscenario3D } from "@/components/games/karaoke/escenario-3d";
 import { abrirMicrofono, canto, fondoDe, miCancion, type Micro } from "@/components/games/karaoke/microfono";
 import { CompartirCancion } from "@/components/games/karaoke/compartir-cancion";
 import { HelpCircle, Mic, MicOff, Square, Play, Volume2, X } from "lucide-react";
@@ -209,6 +210,8 @@ function ComoSeJuega({ onClose }: { onClose: () => void }) {
 function Setlist({ songs, onPick, onComo }: { songs: Song[]; onPick: (s: Song) => void; onComo: () => void }) {
   const tt = useJU();
   const [records, setRecords] = useState<Record<string, Record_ | null>>({});
+  // El escenario 3D se baja mientras se elige la canción.
+  useEffect(() => { precargarEscenario3D(); }, []);
   useEffect(() => { setRecords(Object.fromEntries(songs.map((s) => [s.id, leerRecord(s.id)]))); }, [songs]);
   return (
     <section className="pt-2">
@@ -600,7 +603,7 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
       </div>
 
       <div className="relative">
-        <Escenario beat={beat} playing={playing} pose={pose} animo={fiesta ? 1 : animo} festejo={festejo} nivelVoz={micEstado === "listo" ? (playing ? nivel : 0) : null} />
+        <Escenario3DView beat={beat} playing={playing} pose={pose} animo={fiesta ? 1 : animo} festejo={festejo} fiesta={fiesta} nivelVoz={micEstado === "listo" ? (playing ? nivel : 0) : null} />
         {fiesta && <span className="kk-telon-in absolute left-3 top-3 rounded-full px-3 py-1 font-display text-sm font-bold" style={{ background: K.oro, color: K.noche }}>{tt("kkFiesta")}</span>}
         {pop && (
           <span key={pop.n} className="kk-pop pointer-events-none absolute left-1/2 top-6 flex flex-col items-center whitespace-nowrap font-display font-bold" style={{ color: pop.color, textShadow: "0 2px 12px rgba(0,0,0,.6)" }}>
