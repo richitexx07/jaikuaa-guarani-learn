@@ -209,23 +209,41 @@ export const NOMBRE_ESTADO: Record<Estado, string> = {
 
 export const NOMBRE_PROGRAMA: Record<Programa, string> = { purahei: "Purahéi Jaikuaa", libreria: "Librería Jaikuaa" };
 
-/** El borrador queda en el navegador mientras la persona entra o crea su cuenta. */
+/**
+ * El borrador queda en el navegador mientras la persona entra o crea su cuenta.
+ * Solo se guarda cuando la persona escribió o marcó algo ella misma (nunca por el nombre que se completa solo
+ * desde su cuenta): así, quien entra solo a mirar no queda con un «borrador» ni con el aviso en el panel.
+ */
 export const BORRADOR_KEY = (p: Programa) => `jaikuaa:convenio:${p}`;
+const OCULTO_KEY = (p: Programa) => `jaikuaa:convenio:${p}:aviso-oculto`;
 export function leerBorrador(p: Programa): Firma | null {
   try {
     const v = JSON.parse(localStorage.getItem(BORRADOR_KEY(p)) ?? "null");
-    if (!v || typeof v !== "object") return null;
+    // Los borradores viejos sin la marca «tocado» se descartan (los guardaba el autocompletado).
+    if (!v || typeof v !== "object" || v.tocado !== true) return null;
     return { ...FIRMA_VACIA, ...v, acepto: false, obras: Array.isArray(v.obras) && v.obras.length ? v.obras : FIRMA_VACIA.obras };
   } catch { return null; }
 }
 export function guardarBorrador(p: Programa, f: Firma) {
-  try { localStorage.setItem(BORRADOR_KEY(p), JSON.stringify({ ...f, acepto: false })); } catch { /* sin almacenamiento */ }
+  try {
+    localStorage.setItem(BORRADOR_KEY(p), JSON.stringify({ ...f, acepto: false, tocado: true }));
+    localStorage.removeItem(OCULTO_KEY(p)); // si vuelve a escribir, el aviso vuelve a valer
+  } catch { /* sin almacenamiento */ }
 }
 export function borrarBorrador(p: Programa) {
-  try { localStorage.removeItem(BORRADOR_KEY(p)); } catch { /* nada */ }
+  try { localStorage.removeItem(BORRADOR_KEY(p)); localStorage.removeItem(OCULTO_KEY(p)); } catch { /* nada */ }
 }
+/** La persona cerró el aviso del panel: el borrador sigue guardado por si vuelve al formulario. */
+export function ocultarAviso(p: Programa) {
+  try { localStorage.setItem(OCULTO_KEY(p), "1"); } catch { /* nada */ }
+}
+function avisoOculto(p: Programa): boolean {
+  try { return localStorage.getItem(OCULTO_KEY(p)) === "1"; } catch { return false; }
+}
+/** Hay algo empezado a mano y sin firmar, y el aviso no fue cerrado. */
 export function hayBorrador(): Programa | null {
   for (const p of PROGRAMAS) {
+    if (avisoOculto(p)) continue;
     const b = leerBorrador(p);
     if (b && (b.nombre.trim() || obrasLlenas(b.obras).length)) return p;
   }

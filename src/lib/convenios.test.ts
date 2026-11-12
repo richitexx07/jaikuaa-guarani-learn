@@ -1,6 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  CONVENIOS, codigoConvenio, esCodigoConvenio, faltaParaFirmar, FIRMA_VACIA, normalizarCI, obrasLlenas, textoCanonico, type Firma,
+  borrarBorrador, BORRADOR_KEY, CONVENIOS, codigoConvenio, esCodigoConvenio, faltaParaFirmar, FIRMA_VACIA, guardarBorrador, hayBorrador,
+  leerBorrador, normalizarCI, obrasLlenas, ocultarAviso, textoCanonico, type Firma,
 } from "@/lib/convenios";
 
 const llena: Firma = {
@@ -49,5 +50,30 @@ describe("convenios", () => {
     const c = codigoConvenio(2026, new Uint8Array([0, 1, 2, 31, 32, 255]));
     expect(esCodigoConvenio(c)).toBe(true);
     expect(esCodigoConvenio("CV-2026-0OI111")).toBe(false);
+  });
+});
+
+describe("borrador del convenio", () => {
+  const mem = new Map<string, string>();
+  const ls = { getItem: (k: string) => mem.get(k) ?? null, setItem: (k: string, v: string) => void mem.set(k, v), removeItem: (k: string) => void mem.delete(k) };
+  beforeEach(() => { mem.clear(); vi.stubGlobal("localStorage", ls); });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("un borrador viejo sin la marca de que la persona escribió no cuenta", () => {
+    mem.set(BORRADOR_KEY("purahei"), JSON.stringify({ ...FIRMA_VACIA, nombre: "Nombre de la cuenta" }));
+    expect(leerBorrador("purahei")).toBeNull();
+    expect(hayBorrador()).toBeNull();
+  });
+
+  it("lo que la persona llenó se guarda y avisa; la X lo oculta; escribir de nuevo lo vuelve a mostrar", () => {
+    guardarBorrador("libreria", { ...FIRMA_VACIA, nombre: "Ana Prueba" });
+    expect(hayBorrador()).toBe("libreria");
+    ocultarAviso("libreria");
+    expect(hayBorrador()).toBeNull();
+    expect(leerBorrador("libreria")?.nombre).toBe("Ana Prueba");
+    guardarBorrador("libreria", { ...FIRMA_VACIA, nombre: "Ana Prueba", ci: "123" });
+    expect(hayBorrador()).toBe("libreria");
+    borrarBorrador("libreria");
+    expect(hayBorrador()).toBeNull();
   });
 });

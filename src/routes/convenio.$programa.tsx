@@ -67,9 +67,11 @@ function Formulario({ programa }: { programa: Programa }) {
   const navigate = useNavigate();
   const sesion = useSesion();
   const [f, setF] = useState<Firma>(FIRMA_VACIA);
-  const [cargado, setCargado] = useState(false);
-  useEffect(() => { const b = leerBorrador(programa); if (b) setF(b); setCargado(true); }, [programa]);
-  useEffect(() => { if (cargado) guardarBorrador(programa, f); }, [cargado, programa, f]);
+  // «tocado»: la persona escribió o marcó algo. Solo entonces se guarda el borrador
+  // (el nombre que se completa solo desde la cuenta no cuenta como empezar).
+  const [tocado, setTocado] = useState(false);
+  useEffect(() => { const b = leerBorrador(programa); if (b) { setF(b); setTocado(true); } }, [programa]);
+  useEffect(() => { if (tocado) guardarBorrador(programa, f); }, [tocado, programa, f]);
 
   const cuentaFn = useServerFn(miCuentaConvenio);
   const cuenta = useQuery({
@@ -77,6 +79,10 @@ function Formulario({ programa }: { programa: Programa }) {
     queryFn: () => cuentaFn({ data: { programa } }),
     enabled: !!sesion.id,
   });
+  useEffect(() => {
+    // Ya firmó y no tocó nada en esta visita: un borrador viejo de este celular no debe quedar dando vueltas.
+    if (cuenta.data?.convenios.length && !tocado) borrarBorrador(programa);
+  }, [cuenta.data?.convenios.length]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     const nombre = cuenta.data?.nombre;
     if (nombre && !f.nombre) setF((x) => ({ ...x, nombre }));
@@ -86,9 +92,9 @@ function Formulario({ programa }: { programa: Programa }) {
   const [firmando, setFirmando] = useState(false);
   const falta = faltaParaFirmar(c, f);
 
-  const set = <K extends keyof Firma>(k: K, v: Firma[K]) => setF((x) => ({ ...x, [k]: v }));
-  const alternar = (k: "roles" | "permisos", id: string) => setF((x) => ({ ...x, [k]: x[k].includes(id) ? x[k].filter((y) => y !== id) : [...x[k], id] }));
-  const setObra = (i: number, k: keyof ObraFirmada, v: string) => setF((x) => ({ ...x, obras: x.obras.map((o, j) => (j === i ? { ...o, [k]: v } : o)) }));
+  const set = <K extends keyof Firma>(k: K, v: Firma[K]) => { setTocado(true); setF((x) => ({ ...x, [k]: v })); };
+  const alternar = (k: "roles" | "permisos", id: string) => { setTocado(true); setF((x) => ({ ...x, [k]: x[k].includes(id) ? x[k].filter((y) => y !== id) : [...x[k], id] })); };
+  const setObra = (i: number, k: keyof ObraFirmada, v: string) => { setTocado(true); setF((x) => ({ ...x, obras: x.obras.map((o, j) => (j === i ? { ...o, [k]: v } : o)) })); };
 
   async function firmar() {
     if (falta.length) { toast.error(`Falta: ${falta.join(", ")}`); return; }
@@ -106,7 +112,7 @@ function Formulario({ programa }: { programa: Programa }) {
   }
 
   const irACuenta = (modo: "signup" | "login") => {
-    guardarBorrador(programa, f);
+    if (tocado) guardarBorrador(programa, f);
     rememberAfterLogin(`/convenio/${programa}`);
     navigate({ to: "/auth", search: { mode: modo } });
   };
