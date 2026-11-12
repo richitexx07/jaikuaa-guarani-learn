@@ -1,4 +1,6 @@
 import { useTX, type TXKey } from "@/lib/i18n-pages";
+import { useAppLang } from "@/lib/i18n";
+import { localizarVocab } from "@/lib/significado";
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -152,10 +154,13 @@ const LESSON_CSS = `
 
 function LessonPage() {
   const tx = useTX();
-  const { lang, lesson } = Route.useLoaderData() as unknown as {
+  const { lang, lesson: crudo } = Route.useLoaderData() as unknown as {
     lang: NonNullable<ReturnType<typeof getLanguage>>;
     lesson: CourseLesson | null;
   };
+  // El significado se muestra en el idioma de la persona (solo lo revisado por un docente; si falta, en castellano).
+  const appLang = useAppLang();
+  const lesson = useMemo(() => (crudo ? { ...crudo, vocab: localizarVocab(crudo.vocab, appLang) } : null), [crudo, appLang]);
   const navigate = useNavigate();
   const [phase, setPhaseState] = useState<Phase>("intro");
   const [resumed, setResumed] = useState(false);
@@ -358,7 +363,7 @@ function VocabStep({
               )}
             </div>
             <div className="shrink-0">
-              <ReportErrorButton gn={v.gn} es={v.es} lugar={`Lección ${lesson.n}`} />
+              <ReportErrorButton gn={v.gn} es={(v as VocabItem & { orig?: string }).orig ?? v.es} lugar={`Lección ${lesson.n}`} />
             </div>
           </li>
         ))}

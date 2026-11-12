@@ -88,6 +88,7 @@ import { Route as AuthenticatedCursoLangRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDocenteIndexRouteImport } from './routes/_authenticated/docente.index'
 import { Route as AuthenticatedDocenteConstanciaRouteImport } from './routes/_authenticated/docente.constancia'
 import { Route as AuthenticatedDocenteJuegosRouteImport } from './routes/_authenticated/docente.juegos'
+import { Route as AuthenticatedDocenteSignificadosRouteImport } from './routes/_authenticated/docente.significados'
 import { Route as AuthenticatedGuaraniEscolarIndexRouteImport } from './routes/_authenticated/guarani-escolar.index'
 import { Route as AuthenticatedGuaraniEscolarRescateRouteImport } from './routes/_authenticated/guarani-escolar.rescate'
 import { Route as AuthenticatedGuaraniEscolarSemanalRouteImport } from './routes/_authenticated/guarani-escolar.semanal'
@@ -533,6 +534,12 @@ const AuthenticatedDocenteJuegosRoute =
     path: '/docente/juegos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDocenteSignificadosRoute =
+  AuthenticatedDocenteSignificadosRouteImport.update({
+    id: '/docente/significados',
+    path: '/docente/significados',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedGuaraniEscolarIndexRoute =
   AuthenticatedGuaraniEscolarIndexRouteImport.update({
     id: '/',
@@ -817,6 +824,7 @@ export interface FileRoutesByFullPath {
   '/curso/$lang': typeof AuthenticatedCursoLangRouteWithChildren
   '/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
   '/docente/juegos': typeof AuthenticatedDocenteJuegosRoute
+  '/docente/significados': typeof AuthenticatedDocenteSignificadosRoute
   '/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
   '/guarani-escolar/semanal': typeof AuthenticatedGuaraniEscolarSemanalRoute
   '/guarani-escolar/tema': typeof AuthenticatedGuaraniEscolarTemaRouteWithChildren
@@ -930,6 +938,7 @@ export interface FileRoutesByTo {
   '/constancia-convenio/$codigo': typeof AuthenticatedConstanciaConvenioCodigoRoute
   '/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
   '/docente/juegos': typeof AuthenticatedDocenteJuegosRoute
+  '/docente/significados': typeof AuthenticatedDocenteSignificadosRoute
   '/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
   '/guarani-escolar/semanal': typeof AuthenticatedGuaraniEscolarSemanalRoute
   '/juegos/ahorcado': typeof AuthenticatedJuegosAhorcadoRoute
@@ -1046,6 +1055,7 @@ export interface FileRoutesById {
   '/_authenticated/curso/$lang': typeof AuthenticatedCursoLangRouteWithChildren
   '/_authenticated/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
   '/_authenticated/docente/juegos': typeof AuthenticatedDocenteJuegosRoute
+  '/_authenticated/docente/significados': typeof AuthenticatedDocenteSignificadosRoute
   '/_authenticated/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
   '/_authenticated/guarani-escolar/semanal': typeof AuthenticatedGuaraniEscolarSemanalRoute
   '/_authenticated/guarani-escolar/tema': typeof AuthenticatedGuaraniEscolarTemaRouteWithChildren
@@ -1163,6 +1173,7 @@ export interface FileRouteTypes {
     | '/curso/$lang'
     | '/docente/constancia'
     | '/docente/juegos'
+    | '/docente/significados'
     | '/guarani-escolar/rescate'
     | '/guarani-escolar/semanal'
     | '/guarani-escolar/tema'
@@ -1276,6 +1287,7 @@ export interface FileRouteTypes {
     | '/constancia-convenio/$codigo'
     | '/docente/constancia'
     | '/docente/juegos'
+    | '/docente/significados'
     | '/guarani-escolar/rescate'
     | '/guarani-escolar/semanal'
     | '/juegos/ahorcado'
@@ -1391,6 +1403,7 @@ export interface FileRouteTypes {
     | '/_authenticated/curso/$lang'
     | '/_authenticated/docente/constancia'
     | '/_authenticated/docente/juegos'
+    | '/_authenticated/docente/significados'
     | '/_authenticated/guarani-escolar/rescate'
     | '/_authenticated/guarani-escolar/semanal'
     | '/_authenticated/guarani-escolar/tema'
@@ -2036,6 +2049,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDocenteJuegosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/docente/significados': {
+      id: '/_authenticated/docente/significados'
+      path: '/docente/significados'
+      fullPath: '/docente/significados'
+      preLoaderRoute: typeof AuthenticatedDocenteSignificadosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/guarani-escolar/': {
       id: '/_authenticated/guarani-escolar/'
       path: '/'
@@ -2374,6 +2394,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCursoLangRoute: typeof AuthenticatedCursoLangRouteWithChildren
   AuthenticatedDocenteConstanciaRoute: typeof AuthenticatedDocenteConstanciaRoute
   AuthenticatedDocenteJuegosRoute: typeof AuthenticatedDocenteJuegosRoute
+  AuthenticatedDocenteSignificadosRoute: typeof AuthenticatedDocenteSignificadosRoute
   AuthenticatedJuegosAhorcadoRoute: typeof AuthenticatedJuegosAhorcadoRoute
   AuthenticatedJuegosChacraRoute: typeof AuthenticatedJuegosChacraRoute
   AuthenticatedJuegosConsultorioRoute: typeof AuthenticatedJuegosConsultorioRoute
@@ -2438,6 +2459,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCursoLangRoute: AuthenticatedCursoLangRouteWithChildren,
   AuthenticatedDocenteConstanciaRoute: AuthenticatedDocenteConstanciaRoute,
   AuthenticatedDocenteJuegosRoute: AuthenticatedDocenteJuegosRoute,
+  AuthenticatedDocenteSignificadosRoute: AuthenticatedDocenteSignificadosRoute,
   AuthenticatedJuegosAhorcadoRoute: AuthenticatedJuegosAhorcadoRoute,
   AuthenticatedJuegosChacraRoute: AuthenticatedJuegosChacraRoute,
   AuthenticatedJuegosConsultorioRoute: AuthenticatedJuegosConsultorioRoute,
