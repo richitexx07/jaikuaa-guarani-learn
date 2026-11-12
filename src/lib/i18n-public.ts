@@ -68,6 +68,8 @@ const T = {
   navTeclado: ["Teclado", "Teclado", "Keyboard", "Tastatur", "Clavier", "鍵盤"],
   navJuegos: ["Juegos", "Jogos", "Games", "Spiele", "Jeux", "遊戲"],
   navLibreria: ["Librería", "Livraria", "Bookstore", "Buchhandlung", "Librairie", "書店"],
+  navPurahei: ["Purahéi", "Purahéi", "Purahéi", "Purahéi", "Purahéi", "Purahéi"],
+  navNuevo: ["Nuevo", "Novo", "New", "Neu", "Nouveau", "新"],
   navSobre: ["Sobre Jaikuaa", "Sobre o Jaikuaa", "About Jaikuaa", "Über Jaikuaa", "À propos", "關於 Jaikuaa"],
   navJugar: ["Jugar", "Jogar", "Play", "Spielen", "Jouer", "開玩"],
   navMenu: ["Menú", "Menu", "Menu", "Menü", "Menu", "選單"],

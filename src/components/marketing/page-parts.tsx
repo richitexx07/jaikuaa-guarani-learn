@@ -12,6 +12,7 @@ import { DisplayToggles } from "@/components/display-toggles";
 const NAV_LINKS = [
   { to: "/juegos", label: "navJuegos" },
   { to: "/libreria", label: "navLibreria" },
+  { to: "/purahei", label: "navPurahei" },
   { to: "/teclado", label: "navTeclado" },
   { to: "/turismo", label: "navTurismo" },
   { to: "/instituciones", label: "navInst" },
@@ -36,7 +37,7 @@ export function MarketingHeader({ idioma, accion }: { idioma?: ReactNode; accion
         </Link>
         <nav className="hidden items-center gap-4 text-sm lg:flex">
           {NAV_LINKS.map((l) => (
-            <Link key={l.to} to={l.to} className="text-muted-foreground hover:text-foreground">
+            <Link key={l.to} to={l.to} className={l.to === "/purahei" ? "font-semibold text-primary hover:text-foreground" : "text-muted-foreground hover:text-foreground"}>
               {t(l.label)}
             </Link>
           ))}
@@ -71,6 +72,11 @@ export function MarketingHeader({ idioma, accion }: { idioma?: ReactNode; accion
                   className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
                 >
                   {t(l.label)}
+                  {l.to === "/purahei" && (
+                    <span className="ml-2 rounded-full px-2 py-0.5 align-middle text-[11px] font-bold" style={{ background: "#F6C445", color: "#0F2038" }}>
+                      {t("navNuevo")}
+                    </span>
+                  )}
                 </Link>
               </li>
             ))}

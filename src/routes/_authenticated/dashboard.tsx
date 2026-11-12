@@ -17,6 +17,7 @@ import { Music2,
   Keyboard,
   Languages,
   MessageCircleQuestion,
+  Mic2,
   MessagesSquare,
   Newspaper,
   NotebookPen,
@@ -56,6 +57,7 @@ import { staffStatusRefreshInterval } from "@/lib/staff-status-refresh";
 import { OfflinePackCard } from "@/components/offline/offline-pack-card";
 import { AulaPendientes } from "@/components/aula/aula-pendientes";
 import { NovedadLibreria } from "@/components/libreria/novedad-libreria";
+import { NovedadPurahei } from "@/components/purahei/novedad-purahei";
 import { MisLibrosAcceso } from "@/components/libreria/mis-libros-acceso";
 import { RetoCard } from "@/components/games/reto-card";
 import jaiImg from "@/assets/jai/jai-saluda.webp";
@@ -511,6 +513,9 @@ function Dashboard() {
           <NovedadLibreria />
           <MisLibrosAcceso />
 
+          {/* NOVEDAD — Purahéi Jaikuaa, la vitrina de artistas */}
+          <NovedadPurahei />
+
           {/* RETAR — la tarjeta de «¿Quién sabe más guaraní?», con su código de embajador */}
           <RetoCard guest={false} />
 
@@ -596,6 +601,7 @@ function Dashboard() {
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <FreeCard to="/libreria" icon={BookOpen} title="Librería Jaikuaa" desc="Libros que se leen y libros que hablan. En desarrollo." accent="accent" />
+                <FreeCard to="/purahei" icon={Mic2} title="Purahéi Jaikuaa" desc="Artistas paraguayos: su voz real, sus letras explicadas y contacto directo." accent="accent" />
                 <FreeCard to="/aula" img={jaiProfe} title={t("d.aula.t")} desc={t("d.aula.d")} accent="primary" />
                 <FreeCard to="/pronunciar" img={jaiBienvenida} title={t("d.pron.t")} desc={t("d.pron.d")} accent="primary" />
                 <FreeCard to="/mostrador" img={jaiAtencion} title={t("d.mostr.t")} desc={t("d.mostr.d")} accent="primary" inValidation />
