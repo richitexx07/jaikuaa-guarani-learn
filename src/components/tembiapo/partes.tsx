@@ -3,10 +3,12 @@
  * que ve un artesano antes de sumarse (sin datos inventados: solo el lugar de cada cosa).
  */
 import { Link } from "@tanstack/react-router";
-import { Amphora, Axe, Feather, Footprints, Gem, ImageIcon, MapPin, MessageCircle, Scissors, Shirt, Volume2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Amphora, Award, Axe, Feather, Footprints, Gem, ImageIcon, Loader2, MapPin, MessageCircle, Pause, Route as RutaIcon, Scissors, Shirt, Volume2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Nanduti } from "@/components/libreria/arte";
-import { TB, type Oficio } from "@/lib/tembiapo";
+import { enlaceWhatsappArtesano, nombreOficio, TB, type Oficio } from "@/lib/tembiapo";
+import type { ArtesanoCard, RutaCard, Termino } from "@/lib/tembiapo.functions";
 
 const ICONO: Record<string, LucideIcon> = {
   "ao-poi": Shirt,
@@ -93,5 +95,114 @@ export function FichaEjemplo() {
         <p className="mt-2 text-center text-[11px] text-muted-foreground">Te escriben directo. Jaikuaa no cobra comisión por tus ventas.</p>
       </div>
     </div>
+  );
+}
+
+/** Retrato del artesano; sin foto, un ñandutí con su inicial. */
+export function FotoArtesano({ src, nombre, className = "" }: { src: string | null; nombre: string; className?: string }) {
+  if (src) return <img src={src} alt={`Retrato de ${nombre}`} className={`object-cover ${className}`} loading="lazy" />;
+  return (
+    <div className={`relative grid place-items-center overflow-hidden ${className}`} style={{ background: `linear-gradient(160deg, ${TB.marino}, ${TB.noche})` }} role="img" aria-label={nombre}>
+      <Nanduti className="absolute h-[140%] w-[140%] text-white/10" />
+      <span className="relative font-display text-4xl font-bold text-white">{nombre.trim().charAt(0).toUpperCase() || "?"}</span>
+    </div>
+  );
+}
+
+/** Sello «Maestro artesano»: solo con reconocimiento del Instituto Paraguayo de Artesanía. */
+export function SelloMaestro({ className = "" }: { className?: string }) {
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold text-white ${className}`} style={{ background: TB.rojo }}>
+      <Award className="h-3.5 w-3.5" aria-hidden /> Maestro artesano
+    </span>
+  );
+}
+
+export function TarjetaArtesano({ a }: { a: ArtesanoCard }) {
+  return (
+    <Link to="/tembiapo/maestro/$slug" params={{ slug: a.slug }} className="group block overflow-hidden rounded-3xl bg-card ring-1 ring-border transition active:scale-[.99] hover:shadow-elegant">
+      <div className="relative">
+        <FotoArtesano src={a.foto} nombre={a.nombre} className="aspect-[4/5] w-full" />
+        {a.maestro && <SelloMaestro className="absolute left-2 top-2" />}
+      </div>
+      <div className="p-3">
+        <b className="block truncate font-display text-lg leading-tight text-foreground">{a.nombre}</b>
+        <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+          <IconoOficio slug={a.oficio} className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">{nombreOficio(a.oficio)}{a.ciudad ? ` · ${a.ciudad}` : ""}</span>
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+export function TarjetaRuta({ r }: { r: RutaCard }) {
+  return (
+    <Link to="/tembiapo/ruta/$slug" params={{ slug: r.slug }} className="group flex h-full flex-col overflow-hidden rounded-3xl bg-white/5 ring-1 ring-white/15 transition hover:bg-white/10">
+      {r.foto
+        ? <img src={r.foto} alt="" className="aspect-[16/9] w-full object-cover" loading="lazy" />
+        : <span className="relative grid aspect-[16/9] place-items-center overflow-hidden" style={{ background: TB.noche }}><Nanduti className="absolute h-48 w-48 text-white/15" /><RutaIcon className="relative h-8 w-8 text-white/70" aria-hidden /></span>}
+      <span className="flex flex-1 flex-col p-4">
+        <b className="font-display text-xl text-white">{r.nombre}</b>
+        {r.lugares.length > 0 && <span className="mt-1 text-sm text-white/75">{r.lugares.join(" → ")}</span>}
+        {r.auspiciante && <span className="mt-auto pt-3 text-xs text-white/60">Con el apoyo de {r.auspiciante}</span>}
+      </span>
+    </Link>
+  );
+}
+
+/** Botón para escribirle al artesano. Jaikuaa no intermedia la venta. */
+export function BotonWhatsappArtesano({ numero, nombre, contacto, pieza, className = "" }: { numero: string; nombre: string; contacto?: string; pieza?: string; className?: string }) {
+  return (
+    <div className={className}>
+      <a href={enlaceWhatsappArtesano(numero, nombre, pieza)} target="_blank" rel="noopener noreferrer" className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl px-5 font-display font-bold text-white" style={{ background: TB.rojo }}>
+        <MessageCircle className="h-5 w-5" aria-hidden /> {pieza ? "Consultar por esta pieza" : "Escribile por WhatsApp"}
+      </a>
+      <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
+        {contacto ? `Atiende ${contacto}. ` : ""}Le escribís directo. Jaikuaa no cobra comisión por sus ventas.
+      </p>
+    </div>
+  );
+}
+
+/** Una palabra del oficio con la voz del artesano (si hay grabación). Nunca voz sintética. */
+function PalabraOficio({ t }: { t: Termino }) {
+  const ref = useRef<HTMLAudioElement | null>(null);
+  const [estado, setEstado] = useState<"quieto" | "cargando" | "sonando">("quieto");
+  useEffect(() => () => ref.current?.pause(), []);
+  const tocar = () => {
+    if (!t.audio) return;
+    if (estado === "sonando") { ref.current?.pause(); setEstado("quieto"); return; }
+    const a = ref.current ?? new Audio(t.audio);
+    ref.current = a;
+    a.onended = () => setEstado("quieto");
+    a.onerror = () => setEstado("quieto");
+    setEstado("cargando");
+    a.currentTime = 0;
+    a.play().then(() => setEstado("sonando")).catch(() => setEstado("quieto"));
+  };
+  return (
+    <li className="flex items-start gap-3 rounded-2xl bg-card p-3 ring-1 ring-border">
+      {t.audio ? (
+        <button type="button" onClick={tocar} className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-white" style={{ background: TB.marino }} aria-label={`Escuchar «${t.termino}»`}>
+          {estado === "cargando" ? <Loader2 className="h-5 w-5 animate-spin" /> : estado === "sonando" ? <Pause className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+        </button>
+      ) : (
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full" style={{ background: TB.lino, color: TB.marino }} aria-hidden><Volume2 className="h-5 w-5 opacity-40" /></span>
+      )}
+      <span className="min-w-0">
+        <b className="block font-display text-lg leading-tight" style={{ color: TB.noche }} lang="gn">{t.termino}</b>
+        <span className="text-sm text-muted-foreground">{t.significado}</span>
+      </span>
+    </li>
+  );
+}
+
+export function ListaPalabras({ palabras }: { palabras: Termino[] }) {
+  return (
+    <>
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2">{palabras.map((t) => <PalabraOficio key={t.id} t={t} />)}</ul>
+      <p className="mt-2 text-xs text-muted-foreground">Palabras revisadas por docentes especialistas. Las grabaciones son la voz de los propios artesanos.</p>
+    </>
   );
 }

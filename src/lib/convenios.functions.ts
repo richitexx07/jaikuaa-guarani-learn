@@ -60,10 +60,11 @@ export type ConvenioRow = {
   nombre: string; ci: string; whatsapp: string; ciudad: string; roles: string[]; permisos: string[]; obras: ObraFirmada[];
   ip: string; dispositivo: string; firmado_at: string; adjunto_path: string | null; adjunto_tipo: "cualificada" | "manuscrita" | null;
   adjunto_at: string | null; estado: Estado; nota: string; revisado_at: string | null; artista_id: string | null;
+  artesano_id: string | null;
 };
-const COLS = "id, codigo, programa, version, huella, user_id, email, nombre, ci, whatsapp, ciudad, roles, permisos, obras, ip, dispositivo, firmado_at, adjunto_path, adjunto_tipo, adjunto_at, estado, nota, revisado_at, artista_id";
+const COLS = "id, codigo, programa, version, huella, user_id, email, nombre, ci, whatsapp, ciudad, roles, permisos, obras, ip, dispositivo, firmado_at, adjunto_path, adjunto_tipo, adjunto_at, estado, nota, revisado_at, artista_id, artesano_id";
 
-const programaZ = z.enum(["purahei", "libreria"]);
+const programaZ = z.enum(["purahei", "libreria", "tembiapo"]);
 const codigoZ = z.string().trim().toUpperCase().refine(esCodigoConvenio, "Código inválido");
 
 /** Quién soy para firmar: correo y si está confirmado, y mis convenios de ese programa. */
@@ -281,4 +282,34 @@ export const crearFichaDesdeConvenio = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     await db.from("convenios_firmados").update({ artista_id: nuevo.id }).eq("id", c.id);
     return { artistaId: nuevo.id as string };
+  });
+
+/** Tembiapo: crea la ficha del artesano con los datos del convenio (sin publicar: faltan el oficio, la foto y sus piezas). */
+export const crearArtesanoDesdeConvenio = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    if (!(await esAdmin(context.supabase, context.userId))) throw new Error("Forbidden");
+    const db = await admin();
+    const { data: row } = await db.from("convenios_firmados").select(COLS).eq("id", data.id).maybeSingle();
+    const c = row as ConvenioRow | null;
+    if (!c || c.programa !== "tembiapo") throw new Error("Solo para convenios de Tembiapo");
+    if (c.estado !== "aprobado") throw new Error("Primero aprobá el convenio");
+    if (c.artesano_id) return { artesanoId: c.artesano_id };
+    const base = slugDe(c.nombre);
+    let slug = base;
+    for (let i = 2; i < 50; i++) {
+      const { data: hay } = await db.from("tembiapo_artesanos").select("id").eq("slug", slug).maybeSingle();
+      if (!hay) break;
+      slug = `${base.slice(0, 55)}-${i}`;
+    }
+    const { data: nuevo, error } = await db.from("tembiapo_artesanos").insert({
+      slug, nombre: c.nombre, ciudad: c.ciudad, oficio: "otro",
+      whatsapp: c.permisos.includes("whatsapp") ? c.whatsapp : null,
+      permiso_imagen: c.permisos.includes("imagen"),
+      publicado: false, creado_por: context.userId,
+    }).select("id").single();
+    if (error) throw new Error(error.message);
+    await db.from("convenios_firmados").update({ artesano_id: nuevo.id }).eq("id", c.id);
+    return { artesanoId: nuevo.id as string };
   });

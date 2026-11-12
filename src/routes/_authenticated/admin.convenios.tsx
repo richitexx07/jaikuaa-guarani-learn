@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { ArrowLeft, ChevronDown, ExternalLink, FileSignature, Loader2, Paperclip, UserPlus } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { CONVENIOS, ESTADOS, NOMBRE_ESTADO, NOMBRE_PROGRAMA, type Estado, type Programa } from "@/lib/convenios";
-import { crearFichaDesdeConvenio, decidirConvenio, panelConvenios, type ConvenioRow } from "@/lib/convenios.functions";
+import { crearArtesanoDesdeConvenio, crearFichaDesdeConvenio, decidirConvenio, panelConvenios, type ConvenioRow } from "@/lib/convenios.functions";
 
 /** Panel de convenios firmados en línea: revisar, aprobar o rechazar, retirar y crear la ficha en Purahéi. */
 export const Route = createFileRoute("/_authenticated/admin/convenios")({
@@ -39,7 +39,7 @@ function PanelConvenios() {
         <h1 className="flex items-center gap-2 font-display text-2xl font-bold"><FileSignature className="h-6 w-6 text-primary" aria-hidden /> Convenios firmados</h1>
         <p className="mt-1 text-sm text-muted-foreground">Lo firmado no se puede cambiar. Acá se revisa, se aprueba o se rechaza, y se atienden los pedidos de retiro (plazo: siete días).</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          {([undefined, "purahei", "libreria"] as const).map((p) => (
+          {([undefined, "purahei", "libreria", "tembiapo"] as const).map((p) => (
             <button key={p ?? "todos"} type="button" aria-pressed={programa === p} onClick={() => setPrograma(p)}
               className={`min-h-10 rounded-full px-4 text-sm font-semibold ring-1 ring-border ${programa === p ? "bg-primary text-primary-foreground" : ""}`}>
               {p ? NOMBRE_PROGRAMA[p] : "Todos"}
@@ -71,6 +71,7 @@ function Fila({ c }: { c: ConvenioRow }) {
   const qc = useQueryClient();
   const decidir = useServerFn(decidirConvenio);
   const crearFicha = useServerFn(crearFichaDesdeConvenio);
+  const crearArtesano = useServerFn(crearArtesanoDesdeConvenio);
   const conv = CONVENIOS[c.programa];
   const lbl = (lista: { id: string; label: string }[], ids: string[]) => ids.map((id) => lista.find((x) => x.id === id)?.label ?? id).join(" · ");
   async function hacer(fn: () => Promise<unknown>, ok: string) {
@@ -134,8 +135,14 @@ function Fila({ c }: { c: ConvenioRow }) {
               </button>
             )}
             {c.artista_id && <Link to="/admin/purahei" className="inline-flex min-h-11 items-center font-semibold text-primary">Ir a su ficha en el panel de Purahéi</Link>}
+            {c.programa === "tembiapo" && c.estado === "aprobado" && !c.artesano_id && (
+              <button type="button" disabled={ocupado} onClick={() => hacer(() => crearArtesano({ data: { id: c.id } }), "Ficha creada en Tembiapo (sin publicar)")} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-primary px-4 font-semibold text-primary-foreground disabled:opacity-50">
+                <UserPlus className="h-4 w-4" aria-hidden /> Crear su ficha en Tembiapo
+              </button>
+            )}
+            {c.artesano_id && <Link to="/admin/tembiapo" className="inline-flex min-h-11 items-center font-semibold text-primary">Ir a su ficha en el panel de Tembiapo</Link>}
           </div>
-          {c.estado === "retiro_pedido" && <p className="text-xs text-red-800">Pidió el retiro: despublicá sus obras en el panel de Purahéi o de la Librería y después tocá «Ya retiré sus obras».</p>}
+          {c.estado === "retiro_pedido" && <p className="text-xs text-red-800">Pidió el retiro: despublicá sus obras en el panel de Purahéi, de la Librería o de Tembiapo y después tocá «Ya retiré sus obras».</p>}
         </div>
       )}
     </li>

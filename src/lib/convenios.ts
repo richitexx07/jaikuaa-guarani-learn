@@ -1,5 +1,5 @@
 /**
- * Convenios firmados en línea (Purahéi Jaikuaa y Librería Jaikuaa).
+ * Convenios firmados en línea (Purahéi Jaikuaa, Librería Jaikuaa y Tembiapo Jaikuaa).
  *
  * El texto de cada convenio vive acá, con su versión. Cuando se firma, el servidor guarda una «huella»
  * (SHA-256) del texto exacto que se aceptó: si después el abogado cambia una cláusula, se sube la versión
@@ -10,9 +10,9 @@
  */
 import { normalizarWhatsapp } from "@/lib/purahei";
 
-export type Programa = "purahei" | "libreria";
-export const PROGRAMAS: Programa[] = ["purahei", "libreria"];
-export const esPrograma = (v: unknown): v is Programa => v === "purahei" || v === "libreria";
+export type Programa = "purahei" | "libreria" | "tembiapo";
+export const PROGRAMAS: Programa[] = ["purahei", "libreria", "tembiapo"];
+export const esPrograma = (v: unknown): v is Programa => v === "purahei" || v === "libreria" || v === "tembiapo";
 
 export type Opcion = { id: string; label: string; ayuda?: string };
 export type Clausula = { t: string; x: string };
@@ -135,6 +135,47 @@ export const CONVENIOS: Record<Programa, Convenio> = {
       DIALOGO,
     ],
   },
+  tembiapo: {
+    programa: "tembiapo",
+    version: "tembiapo-1.0",
+    titulo: "Convenio de Difusión de Artesanía y Saberes",
+    subtitulo: "Tembiapo Jaikuaa, vitrina de maestros artesanos y saberes vivos del Paraguay",
+    obra: {
+      singular: "trabajo",
+      plural: "trabajos",
+      campos: [{ id: "titulo", label: "Pieza o línea de trabajo (por ejemplo: manteles de ñandutí)" }],
+    },
+    roles: [
+      { id: "artesano", label: "Artesano o artesana" },
+      { id: "taller", label: "Taller, familia o asociación de artesanos" },
+      { id: "comunidad", label: "Referente de una comunidad indígena" },
+      { id: "representante", label: "Representante" },
+    ],
+    permisos: [
+      { id: "fotos", label: "Mostrar fotos de mis piezas" },
+      { id: "imagen", label: "Mi nombre, foto e historia en la ficha" },
+      { id: "voz", label: "Grabar con mi voz las palabras de mi oficio" },
+      { id: "whatsapp", label: "Publicar mi WhatsApp para que me compren directo" },
+      { id: "ruta", label: "Mostrar mi ciudad en las rutas culturales" },
+    ],
+    alMenosUno: ["fotos"],
+    clausulas: [
+      { t: "Partes", x: `Este convenio se celebra entre ${PARTES}.` },
+      { t: "Objeto", x: "El Titular autoriza a Jaikuaa a mostrar en www.jaikuaa.com su ficha y las piezas que detalla, en la vitrina Tembiapo Jaikuaa y en sus rutas culturales, con fines culturales y educativos, solo en lo que marca como autorizado." },
+      { t: "Sin exclusividad", x: "El Titular conserva todos sus derechos sobre sus piezas, sus diseños y su saber, y puede seguir vendiendo y mostrando su trabajo donde quiera." },
+      { t: "Sin costo y sin comisiones", x: "Aparecer en la vitrina no tiene costo para el Titular. Las ventas se hacen directo con el Titular o su representante: el precio, la entrega y el pago los acuerda el Titular con quien le compra. Jaikuaa no vende, no cobra y no cobra comisión sobre esas ventas." },
+      { t: "Diseños y saberes", x: "Jaikuaa no copia ni produce los diseños del Titular, ni los usa para fabricar o vender productos. Las fotos se usan solo para mostrar su trabajo." },
+      { t: "Las palabras del oficio y la voz", x: "Si el Titular lo autoriza, graba con su voz las palabras de su oficio. Su escritura en guaraní la revisan docentes especialistas antes de publicarse. Jaikuaa no usa voces sintéticas ni traducción automática, y no usa la voz del Titular para nada más que su ficha y el vocabulario de su oficio." },
+      { t: "Comunidades indígenas", x: "Las piezas y los saberes de un pueblo indígena se muestran solo con el consentimiento de su comunidad, con los nombres y las palabras que la comunidad elija." },
+      { t: "Créditos", x: "Cada pieza muestra a quien la hizo, su oficio y su lugar." },
+      { t: "Plazo y retiro", x: "Este convenio dura un año desde su firma y se renueva solo por períodos iguales. El Titular puede pedir el retiro de una pieza o de su ficha en cualquier momento desde su constancia, por WhatsApp o por correo, y Jaikuaa la retira en un plazo máximo de siete días." },
+      { t: "Derechos de terceros", x: "El Titular declara que las piezas que muestra son suyas o de su taller. Si una pieza es de otra persona o de una comunidad, Jaikuaa no la publica sin su autorización." },
+      { t: "Informe", x: "Jaikuaa envía al Titular un informe privado sobre las visitas a su ficha cuando lo pida. Esos datos no se publican." },
+      FIRMA,
+      DATOS,
+      DIALOGO,
+    ],
+  },
 };
 
 /** El texto exacto que se firma, en una sola cadena (de acá sale la huella). */
@@ -207,7 +248,7 @@ export const NOMBRE_ESTADO: Record<Estado, string> = {
   retirado: "Retirado",
 };
 
-export const NOMBRE_PROGRAMA: Record<Programa, string> = { purahei: "Purahéi Jaikuaa", libreria: "Librería Jaikuaa" };
+export const NOMBRE_PROGRAMA: Record<Programa, string> = { purahei: "Purahéi Jaikuaa", libreria: "Librería Jaikuaa", tembiapo: "Tembiapo Jaikuaa" };
 
 /**
  * El borrador queda en el navegador mientras la persona entra o crea su cuenta.

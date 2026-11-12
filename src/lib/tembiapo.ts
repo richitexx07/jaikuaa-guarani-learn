@@ -88,3 +88,34 @@ export function enlaceSumarme(oficio?: string): string {
     : "Mba'éichapa. Soy artesano/a y quiero sumarme a Tembiapo Jaikuaa.";
   return `https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent(texto)}`;
 }
+
+/** Los oficios que acepta la base de datos (los de la vitrina más «otro»). */
+export const OFICIO_IDS = ["nanduti", "ao-poi", "filigrana", "ceramica", "poncho", "tallado", "cuero", "indigena", "otro"] as const;
+export type OficioId = (typeof OFICIO_IDS)[number];
+export const nombreOficio = (id: string) => OFICIOS.find((o) => o.slug === id)?.nombre ?? "Otro oficio";
+
+/** WhatsApp directo con el artesano, con un saludo ya escrito. */
+export function enlaceWhatsappArtesano(numero: string, artesano: string, pieza?: string): string {
+  const texto = pieza
+    ? `Mba'éichapa, ${artesano}. Vi tu pieza «${pieza}» en Tembiapo Jaikuaa y quiero consultarte.`
+    : `Mba'éichapa, ${artesano}. Vi tu ficha en Tembiapo Jaikuaa y quiero consultarte por tus piezas.`;
+  return `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
+}
+
+/** Lo que impide publicar a un artesano (vacío = puede salir a la vitrina). */
+export function faltaArtesano(a: { permiso_imagen: boolean; oficio: string; consentimiento_comunidad: boolean }): string[] {
+  const f: string[] = [];
+  if (!a.permiso_imagen) f.push("autorización de imagen");
+  if (a.oficio === "indigena" && !a.consentimiento_comunidad) f.push("consentimiento de la comunidad");
+  if (a.oficio === "otro") f.push("elegir el oficio");
+  return f;
+}
+
+/** Avisos que no impiden publicar pero conviene completar. */
+export function avisosArtesano(a: { whatsapp: string | null; bio: string; foto_path: string | null }): string[] {
+  const f: string[] = [];
+  if (!a.foto_path) f.push("sin foto");
+  if (!a.bio.trim()) f.push("sin historia");
+  if (!a.whatsapp) f.push("sin WhatsApp: no tendrá botón de compra");
+  return f;
+}

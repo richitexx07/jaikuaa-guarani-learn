@@ -82,6 +82,7 @@ import { Route as AuthenticatedAdminJaiRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminLibrosRouteImport } from './routes/_authenticated/admin.libros'
 import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
 import { Route as AuthenticatedAdminPuraheiRouteImport } from './routes/_authenticated/admin.purahei'
+import { Route as AuthenticatedAdminTembiapoRouteImport } from './routes/_authenticated/admin.tembiapo'
 import { Route as AuthenticatedAulaIndexRouteImport } from './routes/_authenticated/aula.index'
 import { Route as AuthenticatedAulaIdRouteImport } from './routes/_authenticated/aula.$id'
 import { Route as AuthenticatedAulaDocenteRouteImport } from './routes/_authenticated/aula.docente'
@@ -121,7 +122,10 @@ import { Route as AuthenticatedTriviaIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedTriviaCategoryRouteImport } from './routes/_authenticated/trivia.$category'
 import { Route as ApiPublicPagoparRouteImport } from './routes/api/public/pagopar'
 import { Route as PuraheiObraIdRouteImport } from './routes/purahei.obra.$id'
+import { Route as TembiapoMaestroSlugRouteImport } from './routes/tembiapo.maestro.$slug'
 import { Route as TembiapoOficioSlugRouteImport } from './routes/tembiapo.oficio.$slug'
+import { Route as TembiapoPiezaIdRouteImport } from './routes/tembiapo.pieza.$id'
+import { Route as TembiapoRutaSlugRouteImport } from './routes/tembiapo.ruta.$slug'
 import { Route as AuthenticatedCursoLangIndexRouteImport } from './routes/_authenticated/curso.$lang.index'
 import { Route as AuthenticatedGuaraniEscolarTemaIndexRouteImport } from './routes/_authenticated/guarani-escolar.tema.index'
 import { Route as AuthenticatedGuaraniEscolarTemaTopicRouteImport } from './routes/_authenticated/guarani-escolar.tema.$topic'
@@ -502,6 +506,12 @@ const AuthenticatedAdminPuraheiRoute =
     path: '/admin/purahei',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminTembiapoRoute =
+  AuthenticatedAdminTembiapoRouteImport.update({
+    id: '/admin/tembiapo',
+    path: '/admin/tembiapo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAulaIndexRoute = AuthenticatedAulaIndexRouteImport.update({
   id: '/aula/',
   path: '/aula/',
@@ -729,9 +739,24 @@ const PuraheiObraIdRoute = PuraheiObraIdRouteImport.update({
   path: '/purahei/obra/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TembiapoMaestroSlugRoute = TembiapoMaestroSlugRouteImport.update({
+  id: '/tembiapo/maestro/$slug',
+  path: '/tembiapo/maestro/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TembiapoOficioSlugRoute = TembiapoOficioSlugRouteImport.update({
   id: '/tembiapo/oficio/$slug',
   path: '/tembiapo/oficio/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TembiapoPiezaIdRoute = TembiapoPiezaIdRouteImport.update({
+  id: '/tembiapo/pieza/$id',
+  path: '/tembiapo/pieza/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TembiapoRutaSlugRoute = TembiapoRutaSlugRouteImport.update({
+  id: '/tembiapo/ruta/$slug',
+  path: '/tembiapo/ruta/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCursoLangIndexRoute =
@@ -838,6 +863,7 @@ export interface FileRoutesByFullPath {
   '/admin/libros': typeof AuthenticatedAdminLibrosRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/admin/purahei': typeof AuthenticatedAdminPuraheiRoute
+  '/admin/tembiapo': typeof AuthenticatedAdminTembiapoRoute
   '/aula/$id': typeof AuthenticatedAulaIdRoute
   '/aula/docente': typeof AuthenticatedAulaDocenteRoute
   '/constancia-convenio/$codigo': typeof AuthenticatedConstanciaConvenioCodigoRoute
@@ -870,7 +896,10 @@ export interface FileRoutesByFullPath {
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
   '/api/public/pagopar': typeof ApiPublicPagoparRoute
   '/purahei/obra/$id': typeof PuraheiObraIdRoute
+  '/tembiapo/maestro/$slug': typeof TembiapoMaestroSlugRoute
   '/tembiapo/oficio/$slug': typeof TembiapoOficioSlugRoute
+  '/tembiapo/pieza/$id': typeof TembiapoPiezaIdRoute
+  '/tembiapo/ruta/$slug': typeof TembiapoRutaSlugRoute
   '/aula/': typeof AuthenticatedAulaIndexRoute
   '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/guarani-escolar/': typeof AuthenticatedGuaraniEscolarIndexRoute
@@ -956,6 +985,7 @@ export interface FileRoutesByTo {
   '/admin/libros': typeof AuthenticatedAdminLibrosRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/admin/purahei': typeof AuthenticatedAdminPuraheiRoute
+  '/admin/tembiapo': typeof AuthenticatedAdminTembiapoRoute
   '/aula/$id': typeof AuthenticatedAulaIdRoute
   '/aula/docente': typeof AuthenticatedAulaDocenteRoute
   '/constancia-convenio/$codigo': typeof AuthenticatedConstanciaConvenioCodigoRoute
@@ -986,7 +1016,10 @@ export interface FileRoutesByTo {
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
   '/api/public/pagopar': typeof ApiPublicPagoparRoute
   '/purahei/obra/$id': typeof PuraheiObraIdRoute
+  '/tembiapo/maestro/$slug': typeof TembiapoMaestroSlugRoute
   '/tembiapo/oficio/$slug': typeof TembiapoOficioSlugRoute
+  '/tembiapo/pieza/$id': typeof TembiapoPiezaIdRoute
+  '/tembiapo/ruta/$slug': typeof TembiapoRutaSlugRoute
   '/aula': typeof AuthenticatedAulaIndexRoute
   '/docente': typeof AuthenticatedDocenteIndexRoute
   '/guarani-escolar': typeof AuthenticatedGuaraniEscolarIndexRoute
@@ -1075,6 +1108,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/libros': typeof AuthenticatedAdminLibrosRoute
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/_authenticated/admin/purahei': typeof AuthenticatedAdminPuraheiRoute
+  '/_authenticated/admin/tembiapo': typeof AuthenticatedAdminTembiapoRoute
   '/_authenticated/aula/$id': typeof AuthenticatedAulaIdRoute
   '/_authenticated/aula/docente': typeof AuthenticatedAulaDocenteRoute
   '/_authenticated/constancia-convenio/$codigo': typeof AuthenticatedConstanciaConvenioCodigoRoute
@@ -1107,7 +1141,10 @@ export interface FileRoutesById {
   '/_authenticated/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
   '/api/public/pagopar': typeof ApiPublicPagoparRoute
   '/purahei/obra/$id': typeof PuraheiObraIdRoute
+  '/tembiapo/maestro/$slug': typeof TembiapoMaestroSlugRoute
   '/tembiapo/oficio/$slug': typeof TembiapoOficioSlugRoute
+  '/tembiapo/pieza/$id': typeof TembiapoPiezaIdRoute
+  '/tembiapo/ruta/$slug': typeof TembiapoRutaSlugRoute
   '/_authenticated/aula/': typeof AuthenticatedAulaIndexRoute
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/guarani-escolar/': typeof AuthenticatedGuaraniEscolarIndexRoute
@@ -1196,6 +1233,7 @@ export interface FileRouteTypes {
     | '/admin/libros'
     | '/admin/noticias'
     | '/admin/purahei'
+    | '/admin/tembiapo'
     | '/aula/$id'
     | '/aula/docente'
     | '/constancia-convenio/$codigo'
@@ -1228,7 +1266,10 @@ export interface FileRouteTypes {
     | '/trivia/$category'
     | '/api/public/pagopar'
     | '/purahei/obra/$id'
+    | '/tembiapo/maestro/$slug'
     | '/tembiapo/oficio/$slug'
+    | '/tembiapo/pieza/$id'
+    | '/tembiapo/ruta/$slug'
     | '/aula/'
     | '/docente/'
     | '/guarani-escolar/'
@@ -1314,6 +1355,7 @@ export interface FileRouteTypes {
     | '/admin/libros'
     | '/admin/noticias'
     | '/admin/purahei'
+    | '/admin/tembiapo'
     | '/aula/$id'
     | '/aula/docente'
     | '/constancia-convenio/$codigo'
@@ -1344,7 +1386,10 @@ export interface FileRouteTypes {
     | '/trivia/$category'
     | '/api/public/pagopar'
     | '/purahei/obra/$id'
+    | '/tembiapo/maestro/$slug'
     | '/tembiapo/oficio/$slug'
+    | '/tembiapo/pieza/$id'
+    | '/tembiapo/ruta/$slug'
     | '/aula'
     | '/docente'
     | '/guarani-escolar'
@@ -1432,6 +1477,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/libros'
     | '/_authenticated/admin/noticias'
     | '/_authenticated/admin/purahei'
+    | '/_authenticated/admin/tembiapo'
     | '/_authenticated/aula/$id'
     | '/_authenticated/aula/docente'
     | '/_authenticated/constancia-convenio/$codigo'
@@ -1464,7 +1510,10 @@ export interface FileRouteTypes {
     | '/_authenticated/trivia/$category'
     | '/api/public/pagopar'
     | '/purahei/obra/$id'
+    | '/tembiapo/maestro/$slug'
     | '/tembiapo/oficio/$slug'
+    | '/tembiapo/pieza/$id'
+    | '/tembiapo/ruta/$slug'
     | '/_authenticated/aula/'
     | '/_authenticated/docente/'
     | '/_authenticated/guarani-escolar/'
@@ -1530,7 +1579,10 @@ export interface RootRouteChildren {
   TembiapoIndexRoute: typeof TembiapoIndexRoute
   ApiPublicPagoparRoute: typeof ApiPublicPagoparRoute
   PuraheiObraIdRoute: typeof PuraheiObraIdRoute
+  TembiapoMaestroSlugRoute: typeof TembiapoMaestroSlugRoute
   TembiapoOficioSlugRoute: typeof TembiapoOficioSlugRoute
+  TembiapoPiezaIdRoute: typeof TembiapoPiezaIdRoute
+  TembiapoRutaSlugRoute: typeof TembiapoRutaSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2046,6 +2098,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPuraheiRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/tembiapo': {
+      id: '/_authenticated/admin/tembiapo'
+      path: '/admin/tembiapo'
+      fullPath: '/admin/tembiapo'
+      preLoaderRoute: typeof AuthenticatedAdminTembiapoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/aula/': {
       id: '/_authenticated/aula/'
       path: '/aula'
@@ -2319,11 +2378,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PuraheiObraIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tembiapo/maestro/$slug': {
+      id: '/tembiapo/maestro/$slug'
+      path: '/tembiapo/maestro/$slug'
+      fullPath: '/tembiapo/maestro/$slug'
+      preLoaderRoute: typeof TembiapoMaestroSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tembiapo/oficio/$slug': {
       id: '/tembiapo/oficio/$slug'
       path: '/tembiapo/oficio/$slug'
       fullPath: '/tembiapo/oficio/$slug'
       preLoaderRoute: typeof TembiapoOficioSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tembiapo/pieza/$id': {
+      id: '/tembiapo/pieza/$id'
+      path: '/tembiapo/pieza/$id'
+      fullPath: '/tembiapo/pieza/$id'
+      preLoaderRoute: typeof TembiapoPiezaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tembiapo/ruta/$slug': {
+      id: '/tembiapo/ruta/$slug'
+      path: '/tembiapo/ruta/$slug'
+      fullPath: '/tembiapo/ruta/$slug'
+      preLoaderRoute: typeof TembiapoRutaSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/curso/$lang/': {
@@ -2448,6 +2528,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminLibrosRoute: typeof AuthenticatedAdminLibrosRoute
   AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
   AuthenticatedAdminPuraheiRoute: typeof AuthenticatedAdminPuraheiRoute
+  AuthenticatedAdminTembiapoRoute: typeof AuthenticatedAdminTembiapoRoute
   AuthenticatedAulaIdRoute: typeof AuthenticatedAulaIdRoute
   AuthenticatedAulaDocenteRoute: typeof AuthenticatedAulaDocenteRoute
   AuthenticatedConstanciaConvenioCodigoRoute: typeof AuthenticatedConstanciaConvenioCodigoRoute
@@ -2512,6 +2593,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminLibrosRoute: AuthenticatedAdminLibrosRoute,
   AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
   AuthenticatedAdminPuraheiRoute: AuthenticatedAdminPuraheiRoute,
+  AuthenticatedAdminTembiapoRoute: AuthenticatedAdminTembiapoRoute,
   AuthenticatedAulaIdRoute: AuthenticatedAulaIdRoute,
   AuthenticatedAulaDocenteRoute: AuthenticatedAulaDocenteRoute,
   AuthenticatedConstanciaConvenioCodigoRoute:
@@ -2604,7 +2686,10 @@ const rootRouteChildren: RootRouteChildren = {
   TembiapoIndexRoute: TembiapoIndexRoute,
   ApiPublicPagoparRoute: ApiPublicPagoparRoute,
   PuraheiObraIdRoute: PuraheiObraIdRoute,
+  TembiapoMaestroSlugRoute: TembiapoMaestroSlugRoute,
   TembiapoOficioSlugRoute: TembiapoOficioSlugRoute,
+  TembiapoPiezaIdRoute: TembiapoPiezaIdRoute,
+  TembiapoRutaSlugRoute: TembiapoRutaSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { HandHeart, MessageCircle, Mic2, Route as RutaIcon, ShieldCheck, Store, Camera } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { FileSignature, HandHeart, MessageCircle, Mic2, Route as RutaIcon, ShieldCheck, Store, Camera } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { MarketingHeader } from "@/components/marketing/page-parts";
 import { Nanduti } from "@/components/libreria/arte";
-import { FichaEjemplo, TarjetaOficio } from "@/components/tembiapo/partes";
+import { FichaEjemplo, TarjetaArtesano, TarjetaOficio, TarjetaRuta } from "@/components/tembiapo/partes";
+import { vitrinaTembiapo } from "@/lib/tembiapo.functions";
 import { enlaceSumarme, OFICIOS, TB } from "@/lib/tembiapo";
 
 export const Route = createFileRoute("/tembiapo/")({
@@ -22,13 +25,17 @@ export const Route = createFileRoute("/tembiapo/")({
 });
 
 const PASOS = [
-  { icon: MessageCircle, t: "Nos escribís", d: "Nos contás qué hacés y dónde está tu taller." },
+  { icon: FileSignature, t: "Firmás el convenio en línea", d: "Sin costo y sin exclusividad. Elegís qué nos permitís mostrar. Si preferís, te ayudamos por WhatsApp." },
   { icon: Camera, t: "Armamos tu ficha", d: "Con fotos de tus piezas y tu historia, contada como vos quieras. Vos aprobás todo antes de publicar." },
   { icon: Mic2, t: "Grabás las palabras de tu oficio", d: "Con tu voz. Docentes especialistas revisan cómo se escriben en guaraní." },
   { icon: Store, t: "Salís a la vitrina", d: "Con tu WhatsApp, para que te compren directo. Jaikuaa no cobra comisión." },
 ];
 
 function TembiapoPage() {
+  const cargar = useServerFn(vitrinaTembiapo);
+  const { data } = useQuery({ queryKey: ["tembiapo-vitrina"], queryFn: () => cargar(), staleTime: 5 * 60_000 });
+  const artesanos = data?.artesanos ?? [];
+  const rutas = data?.rutas ?? [];
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <MarketingHeader />
@@ -60,14 +67,35 @@ function TembiapoPage() {
           </ul>
         </section>
 
-        <section className="mx-auto max-w-5xl px-4 pb-10 sm:px-6">
-          <div className="rounded-3xl border border-dashed p-6 text-center sm:p-8" style={{ borderColor: TB.hilo, background: TB.lino }}>
-            <Store className="mx-auto h-10 w-10" style={{ color: TB.marino }} aria-hidden />
-            <p className="mt-3 font-display text-xl font-bold text-foreground">Los primeros maestros artesanos están por llegar</p>
-            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Estamos invitando a los primeros artesanos. Cada ficha sale con su permiso, sus fotos y su historia, y con su WhatsApp para comprarle directo.</p>
-          </div>
+        <section id="artesanos" className="mx-auto max-w-5xl scroll-mt-20 px-4 pb-10 sm:px-6">
+          {artesanos.length > 0 ? (
+            <>
+              <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">Los artesanos</h2>
+              <p className="mt-1 max-w-2xl text-muted-foreground">Tocá una ficha para conocer su historia y sus piezas, y escribile directo.</p>
+              <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                {artesanos.map((a) => <li key={a.id}><TarjetaArtesano a={a} /></li>)}
+              </ul>
+            </>
+          ) : (
+            <div className="rounded-3xl border border-dashed p-6 text-center sm:p-8" style={{ borderColor: TB.hilo, background: TB.lino }}>
+              <Store className="mx-auto h-10 w-10" style={{ color: TB.marino }} aria-hidden />
+              <p className="mt-3 font-display text-xl font-bold text-foreground">Los primeros maestros artesanos están por llegar</p>
+              <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Estamos invitando a los primeros artesanos. Cada ficha sale con su permiso, sus fotos y su historia, y con su WhatsApp para comprarle directo.</p>
+            </div>
+          )}
         </section>
 
+        {rutas.length > 0 ? (
+          <section className="text-white" style={{ background: TB.marino }}>
+            <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+              <h2 className="font-display text-2xl font-bold sm:text-3xl">Rutas culturales</h2>
+              <p className="mt-2 max-w-xl text-white/85">Recorridos por los pueblos donde nacen los oficios, para visitar los talleres y comprarles en persona.</p>
+              <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {rutas.map((r) => <li key={r.id}><TarjetaRuta r={r} /></li>)}
+              </ul>
+            </div>
+          </section>
+        ) : (
         <section className="text-white" style={{ background: TB.marino }}>
           <div className="mx-auto grid max-w-5xl gap-6 px-4 py-12 sm:grid-cols-[1fr_auto] sm:items-center sm:px-6">
             <div>
@@ -78,6 +106,7 @@ function TembiapoPage() {
             <Nanduti className="hidden h-36 w-36 text-white/40 sm:block" />
           </div>
         </section>
+        )}
 
         <section id="sumate" className="scroll-mt-20 bg-muted/40">
           <div className="mx-auto grid max-w-5xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[1.2fr_1fr] lg:items-start">
@@ -96,12 +125,12 @@ function TembiapoPage() {
                 ))}
               </ol>
               <div className="mt-6 flex flex-wrap gap-3">
-                <a href={enlaceSumarme()} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-2xl px-5 font-display font-bold text-white" style={{ background: TB.rojo }}>
-                  <MessageCircle className="h-5 w-5" aria-hidden /> Quiero sumarme
-                </a>
-                <Link to="/purahei" className="inline-flex min-h-12 items-center gap-2 rounded-2xl px-5 font-display font-bold text-primary ring-1 ring-border">
-                  Ver Purahéi, la vitrina de artistas
+                <Link to="/convenio/$programa" params={{ programa: "tembiapo" }} className="inline-flex min-h-12 items-center gap-2 rounded-2xl px-5 font-display font-bold text-white" style={{ background: TB.rojo }}>
+                  <FileSignature className="h-5 w-5" aria-hidden /> Quiero sumarme
                 </Link>
+                <a href={enlaceSumarme()} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-2xl px-5 font-display font-bold ring-1 ring-border" style={{ color: TB.marino }}>
+                  <MessageCircle className="h-5 w-5" aria-hidden /> Prefiero que me ayuden por WhatsApp
+                </a>
               </div>
               <p className="mt-4 flex items-start gap-2 text-sm text-muted-foreground"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> Nada se publica sin tu permiso por escrito. Podés pedir que bajemos tu ficha cuando quieras.</p>
             </div>

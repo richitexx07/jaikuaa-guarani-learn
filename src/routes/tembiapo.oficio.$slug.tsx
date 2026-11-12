@@ -1,10 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, MapPin, MessageCircle, Mic2, Store } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowLeft, FileSignature, MapPin, MessageCircle, Mic2, Store } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { MarketingHeader } from "@/components/marketing/page-parts";
 import { Nanduti } from "@/components/libreria/arte";
-import { IconoOficio, TarjetaOficio } from "@/components/tembiapo/partes";
-import { enlaceSumarme, OFICIOS, oficioPorSlug, TB } from "@/lib/tembiapo";
+import { IconoOficio, ListaPalabras, TarjetaArtesano, TarjetaOficio } from "@/components/tembiapo/partes";
+import { oficioTembiapo } from "@/lib/tembiapo.functions";
+import { enlaceSumarme, OFICIOS, oficioPorSlug, TB, type OficioId } from "@/lib/tembiapo";
 
 export const Route = createFileRoute("/tembiapo/oficio/$slug")({
   loader: ({ params }) => {
@@ -27,6 +30,11 @@ export const Route = createFileRoute("/tembiapo/oficio/$slug")({
 function OficioPage() {
   const o = Route.useLoaderData();
   const otros = OFICIOS.filter((x) => x.slug !== o.slug).slice(0, 4);
+  const cargar = useServerFn(oficioTembiapo);
+  const { data } = useQuery({ queryKey: ["tembiapo-oficio", o.slug], queryFn: () => cargar({ data: { oficio: o.slug as OficioId } }), staleTime: 5 * 60_000 });
+  const artesanos = data?.artesanos ?? [];
+  const palabras = data?.palabras ?? [];
+  const este = o.nombre.toLowerCase().startsWith("arte") ? "este arte" : "este oficio";
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <MarketingHeader />
@@ -57,21 +65,37 @@ function OficioPage() {
               <p className="mt-2 text-lg leading-relaxed text-muted-foreground">{o.detalle}</p>
 
               <h2 className="mt-8 font-display text-2xl font-bold text-foreground">Sus artesanos</h2>
-              <div className="mt-3 rounded-3xl border border-dashed p-6 text-center" style={{ borderColor: TB.hilo, background: TB.lino }}>
-                <Store className="mx-auto h-9 w-9" style={{ color: TB.marino }} aria-hidden />
-                <p className="mt-2 font-display text-lg font-bold text-foreground">Pronto, los primeros maestros de {o.nombre.toLowerCase().startsWith("arte") ? "este arte" : "este oficio"}</p>
-                <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">Cada ficha sale con el permiso del artesano, sus fotos, su historia y su WhatsApp.</p>
-              </div>
+              {artesanos.length > 0 ? (
+                <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {artesanos.map((a) => <li key={a.id}><TarjetaArtesano a={a} /></li>)}
+                </ul>
+              ) : (
+                <div className="mt-3 rounded-3xl border border-dashed p-6 text-center" style={{ borderColor: TB.hilo, background: TB.lino }}>
+                  <Store className="mx-auto h-9 w-9" style={{ color: TB.marino }} aria-hidden />
+                  <p className="mt-2 font-display text-lg font-bold text-foreground">Pronto, los primeros maestros de {este}</p>
+                  <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">Cada ficha sale con el permiso del artesano, sus fotos, su historia y su WhatsApp.</p>
+                </div>
+              )}
+
+              {palabras.length > 0 && (
+                <>
+                  <h2 className="mt-8 font-display text-2xl font-bold text-foreground">Las palabras del oficio</h2>
+                  <ListaPalabras palabras={palabras} />
+                </>
+              )}
             </div>
 
             <aside className="rounded-3xl p-5 ring-1" style={{ background: TB.lino, ["--tw-ring-color" as string]: TB.hilo }}>
               <span className="grid h-11 w-11 place-items-center rounded-full text-white" style={{ background: TB.marino }}><Mic2 className="h-5 w-5" aria-hidden /></span>
-              <h2 className="mt-3 font-display text-xl font-bold" style={{ color: TB.noche }}>Las palabras del oficio</h2>
+              <h2 className="mt-3 font-display text-xl font-bold" style={{ color: TB.noche }}>{palabras.length > 0 ? "Tu voz también cuenta" : "Las palabras del oficio"}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Cada oficio tiene su vocabulario en guaraní: herramientas, puntos, materiales y diseños. Lo vamos a sumar con la voz de los propios artesanos y revisado por docentes especialistas.
+                Cada oficio tiene su vocabulario en guaraní: herramientas, puntos, materiales y diseños. Lo sumamos con la voz de los propios artesanos y revisado por docentes especialistas.
               </p>
-              <a href={enlaceSumarme(o.nombre)} target="_blank" rel="noopener noreferrer" className="mt-5 flex min-h-12 items-center justify-center gap-2 rounded-2xl font-display font-bold text-white" style={{ background: TB.rojo }}>
-                <MessageCircle className="h-5 w-5" aria-hidden /> Soy artesano de {o.nombre.toLowerCase().startsWith("arte") ? "este arte" : "este oficio"}
+              <Link to="/convenio/$programa" params={{ programa: "tembiapo" }} className="mt-5 flex min-h-12 items-center justify-center gap-2 rounded-2xl font-display font-bold text-white" style={{ background: TB.rojo }}>
+                <FileSignature className="h-5 w-5" aria-hidden /> Soy artesano de {este}
+              </Link>
+              <a href={enlaceSumarme(o.nombre)} target="_blank" rel="noopener noreferrer" className="mt-2 flex min-h-11 items-center justify-center gap-2 text-sm font-semibold" style={{ color: TB.marino }}>
+                <MessageCircle className="h-4 w-4" aria-hidden /> O escribinos por WhatsApp
               </a>
             </aside>
           </div>

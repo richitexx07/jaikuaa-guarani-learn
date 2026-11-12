@@ -54,6 +54,7 @@ function ConvenioPage() {
           <div className="mt-4 flex justify-center gap-3">
             <Link to="/convenio/$programa" params={{ programa: "purahei" }} className="font-semibold text-primary">Purahéi</Link>
             <Link to="/convenio/$programa" params={{ programa: "libreria" }} className="font-semibold text-primary">Librería</Link>
+            <Link to="/convenio/$programa" params={{ programa: "tembiapo" }} className="font-semibold text-primary">Tembiapo</Link>
           </div>
         </main>
       </div>
