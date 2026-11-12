@@ -170,14 +170,7 @@ const s = (es: string, pt: string, en: string, de: string, fr: string, zh: strin
 
 /** Instrucciones de «¿Cómo se juega?» (clave = título en castellano). */
 export const GAME_HELP: Record<string, Help> = {
-  "Purahéi Karaoke": {
-    xp: s("Hasta 20 XP según tus aciertos", "Até 20 XP conforme seus acertos", "Up to 20 XP based on your answers", "Bis zu 20 XP je nach Treffern", "Jusqu'à 20 XP selon vos bonnes réponses", "依答對數最多得 20 XP"),
-    steps: [
-      s("🎵 Elegí una canción y escuchá el arpa.", "🎵 Escolha uma canção e ouça a harpa.", "🎵 Pick a song and listen to the harp.", "🎵 Wähle ein Lied und hör der Harfe zu.", "🎵 Choisissez une chanson et écoutez la harpe.", "🎵 選一首歌，聆聽豎琴。"),
-      s("🎤 Seguí la letra y completá el verso que falta a tiempo.", "🎤 Acompanhe a letra e complete o verso que falta a tempo.", "🎤 Follow the lyrics and fill in the missing line in time.", "🎤 Folge dem Text und ergänze rechtzeitig die fehlende Zeile.", "🎤 Suivez les paroles et complétez le vers manquant à temps.", "🎤 跟著歌詞，及時補上缺少的那一句。"),
-      s("📼 Si querés, grabate cantando y escuchate.", "📼 Se quiser, grave-se cantando e ouça.", "📼 If you like, record yourself singing and listen back.", "📼 Wenn du willst, nimm dich beim Singen auf und hör es dir an.", "📼 Si vous voulez, enregistrez-vous en chantant et réécoutez-vous.", "📼 想的話，錄下自己唱歌再聽聽看。"),
-    ],
-  },
+  // Purahéi Karaoke tiene su propio «¿Cómo se juega?» con dibujos (ComoSeJuega, en juegos.karaoke.tsx).
   "Ñe'ẽ Rape": {
     xp: s("3 XP por respuesta correcta · 5 XP más si ganás (máx. 20)", "3 XP por resposta certa · mais 5 XP se ganhar (máx. 20)", "3 XP per correct answer · 5 more XP if you win (max. 20)", "3 XP pro richtiger Antwort · 5 XP extra bei Sieg (max. 20)", "3 XP par bonne réponse · 5 XP de plus si vous gagnez (max. 20)", "每答對得 3 XP · 獲勝再加 5 XP（最多 20）"),
     steps: [
