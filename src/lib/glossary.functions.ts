@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type GlossaryItem = { gn: string; es: string; validated: boolean };
+export type GlossaryItem = { gn: string; es: string; validated: boolean; sig?: Partial<Record<"en" | "pt" | "de" | "fr" | "zh", string>> };
 
 /**
  * Glosario: solo las palabras PUBLICADAS del corpus, leídas con los permisos del usuario
@@ -12,15 +12,17 @@ export const listGlossary = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("corpus_words")
-      .select("gn, es, validated_by")
+      .select("gn, es, validated_by, significados")
       .eq("status", "published")
       .order("gn")
       .limit(5000);
     if (error) throw new Error(error.message);
-    const items: GlossaryItem[] = (data ?? []).map((w) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const items: GlossaryItem[] = (data ?? []).map((w: any) => ({
       gn: w.gn,
       es: w.es,
       validated: !!w.validated_by,
+      sig: (w.significados ?? {}) as GlossaryItem["sig"],
     }));
     return { items };
   });

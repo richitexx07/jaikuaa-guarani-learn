@@ -37,23 +37,24 @@ export const getGameWordsGuest = createServerFn({ method: "POST" })
       if (!lesson) return { words: [] as GameWord[] };
       const { data: links, error } = await supabaseAdmin
         .from("lesson_words")
-        .select("corpus_words!inner(gn, es, has_audio, status)")
+        .select("corpus_words!inner(gn, es, has_audio, status, significados)")
         .eq("lesson_id", lesson.id)
         .eq("corpus_words.status", "published");
       if (error) throw new Error(error.message);
       const words = (links ?? []).map((x) => {
-        const w = x.corpus_words as unknown as { gn: string; es: string; has_audio: boolean };
-        return { gn: w.gn, es: w.es, hasAudio: w.has_audio };
+        const w = x.corpus_words as unknown as { gn: string; es: string; has_audio: boolean; significados?: GameWord["sig"] | null };
+        return { gn: w.gn, es: w.es, hasAudio: w.has_audio, sig: w.significados ?? {} };
       });
       return { words };
     }
     const { data: rows, error } = await supabaseAdmin
       .from("corpus_words")
-      .select("gn, es, has_audio")
+      .select("gn, es, has_audio, significados")
       .eq("status", "published")
       .limit(2000);
     if (error) throw new Error(error.message);
-    return { words: (rows ?? []).map((w) => ({ gn: w.gn, es: w.es, hasAudio: w.has_audio })) as GameWord[] };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return { words: (rows ?? []).map((w: any) => ({ gn: w.gn, es: w.es, hasAudio: w.has_audio, sig: (w.significados ?? {}) as GameWord["sig"] })) as GameWord[] };
   });
 
 /** Textos en guaraní de los juegos (escritos por docentes), para quien juega sin cuenta. */
@@ -148,7 +149,7 @@ export const getWordOfDayGuest = createServerFn({ method: "GET" }).handler(async
   const { wordOfDay } = await import("@/lib/games.functions");
   const day = hoyAsuncion();
   const w = await wordOfDay(day);
-  return { day, word: w ? { gn: w.gn, options: w.options } : null, played: null };
+  return { day, word: w ? { gn: w.gn, options: w.options, labels: w.labels } : null, played: null };
 });
 
 /** Corrige la respuesta de quien juega sin cuenta. Los puntos quedan en su celular (como en los otros juegos). */

@@ -1,6 +1,8 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { localizarVocab } from "@/lib/significado";
+import { useAppLang } from "@/lib/i18n";
 import { useServerFn } from "@tanstack/react-start";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
@@ -109,6 +111,9 @@ export function useGameWords(lesson: number | null) {
       ),
     staleTime: 5 * 60_000,
   });
+  // El significado, en el idioma de la persona (solo lo revisado por un docente; si falta, en castellano).
+  const lang = useAppLang();
+  const data = useMemo(() => (q.data ? { ...q.data, words: localizarVocab(q.data.words, lang) } : q.data), [q.data, lang]);
   // Deja listos (y con volumen parejo) los audios de las palabras del juego antes de que suenen.
   const words = q.data?.words;
   useEffect(() => {
@@ -119,7 +124,7 @@ export function useGameWords(lesson: number | null) {
     const t = window.setTimeout(() => { for (const w of conAudio.slice(8, 24)) void prefetchAudio(w.gn); }, 4000);
     return () => window.clearTimeout(t);
   }, [words]);
-  return q;
+  return { ...q, data } as typeof q;
 }
 
 /** «-hára», «mbo-»: piezas de gramática, no palabras para jugar. */

@@ -2,7 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type GameWord = { gn: string; es: string; hasAudio: boolean };
+/** `sig`: el significado en otros idiomas, solo lo aprobado por un docente (ver significado.ts). */
+export type GameWord = { gn: string; es: string; hasAudio: boolean; sig?: Partial<Record<"en" | "pt" | "de" | "fr" | "zh", string>> };
 
 /** Palabras publicadas del corpus para los juegos; opcionalmente solo las de una lección publicada. */
 export const getGameWords = createServerFn({ method: "POST" })
@@ -22,23 +23,24 @@ export const getGameWords = createServerFn({ method: "POST" })
       if (!lesson) return { words: [] as GameWord[] };
       const { data: links, error } = await sb
         .from("lesson_words")
-        .select("corpus_words!inner(gn, es, has_audio, status)")
+        .select("corpus_words!inner(gn, es, has_audio, status, significados)")
         .eq("lesson_id", lesson.id)
         .eq("corpus_words.status", "published");
       if (error) throw new Error(error.message);
       const words = (links ?? []).map((x) => {
-        const w = x.corpus_words as unknown as { gn: string; es: string; has_audio: boolean };
-        return { gn: w.gn, es: w.es, hasAudio: w.has_audio };
+        const w = x.corpus_words as unknown as { gn: string; es: string; has_audio: boolean; significados?: GameWord["sig"] | null };
+        return { gn: w.gn, es: w.es, hasAudio: w.has_audio, sig: w.significados ?? {} };
       });
       return { words };
     }
     const { data: rows, error } = await sb
       .from("corpus_words")
-      .select("gn, es, has_audio")
+      .select("gn, es, has_audio, significados")
       .eq("status", "published")
       .limit(2000);
     if (error) throw new Error(error.message);
-    return { words: (rows ?? []).map((w) => ({ gn: w.gn, es: w.es, hasAudio: w.has_audio })) };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return { words: (rows ?? []).map((w: any) => ({ gn: w.gn, es: w.es, hasAudio: w.has_audio, sig: (w.significados ?? {}) as GameWord["sig"] })) };
   });
 
 /* --------------------------- PALABRA DEL DÍA --------------------------- */
@@ -60,18 +62,20 @@ function seeded(seedStr: string) {
 }
 
 /** Elección determinística por fecha de Paraguay: misma palabra y opciones para todos. */
-type WotdWord = { id: number | string; gn: string; es: string; has_audio: boolean };
+type WotdWord = { id: number | string; gn: string; es: string; has_audio: boolean; significados?: GameWord["sig"] | null };
+/** Para mostrar cada opción en el idioma de la persona: opción en castellano → sus significados aprobados. */
+export type WotdLabels = Record<string, GameWord["sig"]>;
 
 export async function loadWotdWords(): Promise<WotdWord[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
     .from("corpus_words")
-    .select("id, gn, es, has_audio")
+    .select("id, gn, es, has_audio, significados")
     .eq("status", "published")
     .order("id")
     .limit(2000);
   if (error) throw new Error(error.message);
-  return (data ?? []) as WotdWord[];
+  return (data ?? []) as unknown as WotdWord[];
 }
 
 export async function wordOfDay(day: string, preloaded?: WotdWord[]) {
@@ -90,7 +94,13 @@ export async function wordOfDay(day: string, preloaded?: WotdWord[]) {
     const j = Math.floor(rnd() * (i + 1));
     [options[i], options[j]] = [options[j]!, options[i]!];
   }
-  return { gn: word.gn, es: word.es.trim(), options };
+  // La respuesta se sigue comparando en castellano; los significados aprobados solo cambian lo que se ve.
+  const labels: WotdLabels = {};
+  for (const o of options) {
+    const w = all.find((x) => x.es.trim() === o && x.significados && Object.keys(x.significados).length);
+    if (w?.significados) labels[o] = w.significados;
+  }
+  return { gn: word.gn, es: word.es.trim(), options, labels };
 }
 
 const syncIdFor = (day: string) => `game:palabra-del-dia:${day}`;
@@ -110,7 +120,7 @@ export const getWordOfDay = createServerFn({ method: "GET" })
     const prev = tx?.metadata as { choice?: string; correct?: boolean } | undefined;
     return {
       day,
-      word: { gn: w.gn, options: w.options },
+      word: { gn: w.gn, options: w.options, labels: w.labels },
       played: tx
         ? { choice: prev?.choice ?? "", correct: !!prev?.correct, answer: w.es }
         : null,
@@ -148,7 +158,7 @@ function addDays(day: string, n: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-export type WordOfDayPackItem = { day: string; gn: string; options: string[]; answer: string };
+export type WordOfDayPackItem = { day: string; gn: string; options: string[]; answer: string; labels?: WotdLabels };
 
 /**
  * Las Palabras del día de las próximas semanas, para jugar sin señal. Incluye la respuesta para
@@ -164,7 +174,7 @@ export const getWordOfDayPack = createServerFn({ method: "POST" })
     for (let i = 0; i < data.days; i++) {
       const day = addDays(today, i);
       const w = await wordOfDay(day, all);
-      if (w) items.push({ day, gn: w.gn, options: w.options, answer: w.es });
+      if (w) items.push({ day, gn: w.gn, options: w.options, answer: w.es, labels: w.labels });
     }
     return { today, items };
   });

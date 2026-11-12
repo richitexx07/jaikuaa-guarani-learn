@@ -14,6 +14,8 @@ import { ReportErrorButton } from "@/components/report-error-button";
 import { PageHero } from "@/components/page-hero";
 import jaiProfe from "@/assets/jai-profe.webp";
 import { listGlossary } from "@/lib/glossary.functions";
+import { localizarVocab } from "@/lib/significado";
+import { useAppLang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/glosario")({
   head: () => ({
@@ -47,7 +49,9 @@ function GlossaryPage() {
   });
   const [q, setQ] = useState("");
 
-  const items = data?.items ?? [];
+  // El significado en el idioma de la persona (solo lo aprobado por un docente; si falta, en castellano).
+  const lang = useAppLang();
+  const items = useMemo(() => localizarVocab(data?.items ?? [], lang), [data?.items, lang]);
   const shown = useMemo(() => {
     const needle = plain(q.trim());
     if (!needle) return items;
@@ -124,7 +128,7 @@ function GlossaryPage() {
                           {tx("glReviewed")}
                         </span>
                       )}
-                      <ReportErrorButton gn={w.gn} es={w.es} lugar="Glosario" />
+                      <ReportErrorButton gn={w.gn} es={w.orig} lugar="Glosario" />
                     </li>
                   ))}
                 </ul>

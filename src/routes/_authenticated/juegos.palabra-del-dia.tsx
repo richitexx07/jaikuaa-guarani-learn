@@ -7,7 +7,9 @@ import { useGameFeedback } from "@/components/games/game-kit";
 import { useGT } from "@/lib/i18n-games";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import { GameStage } from "@/components/games/game-stage";
-import { answerWordOfDay, getWordOfDay, type WordOfDayPackItem } from "@/lib/games.functions";
+import { answerWordOfDay, getWordOfDay, type WordOfDayPackItem, type WotdLabels } from "@/lib/games.functions";
+import { significado } from "@/lib/significado";
+import { useAppLang } from "@/lib/i18n";
 import { isNetworkError, isOffline, readOfflineCopy } from "@/lib/offline-data";
 import { K } from "@/lib/offline-pack";
 import { localWotdPlay, queueWotdAnswer, rememberWotdPlay } from "@/lib/offline-sync";
@@ -72,7 +74,7 @@ function fechaLarga(day: string) {
 
 type WotdView = {
   day: string;
-  word: { gn: string; options: string[] } | null;
+  word: { gn: string; options: string[]; labels?: WotdLabels } | null;
   played: { choice: string; correct: boolean; answer: string } | null;
   /** Solo sin señal: la respuesta sale del paquete descargado. */
   offlineAnswer?: string;
@@ -92,7 +94,7 @@ async function offlineWordOfDay(): Promise<WotdView> {
   const local = localWotdPlay(day);
   return {
     day,
-    word: { gn: item.gn, options: item.options },
+    word: { gn: item.gn, options: item.options, labels: item.labels },
     played: local ? { choice: local.choice, correct: local.correct, answer: local.answer } : null,
     offlineAnswer: item.answer,
   };
@@ -142,6 +144,9 @@ function WordOfDayContent() {
   const [result, setResult] = useState<{ choice: string; correct: boolean; answer: string } | null>(null);
 
   const d = q.data;
+  // Cada opción se muestra en el idioma de la persona (lo aprobado por un docente); se responde con la opción original.
+  const lang = useAppLang();
+  const verOpcion = (o: string) => significado({ es: o, sig: d?.word?.labels?.[o] }, lang);
   const played = result ?? d?.played ?? null;
 
   // Sin señal se corrige con el paquete y la jugada queda guardada; los puntos los confirma el
@@ -245,7 +250,7 @@ function WordOfDayContent() {
                     opacity: played && !isAnswer && !isWrongChoice ? 0.55 : 1,
                   }}
                 >
-                  {o}
+                  {verOpcion(o)}
                 </button>
               );
             })}
@@ -253,7 +258,7 @@ function WordOfDayContent() {
           {played && (
             <div className="mx-auto max-w-md space-y-1 rounded-2xl bg-white/70 p-4 text-center">
               <p className="font-display text-xl font-bold">
-                {played.correct ? tr("correct") : tr("itWas", { a: played.answer })}
+                {played.correct ? tr("correct") : tr("itWas", { a: verOpcion(played.answer) })}
               </p>
               {played.correct && <p className="font-bold" style={{ color: D.verde }}>+5 XP</p>}
               {d.offlineAnswer && (
