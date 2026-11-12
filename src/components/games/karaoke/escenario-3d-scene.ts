@@ -7,10 +7,25 @@
 import * as THREE from "three";
 
 export type PoseJai3D = "espera" | "canta" | "festeja";
-export type EstadoEscenario = { beat: number; playing: boolean; animo: number; fiesta: boolean; pose: PoseJai3D };
+/** El plano de la cámara, como en una película. */
+export type Plano = "general" | "apertura" | "jai" | "arpa" | "mano";
+export type EstadoEscenario = {
+  beat: number; playing: boolean; animo: number; fiesta: boolean; pose: PoseJai3D;
+  plano?: Plano;
+  /** 0 = telón cerrado, 1 = abierto. */
+  telon?: number;
+  /** Pantalla completa: la letra y los botones tapan la parte de abajo, el escenario se encuadra arriba. */
+  cine?: boolean;
+};
 export type Escenario3D = {
   setEstado: (e: EstadoEscenario) => void;
   festejo: () => void;
+  /** Cámara lenta de un segundo (el verso dorado perfecto). */
+  momento: () => void;
+  /** Telón cerrado y cámara en el fondo de la sala, al instante (antes de la apertura). */
+  reiniciar: () => void;
+  /** Una foto del escenario tal como se ve ahora (para el póster). */
+  foto: () => Promise<Blob | null>;
   dispose: () => void;
 };
 
@@ -134,11 +149,23 @@ export function crearEscenario(canvas: HTMLCanvasElement, poses: Record<PoseJai3
     lado.rotation.y = -s * 0.25;
     scene.add(lado);
   }
+  // Telón de boca: se abre en la apertura y se cierra entre capítulos y al final.
+  const bocas = [-1, 1].map((s) => {
+    const g = track(new THREE.PlaneGeometry(5.8, 5.4, 60, 1));
+    const p = g.attributes.position as THREE.BufferAttribute;
+    for (let i = 0; i < p.count; i++) p.setZ(i, Math.sin(p.getX(i) * 9) * 0.1 + Math.sin(p.getX(i) * 2.1) * 0.05);
+    g.computeVertexNormals();
+    const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: "#8E1640", roughness: 0.7 }));
+    m.position.set(s * 2.9, 2.55, 1.85);
+    scene.add(m);
+    return { m, s };
+  });
+  let telonAbierto = 1, telonObjetivo = 1;
   const bambalina = new THREE.Mesh(track(new THREE.BoxGeometry(11, 0.7, 0.3)), new THREE.MeshStandardMaterial({ color: "#5E0D2C", roughness: 0.7 }));
-  bambalina.position.set(0, 5.05, -0.2);
+  bambalina.position.set(0, 5.05, 2.0);
   scene.add(bambalina);
   const fleco = new THREE.Mesh(track(new THREE.BoxGeometry(11, 0.08, 0.32)), new THREE.MeshStandardMaterial({ color: ORO, metalness: 0.8, roughness: 0.3, emissive: "#5A3A00" }));
-  fleco.position.set(0, 4.68, -0.2);
+  fleco.position.set(0, 4.68, 2.0);
   scene.add(fleco);
 
   // ---------- Ñandutí gigante ----------
@@ -310,6 +337,7 @@ export function crearEscenario(canvas: HTMLCanvasElement, poses: Record<PoseJai3
 
   // ---------- Estado y animación ----------
   let estado: EstadoEscenario = { beat: -1, playing: false, animo: 0.2, fiesta: false, pose: "espera" };
+  let lentoHasta = 0;
   let pulso = 0;
   let ultimoBeat = -1;
   function setEstado(e: EstadoEscenario) {
@@ -322,7 +350,27 @@ export function crearEscenario(canvas: HTMLCanvasElement, poses: Record<PoseJai3
       c2.userData.vib = 0.7;
     }
     estado = e;
+    if (e.telon !== undefined) telonObjetivo = e.telon;
     ponerPose(e.pose);
+  }
+
+  // ---------- Planos de cámara ----------
+  type Toma = { pos: THREE.Vector3; mira: THREE.Vector3; fov: number };
+  const TOMAS: Record<Plano, Toma> = {
+    general: { pos: new THREE.Vector3(0, 1.75, 7.2), mira: new THREE.Vector3(0.1, 1.35, 0), fov: 38 },
+    apertura: { pos: new THREE.Vector3(0, 3.4, 12.5), mira: new THREE.Vector3(0, 1.8, 0), fov: 34 },
+    jai: { pos: new THREE.Vector3(0.9, 1.75, 4.6), mira: new THREE.Vector3(0.35, 1.45, 0), fov: 36 },
+    arpa: { pos: new THREE.Vector3(-1.2, 1.5, 3.6), mira: new THREE.Vector3(-3.0, 1.35, -0.6), fov: 40 },
+    mano: { pos: new THREE.Vector3(0, 1.9, 6.4), mira: new THREE.Vector3(0.1, 1.4, 0), fov: 42 },
+  };
+  const camPos = TOMAS.general.pos.clone();
+  const camMira = TOMAS.general.mira.clone();
+  let camFov = 38;
+  function reiniciar() {
+    telonAbierto = telonObjetivo = 0;
+    camPos.copy(TOMAS.apertura.pos);
+    camMira.copy(TOMAS.apertura.mira);
+    camFov = TOMAS.apertura.fov;
   }
 
   function ajustar() {
@@ -330,8 +378,6 @@ export function crearEscenario(canvas: HTMLCanvasElement, poses: Record<PoseJai3
     const h = canvas.clientHeight || 224;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    // En pantallas angostas (celular) la cámara se aleja un poco para que entren el arpa y el Jai.
-    camera.fov = camera.aspect < 1.4 ? 46 : 38;
     camera.updateProjectionMatrix();
   }
   const ro = new ResizeObserver(ajustar);
@@ -363,17 +409,39 @@ export function crearEscenario(canvas: HTMLCanvasElement, poses: Record<PoseJai3
     }
     impar = !impar;
     if (saltear && impar) return;
-    t += saltear ? dt * 2 : dt;
+    const lento = ahora < lentoHasta ? 0.22 : 1;
+    const paso = (saltear ? dt * 2 : dt) * lento;
+    t += paso;
     const { playing, animo, fiesta, beat } = estado;
     const vivo = reducir ? 0 : 1;
-    pulso = Math.max(0, pulso - dt * 3.2);
+    pulso = Math.max(0, pulso - paso * 3.2);
     const p = pulso * vivo;
     const energia = fiesta ? 1 : playing ? 0.35 + animo * 0.65 : 0.25;
 
-    // Cámara: respira con la música; en la fiesta gira un poco alrededor del escenario.
-    const giro = fiesta ? Math.sin(t * 0.6) * 0.5 : Math.sin(t * 0.25) * 0.18;
-    camera.position.set(CAM.x + giro * vivo, CAM.y + Math.sin(t * 0.4) * 0.05 * vivo, CAM.z - p * 0.18);
-    camera.lookAt(0.1, 1.35, 0);
+    // Cámara: va hacia el plano pedido como una grúa, respira con la música y en la fiesta va «en mano».
+    const plano: Plano = estado.plano ?? (fiesta ? "mano" : "general");
+    const toma = TOMAS[plano];
+    const suave = reducir ? 1 : 1 - Math.exp(-dt * (plano === "apertura" ? 0.9 : 1.8));
+    camPos.lerp(toma.pos, suave);
+    camMira.lerp(toma.mira, suave);
+    // En el celular parado (pantalla alta) la cámara se aleja y el escenario sube, para que la letra no lo tape.
+    const alto = camera.aspect < 1;
+    const fovObj = toma.fov * (alto ? (estado.cine ? 1.75 : 1.3) : camera.aspect < 1.4 ? 1.2 : 1) - (lento < 1 ? 6 : 0);
+    camFov += (fovObj - camFov) * suave;
+    camera.fov = camFov;
+    camera.updateProjectionMatrix();
+    const mano = plano === "mano" ? 0.06 : 0.015;
+    const giro = fiesta ? Math.sin(t * 0.6) * 0.4 : Math.sin(t * 0.25) * 0.12;
+    camera.position.set(
+      camPos.x + (giro + Math.sin(t * 7.3) * mano) * vivo,
+      camPos.y + (Math.sin(t * 0.4) * 0.05 + Math.sin(t * 5.1) * mano * 0.6) * vivo,
+      camPos.z - p * 0.18 * vivo,
+    );
+    camera.lookAt(camMira.x, camMira.y - (alto && estado.cine ? 1.25 : alto ? 0.35 : 0), camMira.z);
+
+    // Telón de boca
+    telonAbierto += (telonObjetivo - telonAbierto) * Math.min(1, (reducir ? 10 : 1.6) * dt);
+    for (const b of bocas) b.m.position.x = b.s * (2.9 + telonAbierto * 5.4);
 
     // Jai: rebota con el pulso.
     if (jai.visible) {
@@ -460,6 +528,14 @@ export function crearEscenario(canvas: HTMLCanvasElement, poses: Record<PoseJai3
   return {
     setEstado,
     festejo,
+    momento() { lentoHasta = performance.now() + 1100; },
+    reiniciar,
+    foto() {
+      try {
+        renderer.render(scene, camera);
+        return new Promise((ok) => canvas.toBlob((b) => ok(b), "image/jpeg", 0.9));
+      } catch { return Promise.resolve(null); }
+    },
     dispose() {
       cancelAnimationFrame(raf);
       ro.disconnect();

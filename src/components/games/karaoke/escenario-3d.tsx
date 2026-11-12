@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Mic } from "lucide-react";
-import type { Escenario3D, PoseJai3D } from "./escenario-3d-scene";
+import type { Escenario3D, Plano, PoseJai3D } from "./escenario-3d-scene";
+export type { Escenario3D, Plano } from "./escenario-3d-scene";
 import { Escenario, JAI_KARAOKE, K, type PoseJai } from "./escenario";
 
 /**
@@ -25,10 +26,16 @@ type Props = {
   fiesta: boolean;
   /** Nivel del micrófono de 0 a 1, o null si no se canta con micrófono. */
   nivelVoz: number | null;
+  plano?: Plano;
+  telon?: number;
+  /** Pantalla completa (modo película). */
+  cine?: boolean;
+  /** Avisa cuando el escenario 3D está listo (para la cámara lenta, la apertura y la foto del póster). */
+  onListo?: (esc: Escenario3D | null) => void;
 };
 
 export function Escenario3DView(props: Props) {
-  const { beat, playing, pose, animo, festejo, fiesta, nivelVoz } = props;
+  const { beat, playing, pose, animo, festejo, fiesta, nivelVoz, plano, telon, cine, onListo } = props;
   const caja = useRef<HTMLDivElement>(null);
   const [esc, setEsc] = useState<Escenario3D | null>(null);
   const [sin3d, setSin3d] = useState(false);
@@ -64,15 +71,20 @@ export function Escenario3DView(props: Props) {
   }, []);
 
   useEffect(() => {
-    esc?.setEstado({ beat, playing, animo, fiesta, pose });
-  }, [esc, beat, playing, animo, fiesta, pose]);
+    esc?.setEstado({ beat, playing, animo, fiesta, pose, plano, telon, cine });
+  }, [esc, beat, playing, animo, fiesta, pose, plano, telon, cine]);
+  useEffect(() => { onListo?.(esc); }, [esc]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (festejo > 0) esc?.festejo();
   }, [esc, festejo]);
 
-  if (sin3d) return <Escenario beat={beat} playing={playing} pose={pose} animo={animo} festejo={festejo} nivelVoz={nivelVoz} />;
+  if (sin3d) {
+    return cine ? (
+      <div className="absolute inset-x-0 top-[9%] px-3"><Escenario beat={beat} playing={playing} pose={pose} animo={animo} festejo={festejo} nivelVoz={nivelVoz} /></div>
+    ) : <Escenario beat={beat} playing={playing} pose={pose} animo={animo} festejo={festejo} nivelVoz={nivelVoz} />;
+  }
   return (
-    <div ref={caja} className="relative h-60 overflow-hidden rounded-3xl ring-1 ring-white/10 sm:h-80" style={{ background: K.noche }}>
+    <div ref={caja} className={cine ? "absolute inset-0 overflow-hidden" : "relative h-60 overflow-hidden rounded-3xl ring-1 ring-white/10 sm:h-80"} style={{ background: K.noche }}>
       {!esc && (
         <div className="absolute inset-0 grid place-items-center" aria-hidden>
           <img src={JAI_KARAOKE.espera} alt="" className="kk-jai-wait h-3/4 w-auto object-contain opacity-80" />

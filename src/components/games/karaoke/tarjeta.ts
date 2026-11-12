@@ -9,6 +9,8 @@ export type DatosTarjeta = {
   detalle: string; // «4 de 4 versos perfectos · 20 puntos»
   cta: string; // «¿Me ganás?»
   jai: string; // imagen del Jai
+  rango?: string; // «Leyenda del arpa»
+  foto?: Blob | null; // el mejor momento del escenario 3D: con foto, la tarjeta es un póster de película
 };
 
 const C = { noche: "#1A0B33", violeta: "#3A1670", magenta: "#E0457B", oro: "#F6C445", blanco: "#FFFFFF" };
@@ -31,6 +33,67 @@ function ajustar(ctx: CanvasRenderingContext2D, txt: string, max: number, tam: n
   } while (ctx.measureText(txt).width > max && t > 24);
 }
 
+function cargarBlob(b: Blob): Promise<HTMLImageElement | null> {
+  const u = URL.createObjectURL(b);
+  return cargar(u).then((im) => { URL.revokeObjectURL(u); return im; });
+}
+
+/** El póster: la foto del escenario a pantalla completa, franjas de cine y el título de cantor como título de película. */
+async function dibujarPoster(d: DatosTarjeta, ctx: CanvasRenderingContext2D, W: number, H: number, foto: HTMLImageElement): Promise<void> {
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, W, H);
+  // La foto, recortada para llenar el póster.
+  const esc = Math.max(W / foto.naturalWidth, (H * 0.78) / foto.naturalHeight);
+  const fw = foto.naturalWidth * esc, fh = foto.naturalHeight * esc;
+  ctx.drawImage(foto, (W - fw) / 2, 70, fw, fh);
+  // Oscurecer abajo para que se lean los títulos.
+  const g = ctx.createLinearGradient(0, H * 0.35, 0, H);
+  g.addColorStop(0, "rgba(0,0,0,0)");
+  g.addColorStop(0.45, "rgba(8,3,18,.85)");
+  g.addColorStop(1, "rgba(8,3,18,1)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+  // Franjas de cine.
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, W, 70);
+  ["#D52B1E", "#FFFFFF", "#2F62C9"].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect((W / 3) * i, 0, W / 3, 10); });
+  ctx.textAlign = "center";
+  ctx.fillStyle = "rgba(255,255,255,.85)";
+  ctx.font = `600 34px "Space Grotesk", system-ui, sans-serif`;
+  ctx.fillText("Jaikuaa presenta", W / 2, 52);
+  ctx.fillStyle = C.oro;
+  const rango = d.rango ?? d.titulo;
+  ajustar(ctx, rango, W - 120, 118);
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,.8)";
+  ctx.shadowBlur = 30;
+  ctx.fillText(rango, W / 2, 880);
+  ctx.restore();
+  ctx.fillStyle = C.blanco;
+  const cancion = `${d.titulo} «${d.cancion}»`;
+  ajustar(ctx, cancion, W - 140, 52, 700);
+  ctx.fillText(cancion, W / 2, 960);
+  ctx.fillStyle = C.oro;
+  ctx.font = `800 92px system-ui, sans-serif`;
+  ctx.fillText("★".repeat(d.estrellas) + "☆".repeat(Math.max(0, 3 - d.estrellas)), W / 2, 1066);
+  ctx.fillStyle = "rgba(255,255,255,.85)";
+  ajustar(ctx, d.detalle, W - 160, 38, 600);
+  ctx.fillText(d.detalle, W / 2, 1122);
+  // Créditos, como al pie de un póster.
+  ctx.fillStyle = "rgba(255,255,255,.55)";
+  ctx.font = `500 26px "Space Grotesk", system-ui, sans-serif`;
+  ctx.fillText("Con el Jai y el arpa paraguaya · Purahéi Karaoke", W / 2, 1172);
+  ctx.fillStyle = C.oro;
+  const bw = 760, bh = 100, bx = W / 2 - bw / 2, by = 1210;
+  ctx.beginPath();
+  ctx.roundRect?.(bx, by, bw, bh, 50);
+  if (!ctx.roundRect) ctx.rect(bx, by, bw, bh);
+  ctx.fill();
+  ctx.fillStyle = C.noche;
+  ajustar(ctx, `${d.cta}  jaikuaa.com`, bw - 80, 48);
+  ctx.fillText(`${d.cta}  jaikuaa.com`, W / 2, by + 66);
+}
+
 export async function dibujarTarjeta(d: DatosTarjeta): Promise<Blob | null> {
   try {
     const W = 1080, H = 1350;
@@ -40,6 +103,11 @@ export async function dibujarTarjeta(d: DatosTarjeta): Promise<Blob | null> {
     const ctx = cv.getContext("2d");
     if (!ctx) return null;
     await document.fonts?.load?.('800 80px "Space Grotesk"').catch(() => undefined);
+    const foto = d.foto ? await cargarBlob(d.foto) : null;
+    if (foto) {
+      await dibujarPoster(d, ctx, W, H, foto);
+      return await new Promise((ok) => cv.toBlob((b) => ok(b), "image/png"));
+    }
     // Fondo: noche violeta con reflectores.
     const g = ctx.createRadialGradient(W / 2, 0, 50, W / 2, 200, 1300);
     g.addColorStop(0, "#5A2596");

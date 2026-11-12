@@ -22,12 +22,16 @@ export function CompartirCancion({
   detalle,
   audio,
   mezclando,
+  rango,
+  foto,
 }: {
   cancion: string;
   estrellas: number;
   detalle: string;
   audio: Blob | null;
   mezclando: boolean;
+  rango?: string;
+  foto?: Blob | null;
 }) {
   const tt = useJU();
   const [tarjeta, setTarjeta] = useState<Blob | null>(null);
@@ -38,14 +42,14 @@ export function CompartirCancion({
   useEffect(() => {
     let vivo = true;
     let u: string | null = null;
-    void dibujarTarjeta({ titulo: tt("kkTarjetaTitulo"), cancion, estrellas, detalle, cta: tt("kkMeGanas"), jai: JAI_KARAOKE.festeja }).then((b) => {
+    void dibujarTarjeta({ titulo: tt("kkTarjetaTitulo"), cancion, estrellas, detalle, cta: tt("kkMeGanas"), jai: JAI_KARAOKE.festeja, rango, foto }).then((b) => {
       if (!vivo || !b) return;
       setTarjeta(b);
       u = URL.createObjectURL(b);
       setVerTarjeta(u);
     });
     return () => { vivo = false; if (u) URL.revokeObjectURL(u); };
-  }, [cancion, estrellas, detalle]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [cancion, estrellas, detalle, rango, foto]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!audio) return;

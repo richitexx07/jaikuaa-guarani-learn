@@ -1,6 +1,5 @@
 import { useJU } from "@/lib/i18n-juegos-ui";
 import { callarVoz } from "@/lib/voz-unica";
-import { QuitGameButton } from "@/components/games/quit-game-button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GameStage } from "@/components/games/game-stage";
@@ -14,13 +13,13 @@ import { useJuegoTextos } from "@/lib/use-juego-textos";
 import { louderBlob } from "@/lib/audio-louder";
 import { getHumanAudioUrl, playGuarani } from "@/lib/audio";
 import { sesionDeAudio } from "@/lib/karaoke-arpa";
-import { aplausosWav, renderMusica, ritmoDe, SR_MUSICA } from "@/lib/karaoke-musica";
+import { aplausos, aplausosWav, renderMusica, ritmoDe, SR_MUSICA } from "@/lib/karaoke-musica";
 import {
   armarShow, dificultad, estrellas, guardarRecord, HITOS_RACHA, juzgar, leerRecord, multiplicador, opcionesVisibles,
   pulsoDelHueco, puntajeMaximo, puntosDe, RACHA_FIESTA, rango, TELON, CUENTA, type Nota, type Record_, type Show, type Vuelta,
 } from "@/lib/karaoke-juego";
 import { Aplausometro, Arpa as ArpaDibujo, CSS_ESCENARIO, JAI_KARAOKE, K, Reflectores, type PoseJai } from "@/components/games/karaoke/escenario";
-import { Escenario3DView, precargarEscenario3D } from "@/components/games/karaoke/escenario-3d";
+import { Escenario3DView, precargarEscenario3D, type Escenario3D, type Plano } from "@/components/games/karaoke/escenario-3d";
 import { abrirMicrofono, canto, fondoDe, miCancion, type Micro } from "@/components/games/karaoke/microfono";
 import { CompartirCancion } from "@/components/games/karaoke/compartir-cancion";
 import { HelpCircle, Mic, MicOff, Square, Play, Volume2, X } from "lucide-react";
@@ -88,7 +87,64 @@ class Arpa {
     const notas = [1, 2, 4].flatMap((oct) => chord.map((f) => f * oct)).sort((a, b) => a - b);
     (subir ? notas : notas.reverse()).forEach((f, i) => this.pluck(f, i * 0.035, 0.035, "triangle", 0.8));
   }
-  stop() { void this.ctx?.close(); this.ctx = null; this.out = null; }
+  /** El murmullo del público (ruido suave y grave). 0 = callado. */
+  private murm: GainNode | null = null;
+  murmullo(vol: number) {
+    try {
+      const a = this.ctx;
+      if (!a || !this.out) return;
+      if (!this.murm) {
+        const n = a.sampleRate * 2;
+        const b = a.createBuffer(1, n, a.sampleRate);
+        const d = b.getChannelData(0);
+        let ultimo = 0;
+        for (let i = 0; i < n; i++) { ultimo = ultimo * 0.97 + (Math.random() * 2 - 1) * 0.03; d[i] = ultimo * 6; }
+        const src = a.createBufferSource(); src.buffer = b; src.loop = true;
+        const f = a.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 480; f.Q.value = 0.6;
+        const g = a.createGain(); g.gain.value = 0;
+        src.connect(f).connect(g).connect(this.out); src.start();
+        this.murm = g;
+      }
+      this.murm.gain.setTargetAtTime(vol, a.currentTime, 0.5);
+    } catch { /* audio opcional */ }
+  }
+  /** Aplausos del público (más fuertes cuanto más larga la racha). */
+  ovacion(fuerza: number) {
+    try {
+      const a = this.ctx;
+      if (!a || !this.out) return;
+      const m = aplausos(1 + fuerza, SR_MUSICA, Math.floor(Math.random() * 997));
+      const b = a.createBuffer(1, m.length, SR_MUSICA);
+      b.getChannelData(0).set(m);
+      const s = a.createBufferSource(); s.buffer = b;
+      const g = a.createGain(); g.gain.value = 0.18 * fuerza;
+      s.connect(g).connect(this.out); s.start();
+    } catch { /* audio opcional */ }
+  }
+  /** El «oooh» del público cuando se corta una racha. */
+  ooh() {
+    try {
+      const a = this.ctx;
+      if (!a || !this.out) return;
+      const t = a.currentTime;
+      const f = a.createBiquadFilter(); f.type = "lowpass";
+      f.frequency.setValueAtTime(900, t); f.frequency.exponentialRampToValueAtTime(320, t + 0.9);
+      const g = a.createGain();
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.035, t + 0.12); g.gain.exponentialRampToValueAtTime(0.0001, t + 1);
+      f.connect(g).connect(this.out);
+      [196, 247, 294, 330].forEach((fr, i) => {
+        const o = a.createOscillator(); o.type = "sawtooth";
+        o.frequency.setValueAtTime(fr * (1 + i * 0.004), t); o.frequency.exponentialRampToValueAtTime(fr * 0.82, t + 1);
+        o.connect(f); o.start(t); o.stop(t + 1.05);
+      });
+    } catch { /* audio opcional */ }
+  }
+  stop() { void this.ctx?.close(); this.ctx = null; this.out = null; this.murm = null; }
+}
+
+/** Un toquecito de vibración (en los celulares que lo permiten). */
+function vibrar(ms: number | number[]) {
+  try { navigator.vibrate?.(ms); } catch { /* sin vibración */ }
 }
 
 const CSS = `
@@ -114,7 +170,11 @@ const CSS = `
 .kk-demo-anillo { animation: kk-demo-anillo 1.6s cubic-bezier(.4,0,.6,1) infinite; }
 @keyframes kk-demo-anillo { 0% { transform: scale(2.6); opacity: .2 } 70% { transform: scale(1); opacity: 1 } 100% { transform: scale(1); opacity: 0 } }
 .kk-modal { animation: kk-telon-in .35s cubic-bezier(.2,.8,.2,1) 1; }
-@media (prefers-reduced-motion: reduce) { .kk-ball, .kk-pop, .kk-disc, .kk-count, .kk-telon-in, .kk-shake, .kk-acierto, .kk-llama, .kk-demo-anillo, .kk-modal, .kk-fiesta .kk-letra { animation: none !important; } }
+.kk-franja { animation: kk-franja 1s cubic-bezier(.2,.8,.2,1) 1 both; }
+@keyframes kk-franja { from { transform: scaleY(0) } }
+.kk-titulo { animation: kk-titulo 1.3s cubic-bezier(.2,.8,.2,1) 1 both; }
+@keyframes kk-titulo { from { opacity: 0; letter-spacing: .25em; filter: blur(8px) } }
+@media (prefers-reduced-motion: reduce) { .kk-ball, .kk-pop, .kk-disc, .kk-count, .kk-telon-in, .kk-shake, .kk-acierto, .kk-llama, .kk-demo-anillo, .kk-modal, .kk-fiesta .kk-letra, .kk-franja, .kk-titulo { animation: none !important; } }
 `;
 
 const TUTO = "jk.karaoke.tuto";
@@ -334,6 +394,33 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
   const beatRef = useRef(-1);
   beatRef.current = beat;
   const fiesta = racha >= RACHA_FIESTA;
+  const rachaRef = useRef(0);
+  rachaRef.current = racha;
+  // El modo película: pantalla completa desde «A cantar» hasta los créditos.
+  const esc = useRef<Escenario3D | null>(null);
+  const [creditos, setCreditos] = useState(false);
+  const [salirSeguro, setSalirSeguro] = useState(false);
+  useEffect(() => {
+    if (!salirSeguro) return;
+    const id = window.setTimeout(() => setSalirSeguro(false), 4000);
+    return () => window.clearTimeout(id);
+  }, [salirSeguro]);
+  const enCine = beat >= 0 && !creditos;
+  useEffect(() => {
+    if (!enCine) return;
+    const antes = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = antes; };
+  }, [enCine]);
+  // La foto del mejor momento, para el póster.
+  const [foto, setFoto] = useState<Blob | null>(null);
+  const ultimaFoto = useRef(0);
+  function sacarFoto(forzar = false) {
+    const ahora = performance.now();
+    if (!forzar && ahora - ultimaFoto.current < 3000) return;
+    ultimaFoto.current = ahora;
+    window.setTimeout(() => { void esc.current?.foto().then((b) => { if (b) setFoto(b); }); }, 350);
+  }
 
   // La música (arpa, guitarra y bajo) se arma apenas se abre la canción, para tenerla lista al tocar «A cantar».
   const [pista, setPista] = useState<string | null>(null);
@@ -360,8 +447,6 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
     return (performance.now() - t0.current) / 1000;
   }, []);
   const procesado = useRef(-1);
-  // Al arrancar, la pantalla se acomoda para ver el marcador, la letra y los botones juntos.
-  const raiz = useRef<HTMLElement>(null);
 
   // ---------- Micrófono (opcional) ----------
   const micro = useRef<Micro | null>(null);
@@ -419,7 +504,8 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
     for (let b = procesado.current + 1; b <= hasta; b++) {
       const p = pasos[b];
       if (!relojAudio.current) arpa.current.beat(acorde(b), beatSec);
-      if (p?.tipo === "telon" && p.i === 0) arpa.current.gliss(acorde(b));
+      if (p?.tipo === "telon" && p.i === 0) { arpa.current.gliss(acorde(b)); arpa.current.ovacion(0.6); }
+      if (p?.tipo === "cuenta" && p.i === 0) arpa.current.murmullo(0.02);
       if (p?.tipo !== "verso" || p.word !== -1) continue;
       // Si el hueco pasó sin respuesta, cuenta como fallo.
       if (notasRef.current[p.v] === undefined) fallos.push(p.v);
@@ -430,7 +516,8 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
     if (fallos.length) {
       setNotas((a) => { const n = { ...a }; for (const v of fallos) if (n[v] === undefined) n[v] = "fallo"; return n; });
       setAyudas((a) => { const n = { ...a }; for (const v of fallos) n[v + 1] = true; return n; });
-      setRacha(0); feedback("error"); arpa.current.fallo();
+      if (rachaRef.current >= 3) arpa.current.ooh();
+      setRacha(0); feedback("error"); arpa.current.fallo(); vibrar(40);
       setAnimo((x) => Math.max(0, x - 0.25));
     }
     if (cantados.length) {
@@ -446,6 +533,9 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
     callarVoz(); // si estaba sonando una palabra, se calla antes de la canción
     sesionDeAudio(micro.current ? "play-and-record" : "playback");
     arpa.current.unlock(); // para los sonidos de acierto
+    arpa.current.murmullo(0.05); // el público espera
+    esc.current?.reiniciar(); // telón cerrado y cámara al fondo de la sala: empieza la película
+    setCreditos(false);
     procesado.current = -1;
     niveles.current = { fondo: [], verso: {} };
     if (micro.current) { micro.current.empezarGrabacion(); inicioGrabacion.current = performance.now(); micro.current.desfase = 0; }
@@ -464,7 +554,6 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
     }
     setBeat(0);
     setPlaying(true);
-    requestAnimationFrame(() => raiz.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
 
   const paso = beat >= 0 ? pasos[Math.min(beat, total - 1)] : undefined;
@@ -487,7 +576,8 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
     if (w !== verso.correcta) {
       setNotas((a) => ({ ...a, [verso.n]: "fallo" }));
       setAyudas((a) => ({ ...a, [verso.n + 1]: true }));
-      setRacha(0); feedback("error"); arpa.current.fallo();
+      if (racha >= 3) arpa.current.ooh();
+      setRacha(0); feedback("error"); arpa.current.fallo(); vibrar(40);
       setPop({ text: "¡Uy!", color: "#FF8A8A", n: Date.now() });
       setSacudir(Date.now());
       setAnimo((x) => Math.max(0, x - 0.25));
@@ -503,13 +593,24 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
     setPuntos((p) => p + pts);
     feedback("success");
     arpa.current.acierto(acorde(beatRef.current), nota);
+    vibrar(nota === "perfecto" ? [12, 40, 12] : 12);
     const hito = HITOS_RACHA.includes(nueva);
-    if (hito) arpa.current.gliss(acorde(beatRef.current));
+    if (hito) { arpa.current.gliss(acorde(beatRef.current)); arpa.current.ovacion(0.5 + HITOS_RACHA.indexOf(nueva) * 0.3); }
+    // Verso dorado perfecto: cámara lenta y foto para el póster.
+    if (verso.dorado && nota === "perfecto") { esc.current?.momento(); sacarFoto(true); }
     const text = hito ? tt("kkStreak", { m: multiplicador(nueva) })
       : nota === "perfecto" ? "¡Iporãite! ✨" : nota === "bien" ? "¡Porã!" : dt < 0 ? tt("kkEarly") : tt("kkLate");
     setPop({ text, sub: `+${pts}`, color: K.oro, n: Date.now() });
     setAnimo((x) => Math.min(1, x + (nota === "perfecto" ? 0.25 : 0.12)));
-    if (nota === "perfecto" || hito || nueva >= RACHA_FIESTA) festejar();
+    if (nota === "perfecto" || hito || nueva >= RACHA_FIESTA) { festejar(); sacarFoto(); }
+    else if (!ultimaFoto.current) sacarFoto();
+  }
+  useEffect(() => { if (playing) arpa.current.murmullo(fiesta ? 0.06 : 0.02); }, [fiesta, playing]);
+  function salir() {
+    audio.current?.pause();
+    setSalirSeguro(false);
+    setPlaying(false);
+    setBeat(total);
   }
 
   const nVoces = Object.values(voces).filter(Boolean).length;
@@ -523,6 +624,10 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
   useEffect(() => {
     if (!done || recorded.current) return;
     recorded.current = true; feedback("victory");
+    if (!ultimaFoto.current) sacarFoto(true);
+    arpa.current.murmullo(0.07);
+    // Cae el telón, el título final, y después los créditos.
+    window.setTimeout(() => { arpa.current.murmullo(0); setCreditos(true); window.scrollTo({ top: 0 }); }, 2300);
     if (xp > 0) recordCompletion({ source: "game", sourceRef: "karaoke", xp });
     setEsRecord(guardarRecord(song.id, puntosLetra, estrellas(ratio)));
     // Aplausos del público al terminar (la música ya paró, así no se pisan).
@@ -545,7 +650,7 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
   const nombreVuelta = (n: Vuelta) => tt(n === 1 ? "kkV1" : n === 2 ? "kkV2" : "kkV3");
   const infoVuelta = (n: Vuelta) => tt(n === 1 ? "kkV1i" : n === 2 ? "kkV2i" : "kkV3i");
 
-  if (done) {
+  if (done && creditos) {
     const cuenta = (n: Nota) => Object.values(notas).filter((g) => g === n).length;
     const perfect = cuenta("perfecto");
     const stars = estrellas(ratio);
@@ -576,7 +681,7 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
           <button type="button" onClick={onBack} className="h-12 rounded-2xl px-6 font-bold ring-1 ring-white/30">{tt("kkOther")}</button>
         </div>
         <Repaso song={song} />
-        <CompartirCancion cancion={song.title} estrellas={stars} detalle={detalle} audio={cancion} mezclando={mezclando} />
+        <CompartirCancion cancion={song.title} estrellas={stars} detalle={detalle} audio={cancion} mezclando={mezclando} rango={tt(`kkRank${rk}` as "kkRank0")} foto={foto} />
         {!cancion && !mezclando && <Recorder song={song} />}
         <RetoFinal partida={partida} puntaje={puntosLetra} total={maximo} extra={song.id} coincide={!partida.reto || partida.reto.x === song.id} />
       </section>
@@ -587,79 +692,167 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
   const siguiente = verso ? versos[verso.n + 1] : undefined;
   const opciones = verso ? opcionesVisibles(verso, !!ayudas[verso.n]) : [];
   const mult = multiplicador(racha);
-  return (
-    <section ref={raiz} className={`scroll-mt-2 space-y-3 pt-2 ${fiesta ? "kk-fiesta" : ""}`} style={{ ["--kk-beat" as string]: `${beatSec}s` }}>
-      <div className="flex items-center justify-between gap-3">
+  // La cámara y el telón, como en una película.
+  const plano: Plano = done ? "general" : paso?.tipo === "intro" ? "apertura" : paso?.tipo === "telon" ? "arpa"
+    : verso ? (fiesta ? "mano" : verso.n % 3 === 2 ? "general" : "jai") : "general";
+  const telon = done ? 0 : paso?.tipo === "intro" ? (paso.i >= 1 ? 1 : 0) : paso?.tipo === "telon" ? (paso.i >= 2 ? 1 : 0) : 1;
+  const escenario = (cine: boolean) => (
+    <Escenario3DView
+      cine={cine}
+      beat={beat}
+      playing={playing}
+      pose={pose}
+      animo={fiesta ? 1 : animo}
+      festejo={festejo}
+      fiesta={fiesta}
+      plano={cine ? plano : "general"}
+      telon={cine ? telon : 1}
+      onListo={(e) => { esc.current = e; }}
+      nivelVoz={micEstado === "listo" ? (playing ? nivel : 0) : null}
+    />
+  );
+
+  if (!enCine) {
+    // Antes de empezar: el escenario, el micrófono y el botón para cantar.
+    return (
+      <section className="space-y-3 pt-2">
         <div className="min-w-0">
           <p className="truncate font-display text-lg font-bold">{song.title}</p>
-          <p className="text-sm text-white/60">{playing ? `${tt("kkVuelta", { i: vueltaActual })} · ${nombreVuelta(vueltaActual)}` : song.style}</p>
+          <p className="text-sm text-white/60">{song.style}</p>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <span className="rounded-full px-3 py-1 text-sm font-bold transition-colors" style={{ background: mult > 1 ? (fiesta ? K.oro : K.magenta) : "rgba(255,255,255,.1)", color: fiesta ? K.noche : "#fff" }} aria-label={tt("kkStreak", { m: mult })}>
+        {escenario(false)}
+        <div className="rounded-3xl bg-black/30 px-4 py-4 text-center ring-1 ring-white/10">
+          <p className="font-display text-2xl font-bold">{tt("kkReady")}</p>
+          <div className="mt-3 flex flex-wrap justify-center gap-1.5 text-xs">
+            {([1, 2, 3] as Vuelta[]).map((n) => <span key={n} className="rounded-full bg-white/10 px-2.5 py-1">{n}. {nombreVuelta(n)}</span>)}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => void alternarMicrofono()}
+          aria-pressed={micEstado === "listo"}
+          className="flex w-full items-center gap-3 rounded-2xl p-3 text-left ring-1 transition"
+          style={{ background: micEstado === "listo" ? "rgba(224,69,123,.22)" : "rgba(255,255,255,.07)", borderColor: K.magenta, boxShadow: micEstado === "listo" ? `0 0 0 2px ${K.magenta}` : undefined }}
+        >
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full" style={{ background: micEstado === "listo" ? K.magenta : "rgba(255,255,255,.12)" }}>
+            {micEstado === "listo" ? <Mic className="h-5 w-5 text-white" /> : <MicOff className="h-5 w-5 text-white/80" />}
+          </span>
+          <span className="min-w-0 flex-1">
+            <b className="block font-display">{micEstado === "listo" ? `${tt("kkMicListo")} ✓` : tt("kkMicOn")}</b>
+            <span className="block text-xs text-white/70">{micEstado === "sin-permiso" ? tt("kkMic") : tt("kkMicInfo")}</span>
+          </span>
+          <span className="h-7 w-12 shrink-0 rounded-full p-1 transition" style={{ background: micEstado === "listo" ? K.magenta : "rgba(255,255,255,.2)" }} aria-hidden>
+            <span className="block h-5 w-5 rounded-full bg-white transition-transform" style={{ transform: micEstado === "listo" ? "translateX(20px)" : "none" }} />
+          </span>
+        </button>
+        <button
+          type="button"
+          className="flex h-16 w-full items-center justify-center gap-3 rounded-2xl font-display text-xl font-bold shadow-lg transition active:scale-[.98] disabled:opacity-60"
+          style={{ background: K.oro, color: K.noche }}
+          onClick={empezar}
+          disabled={micEstado === "pidiendo"}
+        >
+          <Play className="h-6 w-6" fill="currentColor" /> {tt("kkPlay")}
+        </button>
+        <button type="button" onClick={onComo} className="mx-auto flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold text-white/80">
+          <HelpCircle className="h-4 w-4" /> {tt("kkHowBtn")}
+        </button>
+      </section>
+    );
+  }
+
+  // La película: pantalla completa, franjas de cine, la letra como subtítulos.
+  return (
+    <div className={`kk-cine fixed inset-0 z-[60] overflow-hidden bg-black text-white ${fiesta ? "kk-fiesta" : ""}`} style={{ ["--kk-beat" as string]: `${beatSec}s` }} role="region" aria-label={song.title}>
+      {escenario(true)}
+      <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(120% 80% at 50% 35%, transparent 55%, rgba(0,0,0,.65) 100%)" }} aria-hidden />
+      <div className="kk-franja pointer-events-none absolute inset-x-0 top-0 h-[7%] bg-black" aria-hidden />
+      <div className="kk-franja pointer-events-none absolute inset-x-0 bottom-0 h-[3%] bg-black" aria-hidden />
+
+      {/* Marcador arriba */}
+      <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-2 px-3 pt-[max(env(safe-area-inset-top),8px)]">
+        <div className="min-w-0">
+          <p className="truncate font-display text-sm font-bold">{song.title}</p>
+          <p className="truncate text-[11px] text-white/70">{done ? "" : `${tt("kkVuelta", { i: vueltaActual })} · ${nombreVuelta(vueltaActual)}`}</p>
+        </div>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span className="rounded-full px-2.5 py-1 text-sm font-bold transition-colors" style={{ background: mult > 1 ? (fiesta ? K.oro : K.magenta) : "rgba(255,255,255,.14)", color: fiesta ? K.noche : "#fff" }} aria-label={tt("kkStreak", { m: mult })}>
             {mult > 1 && <span className="kk-llama" aria-hidden>🔥</span>} ×{mult}
           </span>
-          <span className="rounded-full bg-white/10 px-3 py-1 text-sm"><b>{puntos}</b> {tt("kkPts")}</span>
+          <span className="rounded-full bg-white/15 px-2.5 py-1 text-sm"><b>{puntos}</b> {tt("kkPts")}</span>
+          {playing && (
+            <button
+              type="button"
+              onClick={() => { if (salirSeguro) salir(); else setSalirSeguro(true); }}
+              className="grid h-9 min-w-9 place-items-center rounded-full bg-white/15 px-2 text-xs font-bold"
+              aria-label={tt("kkStop")}
+            >
+              {salirSeguro ? tt("kkStop") : <X className="h-4 w-4" />}
+            </button>
+          )}
         </div>
       </div>
-
-      <div className="relative">
-        <Escenario3DView beat={beat} playing={playing} pose={pose} animo={fiesta ? 1 : animo} festejo={festejo} fiesta={fiesta} nivelVoz={micEstado === "listo" ? (playing ? nivel : 0) : null} />
-        {fiesta && <span className="kk-telon-in absolute left-3 top-3 rounded-full px-3 py-1 font-display text-sm font-bold" style={{ background: K.oro, color: K.noche }}>{tt("kkFiesta")}</span>}
-        {pop && (
-          <span key={pop.n} className="kk-pop pointer-events-none absolute left-1/2 top-6 flex flex-col items-center whitespace-nowrap font-display font-bold" style={{ color: pop.color, textShadow: "0 2px 12px rgba(0,0,0,.6)" }}>
-            <span className="text-3xl">{pop.text}</span>
-            {pop.sub && <span className="text-xl text-white">{pop.sub}</span>}
-          </span>
-        )}
-        {popVoz > 0 && (
-          <span key={popVoz} className="kk-pop pointer-events-none absolute left-[78%] top-4 whitespace-nowrap rounded-full px-3 py-1 font-display text-sm font-bold" style={{ background: K.magenta, color: "#fff" }}>
-            {tt("kkTeEscuche")}
-          </span>
-        )}
+      <div className="absolute inset-x-3 top-[calc(max(env(safe-area-inset-top),8px)+44px)] flex items-center gap-2" aria-hidden>
+        <div className="flex flex-1 gap-[3px]">
+          {versos.map((v) => {
+            const g = notas[v.n];
+            const actual = verso?.n === v.n;
+            return <span key={v.n} className="h-1 flex-1 rounded-full" style={{ marginLeft: v.linea === 0 && v.vuelta > 1 ? 6 : 0, background: g === "perfecto" ? K.oro : g === "bien" || g === "justo" ? "#F7E6C4" : g === "fallo" ? "#9A3B62" : actual ? K.magenta : "rgba(255,255,255,.22)" }} />;
+          })}
+        </div>
+        <div className="w-16"><Aplausometro animo={fiesta ? 1 : animo} label="" /></div>
       </div>
 
-      <Aplausometro animo={fiesta ? 1 : animo} label={tt("kkAplausos")} />
+      {fiesta && !done && <span className="kk-telon-in absolute left-1/2 top-[16%] -translate-x-1/2 rounded-full px-4 py-1 font-display text-sm font-bold" style={{ background: K.oro, color: K.noche }}>{tt("kkFiesta")}</span>}
+      {pop && (
+        <span key={pop.n} className="kk-pop pointer-events-none absolute left-1/2 top-[22%] flex flex-col items-center whitespace-nowrap font-display font-bold" style={{ color: pop.color, textShadow: "0 3px 18px rgba(0,0,0,.8)" }}>
+          <span className="text-4xl">{pop.text}</span>
+          {pop.sub && <span className="text-2xl text-white">{pop.sub}</span>}
+        </span>
+      )}
+      {popVoz > 0 && (
+        <span key={popVoz} className="kk-pop pointer-events-none absolute left-[78%] top-[18%] whitespace-nowrap rounded-full px-3 py-1 font-display text-sm font-bold" style={{ background: K.magenta, color: "#fff" }}>
+          {tt("kkTeEscuche")}
+        </span>
+      )}
 
-      {/* La letra */}
-      <div
-        key={sacudir}
-        className={`kk-letra relative overflow-hidden rounded-3xl px-4 pb-4 pt-3 text-center ring-1 ${sacudir ? "kk-shake" : ""}`}
-        style={{
-          background: verso?.dorado ? "linear-gradient(180deg, rgba(246,196,69,.18), rgba(0,0,0,.55))" : "linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.55))",
-          ["--tw-ring-color" as string]: verso?.dorado ? K.oro : "rgba(255,255,255,.1)",
-        }}
-      >
-        <div className="mb-2 flex items-center justify-center gap-2" aria-hidden>
-          {[0, 1, 2, 3].map((i) => (
-            <span key={i} className="h-2.5 w-2.5 rounded-full transition-transform" style={{ background: playing && beat % 4 === i ? K.oro : "rgba(255,255,255,.2)", transform: playing && beat % 4 === i ? "scale(1.5)" : "none" }} />
-          ))}
-        </div>
-        {verso?.dorado && <p className="mb-1 font-display text-sm font-bold" style={{ color: K.oro }}>★ {tt("kkGolden")} ★</p>}
-        {sinEmpezar ? (
-          <div className="py-3">
-            <p className="font-display text-2xl font-bold">{tt("kkReady")}</p>
-            <div className="mt-3 flex flex-wrap justify-center gap-1.5 text-xs">
-              {([1, 2, 3] as Vuelta[]).map((n) => <span key={n} className="rounded-full bg-white/10 px-2.5 py-1">{n}. {nombreVuelta(n)}</span>)}
+      {/* Títulos en el centro: la apertura, la cuenta, los capítulos y el final */}
+      {(done || paso?.tipo === "intro" || paso?.tipo === "cuenta" || paso?.tipo === "telon") && (
+        <div className="pointer-events-none absolute inset-x-4 top-[30%] mx-auto max-w-md rounded-3xl bg-black/50 px-5 py-5 text-center backdrop-blur-sm" style={{ textShadow: "0 4px 24px rgba(0,0,0,.85)" }}>
+          {done ? (
+            <div className="kk-titulo">
+              <p className="font-display text-sm font-semibold tracking-wide text-white/80">Jaikuaa</p>
+              <p className="mt-1 font-display text-4xl font-bold leading-tight" style={{ color: K.oro }}>{tt("kkSang", { n: song.title })}</p>
             </div>
-          </div>
-        ) : paso?.tipo === "intro" ? (
-          <div className="kk-telon-in py-2">
-            <p className="text-sm font-semibold text-white/70">{tt("kkVuelta", { i: 1 })}</p>
-            <p className="font-display text-3xl font-bold" style={{ color: K.oro }}>{nombreVuelta(1)}</p>
-            <p className="mt-1 text-white/85">{infoVuelta(1)}</p>
-          </div>
-        ) : paso?.tipo === "cuenta" ? (
-          <p key={beat} className="kk-count py-1 font-display text-7xl font-bold" style={{ color: K.oro }}>{CUENTA - paso.i}</p>
-        ) : paso?.tipo === "telon" ? (
-          <div key={`t${paso.vuelta}`} className="kk-telon-in py-2">
-            <p className="text-sm font-semibold text-white/70">{tt("kkVuelta", { i: paso.vuelta })}</p>
-            <p className="font-display text-3xl font-bold" style={{ color: K.oro }}>{nombreVuelta(paso.vuelta)}</p>
-            <p className="mt-1 text-white/85">{infoVuelta(paso.vuelta)}</p>
-            {paso.i >= 1 && <p key={beat} className="kk-count mt-1 font-display text-4xl font-bold" style={{ color: K.oro }}>{TELON - paso.i}</p>}
-          </div>
-        ) : verso && paso?.tipo === "verso" ? (
-          <>
-            <p className="flex min-h-20 flex-wrap items-end justify-center gap-x-2 gap-y-3 pt-4 font-display text-3xl font-bold leading-tight sm:text-5xl">
+          ) : paso?.tipo === "intro" ? (
+            <div className="kk-titulo">
+              <p className="font-display text-sm font-semibold tracking-wide text-white/80">Jaikuaa · Purahéi</p>
+              <p className="mt-2 font-display text-5xl font-bold leading-none">{song.title}</p>
+              <p className="mt-3 text-sm text-white/80">{song.style}</p>
+            </div>
+          ) : paso?.tipo === "cuenta" ? (
+            <div>
+              <p className="font-display text-base font-semibold" style={{ color: K.oro }}>{tt("kkVuelta", { i: 1 })} · {nombreVuelta(1)}</p>
+              <p key={beat} className="kk-count font-display text-8xl font-bold" style={{ color: K.oro }}>{CUENTA - paso.i}</p>
+              <p className="mx-auto max-w-xs text-sm text-white/90">{infoVuelta(1)}</p>
+            </div>
+          ) : paso?.tipo === "telon" ? (
+            <div key={`t${paso.vuelta}`} className="kk-titulo">
+              <p className="font-display text-base font-semibold text-white/80">{tt("kkVuelta", { i: paso.vuelta })}</p>
+              <p className="mt-1 font-display text-5xl font-bold leading-none" style={{ color: K.oro }}>{nombreVuelta(paso.vuelta)}</p>
+              <p className="mx-auto mt-3 max-w-xs text-white/90">{infoVuelta(paso.vuelta)}</p>
+              {paso.i >= 1 && <p key={beat} className="kk-count mt-2 font-display text-5xl font-bold" style={{ color: K.oro }}>{TELON - paso.i}</p>}
+            </div>
+          ) : null}
+        </div>
+      )}
+
+      {/* Subtítulos y botones abajo */}
+      {verso && paso?.tipo === "verso" && !done && (
+        <div className="absolute inset-x-0 bottom-0 px-3 pb-[max(env(safe-area-inset-bottom),14px)] pt-16" style={{ background: "linear-gradient(180deg, transparent, rgba(8,3,18,.82) 30%, rgba(8,3,18,.95))" }}>
+          <div key={sacudir} className={`kk-letra mx-auto max-w-2xl rounded-3xl px-2 pb-2 pt-1 text-center ${sacudir ? "kk-shake" : ""}`} style={{ boxShadow: verso.dorado ? `0 0 0 2px ${K.oro}, 0 0 36px -6px ${K.oro}` : undefined }}>
+            {verso.dorado && <p className="font-display text-sm font-bold" style={{ color: K.oro }}>★ {tt("kkGolden")} ★</p>}
+            <p className="flex min-h-16 flex-wrap items-end justify-center gap-x-2 gap-y-3 pt-4 font-display text-4xl font-bold leading-tight sm:text-5xl" style={{ textShadow: "0 3px 14px rgba(0,0,0,.9)" }}>
               {verso.words.map((w, wi) => {
                 const isGap = wi === verso.gap;
                 const res = notas[verso.n];
@@ -673,19 +866,19 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
                     key={`${verso.n}-${wi}`}
                     className={`relative rounded-lg px-1 ${isGap && res && res !== "fallo" ? "kk-acierto" : ""}`}
                     style={{
-                      color: isGap && res === "fallo" ? "#FF8A8A" : "rgba(255,255,255,.85)",
-                      background: hueco ? "rgba(224,69,123,.25)" : undefined,
+                      color: isGap && res === "fallo" ? "#FF8A8A" : "rgba(255,255,255,.92)",
+                      background: hueco ? "rgba(224,69,123,.3)" : undefined,
                       outline: hueco ? `2px dashed ${K.magenta}` : undefined,
-                      filter: oculto ? "blur(7px)" : undefined,
+                      filter: oculto ? "blur(8px)" : undefined,
                       opacity: oculto ? 0.45 : 1,
                       transition: "filter .2s, opacity .2s",
                     }}
                   >
-                    {active && <span className="kk-ball absolute -top-4 left-1/2 h-3 w-3 rounded-full" style={{ background: K.magenta }} aria-hidden />}
+                    {active && <span className="kk-ball absolute -top-4 left-1/2 h-3 w-3 rounded-full" style={{ background: K.magenta, boxShadow: `0 0 12px ${K.magenta}` }} aria-hidden />}
                     {hueco && <Anillo tGap={pulsoDelHueco(show, verso.n) * beatSec} beatSec={beatSec} tiempo={tiempo} />}
                     {texto}
                     {!(isGap && res === "fallo") && !oculto && (
-                      <span aria-hidden className={`kk-sweep absolute inset-0 px-1 ${active ? "on" : sung ? "done" : ""}`} style={{ color: K.oro, textShadow: `0 0 18px ${K.oro}88` }}>
+                      <span aria-hidden className={`kk-sweep absolute inset-0 px-1 ${active ? "on" : sung ? "done" : ""}`} style={{ color: K.oro, textShadow: `0 0 18px ${K.oro}aa` }}>
                         {texto}
                       </span>
                     )}
@@ -693,38 +886,17 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
                 );
               })}
             </p>
-            <p className="mt-2 text-sm italic text-white/70">{verso.es}</p>
+            <p className="mt-2 text-sm italic text-white/80">{verso.es}</p>
             {siguiente && siguiente.vuelta === verso.vuelta && (
-              <p className="mt-2 truncate text-sm text-white/40">
+              <p className="mt-1 truncate text-xs text-white/45">
                 {tt("kkSigue")} <span className="font-display font-semibold">{siguiente.memoria ? siguiente.es : siguiente.words.map((w, i) => (i === siguiente.gap ? "…" : w)).join(" ")}</span>
               </p>
             )}
-          </>
-        ) : null}
-        <div className="absolute inset-x-0 bottom-0 h-1.5 bg-white/10">
-          <div className="h-full transition-all" style={{ width: `${Math.max(0, (beat / total) * 100)}%`, background: `linear-gradient(90deg, ${K.magenta}, ${K.oro})` }} />
-        </div>
-      </div>
-
-      {/* Cómo va cada verso, por vuelta */}
-      <div className="flex justify-center gap-3" aria-hidden>
-        {([1, 2, 3] as Vuelta[]).map((n) => (
-          <div key={n} className="flex gap-1">
-            {versos.filter((v) => v.vuelta === n).map((v) => {
-              const g = notas[v.n];
-              const actual = verso?.n === v.n;
-              return <span key={v.n} className="h-2 w-5 rounded-full sm:w-7" style={{ background: g === "perfecto" ? K.oro : g === "bien" || g === "justo" ? "#F7E6C4" : g === "fallo" ? "#7A3355" : actual ? K.magenta : "rgba(255,255,255,.15)", outline: v.dorado ? `1px solid ${K.oro}` : undefined }} />;
-            })}
           </div>
-        ))}
-      </div>
-
-      {verso && (
-        <>
           {ayudas[verso.n] && opciones.length === 2 && notas[verso.n] === undefined && (
-            <p className="text-center text-xs font-semibold" style={{ color: K.cuerda }}>{tt("kkHelp")}</p>
+            <p className="mt-1 text-center text-xs font-semibold" style={{ color: K.cuerda }}>{tt("kkHelp")}</p>
           )}
-          <div className={`grid gap-2 ${opciones.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+          <div className={`mx-auto mt-2 grid max-w-2xl gap-2 ${opciones.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
             {opciones.map((w) => {
               const elegida = notas[verso.n] !== undefined && w === verso.correcta;
               return (
@@ -733,10 +905,10 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
                   type="button"
                   disabled={!answerOpen}
                   onClick={() => answer(w)}
-                  className="min-h-16 rounded-2xl px-2 font-display text-lg font-bold transition active:scale-95 disabled:opacity-35 sm:text-xl"
+                  className="min-h-16 rounded-2xl px-2 font-display text-lg font-bold backdrop-blur-md transition active:scale-95 disabled:opacity-35 sm:text-xl"
                   style={{
-                    background: elegida ? (notas[verso.n] === "fallo" ? "rgba(255,138,138,.25)" : `${K.oro}33`) : "rgba(255,255,255,.1)",
-                    boxShadow: answerOpen ? `0 0 0 2px ${K.magenta}, 0 0 24px -4px ${K.magenta}` : "none",
+                    background: elegida ? (notas[verso.n] === "fallo" ? "rgba(255,138,138,.3)" : `${K.oro}44`) : "rgba(255,255,255,.12)",
+                    boxShadow: answerOpen ? `0 0 0 2px ${K.magenta}, 0 0 26px -4px ${K.magenta}` : "none",
                   }}
                 >
                   {w}
@@ -744,50 +916,9 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
               );
             })}
           </div>
-        </>
+        </div>
       )}
-      {sinEmpezar && (
-        <>
-          <button
-            type="button"
-            onClick={() => void alternarMicrofono()}
-            aria-pressed={micEstado === "listo"}
-            className="flex w-full items-center gap-3 rounded-2xl p-3 text-left ring-1 transition"
-            style={{ background: micEstado === "listo" ? "rgba(224,69,123,.22)" : "rgba(255,255,255,.07)", borderColor: K.magenta, boxShadow: micEstado === "listo" ? `0 0 0 2px ${K.magenta}` : undefined }}
-          >
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full" style={{ background: micEstado === "listo" ? K.magenta : "rgba(255,255,255,.12)" }}>
-              {micEstado === "listo" ? <Mic className="h-5 w-5 text-white" /> : <MicOff className="h-5 w-5 text-white/80" />}
-            </span>
-            <span className="min-w-0 flex-1">
-              <b className="block font-display">{micEstado === "listo" ? `${tt("kkMicListo")} ✓` : tt("kkMicOn")}</b>
-              <span className="block text-xs text-white/70">{micEstado === "sin-permiso" ? tt("kkMic") : tt("kkMicInfo")}</span>
-            </span>
-            <span className="h-7 w-12 shrink-0 rounded-full p-1 transition" style={{ background: micEstado === "listo" ? K.magenta : "rgba(255,255,255,.2)" }} aria-hidden>
-              <span className="block h-5 w-5 rounded-full bg-white transition-transform" style={{ transform: micEstado === "listo" ? "translateX(20px)" : "none" }} />
-            </span>
-          </button>
-          <button
-            type="button"
-            className="flex h-16 w-full items-center justify-center gap-3 rounded-2xl font-display text-xl font-bold shadow-lg transition active:scale-[.98] disabled:opacity-60"
-            style={{ background: K.oro, color: K.noche }}
-            onClick={empezar}
-            disabled={micEstado === "pidiendo"}
-          >
-            <Play className="h-6 w-6" fill="currentColor" /> {tt("kkPlay")}
-          </button>
-          <button type="button" onClick={onComo} className="mx-auto flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold text-white/80">
-            <HelpCircle className="h-4 w-4" /> {tt("kkHowBtn")}
-          </button>
-        </>
-      )}
-      {playing && (
-        <QuitGameButton
-          className="text-white"
-          kind="song"
-          onQuit={() => { arpa.current.stop(); audio.current?.pause(); setPlaying(false); setBeat(total); }}
-        />
-      )}
-    </section>
+    </div>
   );
 }
 
