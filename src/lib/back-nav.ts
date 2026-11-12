@@ -14,6 +14,8 @@ export function showsBackButton(pathname: string): boolean {
   if (p.startsWith("/trivia/") || p === "/teclado" || p === "/pronunciar") return false;
   // El lector de libros tiene «←» arriba y sus botones de página abajo.
   if (p.startsWith("/leer/")) return false;
+  // El visor de letras de Purahéi tiene su propia flecha y su botón abajo.
+  if (p.startsWith("/purahei/obra/")) return false;
   return !HIDDEN.has(p);
 }
 

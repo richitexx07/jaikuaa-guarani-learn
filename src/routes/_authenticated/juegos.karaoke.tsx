@@ -1,6 +1,9 @@
 import { useJU } from "@/lib/i18n-juegos-ui";
 import { callarVoz } from "@/lib/voz-unica";
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { cancionesDeArtistas, karaokeDeObra } from "@/lib/purahei.functions";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GameStage } from "@/components/games/game-stage";
 import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from "@/components/games/reto";
@@ -25,6 +28,9 @@ import { CompartirCancion } from "@/components/games/karaoke/compartir-cancion";
 import { HelpCircle, Mic, MicOff, Square, Play, Volume2, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/juegos/karaoke")({
+  // ?obra=<id>: abre directo la canción de un artista de Purahéi Jaikuaa.
+  validateSearch: (s: Record<string, unknown>): { obra?: string } =>
+    typeof s.obra === "string" && /^[0-9a-f-]{36}$/i.test(s.obra) ? { obra: s.obra } : {},
   head: () => ({
     meta: [
       { title: "Purahéi Karaoke | Jaikuaa" },
@@ -185,12 +191,26 @@ function tutoVisto(): boolean {
 function Karaoke() {
   const partida = useRetoPartida("karaoke", { total: 20 });
   const { reto, seed, otra } = partida;
-  const [songId, setSongId] = useState<string | null>(() => reto?.x ?? null);
+  const { obra } = Route.useSearch();
+  const [songId, setSongId] = useState<string | null>(() => reto?.x ?? (obra ? `o:${obra}` : null));
   // Si el reto llega después (se carga de internet), abre su canción.
   useEffect(() => { if (reto?.x) setSongId(reto.x); }, [reto?.id, reto?.x]);
+  useEffect(() => { if (obra) setSongId(`o:${obra}`); }, [obra]);
   const { idx, loading } = useJuegoTextos();
   const tt = useJU();
-  const songs = useMemo(() => applyKaraoke(SONGS, idx), [idx]);
+  // Las canciones de artistas (Purahéi Jaikuaa) se cargan cuando se eligen.
+  const obraId = songId?.startsWith("o:") ? songId.slice(2) : null;
+  const cargarObra = useServerFn(karaokeDeObra);
+  const { data: deArtista, isLoading: cargandoObra } = useQuery({
+    queryKey: ["karaoke-obra", obraId],
+    queryFn: () => cargarObra({ data: { id: obraId! } }),
+    enabled: !!obraId,
+    staleTime: 10 * 60 * 1000,
+  });
+  const songs = useMemo(() => {
+    const base = applyKaraoke(SONGS, idx);
+    return deArtista?.song ? [...base, deArtista.song] : base;
+  }, [idx, deArtista]);
   const song = songs.find((s) => s.id === songId) ?? null;
   const show = useMemo(() => (song ? armarShow(song, seed) : null), [song, seed]);
   const maximo = useMemo(() => (show ? puntajeMaximo(show.versos) : 0), [show]);
@@ -207,10 +227,10 @@ function Karaoke() {
       background={`radial-gradient(90% 55% at 50% 0%, #4A1F7A 0%, ${K.violeta} 45%, ${K.noche} 100%)`}
     >
       <ValidationNotice />
-      {loading ? (
+      {loading || (obraId && cargandoObra) ? (
         <p className="py-16 text-center text-sm text-white/70">{tt("kkLoading")}</p>
       ) : !song || !show ? (
-        <Setlist songs={songs} onPick={elegir} onComo={() => setComo(true)} />
+        <Setlist songs={songs} onPick={elegir} onComo={() => setComo(true)} onObra={(id) => elegir({ id: `o:${id}` } as Song)} />
       ) : (
         <>
           <RetoBanner partida={partida} extra={song.id} total={maximo} coincide={!reto || reto.x === song.id} className="mb-3" />
@@ -267,8 +287,10 @@ function ComoSeJuega({ onClose }: { onClose: () => void }) {
 
 /* ------------------------------------ Lista de canciones ------------------------------------ */
 
-function Setlist({ songs, onPick, onComo }: { songs: Song[]; onPick: (s: Song) => void; onComo: () => void }) {
+function Setlist({ songs, onPick, onComo, onObra }: { songs: Song[]; onPick: (s: Song) => void; onComo: () => void; onObra: (id: string) => void }) {
   const tt = useJU();
+  const listarArtistas = useServerFn(cancionesDeArtistas);
+  const { data: deArtistas } = useQuery({ queryKey: ["karaoke-artistas"], queryFn: () => listarArtistas(), staleTime: 10 * 60 * 1000 });
   const [records, setRecords] = useState<Record<string, Record_ | null>>({});
   // El escenario 3D se baja mientras se elige la canción.
   useEffect(() => { precargarEscenario3D(); }, []);
@@ -292,9 +314,27 @@ function Setlist({ songs, onPick, onComo }: { songs: Song[]; onPick: (s: Song) =
         </div>
         <div className="h-3" style={{ background: `repeating-linear-gradient(90deg, ${K.oro} 0 14px, ${K.magenta} 14px 28px)` }} />
       </div>
+      {(deArtistas?.canciones.length ?? 0) > 0 && (
+        <>
+          <h2 className="mt-8 font-display text-xl font-bold">Canciones de artistas paraguayos</h2>
+          <div className="mt-3 space-y-3">
+            {deArtistas!.canciones.map((c) => (
+              <button key={c.id} type="button" onClick={() => onObra(c.id)} className="kk-song flex w-full items-center gap-4 rounded-2xl p-3 text-left ring-1 transition active:scale-[.99]" style={{ background: "rgba(246,196,69,.1)", borderColor: K.oro }}>
+                <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full" style={{ background: K.oro, color: K.noche }}><Mic className="h-6 w-6" /></span>
+                <span className="min-w-0 flex-1">
+                  <b className="block truncate font-display text-lg">{c.titulo}</b>
+                  <span className="text-sm text-white/70">{c.artista}</span>
+                </span>
+                <Play className="h-5 w-5 shrink-0" fill="currentColor" style={{ color: K.oro }} />
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+      <a href="/purahei" className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-white/10 px-4 text-sm font-semibold ring-1 ring-white/20">Conocé a los artistas de Purahéi Jaikuaa</a>
       <h2 className="mt-8 font-display text-xl font-bold">{tt("kkChoose")}</h2>
       <div className="mt-3 space-y-3">
-        {songs.map((s) => {
+        {songs.filter((s) => !s.id.startsWith("o:")).map((s) => {
           const d = dificultad(s.bpm);
           const r = records[s.id];
           return (

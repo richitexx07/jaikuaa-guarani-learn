@@ -22,7 +22,7 @@ import { JaiLauncher } from "@/components/jai-launcher";
 // En /validar los botones de decisión van abajo: Jai no debe taparlos.
 // /ficha-auspiciantes es una hoja comercial para imprimir: Jai no debe flotar sobre ella.
 // También en la trivia, el teclado y «Pronunciá»: ahí abajo están los botones de la actividad y el Jai flotante los tapaba.
-const HIDDEN_PREFIXES = ["/juegos", "/trivia/", "/teclado", "/pronunciar", "/admin", "/piloto-ateneo", "/certificado", "/validar", "/docente/juegos", "/ficha-auspiciantes", "/bienvenida", "/leer/"];
+const HIDDEN_PREFIXES = ["/juegos", "/trivia/", "/teclado", "/pronunciar", "/admin", "/piloto-ateneo", "/certificado", "/validar", "/docente/juegos", "/ficha-auspiciantes", "/bienvenida", "/leer/", "/purahei/obra/"];
 
 
 type Msg =

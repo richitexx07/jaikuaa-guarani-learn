@@ -6,7 +6,7 @@ import { AI_GUARANI_TOOLS_ENABLED } from "@/lib/features";
 import { BrandLogo } from "@/components/brand-logo";
 import { AppLanguageToggle } from "@/components/app-language-toggle";
 import { useT } from "@/lib/i18n";
-import {
+import { Music2,
   BarChart3,
   BookOpen,
   CheckCircle2,
@@ -123,6 +123,7 @@ function StaffShortcuts() {
         <StaffLink to="/docente/juegos" icon={Gamepad2} label="Guaraní de los juegos" />
         <StaffLink to="/cuaderno" icon={NotebookPen} label="Cuaderno digital del aula" />
         <StaffLink to="/mostrador/editar" icon={Stethoscope} label="Frases del mostrador" />
+        <StaffLink to="/admin/purahei" icon={Music2} label="Purahéi: artistas y obras" />
         <StaffLink to="/aula/docente" icon={School} label="Mis aulas" />
         <StaffLink to="/admin/corpus" icon={CheckCircle2} label="Bandeja de validación" />
         <StaffLink to="/validacion" icon={RefreshCw} label="Circuito de validación" />

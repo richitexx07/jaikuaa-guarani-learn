@@ -66,6 +66,8 @@ import { Route as AuthenticatedValidacionRouteImport } from './routes/_authentic
 import { Route as AuthenticatedValidarRouteImport } from './routes/_authenticated/validar'
 import { Route as ApiRecordatorioRouteImport } from './routes/api/recordatorio'
 import { Route as ApiTutorRouteImport } from './routes/api/tutor'
+import { Route as PuraheiIndexRouteImport } from './routes/purahei.index'
+import { Route as PuraheiSlugRouteImport } from './routes/purahei.$slug'
 import { Route as StudioIndexRouteImport } from './routes/studio.index'
 import { Route as StudioSplatRouteImport } from './routes/studio.$'
 import { Route as VerificarCodeRouteImport } from './routes/verificar.$code'
@@ -74,6 +76,7 @@ import { Route as AuthenticatedAdminInformeAuspicianteRouteImport } from './rout
 import { Route as AuthenticatedAdminJaiRouteImport } from './routes/_authenticated/admin.jai'
 import { Route as AuthenticatedAdminLibrosRouteImport } from './routes/_authenticated/admin.libros'
 import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
+import { Route as AuthenticatedAdminPuraheiRouteImport } from './routes/_authenticated/admin.purahei'
 import { Route as AuthenticatedAulaIndexRouteImport } from './routes/_authenticated/aula.index'
 import { Route as AuthenticatedAulaIdRouteImport } from './routes/_authenticated/aula.$id'
 import { Route as AuthenticatedAulaDocenteRouteImport } from './routes/_authenticated/aula.docente'
@@ -110,6 +113,7 @@ import { Route as AuthenticatedPracticaRegistroRouteImport } from './routes/_aut
 import { Route as AuthenticatedTriviaIndexRouteImport } from './routes/_authenticated/trivia.index'
 import { Route as AuthenticatedTriviaCategoryRouteImport } from './routes/_authenticated/trivia.$category'
 import { Route as ApiPublicPagoparRouteImport } from './routes/api/public/pagopar'
+import { Route as PuraheiObraIdRouteImport } from './routes/purahei.obra.$id'
 import { Route as AuthenticatedCursoLangIndexRouteImport } from './routes/_authenticated/curso.$lang.index'
 import { Route as AuthenticatedGuaraniEscolarTemaIndexRouteImport } from './routes/_authenticated/guarani-escolar.tema.index'
 import { Route as AuthenticatedGuaraniEscolarTemaTopicRouteImport } from './routes/_authenticated/guarani-escolar.tema.$topic'
@@ -404,6 +408,16 @@ const ApiTutorRoute = ApiTutorRouteImport.update({
   path: '/api/tutor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PuraheiIndexRoute = PuraheiIndexRouteImport.update({
+  id: '/purahei/',
+  path: '/purahei/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PuraheiSlugRoute = PuraheiSlugRouteImport.update({
+  id: '/purahei/$slug',
+  path: '/purahei/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudioIndexRoute = StudioIndexRouteImport.update({
   id: '/studio/',
   path: '/studio/',
@@ -446,6 +460,12 @@ const AuthenticatedAdminNoticiasRoute =
   AuthenticatedAdminNoticiasRouteImport.update({
     id: '/admin/noticias',
     path: '/admin/noticias',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminPuraheiRoute =
+  AuthenticatedAdminPuraheiRouteImport.update({
+    id: '/admin/purahei',
+    path: '/admin/purahei',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAulaIndexRoute = AuthenticatedAulaIndexRouteImport.update({
@@ -658,6 +678,11 @@ const ApiPublicPagoparRoute = ApiPublicPagoparRouteImport.update({
   path: '/api/public/pagopar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PuraheiObraIdRoute = PuraheiObraIdRouteImport.update({
+  id: '/purahei/obra/$id',
+  path: '/purahei/obra/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCursoLangIndexRoute =
   AuthenticatedCursoLangIndexRouteImport.update({
     id: '/',
@@ -746,14 +771,17 @@ export interface FileRoutesByFullPath {
   '/validar': typeof AuthenticatedValidarRoute
   '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar/$code': typeof VerificarCodeRoute
+  '/purahei/': typeof PuraheiIndexRoute
   '/studio/': typeof StudioIndexRoute
   '/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/admin/libros': typeof AuthenticatedAdminLibrosRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/admin/purahei': typeof AuthenticatedAdminPuraheiRoute
   '/aula/$id': typeof AuthenticatedAulaIdRoute
   '/aula/docente': typeof AuthenticatedAulaDocenteRoute
   '/curso/$lang': typeof AuthenticatedCursoLangRouteWithChildren
@@ -783,6 +811,7 @@ export interface FileRoutesByFullPath {
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
   '/api/public/pagopar': typeof ApiPublicPagoparRoute
+  '/purahei/obra/$id': typeof PuraheiObraIdRoute
   '/aula/': typeof AuthenticatedAulaIndexRoute
   '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/guarani-escolar/': typeof AuthenticatedGuaraniEscolarIndexRoute
@@ -852,14 +881,17 @@ export interface FileRoutesByTo {
   '/validar': typeof AuthenticatedValidarRoute
   '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar/$code': typeof VerificarCodeRoute
+  '/purahei': typeof PuraheiIndexRoute
   '/studio': typeof StudioIndexRoute
   '/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/admin/libros': typeof AuthenticatedAdminLibrosRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/admin/purahei': typeof AuthenticatedAdminPuraheiRoute
   '/aula/$id': typeof AuthenticatedAulaIdRoute
   '/aula/docente': typeof AuthenticatedAulaDocenteRoute
   '/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
@@ -887,6 +919,7 @@ export interface FileRoutesByTo {
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
   '/api/public/pagopar': typeof ApiPublicPagoparRoute
+  '/purahei/obra/$id': typeof PuraheiObraIdRoute
   '/aula': typeof AuthenticatedAulaIndexRoute
   '/docente': typeof AuthenticatedDocenteIndexRoute
   '/guarani-escolar': typeof AuthenticatedGuaraniEscolarIndexRoute
@@ -959,14 +992,17 @@ export interface FileRoutesById {
   '/_authenticated/validar': typeof AuthenticatedValidarRoute
   '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar/$code': typeof VerificarCodeRoute
+  '/purahei/': typeof PuraheiIndexRoute
   '/studio/': typeof StudioIndexRoute
   '/_authenticated/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/_authenticated/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/_authenticated/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/_authenticated/admin/libros': typeof AuthenticatedAdminLibrosRoute
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/_authenticated/admin/purahei': typeof AuthenticatedAdminPuraheiRoute
   '/_authenticated/aula/$id': typeof AuthenticatedAulaIdRoute
   '/_authenticated/aula/docente': typeof AuthenticatedAulaDocenteRoute
   '/_authenticated/curso/$lang': typeof AuthenticatedCursoLangRouteWithChildren
@@ -996,6 +1032,7 @@ export interface FileRoutesById {
   '/_authenticated/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/_authenticated/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
   '/api/public/pagopar': typeof ApiPublicPagoparRoute
+  '/purahei/obra/$id': typeof PuraheiObraIdRoute
   '/_authenticated/aula/': typeof AuthenticatedAulaIndexRoute
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/guarani-escolar/': typeof AuthenticatedGuaraniEscolarIndexRoute
@@ -1068,14 +1105,17 @@ export interface FileRouteTypes {
     | '/validar'
     | '/api/recordatorio'
     | '/api/tutor'
+    | '/purahei/$slug'
     | '/studio/$'
     | '/verificar/$code'
+    | '/purahei/'
     | '/studio/'
     | '/admin/corpus'
     | '/admin/informe-auspiciante'
     | '/admin/jai'
     | '/admin/libros'
     | '/admin/noticias'
+    | '/admin/purahei'
     | '/aula/$id'
     | '/aula/docente'
     | '/curso/$lang'
@@ -1105,6 +1145,7 @@ export interface FileRouteTypes {
     | '/practica/registro'
     | '/trivia/$category'
     | '/api/public/pagopar'
+    | '/purahei/obra/$id'
     | '/aula/'
     | '/docente/'
     | '/guarani-escolar/'
@@ -1174,14 +1215,17 @@ export interface FileRouteTypes {
     | '/validar'
     | '/api/recordatorio'
     | '/api/tutor'
+    | '/purahei/$slug'
     | '/studio/$'
     | '/verificar/$code'
+    | '/purahei'
     | '/studio'
     | '/admin/corpus'
     | '/admin/informe-auspiciante'
     | '/admin/jai'
     | '/admin/libros'
     | '/admin/noticias'
+    | '/admin/purahei'
     | '/aula/$id'
     | '/aula/docente'
     | '/docente/constancia'
@@ -1209,6 +1253,7 @@ export interface FileRouteTypes {
     | '/practica/registro'
     | '/trivia/$category'
     | '/api/public/pagopar'
+    | '/purahei/obra/$id'
     | '/aula'
     | '/docente'
     | '/guarani-escolar'
@@ -1280,14 +1325,17 @@ export interface FileRouteTypes {
     | '/_authenticated/validar'
     | '/api/recordatorio'
     | '/api/tutor'
+    | '/purahei/$slug'
     | '/studio/$'
     | '/verificar/$code'
+    | '/purahei/'
     | '/studio/'
     | '/_authenticated/admin/corpus'
     | '/_authenticated/admin/informe-auspiciante'
     | '/_authenticated/admin/jai'
     | '/_authenticated/admin/libros'
     | '/_authenticated/admin/noticias'
+    | '/_authenticated/admin/purahei'
     | '/_authenticated/aula/$id'
     | '/_authenticated/aula/docente'
     | '/_authenticated/curso/$lang'
@@ -1317,6 +1365,7 @@ export interface FileRouteTypes {
     | '/_authenticated/practica/registro'
     | '/_authenticated/trivia/$category'
     | '/api/public/pagopar'
+    | '/purahei/obra/$id'
     | '/_authenticated/aula/'
     | '/_authenticated/docente/'
     | '/_authenticated/guarani-escolar/'
@@ -1371,10 +1420,13 @@ export interface RootRouteChildren {
   ZhRoute: typeof ZhRoute
   ApiRecordatorioRoute: typeof ApiRecordatorioRoute
   ApiTutorRoute: typeof ApiTutorRoute
+  PuraheiSlugRoute: typeof PuraheiSlugRoute
   StudioSplatRoute: typeof StudioSplatRoute
   VerificarCodeRoute: typeof VerificarCodeRoute
+  PuraheiIndexRoute: typeof PuraheiIndexRoute
   StudioIndexRoute: typeof StudioIndexRoute
   ApiPublicPagoparRoute: typeof ApiPublicPagoparRoute
+  PuraheiObraIdRoute: typeof PuraheiObraIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1778,6 +1830,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTutorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/purahei/': {
+      id: '/purahei/'
+      path: '/purahei'
+      fullPath: '/purahei/'
+      preLoaderRoute: typeof PuraheiIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/purahei/$slug': {
+      id: '/purahei/$slug'
+      path: '/purahei/$slug'
+      fullPath: '/purahei/$slug'
+      preLoaderRoute: typeof PuraheiSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/studio/': {
       id: '/studio/'
       path: '/studio'
@@ -1832,6 +1898,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/noticias'
       fullPath: '/admin/noticias'
       preLoaderRoute: typeof AuthenticatedAdminNoticiasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/purahei': {
+      id: '/_authenticated/admin/purahei'
+      path: '/admin/purahei'
+      fullPath: '/admin/purahei'
+      preLoaderRoute: typeof AuthenticatedAdminPuraheiRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/aula/': {
@@ -2086,6 +2159,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPagoparRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/purahei/obra/$id': {
+      id: '/purahei/obra/$id'
+      path: '/purahei/obra/$id'
+      fullPath: '/purahei/obra/$id'
+      preLoaderRoute: typeof PuraheiObraIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/curso/$lang/': {
       id: '/_authenticated/curso/$lang/'
       path: '/'
@@ -2206,6 +2286,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminJaiRoute: typeof AuthenticatedAdminJaiRoute
   AuthenticatedAdminLibrosRoute: typeof AuthenticatedAdminLibrosRoute
   AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
+  AuthenticatedAdminPuraheiRoute: typeof AuthenticatedAdminPuraheiRoute
   AuthenticatedAulaIdRoute: typeof AuthenticatedAulaIdRoute
   AuthenticatedAulaDocenteRoute: typeof AuthenticatedAulaDocenteRoute
   AuthenticatedCursoLangRoute: typeof AuthenticatedCursoLangRouteWithChildren
@@ -2266,6 +2347,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminJaiRoute: AuthenticatedAdminJaiRoute,
   AuthenticatedAdminLibrosRoute: AuthenticatedAdminLibrosRoute,
   AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
+  AuthenticatedAdminPuraheiRoute: AuthenticatedAdminPuraheiRoute,
   AuthenticatedAulaIdRoute: AuthenticatedAulaIdRoute,
   AuthenticatedAulaDocenteRoute: AuthenticatedAulaDocenteRoute,
   AuthenticatedCursoLangRoute: AuthenticatedCursoLangRouteWithChildren,
@@ -2344,10 +2426,13 @@ const rootRouteChildren: RootRouteChildren = {
   ZhRoute: ZhRoute,
   ApiRecordatorioRoute: ApiRecordatorioRoute,
   ApiTutorRoute: ApiTutorRoute,
+  PuraheiSlugRoute: PuraheiSlugRoute,
   StudioSplatRoute: StudioSplatRoute,
   VerificarCodeRoute: VerificarCodeRoute,
+  PuraheiIndexRoute: PuraheiIndexRoute,
   StudioIndexRoute: StudioIndexRoute,
   ApiPublicPagoparRoute: ApiPublicPagoparRoute,
+  PuraheiObraIdRoute: PuraheiObraIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
