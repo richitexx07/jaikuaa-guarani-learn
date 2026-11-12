@@ -16,6 +16,8 @@ export function showsBackButton(pathname: string): boolean {
   if (p.startsWith("/leer/")) return false;
   // El visor de letras de Purahéi tiene su propia flecha y su botón abajo.
   if (p.startsWith("/purahei/obra/")) return false;
+  // La constancia del convenio se imprime y tiene su «Volver» arriba.
+  if (p.startsWith("/constancia-convenio/")) return false;
   return !HIDDEN.has(p);
 }
 

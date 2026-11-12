@@ -37,7 +37,7 @@ export function PreLaunchBanner({ invitado = false }: { invitado?: boolean }) {
   if (invitado) {
     return (
       <>
-        <div role="note" className="flex items-center justify-center gap-2 border-b border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary sm:text-sm">
+        <div role="note" className="print:hidden flex items-center justify-center gap-2 border-b border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary sm:text-sm">
           <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
           <span className="min-w-0 truncate">
             <strong>{t("pl.strong")}</strong> <span className="hidden sm:inline">{t("pl.short")}</span>
@@ -60,7 +60,7 @@ export function PreLaunchBanner({ invitado = false }: { invitado?: boolean }) {
     <>
       <div
         role="note"
-        className="flex items-center justify-center gap-2 border-b border-primary/20 bg-primary/5 px-4 py-1.5 text-center text-xs font-medium text-primary sm:py-2 sm:text-sm"
+        className="print:hidden flex items-center justify-center gap-2 border-b border-primary/20 bg-primary/5 px-4 py-1.5 text-center text-xs font-medium text-primary sm:py-2 sm:text-sm"
       >
         <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden />
         {/* En el celular, una sola línea corta: el aviso largo comía media pantalla. */}

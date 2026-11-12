@@ -12,7 +12,7 @@ import { LIB_COLORES, Nanduti } from "@/components/libreria/arte";
 import { CatalogoLibreria } from "@/components/libreria/catalogo";
 import {
   BookOpen, Headphones, Globe2, HandCoins, Stethoscope, Scale, Languages,
-  Feather, GraduationCap, Send, FileText, Mic, CheckCircle2, Building2, PenLine, ArrowRight,
+  Feather, GraduationCap, Send, FileText, Mic, CheckCircle2, Building2, PenLine, ArrowRight, FileSignature, ChevronRight,
 } from "lucide-react";
 
 export const Route = createFileRoute("/libreria")({
@@ -270,6 +270,18 @@ function LibreriaPage() {
                 <p className="mt-0.5 text-sm text-white/80">Tarda un minuto. Se abre WhatsApp con tus datos listos para enviar.</p>
               </div>
             </div>
+            <Link
+              to="/convenio/$programa"
+              params={{ programa: "libreria" }}
+              className="flex items-center gap-3 border-b border-black/5 bg-[#FFF3D6] px-6 py-4 text-[#0F2038] transition hover:brightness-[.98] sm:px-8"
+            >
+              <FileSignature className="h-6 w-6 shrink-0" aria-hidden />
+              <span className="min-w-0 flex-1">
+                <b className="block font-display">¿Ya decidiste publicar? Firmá la autorización en línea</b>
+                <span className="text-sm">Con tu correo confirmado, sin imprimir nada, y te queda una constancia verificable.</span>
+              </span>
+              <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
+            </Link>
             <form onSubmit={enviar} className="space-y-4 p-6 sm:p-8">
               <div className="grid grid-cols-2 gap-2">
                 {(["autor", "editorial"] as const).map((k) => (

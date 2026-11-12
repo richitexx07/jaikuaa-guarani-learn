@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpenText, Handshake, Loader2, MapPin, MessageCircle, Mic2, Music2, ShieldCheck } from "lucide-react";
+import { BookOpenText, FileSignature, Handshake, Loader2, MapPin, MessageCircle, Mic2, Music2, ShieldCheck } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { MarketingHeader } from "@/components/marketing/page-parts";
 import { Nanduti } from "@/components/libreria/arte";
@@ -26,8 +26,8 @@ export const Route = createFileRoute("/purahei/")({
 });
 
 const PASOS = [
-  { icon: MessageCircle, t: "Nos escribís", d: "Nos contás quién sos y qué canciones querés compartir." },
-  { icon: Handshake, t: "Firmamos el convenio", d: "Una carilla clara: qué se usa, por cuánto tiempo y cómo se retira. Sin letra chica." },
+  { icon: FileSignature, t: "Firmás en línea", d: "Llenás tus datos, marcás qué autorizás y firmás con tu correo confirmado. Sin imprimir nada." },
+  { icon: Handshake, t: "Te queda tu constancia", d: "Con un código que cualquiera puede verificar. Podés pedir el retiro cuando quieras." },
   { icon: ShieldCheck, t: "Docentes revisan la letra", d: "Tu letra en guaraní y su traducción las revisan docentes especialistas." },
   { icon: Mic2, t: "Salís a la vitrina", d: "Tu ficha, tu voz y tu canción en el karaoke, con tu WhatsApp para que te contraten directo." },
 ];
@@ -36,7 +36,7 @@ function VitrinaPage() {
   const cargar = useServerFn(vitrinaPurahei);
   const { data, isLoading } = useQuery({ queryKey: ["purahei-vitrina"], queryFn: () => cargar() });
   const artistas = data?.artistas ?? [];
-  const sumarme = `https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent("Mba'éichapa. Soy artista y quiero sumarme a Purahéi Jaikuaa.")}`;
+  const sumarme = `https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent("Mba'éichapa. Soy artista y tengo una consulta sobre Purahéi Jaikuaa.")}`;
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <MarketingHeader />
@@ -64,8 +64,11 @@ function VitrinaPage() {
           ) : artistas.length === 0 ? (
             <div className="mt-6 rounded-3xl border border-dashed border-border p-8 text-center">
               <Mic2 className="mx-auto h-10 w-10 text-primary" aria-hidden />
-              <p className="mt-3 font-display text-xl font-bold">Muy pronto, los primeros artistas</p>
-              <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Estamos firmando con los primeros músicos. Cada canción sale con el permiso de sus dueños y la letra revisada por docentes especialistas.</p>
+              <p className="mt-3 font-display text-xl font-bold">Sé de los primeros artistas de Purahéi</p>
+              <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Estamos sumando a los primeros músicos. Cada canción sale con el permiso de sus dueños y la letra revisada por docentes especialistas.</p>
+              <Link to="/convenio/$programa" params={{ programa: "purahei" }} className="mt-4 inline-flex min-h-12 items-center gap-2 rounded-2xl px-5 font-display font-bold" style={{ background: PH.dorado, color: PH.noche }}>
+                <FileSignature className="h-5 w-5" aria-hidden /> Soy artista: quiero sumarme
+              </Link>
             </div>
           ) : (
             <ul className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -103,8 +106,11 @@ function VitrinaPage() {
               ))}
             </ol>
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href={sumarme} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-2xl px-5 font-display font-bold text-white" style={{ background: PH.rojo }}>
-                <MessageCircle className="h-5 w-5" aria-hidden /> Quiero sumarme
+              <Link to="/convenio/$programa" params={{ programa: "purahei" }} className="inline-flex min-h-12 items-center gap-2 rounded-2xl px-5 font-display font-bold text-white" style={{ background: PH.rojo }}>
+                <FileSignature className="h-5 w-5" aria-hidden /> Quiero sumarme: firmar en línea
+              </Link>
+              <a href={sumarme} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-2xl px-5 font-display font-bold text-primary ring-1 ring-border">
+                <MessageCircle className="h-5 w-5" aria-hidden /> Tengo dudas
               </a>
               <Link to="/libreria" className="inline-flex min-h-12 items-center gap-2 rounded-2xl px-5 font-display font-bold text-primary ring-1 ring-border">
                 <BookOpenText className="h-5 w-5" aria-hidden /> Ver la Librería

@@ -17,6 +17,7 @@ import { Music2,
   Keyboard,
   Languages,
   MessageCircleQuestion,
+  FileSignature,
   Mic2,
   MessagesSquare,
   Newspaper,
@@ -58,6 +59,7 @@ import { OfflinePackCard } from "@/components/offline/offline-pack-card";
 import { AulaPendientes } from "@/components/aula/aula-pendientes";
 import { NovedadLibreria } from "@/components/libreria/novedad-libreria";
 import { NovedadPurahei } from "@/components/purahei/novedad-purahei";
+import { ConvenioPendiente } from "@/components/convenio-pendiente";
 import { MisLibrosAcceso } from "@/components/libreria/mis-libros-acceso";
 import { RetoCard } from "@/components/games/reto-card";
 import jaiImg from "@/assets/jai/jai-saluda.webp";
@@ -134,6 +136,7 @@ function StaffShortcuts() {
         {data.isAdmin && <StaffLink href="/studio" icon={FlaskConical} label="Jaikuaa Studio · motor en desarrollo" />}
         {data.isAdmin && <StaffLink to="/admin/noticias" icon={Newspaper} label="Noticias para aprobar" />}
         {data.isAdmin && <StaffLink to="/admin/libros" icon={BookOpen} label="Librería: libros y accesos" />}
+        {data.isAdmin && <StaffLink to="/admin/convenios" icon={FileSignature} label="Convenios firmados (artistas y autores)" />}
         {data.isAdmin && <StaffLink to="/admin/jai" icon={MessageCircleQuestion} label="Qué le preguntan a Jai" />}
       </div>
     </section>
@@ -500,6 +503,7 @@ function Dashboard() {
             </div>
           </div>
 
+          <ConvenioPendiente />
           <ResumeCard />
 
           {/* 2. TRES BOTONES GIGANTES */}

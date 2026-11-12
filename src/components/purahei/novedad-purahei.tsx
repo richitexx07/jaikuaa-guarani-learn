@@ -3,14 +3,13 @@
  *
  * Un escenario de noche: un reflector dorado cae sobre el Jai cantor, el ñandutí brilla atrás,
  * del micrófono sale la onda de la voz y suben notitas. Dos caminos claros: ver los artistas
- * o, si sos artista, escribirnos para sumarte.
+ * o, si sos artista, firmar en línea para sumarte.
  */
 import { Link } from "@tanstack/react-router";
-import { MessageCircle, Mic2 } from "lucide-react";
+import { FileSignature, Mic2 } from "lucide-react";
 import { useAppLang, type AppLang } from "@/lib/i18n";
 import { Nanduti } from "@/components/libreria/arte";
 import { PH } from "@/components/purahei/partes";
-import { SUPPORT_WHATSAPP } from "@/lib/contact";
 import jaiCanta from "@/assets/karaoke/jai-canta.webp";
 
 type L = Record<AppLang, string>;
@@ -57,7 +56,6 @@ const CSS = `
 export function NovedadPurahei() {
   const lang = useAppLang();
   const t = (k: keyof typeof T) => T[k][lang] ?? T[k].es;
-  const sumarme = `https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent("Mba'éichapa. Soy artista y quiero sumarme a Purahéi Jaikuaa.")}`;
   return (
     <section
       aria-labelledby="novedad-purahei"
@@ -94,14 +92,13 @@ export function NovedadPurahei() {
             >
               <Mic2 className="h-5 w-5" aria-hidden /> {t("ver")}
             </Link>
-            <a
-              href={sumarme}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/convenio/$programa"
+              params={{ programa: "purahei" }}
               className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/35 px-4 text-sm font-semibold text-white transition hover:bg-white/10 active:scale-[.98]"
             >
-              <MessageCircle className="h-4 w-4" aria-hidden /> {t("sumarme")}
-            </a>
+              <FileSignature className="h-4 w-4" aria-hidden /> {t("sumarme")}
+            </Link>
           </div>
         </div>
 

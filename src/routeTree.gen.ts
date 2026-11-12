@@ -66,11 +66,14 @@ import { Route as AuthenticatedValidacionRouteImport } from './routes/_authentic
 import { Route as AuthenticatedValidarRouteImport } from './routes/_authenticated/validar'
 import { Route as ApiRecordatorioRouteImport } from './routes/api/recordatorio'
 import { Route as ApiTutorRouteImport } from './routes/api/tutor'
+import { Route as ConvenioProgramaRouteImport } from './routes/convenio.$programa'
 import { Route as PuraheiIndexRouteImport } from './routes/purahei.index'
 import { Route as PuraheiSlugRouteImport } from './routes/purahei.$slug'
 import { Route as StudioIndexRouteImport } from './routes/studio.index'
 import { Route as StudioSplatRouteImport } from './routes/studio.$'
+import { Route as VerificarConvenioCodigoRouteImport } from './routes/verificar-convenio.$codigo'
 import { Route as VerificarCodeRouteImport } from './routes/verificar.$code'
+import { Route as AuthenticatedAdminConveniosRouteImport } from './routes/_authenticated/admin.convenios'
 import { Route as AuthenticatedAdminCorpusRouteImport } from './routes/_authenticated/admin.corpus'
 import { Route as AuthenticatedAdminInformeAuspicianteRouteImport } from './routes/_authenticated/admin.informe-auspiciante'
 import { Route as AuthenticatedAdminJaiRouteImport } from './routes/_authenticated/admin.jai'
@@ -80,6 +83,7 @@ import { Route as AuthenticatedAdminPuraheiRouteImport } from './routes/_authent
 import { Route as AuthenticatedAulaIndexRouteImport } from './routes/_authenticated/aula.index'
 import { Route as AuthenticatedAulaIdRouteImport } from './routes/_authenticated/aula.$id'
 import { Route as AuthenticatedAulaDocenteRouteImport } from './routes/_authenticated/aula.docente'
+import { Route as AuthenticatedConstanciaConvenioCodigoRouteImport } from './routes/_authenticated/constancia-convenio.$codigo'
 import { Route as AuthenticatedCursoLangRouteImport } from './routes/_authenticated/curso.$lang'
 import { Route as AuthenticatedDocenteIndexRouteImport } from './routes/_authenticated/docente.index'
 import { Route as AuthenticatedDocenteConstanciaRouteImport } from './routes/_authenticated/docente.constancia'
@@ -408,6 +412,11 @@ const ApiTutorRoute = ApiTutorRouteImport.update({
   path: '/api/tutor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConvenioProgramaRoute = ConvenioProgramaRouteImport.update({
+  id: '/convenio/$programa',
+  path: '/convenio/$programa',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PuraheiIndexRoute = PuraheiIndexRouteImport.update({
   id: '/purahei/',
   path: '/purahei/',
@@ -428,11 +437,22 @@ const StudioSplatRoute = StudioSplatRouteImport.update({
   path: '/studio/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerificarConvenioCodigoRoute = VerificarConvenioCodigoRouteImport.update({
+  id: '/verificar-convenio/$codigo',
+  path: '/verificar-convenio/$codigo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VerificarCodeRoute = VerificarCodeRouteImport.update({
   id: '/verificar/$code',
   path: '/verificar/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminConveniosRoute =
+  AuthenticatedAdminConveniosRouteImport.update({
+    id: '/admin/convenios',
+    path: '/admin/convenios',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminCorpusRoute =
   AuthenticatedAdminCorpusRouteImport.update({
     id: '/admin/corpus',
@@ -482,6 +502,12 @@ const AuthenticatedAulaDocenteRoute =
   AuthenticatedAulaDocenteRouteImport.update({
     id: '/aula/docente',
     path: '/aula/docente',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConstanciaConvenioCodigoRoute =
+  AuthenticatedConstanciaConvenioCodigoRouteImport.update({
+    id: '/constancia-convenio/$codigo',
+    path: '/constancia-convenio/$codigo',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedCursoLangRoute = AuthenticatedCursoLangRouteImport.update({
@@ -771,11 +797,14 @@ export interface FileRoutesByFullPath {
   '/validar': typeof AuthenticatedValidarRoute
   '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/convenio/$programa': typeof ConvenioProgramaRoute
   '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
+  '/verificar-convenio/$codigo': typeof VerificarConvenioCodigoRoute
   '/verificar/$code': typeof VerificarCodeRoute
   '/purahei/': typeof PuraheiIndexRoute
   '/studio/': typeof StudioIndexRoute
+  '/admin/convenios': typeof AuthenticatedAdminConveniosRoute
   '/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
@@ -784,6 +813,7 @@ export interface FileRoutesByFullPath {
   '/admin/purahei': typeof AuthenticatedAdminPuraheiRoute
   '/aula/$id': typeof AuthenticatedAulaIdRoute
   '/aula/docente': typeof AuthenticatedAulaDocenteRoute
+  '/constancia-convenio/$codigo': typeof AuthenticatedConstanciaConvenioCodigoRoute
   '/curso/$lang': typeof AuthenticatedCursoLangRouteWithChildren
   '/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
   '/docente/juegos': typeof AuthenticatedDocenteJuegosRoute
@@ -881,11 +911,14 @@ export interface FileRoutesByTo {
   '/validar': typeof AuthenticatedValidarRoute
   '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/convenio/$programa': typeof ConvenioProgramaRoute
   '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
+  '/verificar-convenio/$codigo': typeof VerificarConvenioCodigoRoute
   '/verificar/$code': typeof VerificarCodeRoute
   '/purahei': typeof PuraheiIndexRoute
   '/studio': typeof StudioIndexRoute
+  '/admin/convenios': typeof AuthenticatedAdminConveniosRoute
   '/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
@@ -894,6 +927,7 @@ export interface FileRoutesByTo {
   '/admin/purahei': typeof AuthenticatedAdminPuraheiRoute
   '/aula/$id': typeof AuthenticatedAulaIdRoute
   '/aula/docente': typeof AuthenticatedAulaDocenteRoute
+  '/constancia-convenio/$codigo': typeof AuthenticatedConstanciaConvenioCodigoRoute
   '/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
   '/docente/juegos': typeof AuthenticatedDocenteJuegosRoute
   '/guarani-escolar/rescate': typeof AuthenticatedGuaraniEscolarRescateRoute
@@ -992,11 +1026,14 @@ export interface FileRoutesById {
   '/_authenticated/validar': typeof AuthenticatedValidarRoute
   '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/convenio/$programa': typeof ConvenioProgramaRoute
   '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
+  '/verificar-convenio/$codigo': typeof VerificarConvenioCodigoRoute
   '/verificar/$code': typeof VerificarCodeRoute
   '/purahei/': typeof PuraheiIndexRoute
   '/studio/': typeof StudioIndexRoute
+  '/_authenticated/admin/convenios': typeof AuthenticatedAdminConveniosRoute
   '/_authenticated/admin/corpus': typeof AuthenticatedAdminCorpusRoute
   '/_authenticated/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/_authenticated/admin/jai': typeof AuthenticatedAdminJaiRoute
@@ -1005,6 +1042,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/purahei': typeof AuthenticatedAdminPuraheiRoute
   '/_authenticated/aula/$id': typeof AuthenticatedAulaIdRoute
   '/_authenticated/aula/docente': typeof AuthenticatedAulaDocenteRoute
+  '/_authenticated/constancia-convenio/$codigo': typeof AuthenticatedConstanciaConvenioCodigoRoute
   '/_authenticated/curso/$lang': typeof AuthenticatedCursoLangRouteWithChildren
   '/_authenticated/docente/constancia': typeof AuthenticatedDocenteConstanciaRoute
   '/_authenticated/docente/juegos': typeof AuthenticatedDocenteJuegosRoute
@@ -1105,11 +1143,14 @@ export interface FileRouteTypes {
     | '/validar'
     | '/api/recordatorio'
     | '/api/tutor'
+    | '/convenio/$programa'
     | '/purahei/$slug'
     | '/studio/$'
+    | '/verificar-convenio/$codigo'
     | '/verificar/$code'
     | '/purahei/'
     | '/studio/'
+    | '/admin/convenios'
     | '/admin/corpus'
     | '/admin/informe-auspiciante'
     | '/admin/jai'
@@ -1118,6 +1159,7 @@ export interface FileRouteTypes {
     | '/admin/purahei'
     | '/aula/$id'
     | '/aula/docente'
+    | '/constancia-convenio/$codigo'
     | '/curso/$lang'
     | '/docente/constancia'
     | '/docente/juegos'
@@ -1215,11 +1257,14 @@ export interface FileRouteTypes {
     | '/validar'
     | '/api/recordatorio'
     | '/api/tutor'
+    | '/convenio/$programa'
     | '/purahei/$slug'
     | '/studio/$'
+    | '/verificar-convenio/$codigo'
     | '/verificar/$code'
     | '/purahei'
     | '/studio'
+    | '/admin/convenios'
     | '/admin/corpus'
     | '/admin/informe-auspiciante'
     | '/admin/jai'
@@ -1228,6 +1273,7 @@ export interface FileRouteTypes {
     | '/admin/purahei'
     | '/aula/$id'
     | '/aula/docente'
+    | '/constancia-convenio/$codigo'
     | '/docente/constancia'
     | '/docente/juegos'
     | '/guarani-escolar/rescate'
@@ -1325,11 +1371,14 @@ export interface FileRouteTypes {
     | '/_authenticated/validar'
     | '/api/recordatorio'
     | '/api/tutor'
+    | '/convenio/$programa'
     | '/purahei/$slug'
     | '/studio/$'
+    | '/verificar-convenio/$codigo'
     | '/verificar/$code'
     | '/purahei/'
     | '/studio/'
+    | '/_authenticated/admin/convenios'
     | '/_authenticated/admin/corpus'
     | '/_authenticated/admin/informe-auspiciante'
     | '/_authenticated/admin/jai'
@@ -1338,6 +1387,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/purahei'
     | '/_authenticated/aula/$id'
     | '/_authenticated/aula/docente'
+    | '/_authenticated/constancia-convenio/$codigo'
     | '/_authenticated/curso/$lang'
     | '/_authenticated/docente/constancia'
     | '/_authenticated/docente/juegos'
@@ -1420,8 +1470,10 @@ export interface RootRouteChildren {
   ZhRoute: typeof ZhRoute
   ApiRecordatorioRoute: typeof ApiRecordatorioRoute
   ApiTutorRoute: typeof ApiTutorRoute
+  ConvenioProgramaRoute: typeof ConvenioProgramaRoute
   PuraheiSlugRoute: typeof PuraheiSlugRoute
   StudioSplatRoute: typeof StudioSplatRoute
+  VerificarConvenioCodigoRoute: typeof VerificarConvenioCodigoRoute
   VerificarCodeRoute: typeof VerificarCodeRoute
   PuraheiIndexRoute: typeof PuraheiIndexRoute
   StudioIndexRoute: typeof StudioIndexRoute
@@ -1830,6 +1882,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTutorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/convenio/$programa': {
+      id: '/convenio/$programa'
+      path: '/convenio/$programa'
+      fullPath: '/convenio/$programa'
+      preLoaderRoute: typeof ConvenioProgramaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/purahei/': {
       id: '/purahei/'
       path: '/purahei'
@@ -1858,12 +1917,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudioSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verificar-convenio/$codigo': {
+      id: '/verificar-convenio/$codigo'
+      path: '/verificar-convenio/$codigo'
+      fullPath: '/verificar-convenio/$codigo'
+      preLoaderRoute: typeof VerificarConvenioCodigoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/verificar/$code': {
       id: '/verificar/$code'
       path: '/verificar/$code'
       fullPath: '/verificar/$code'
       preLoaderRoute: typeof VerificarCodeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin/convenios': {
+      id: '/_authenticated/admin/convenios'
+      path: '/admin/convenios'
+      fullPath: '/admin/convenios'
+      preLoaderRoute: typeof AuthenticatedAdminConveniosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/corpus': {
       id: '/_authenticated/admin/corpus'
@@ -1926,6 +1999,13 @@ declare module '@tanstack/react-router' {
       path: '/aula/docente'
       fullPath: '/aula/docente'
       preLoaderRoute: typeof AuthenticatedAulaDocenteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/constancia-convenio/$codigo': {
+      id: '/_authenticated/constancia-convenio/$codigo'
+      path: '/constancia-convenio/$codigo'
+      fullPath: '/constancia-convenio/$codigo'
+      preLoaderRoute: typeof AuthenticatedConstanciaConvenioCodigoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/curso/$lang': {
@@ -2281,6 +2361,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
   AuthenticatedValidacionRoute: typeof AuthenticatedValidacionRoute
   AuthenticatedValidarRoute: typeof AuthenticatedValidarRoute
+  AuthenticatedAdminConveniosRoute: typeof AuthenticatedAdminConveniosRoute
   AuthenticatedAdminCorpusRoute: typeof AuthenticatedAdminCorpusRoute
   AuthenticatedAdminInformeAuspicianteRoute: typeof AuthenticatedAdminInformeAuspicianteRoute
   AuthenticatedAdminJaiRoute: typeof AuthenticatedAdminJaiRoute
@@ -2289,6 +2370,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminPuraheiRoute: typeof AuthenticatedAdminPuraheiRoute
   AuthenticatedAulaIdRoute: typeof AuthenticatedAulaIdRoute
   AuthenticatedAulaDocenteRoute: typeof AuthenticatedAulaDocenteRoute
+  AuthenticatedConstanciaConvenioCodigoRoute: typeof AuthenticatedConstanciaConvenioCodigoRoute
   AuthenticatedCursoLangRoute: typeof AuthenticatedCursoLangRouteWithChildren
   AuthenticatedDocenteConstanciaRoute: typeof AuthenticatedDocenteConstanciaRoute
   AuthenticatedDocenteJuegosRoute: typeof AuthenticatedDocenteJuegosRoute
@@ -2341,6 +2423,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
   AuthenticatedValidacionRoute: AuthenticatedValidacionRoute,
   AuthenticatedValidarRoute: AuthenticatedValidarRoute,
+  AuthenticatedAdminConveniosRoute: AuthenticatedAdminConveniosRoute,
   AuthenticatedAdminCorpusRoute: AuthenticatedAdminCorpusRoute,
   AuthenticatedAdminInformeAuspicianteRoute:
     AuthenticatedAdminInformeAuspicianteRoute,
@@ -2350,6 +2433,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminPuraheiRoute: AuthenticatedAdminPuraheiRoute,
   AuthenticatedAulaIdRoute: AuthenticatedAulaIdRoute,
   AuthenticatedAulaDocenteRoute: AuthenticatedAulaDocenteRoute,
+  AuthenticatedConstanciaConvenioCodigoRoute:
+    AuthenticatedConstanciaConvenioCodigoRoute,
   AuthenticatedCursoLangRoute: AuthenticatedCursoLangRouteWithChildren,
   AuthenticatedDocenteConstanciaRoute: AuthenticatedDocenteConstanciaRoute,
   AuthenticatedDocenteJuegosRoute: AuthenticatedDocenteJuegosRoute,
@@ -2426,8 +2511,10 @@ const rootRouteChildren: RootRouteChildren = {
   ZhRoute: ZhRoute,
   ApiRecordatorioRoute: ApiRecordatorioRoute,
   ApiTutorRoute: ApiTutorRoute,
+  ConvenioProgramaRoute: ConvenioProgramaRoute,
   PuraheiSlugRoute: PuraheiSlugRoute,
   StudioSplatRoute: StudioSplatRoute,
+  VerificarConvenioCodigoRoute: VerificarConvenioCodigoRoute,
   VerificarCodeRoute: VerificarCodeRoute,
   PuraheiIndexRoute: PuraheiIndexRoute,
   StudioIndexRoute: StudioIndexRoute,
