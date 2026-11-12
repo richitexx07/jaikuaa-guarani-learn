@@ -45,6 +45,9 @@ export function SiteFooter() {
             <Link to="/purahei" className="font-semibold text-primary transition-colors hover:text-foreground">
               Purahéi: artistas
             </Link>
+            <Link to="/tembiapo" className="font-semibold text-primary transition-colors hover:text-foreground">
+              Tembiapo: artesanos
+            </Link>
             <Link to="/expertos" className="font-semibold text-primary transition-colors hover:text-foreground">
               Expertos
             </Link>

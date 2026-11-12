@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { to: "/juegos", label: "navJuegos" },
   { to: "/libreria", label: "navLibreria" },
   { to: "/purahei", label: "navPurahei" },
+  { to: "/tembiapo", label: "navTembiapo" },
   { to: "/teclado", label: "navTeclado" },
   { to: "/turismo", label: "navTurismo" },
   { to: "/instituciones", label: "navInst" },
@@ -35,16 +36,16 @@ export function MarketingHeader({ idioma, accion }: { idioma?: ReactNode; accion
         <Link to="/" aria-label="Jaikuaa, inicio" className="flex shrink-0 items-center gap-2 font-display text-xl font-bold text-primary">
           <BrandLogo wordmarkFromSm />
         </Link>
-        <nav className="hidden items-center gap-4 text-sm lg:flex">
+        <nav className="hidden items-center gap-4 text-sm xl:flex">
           {NAV_LINKS.map((l) => (
-            <Link key={l.to} to={l.to} className={l.to === "/purahei" ? "font-semibold text-primary hover:text-foreground" : "text-muted-foreground hover:text-foreground"}>
+            <Link key={l.to} to={l.to} className={l.to === "/purahei" || l.to === "/tembiapo" ? "font-semibold text-primary hover:text-foreground" : "text-muted-foreground hover:text-foreground"}>
               {t(l.label)}
             </Link>
           ))}
         </nav>
         <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
           {accion ?? (
-            <Link to="/juegos" className="shrink-0 whitespace-nowrap rounded-full bg-accent px-3 py-1.5 text-sm font-bold text-accent-foreground shadow-sm lg:hidden">
+            <Link to="/juegos" className="shrink-0 whitespace-nowrap rounded-full bg-accent px-3 py-1.5 text-sm font-bold text-accent-foreground shadow-sm xl:hidden">
               {t("navJugar")}
             </Link>
           )}
@@ -72,7 +73,7 @@ export function MarketingHeader({ idioma, accion }: { idioma?: ReactNode; accion
                   className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
                 >
                   {t(l.label)}
-                  {l.to === "/purahei" && (
+                  {(l.to === "/purahei" || l.to === "/tembiapo") && (
                     <span className="ml-2 rounded-full px-2 py-0.5 align-middle text-[11px] font-bold" style={{ background: "#F6C445", color: "#0F2038" }}>
                       {t("navNuevo")}
                     </span>
