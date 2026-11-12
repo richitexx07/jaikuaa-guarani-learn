@@ -1,4 +1,5 @@
 import { useJU } from "@/lib/i18n-juegos-ui";
+import { useTraducir } from "@/lib/use-traducir";
 import { callarVoz } from "@/lib/voz-unica";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -408,6 +409,7 @@ type Pop = { text: string; sub?: string; color: string; n: number };
 function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
   song: Song; show: Show; maximo: number; partida: Partida; onAgain: () => void; onBack: () => void; onComo: () => void;
 }) {
+  const tr = useTraducir();
   const feedback = useGameFeedback();
   const tt = useJU();
   const beatSec = 60 / song.bpm;
@@ -926,10 +928,10 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
                 );
               })}
             </p>
-            <p className="mt-2 text-sm italic text-white/80">{verso.es}</p>
+            <p className="mt-2 text-sm italic text-white/80">{tr(verso.es)}</p>
             {siguiente && siguiente.vuelta === verso.vuelta && (
               <p className="mt-1 truncate text-xs text-white/45">
-                {tt("kkSigue")} <span className="font-display font-semibold">{siguiente.memoria ? siguiente.es : siguiente.words.map((w, i) => (i === siguiente.gap ? "…" : w)).join(" ")}</span>
+                {tt("kkSigue")} <span className="font-display font-semibold">{siguiente.memoria ? tr(siguiente.es) : siguiente.words.map((w, i) => (i === siguiente.gap ? "…" : w)).join(" ")}</span>
               </p>
             )}
           </div>
@@ -964,6 +966,7 @@ function Stage({ song, show, maximo, partida, onAgain, onBack, onComo }: {
 
 /** Al final: la letra completa, y cada palabra que tiene grabación se puede escuchar con voz humana real. */
 function Repaso({ song }: { song: Song }) {
+  const tr = useTraducir();
   const tt = useJU();
   const [conAudio, setConAudio] = useState<Record<string, boolean>>({});
   useEffect(() => {
@@ -991,7 +994,7 @@ function Repaso({ song }: { song: Song }) {
                 <span key={wi} className="px-1 py-0.5">{w}</span>
               ))}
             </p>
-            <p className="text-sm italic text-white/60">{l.es}</p>
+            <p className="text-sm italic text-white/60">{tr(l.es)}</p>
           </div>
         ))}
       </div>

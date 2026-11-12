@@ -1,4 +1,5 @@
 import { useJU } from "@/lib/i18n-juegos-ui";
+import { useTraducir } from "@/lib/use-traducir";
 import { useSDT } from "@/lib/i18n-sopa-duelo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
@@ -39,6 +40,7 @@ function buildDeck(): Q[] {
 }
 
 function TriviaDuel() {
+  const tr = useTraducir();
   const [match, setMatch] = useState(0);
   const [series, setSeries] = useState<DuelSeries>(NEW_SERIES);
   const { idx: textos } = useJuegoTextos();
@@ -71,10 +73,10 @@ function TriviaDuel() {
             oneChance
             buildRounds={(): LiveRound[] =>
               buildDeck().slice(0, TARGET * 2 + 6).map((q) => ({
-                prompt: q.q,
+                prompt: tr(q.q),
                 pre: getTexto(textos, "trivia", claveTrivia(q.catId, q.n), "pregunta"),
-                sub: `${q.emoji} ${q.cat}`,
-                options: q.options,
+                sub: `${q.emoji} ${tr(q.cat)}`,
+                options: q.options.map(tr),
                 answer: q.answer,
               }))
             }
@@ -137,6 +139,7 @@ function Board({ series, onResult, onRematch, onRemote, theme }: { series: DuelS
   const feedback = useGameFeedback();
   const tt = useJU();
   const sd = useSDT();
+  const tr = useTraducir();
   const [deck] = useState(buildDeck);
   const { idx: textos } = useJuegoTextos();
   const [idx, setIdx] = useState(0);
@@ -245,12 +248,12 @@ function Board({ series, onResult, onRematch, onRemote, theme }: { series: DuelS
           <span key={`a${score[0]}`} className="tv-punto font-display text-4xl font-bold tabular-nums" style={{ color: "#5FE0E8" }}>{score[0]}</span>
           <div className="flex items-center gap-2">
             <Pulsador className="h-10 w-10" late={winner === null} />
-            <span className="max-w-[9rem] truncate text-xs font-semibold" style={{ color: TV.oro }}>{q.emoji} {q.cat}</span>
+            <span className="max-w-[9rem] truncate text-xs font-semibold" style={{ color: TV.oro }}>{q.emoji} {tr(q.cat)}</span>
           </div>
           <span key={`b${score[1]}`} className="tv-punto rotate-180 font-display text-4xl font-bold tabular-nums" style={{ color: "#D3A6FF" }}>{score[1]}</span>
           <span className="sr-only" aria-live="polite">{sd("scoreSr", { a: score[0], b: score[1] })}</span>
         </div>
-        {winner !== null && <p className="px-2 pb-1 pt-1 text-center text-xs text-white/90">{q.explanation}</p>}
+        {winner !== null && <p className="px-2 pb-1 pt-1 text-center text-xs text-white/90">{tr(q.explanation)}</p>}
       </div>
       <Half p={0} q={q} gn={q ? getTexto(textos, "trivia", claveTrivia(q.catId, q.n), "pregunta") : undefined} pick={picks[0]} winner={winner} onPick={pick} />
     </div>
@@ -263,6 +266,7 @@ function Half({ p, q, gn, pick, winner, onPick, rotated }: {
 }) {
   const tt = useJU();
   const sd = useSDT();
+  const tr = useTraducir();
   const won = winner === p;
   const status = won ? sd("point") : winner === "none" ? tt("trNobody") : winner !== null ? sd("rivalPoint") : pick !== null ? tt("trMissed") : tt("trQuick");
   return (
@@ -276,7 +280,7 @@ function Half({ p, q, gn, pick, winner, onPick, rotated }: {
         <span className="rounded-full bg-black/20 px-3 py-0.5">{status}</span>
       </div>
       {gn && <div lang="gn" className="text-center font-display text-lg font-bold leading-snug sm:text-xl">{gn}</div>}
-      <div className={gn ? "text-center text-sm leading-snug text-white/85" : "text-center font-display text-lg font-bold leading-snug sm:text-xl"}>{q.q}</div>
+      <div className={gn ? "text-center text-sm leading-snug text-white/85" : "text-center font-display text-lg font-bold leading-snug sm:text-xl"}>{tr(q.q)}</div>
       <div className="grid grid-cols-2 gap-2">
         {q.options.map((o, i) => {
           const reveal = winner !== null && i === q.answer;
@@ -295,7 +299,7 @@ function Half({ p, q, gn, pick, winner, onPick, rotated }: {
                 opacity: (pick !== null || winner !== null) && !reveal && !wrong ? 0.6 : 1,
               }}
             >
-              {o}
+              {tr(o)}
             </button>
           );
         })}

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Check, Languages, Loader2, Undo2 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Input } from "@/components/ui/input";
+import { aprobarTextos, panelTextos, quitarTexto } from "@/lib/textos-traducidos.functions";
 import {
   aprobarSignificados, IDIOMAS_SIG, NOMBRE_IDIOMA_SIG, panelSignificados, quitarSignificado, type FilaSignificado, type IdiomaSig,
 } from "@/lib/significados.functions";
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/docente/significados")({
 
 function SignificadosPage() {
   const [lang, setLang] = useState<IdiomaSig>("en");
+  const [fuente, setFuente] = useState<"palabras" | "juegos">("palabras");
   const listar = useServerFn(panelSignificados);
   const aprobar = useServerFn(aprobarSignificados);
   const qc = useQueryClient();
@@ -78,6 +80,14 @@ function SignificadosPage() {
           ))}
         </div>
 
+        <div className="mt-3 grid grid-cols-2 gap-1 rounded-2xl bg-muted p-1" role="tablist" aria-label="Qué revisar">
+          {([["palabras", "Palabras"], ["juegos", "Textos de los juegos"]] as const).map(([k, t]) => (
+            <button key={k} type="button" role="tab" aria-selected={fuente === k} onClick={() => setFuente(k)}
+              className={`min-h-11 rounded-xl text-sm font-semibold ${fuente === k ? "bg-card text-foreground shadow" : "text-muted-foreground"}`}>{t}</button>
+          ))}
+        </div>
+
+        {fuente === "juegos" ? <TextosJuegos lang={lang} /> : <>
         {q.data && (
           <p className="mt-3 text-sm">
             <b>{aprobadas}</b> de {q.data.length} palabras ya aprobadas en {NOMBRE_IDIOMA_SIG[lang].toLowerCase()}.
@@ -114,6 +124,7 @@ function SignificadosPage() {
             ))}
           </ul>
         )}
+        </>}
       </main>
 
     </div>
@@ -152,5 +163,102 @@ function Fila({ f, lang, texto, marcada, onTexto, onMarcar, onCambio }: {
         </div>
       </div>
     </li>
+  );
+}
+
+const NOMBRE_JUEGO: Record<string, string> = { trivia: "Trivia", tekojoja: "Tekojoja", tembiu: "Tembi'u", taanga: "Ta'anga", chacra: "Chacra", karaoke: "Karaoke" };
+
+/** Preguntas, historias y explicaciones de los juegos: se revisa la traducción del castellano (el guaraní queda igual). */
+function TextosJuegos({ lang }: { lang: IdiomaSig }) {
+  const listar = useServerFn(panelTextos);
+  const aprobar = useServerFn(aprobarTextos);
+  const quitar = useServerFn(quitarTexto);
+  const qc = useQueryClient();
+  const q = useQuery({ queryKey: ["panel-textos", lang], queryFn: () => listar({ data: { lang } }) });
+  const [juego, setJuego] = useState<string>("todos");
+  const [textos, setTextos] = useState<Record<string, string>>({});
+  const [marcadas, setMarcadas] = useState<Set<string>>(new Set());
+  const [guardando, setGuardando] = useState(false);
+  useEffect(() => {
+    setTextos(Object.fromEntries((q.data ?? []).map((f) => [f.es, f.aprobado ?? f.propuesto ?? ""])));
+    setMarcadas(new Set());
+  }, [q.data]);
+  const filas = useMemo(() => (q.data ?? []).filter((f) => juego === "todos" || f.juego === juego)
+    .sort((a, b) => Number(!!a.aprobado) - Number(!!b.aprobado)), [q.data, juego]);
+  const pendientes = filas.filter((f) => !f.aprobado);
+  const juegos = [...new Set((q.data ?? []).map((f) => f.juego))];
+  const recargar = () => qc.invalidateQueries({ queryKey: ["panel-textos", lang] });
+
+  async function aprobarMarcadas() {
+    const items = (q.data ?? []).filter((f) => marcadas.has(f.es)).map((f) => ({ es: f.es, juego: f.juego, texto: (textos[f.es] ?? "").trim() })).filter((i) => i.texto);
+    if (!items.length) { toast.error("No hay nada marcado para aprobar."); return; }
+    setGuardando(true);
+    try {
+      const r = await aprobar({ data: { lang, items } });
+      toast.success(`${r.aprobados} textos aprobados`);
+      await recargar();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo guardar.");
+    } finally {
+      setGuardando(false);
+    }
+  }
+
+  if (q.isLoading) return <p className="mt-8 flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Cargando…</p>;
+  if (q.error) return <p className="mt-8 text-destructive">Esta página es para docentes y administración.</p>;
+  if (!q.data?.length) return <p className="mt-6 rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">Todavía no hay propuestas en {NOMBRE_IDIOMA_SIG[lang].toLowerCase()} para los textos de los juegos.</p>;
+  return (
+    <>
+      <p className="mt-3 text-sm"><b>{q.data.filter((f) => f.aprobado).length}</b> de {q.data.length} textos ya aprobados en {NOMBRE_IDIOMA_SIG[lang].toLowerCase()}.</p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {["todos", ...juegos].map((j) => (
+          <button key={j} type="button" aria-pressed={juego === j} onClick={() => setJuego(j)}
+            className={`min-h-10 rounded-full px-3 text-xs font-semibold ring-1 ring-border ${juego === j ? "bg-primary text-primary-foreground" : ""}`}>
+            {j === "todos" ? "Todos" : NOMBRE_JUEGO[j] ?? j}
+          </button>
+        ))}
+      </div>
+      {pendientes.length > 0 && (
+        <div className="sticky top-0 z-10 -mx-4 mt-3 flex flex-wrap items-center gap-2 border-b border-border/60 bg-background/95 px-4 py-2 backdrop-blur">
+          <button type="button" onClick={() => setMarcadas(new Set(pendientes.map((f) => f.es)))} className="min-h-12 rounded-xl px-4 text-sm font-semibold ring-1 ring-border">
+            Marcar todas ({pendientes.length})
+          </button>
+          <button type="button" disabled={guardando || marcadas.size === 0} onClick={aprobarMarcadas}
+            className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 font-semibold text-white disabled:opacity-50">
+            {guardando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" aria-hidden />} Aprobar ({marcadas.size})
+          </button>
+        </div>
+      )}
+      <ul className="mt-4 space-y-2">
+        {filas.map((f) => (
+          <li key={f.es} className={`rounded-2xl p-3 ring-1 ${f.aprobado ? "bg-emerald-50/60 ring-emerald-200 dark:bg-emerald-950/20" : "bg-card ring-border"}`}>
+            <div className="flex items-start gap-3">
+              {!f.aprobado && (
+                <input type="checkbox" checked={marcadas.has(f.es)} aria-label="Marcar"
+                  onChange={(e) => setMarcadas((s) => { const n = new Set(s); if (e.target.checked) n.add(f.es); else n.delete(f.es); return n; })} className="mt-1 h-5 w-5 shrink-0" />
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="text-sm"><span className="mr-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold">{NOMBRE_JUEGO[f.juego] ?? f.juego}</span>{f.es}</p>
+                {f.aprobado ? (
+                  <div className="mt-1 flex items-center justify-between gap-2">
+                    <p className="flex items-start gap-1.5 text-sm font-semibold text-emerald-800 dark:text-emerald-200"><Check className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> {f.aprobado}</p>
+                    <button type="button" onClick={async () => {
+                      try { await quitar({ data: { lang, es: f.es } }); toast.success("Vuelve a revisión"); await recargar(); }
+                      catch (e) { toast.error(e instanceof Error ? e.message : "No se pudo."); }
+                    }} className="inline-flex min-h-10 shrink-0 items-center gap-1 text-xs font-semibold text-muted-foreground underline underline-offset-4">
+                      <Undo2 className="h-3.5 w-3.5" aria-hidden /> Corregir
+                    </button>
+                  </div>
+                ) : (
+                  <textarea value={textos[f.es] ?? ""} rows={f.es.length > 60 ? 3 : 1} maxLength={500}
+                    onChange={(e) => { const t = e.target.value; setTextos((x) => ({ ...x, [f.es]: t })); setMarcadas((s) => new Set(s).add(f.es)); }}
+                    className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-base" aria-label="Traducción" />
+                )}
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }

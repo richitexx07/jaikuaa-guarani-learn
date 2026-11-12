@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTraducir } from "@/lib/use-traducir";
 import { QuitGameButton } from "@/components/games/quit-game-button";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shuffle } from "@/components/games/game-shell";
@@ -85,6 +86,7 @@ function Tekojoja() {
 
 function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: CaseConGn[]; seed: number; partida: Partida }) {
   const feedback = useGameFeedback();
+  const tr = useTraducir();
   const tt = useJU();
   const cases = useMemo(() => shufflerFor(seed)(all).slice(0, ROUNDS), []);
   const [i, setI] = useState(0);
@@ -177,7 +179,7 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
               <span className="text-4xl" aria-hidden>{c.emoji}</span>
               <div className="min-w-0">
                 {c.storyGn && <p lang="gn" className="mb-2 font-display text-lg font-bold leading-relaxed">{c.storyGn}</p>}
-                <p className={c.storyGn ? "text-base leading-relaxed opacity-80" : "text-lg leading-relaxed"}>{c.story}</p>
+                <p className={c.storyGn ? "text-base leading-relaxed opacity-80" : "text-lg leading-relaxed"}>{tr(c.story)}</p>
               </div>
             </div>
           </div>
@@ -197,7 +199,7 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
             : { background: "rgba(255,255,255,.08)", color: "#fff", boxShadow: `inset 0 0 0 2px rgba(232,194,106,.45)` };
           return (
             <button key={o} type="button" onClick={() => choose(o)} disabled={!!pick} className="min-h-14 rounded-2xl tap-3d-dark px-4 py-3 text-left font-display text-lg font-bold transition active:scale-[.98]" style={estilo}>
-              {o}
+              {tr(o)}
             </button>
           );
         })}
@@ -205,7 +207,7 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
       {pick && (
         <div className="space-y-3">
           <div className="rounded-2xl p-4 text-sm" style={{ background: "rgba(0,0,0,.25)" }}>
-            <p>{c.why}</p>
+            <p>{tr(c.why)}</p>
             {c.answerGn ? (
               <p className="mt-2">
                 {tt("tjTerm")} <b lang="gn" className="font-display text-base" style={{ color: J.oro }}>{c.answerGn}</b>

@@ -1,4 +1,5 @@
 import { useGT } from "@/lib/i18n-games";
+import { useTraducir } from "@/lib/use-traducir";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { QuitGameButton } from "@/components/games/quit-game-button";
 import { forgetPlace } from "@/lib/last-place";
@@ -125,6 +126,7 @@ function Olla({ picked, hot, ing }: { picked: string[]; hot: boolean; ing: typeo
 }
 
 function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: typeof ING; seed: number; partida: Partida }) {
+  const tr = useTraducir();
   const feedback = useGameFeedback();
   const tt = useJU();
   const dishes = useMemo(() => shufflerFor(seed)(DISHES).slice(0, ROUNDS), []);
@@ -189,8 +191,8 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
             {platos.map((p, k) => (
               <div key={k} className="rounded-xl bg-white/70 p-3 text-sm">
                 <p className="font-bold">{p.dish.name} <span className="text-xs font-semibold" style={{ color: p.ok ? T.verde : T.rojo }}>· {p.ok ? "Bien" : "Repasar"}</span></p>
-                <p className="mt-0.5 opacity-80">{p.dish.info}</p>
-                <p className="mt-1 text-xs">{p.dish.ok.map((x) => ing[x] ? `${ing[x]!.gn} (${ing[x]!.es})` : x).join(" · ")}</p>
+                <p className="mt-0.5 opacity-80">{tr(p.dish.info)}</p>
+                <p className="mt-1 text-xs">{p.dish.ok.map((x) => ing[x] ? `${ing[x]!.gn} (${tr(ing[x]!.es)})` : x).join(" · ")}</p>
               </div>
             ))}
           </div>
@@ -247,7 +249,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
             <DishPic dish={dish} className="h-20 w-20 shrink-0 rounded-2xl text-5xl shadow-md ring-2 ring-white" />
             <h2 className="font-display text-3xl font-bold leading-none">{dish.name}</h2>
           </div>
-          <p className="mt-2 text-sm opacity-80">{dish.info}</p>
+          <p className="mt-2 text-sm opacity-80">{tr(dish.info)}</p>
           <div className="mt-3 border-t border-dashed pt-2 text-sm" style={{ borderColor: "#D8C6AA" }}>
             {tt("tbChoose")} <b>{tt("tbFive")}</b>
           </div>
@@ -285,7 +287,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
             >
               <span className="grid h-12 w-12 place-items-center rounded-full text-3xl" style={{ background: "#F3DFC0" }} aria-hidden>{ing[x]?.emoji}</span>
               <b className="text-sm leading-tight sm:text-base">{ing[x]?.gn}</b>
-              <span className="text-[11px] leading-tight opacity-70">{ing[x]?.es}</span>
+              <span className="text-[11px] leading-tight opacity-70">{ing[x] ? tr(ing[x]!.es) : null}</span>
               {on && !checked && <span className="absolute right-2 top-2 grid h-5 w-5 place-items-center rounded-full text-xs font-bold" style={{ background: T.ocre }}>✓</span>}
             </button>
           );

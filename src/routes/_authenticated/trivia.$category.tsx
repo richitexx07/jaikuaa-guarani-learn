@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { useTraducir } from "@/lib/use-traducir";
 import { TRIVIA_CATEGORIAS } from "@/lib/listas-livianas";
 import { ValidationNotice } from "@/components/validation-notice";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -90,7 +91,9 @@ function TriviaQuiz() {
   const { idx: textos } = useJuegoTextos();
   const preguntaGn = getTexto(textos, "trivia", claveTrivia(category, idx), "pregunta");
   const answered = selected !== null || timedOut;
-  const correctAnswerText = question.options[question.answer];
+  // Preguntas, opciones y explicaciones en el idioma de la persona (solo lo aprobado por docentes).
+  const tr = useTraducir();
+  const correctAnswerText = tr(question.options[question.answer]);
 
   // Timer
   useEffect(() => {
@@ -182,7 +185,7 @@ function TriviaQuiz() {
 
   const isCorrectAnswered = answered && selected === question.answer;
   const errorCopy = err(correctAnswerText, errorSeedRef.current + idx);
-  const successCopy = ok(category, correctAnswerText, question.explanation);
+  const successCopy = ok(category, correctAnswerText, tr(question.explanation));
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -206,7 +209,7 @@ function TriviaQuiz() {
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm">
                   <img src={TRIVIA_ART[category]} alt="" className="h-9 w-9 object-contain" />
-                  <span className="font-semibold text-foreground">{cat.title}</span>
+                  <span className="font-semibold text-foreground">{tr(cat.title)}</span>
                 </div>
                 <span className="text-sm font-medium text-muted-foreground">
                   {tt("question", { a: idx + 1, b: total })}
@@ -249,7 +252,7 @@ function TriviaQuiz() {
                   </p>
                 )}
                 <h2 className={preguntaGn ? "text-base font-medium leading-snug text-muted-foreground sm:text-lg" : "font-display text-xl font-bold leading-snug text-foreground sm:text-2xl"}>
-                  {question.q}
+                  {tr(question.q)}
                 </h2>
 
                 <div className="mt-5 grid gap-2.5">
@@ -281,7 +284,7 @@ function TriviaQuiz() {
                         <span className="mr-2 font-bold text-primary/70">
                           {String.fromCharCode(65 + i)}.
                         </span>
-                        {opt}
+                        {tr(opt)}
                         {answered && isCorrect && <span className="ml-2">✓</span>}
                         {answered && isPicked && !isCorrect && <span className="ml-2">✗</span>}
                       </button>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTraducir } from "@/lib/use-traducir";
 import { Link } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 import { TRIVIA, TRIVIA_ORDER, type TriviaCategoryId } from "@/lib/trivia";
@@ -21,6 +22,7 @@ const CSS = `
  * el camino sugiere un orden y premia completar cada una. Sin azar.
  */
 export function SenderoJai() {
+  const tr = useTraducir();
   const [done, setDone] = useState<TriviaCategoryId[]>([]);
   useEffect(() => setDone(readSendero()), []);
   const next = nextStop(done);
@@ -83,9 +85,9 @@ export function SenderoJai() {
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-xs font-semibold text-muted-foreground">Parada {i + 1}</span>
-                    <span className="block font-display text-base font-bold leading-tight text-foreground sm:text-lg">{cat.title}</span>
+                    <span className="block font-display text-base font-bold leading-tight text-foreground sm:text-lg">{tr(cat.title)}</span>
                     <span className={`mt-0.5 block text-xs font-semibold ${isNext ? "text-accent" : isDone ? "text-primary" : "text-muted-foreground"}`}>
-                      {isNext ? "Te toca" : isDone ? "Hecha · podés repetirla" : cat.subtitle}
+                      {isNext ? "Te toca" : isDone ? "Hecha · podés repetirla" : tr(cat.subtitle)}
                     </span>
                   </span>
                   {isNext && (

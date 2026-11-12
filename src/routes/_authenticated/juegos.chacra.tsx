@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTraducir } from "@/lib/use-traducir";
 import { QuitGameButton } from "@/components/games/quit-game-button";
 import { useJU } from "@/lib/i18n-juegos-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -103,6 +104,7 @@ function Camino({ i, oks }: { i: number; oks: boolean[] }) {
 }
 
 function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: Partida; textos: ReturnType<typeof useJuegoTextos>["idx"]; onAgain: () => void }) {
+  const tr = useTraducir();
   const feedback = useGameFeedback();
   const tt = useJU();
   const visitas = useMemo<VisitaChacra[]>(() => armarVisitas(seed), [seed]);
@@ -178,9 +180,9 @@ function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: 
         <div className="px-4 pb-4 pt-3">
           <div className="relative rounded-2xl bg-white p-4 shadow-inner">
             {gn && <p lang="gn" className="mb-2 font-display text-lg font-bold leading-snug">«{gn}»</p>}
-            <p className={gn ? "text-sm leading-relaxed opacity-75" : "text-lg leading-relaxed"}>{gn ? v.caso.historia : `«${v.caso.historia}»`}</p>
+            <p className={gn ? "text-sm leading-relaxed opacity-75" : "text-lg leading-relaxed"}>{gn ? tr(v.caso.historia) : `«${tr(v.caso.historia)}»`}</p>
           </div>
-          <p className="mt-4 font-display text-lg font-bold">{v.caso.pregunta}</p>
+          <p className="mt-4 font-display text-lg font-bold">{tr(v.caso.pregunta)}</p>
         </div>
       </div>
 
@@ -205,7 +207,7 @@ function Recorrida({ seed, partida, textos, onAgain }: { seed: number; partida: 
               {right ? tt("chRight") : tt("notThisTime")} <span lang="gn" className="font-display text-base font-bold">{v.caso.palabra}</span> = {v.es}
               <SpeakerButton gn={v.caso.palabra} />
             </p>
-            <p className="mt-2"><b>{tt("chTip")}</b> {v.caso.consejo}</p>
+            <p className="mt-2"><b>{tt("chTip")}</b> {tr(v.caso.consejo)}</p>
           </div>
           <button type="button" className="h-14 w-full rounded-2xl tap-3d-dark font-display text-lg font-bold text-white shadow-lg" style={{ background: C.tierra }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
             {i + 1 === VISITAS_POR_DIA ? tt("chFinish") : tt("chNext")}

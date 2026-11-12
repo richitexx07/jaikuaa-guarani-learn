@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTraducir } from "@/lib/use-traducir";
 import { QuitGameButton } from "@/components/games/quit-game-button";
 import { useJU } from "@/lib/i18n-juegos-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -122,6 +123,7 @@ function Claqueta({ escena, toma, lugar, cerrada }: { escena: number; toma: numb
 }
 
 function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[]; seed: number; partida: Partida }) {
+  const tr = useTraducir();
   const feedback = useGameFeedback();
   const tt = useJU();
   const scenes = useMemo(() => shufflerFor(seed)(all).slice(0, ROUNDS), []);
@@ -195,7 +197,7 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
 
   return (
     <section className="space-y-4 pt-1">
-      <Claqueta key={i} escena={i + 1} toma={1} lugar={scene.place} cerrada={!!pick && right} />
+      <Claqueta key={i} escena={i + 1} toma={1} lugar={tr(scene.place)} cerrada={!!pick && right} />
 
       {/* El monitor de cámara: arriba el lugar, abajo el subtítulo con el diálogo. */}
       <div className="relative overflow-hidden rounded-xl ring-4" style={{ background: "#000", ["--tw-ring-color" as string]: F.panel }}>
@@ -233,7 +235,7 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
 
       {/* Acotación del guion */}
       <p className="rounded-lg px-4 py-3 font-mono text-sm" style={{ background: F.papel, color: F.tinta }}>
-        <b className="uppercase">{scene.who}</b> <span className="italic">({scene.es})</span>
+        <b className="uppercase">{scene.who}</b> <span className="italic">({tr(scene.es)})</span>
       </p>
 
       {pick && !right && (
