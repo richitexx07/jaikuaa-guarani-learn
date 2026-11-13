@@ -38,8 +38,7 @@ import { NovedadPurahei } from "@/components/purahei/novedad-purahei";
 import { ConvenioPendiente } from "@/components/convenio-pendiente";
 import { MisLibrosAcceso } from "@/components/libreria/mis-libros-acceso";
 import { RetoCard } from "@/components/games/reto-card";
-import { HeroLeccion, JuegosCarrusel, NovedadesCampana } from "@/components/dashboard/inicio-dos-toques";
-import jaiImg from "@/assets/jai/jai-saluda.webp";
+import { HeroLeccion, JuegosCarrusel, NovedadesCampana, PalabraDeHoy, useJaiDelMomento } from "@/components/dashboard/inicio-dos-toques";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import bannerAprender from "@/assets/banners/banner-aprender.webp";
 import bannerCurso from "@/assets/banners/banner-curso.webp";
@@ -57,7 +56,6 @@ import jaiAtencion from "@/assets/jai-atencion-pro.webp";
 import jaiAgro from "@/assets/jai-agro.webp";
 import { shouldShowWelcome, welcomeSeen } from "@/lib/welcome";
 import triviaVocabulario from "@/assets/trivia/trivia-vocabulario.webp";
-const jaiAsset = { url: jaiImg };
 
 function StaffShortcuts() {
   const check = useServerFn(checkCorpusAdmin);
@@ -256,6 +254,7 @@ function Dashboard() {
   const [name, setName] = useState<string>(() => readCachedName());
   const [openTeaser, setOpenTeaser] = useState<TeaserKey>(null);
   const greeting = useMemo(() => greetingFor(new Date().getHours()), []);
+  const jai = useJaiDelMomento();
 
   const claim = useServerFn(claimReferral);
   useEffect(() => {
@@ -355,13 +354,13 @@ function Dashboard() {
           <div className="nanduti-bg relative flex items-center gap-3 overflow-hidden rounded-3xl border border-border bg-card p-4 shadow-elegant sm:gap-5 sm:p-5">
             <div className="relative h-24 w-24 shrink-0 sm:h-32 sm:w-32">
               <NandutiDisc className="absolute inset-0 h-full w-full text-primary" />
-              <img src={jaiAsset.url} alt="Jai, el jaguarete, te saluda" className="relative h-full w-full object-contain drop-shadow-lg" />
+              <img src={jai.img} alt="Jai, el jaguarete" className="relative h-full w-full object-contain drop-shadow-lg" />
             </div>
             <div className="min-w-0">
               <h1 className="font-display text-2xl font-bold leading-tight text-foreground sm:text-4xl">
                 ¡Mba'éichapa, {name ? <span className="text-accent">{name}</span> : t("dash.friend")}! {greeting.emoji}
               </h1>
-              <p className="mt-1 text-base text-muted-foreground">{t("dash.question")}</p>
+              <p className="mt-1 text-base text-muted-foreground">{jai.msg}</p>
             </div>
           </div>
 
@@ -369,6 +368,9 @@ function Dashboard() {
 
           {/* 2. UN SOLO BOTÓN PROTAGONISTA: seguir aprendiendo (a dos toques de la lección) */}
           <HeroLeccion />
+
+          {/* La palabra de hoy, con su voz real */}
+          <PalabraDeHoy />
 
           {/* 3. LOS JUEGOS, con sus portadas, para jugar y repasar */}
           <JuegosCarrusel />
