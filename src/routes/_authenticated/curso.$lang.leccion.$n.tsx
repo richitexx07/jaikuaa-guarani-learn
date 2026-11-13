@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { getLanguage } from "@/lib/languages";
 import { getCourseLessonGuest } from "@/lib/guest.functions";
 import { authMode, useIsGuest } from "@/lib/guest";
+import { reiniciarAciertos, sumarAcierto } from "@/lib/desafio-leccion";
+import { DesafioCompartir, DesafioRecibido, useDesafioRecibido } from "@/components/desafio-leccion";
 import { getCourseLesson, type CourseLesson, type CourseVocabItem as VocabItem } from "@/lib/lessons.functions";
 import { useRecordOnMount, useRecordVisit } from "@/lib/gamification";
 import { logAnswer } from "@/lib/answer-log";
@@ -207,6 +209,9 @@ function LessonPage() {
   const [resumed, setResumed] = useState(false);
   const [round, setRound] = useState(0);
   const draft = useRef<Omit<LessonDraft, "savedAt">>({ phase: "intro" });
+  const desafio = useDesafioRecibido(lesson?.n);
+  // Respuestas bien / en total, para el desafío por WhatsApp (se cuentan en el celular).
+  const anotar = (ok: boolean) => { if (lesson) sumarAcierto(lang.slug, lesson.n, ok); };
   useRecordVisit(`${lang.slug ?? "curso"}:${lesson?.n ?? 0}`);
   useRememberPlace(lesson ? `Lección ${lesson.n}: ${lesson.title}` : "", "lesson", !!lesson);
 
@@ -233,7 +238,7 @@ function LessonPage() {
     setPhaseState(p);
   };
   const restart = () => {
-    if (lesson) clearLessonDraft(lang.slug, lesson.n);
+    if (lesson) { clearLessonDraft(lang.slug, lesson.n); reiniciarAciertos(lang.slug, lesson.n); }
     draft.current = { phase: "intro" };
     setResumed(false);
     setRound((r) => r + 1);
@@ -321,8 +326,9 @@ function LessonPage() {
               </button>
             </div>
           )}
+          {phase === "intro" && desafio && <DesafioRecibido d={desafio} />}
           {phase === "intro" && (
-            <IntroStep lesson={lesson} onStart={() => setPhase("vocab")} />
+            <IntroStep lesson={lesson} onStart={() => { reiniciarAciertos(lang.slug, lesson.n); setPhase("vocab"); }} />
           )}
           {phase === "vocab" && (
             <VocabStep lesson={lesson} onNext={() => setPhase("choice")} />
@@ -334,6 +340,7 @@ function LessonPage() {
               lessonRef={`${lang.slug}:${lesson.n}`}
               initial={draft.current.choice}
               onChange={(choice) => persist({ choice })}
+              onAnswer={anotar}
               onNext={() => setPhase("match")}
             />
           )}
@@ -344,10 +351,11 @@ function LessonPage() {
               lessonRef={`${lang.slug}:${lesson.n}`}
               initial={draft.current.match}
               onChange={(match) => persist({ match })}
+              onAnswer={anotar}
               onNext={() => setPhase("done")}
             />
           )}
-          {phase === "done" && <DoneStep lesson={lesson} langSlug={lang.slug} />}
+          {phase === "done" && <DoneStep lesson={lesson} langSlug={lang.slug} desafio={desafio} />}
         </div>
       </main>
     </div>
@@ -457,9 +465,11 @@ function ChoiceStep({
   initial,
   onChange,
   lessonRef,
+  onAnswer,
 }: {
   lesson: { vocab: VocabItem[] };
   lessonRef?: string;
+  onAnswer?: (ok: boolean) => void;
   onNext: () => void;
   initial?: ChoiceDraft;
   onChange?: (d: ChoiceDraft) => void;
@@ -554,6 +564,7 @@ function ChoiceStep({
                   setPicked(opt);
                   if (opt === answer) setCorrect((c) => c + 1);
                   logAnswer(q.item.gn, opt === answer, "lesson", lessonRef);
+                  onAnswer?.(opt === answer);
                   // Acierte o no, se escucha cómo se dice, entera y sin apuro.
                   void decir(q.item.gn);
                 }}
@@ -597,9 +608,11 @@ function MatchStep({
   initial,
   onChange,
   lessonRef,
+  onAnswer,
 }: {
   lesson: { vocab: VocabItem[] };
   lessonRef?: string;
+  onAnswer?: (ok: boolean) => void;
   onNext: () => void;
   initial?: MatchDraft;
   onChange?: (d: MatchDraft) => void;
@@ -647,6 +660,7 @@ function MatchStep({
     if (!selectedGn || sonando) return;
     const ok = lookup.get(selectedGn) === es;
     logAnswer(selectedGn, ok, "lesson", lessonRef);
+    onAnswer?.(ok);
     if (ok) {
       const gn = selectedGn;
       setMatched((prev) => new Set(prev).add(gn));
@@ -840,9 +854,11 @@ function PairBadge({ n, pc, side }: { n: number; pc: (typeof PAIR_COLORS)[number
 function DoneStep({
   lesson,
   langSlug,
+  desafio,
 }: {
   lesson: { n: number; title: string; vocab: VocabItem[] };
   langSlug: string;
+  desafio: ReturnType<typeof useDesafioRecibido>;
 }) {
   const tx = useTX();
   const guest = useIsGuest();
@@ -868,6 +884,9 @@ function DoneStep({
         +{xp} XP
       </div>
 
+      {/* Desafiá a un amigo por WhatsApp con tu puntaje (y si te desafiaron, quién ganó). */}
+      <DesafioCompartir lang={langSlug} lesson={lesson} recibido={desafio} />
+
       {/* El premio: el juego refuerza lo que se acaba de aprender (con las palabras de esta lección). */}
       {langSlug === "guarani" && lesson.vocab.length >= 5 && (
         <a
@@ -878,15 +897,16 @@ function DoneStep({
           <span className="min-w-0 flex-1">
             <span className="block text-xs font-semibold uppercase tracking-wide text-[#F6C445]">{tx("lsPremio")}</span>
             <span className="block font-display text-base font-bold leading-tight sm:text-lg">{tx("lsPremioT")}</span>
+            {/* El botón va debajo del texto: al costado, en el celular, el texto quedaba de una palabra por renglón. */}
+            <span className="mt-2 inline-block rounded-xl bg-[#F6C445] px-3 py-1.5 text-sm font-bold text-[#13233A]">{tx("lsPremioJugar")}</span>
           </span>
-          <span className="shrink-0 rounded-xl bg-[#F6C445] px-3 py-2 text-sm font-bold text-[#13233A]">{tx("lsPremioJugar")}</span>
         </a>
       )}
 
       {guest ? (
         // Sin cuenta: terminó la primera lección; la cuenta se pide para guardar y seguir.
         <div className="mt-4 grid gap-2">
-          <Button asChild variant="cta" size="lg">
+          <Button asChild variant="cta" size="lg" className="h-auto min-h-12 whitespace-normal py-3 leading-snug">
             <Link to="/auth" search={{ mode: authMode() }}>{tx("lsGuestSeguir", { n: lesson.n + 1 })}</Link>
           </Button>
           <p className="text-sm text-muted-foreground">{tx("lsGuestGuarda")}</p>
