@@ -40,7 +40,12 @@ async function isValidationStaff(userId: string): Promise<boolean> {
   return a.data === true || e.data === true || !!r.data;
 }
 
-/** Slugs con palabra YA publicada en el corpus: los únicos que suenan para el público. */
+/**
+ * Slugs con palabra YA publicada en el corpus: los únicos que suenan para el público.
+ * Una palabra marcada «sin audio» (has_audio = false) no suena aunque quede un archivo viejo o
+ * equivocado en el depósito: así se silencia una grabación mal cargada hasta que un docente la
+ * vuelva a grabar (al grabar de nuevo, has_audio vuelve a true solo).
+ */
 async function publishedSlugsFor(slugs: readonly string[]): Promise<Set<string>> {
   const out = new Set<string>();
   if (slugs.length === 0) return out;
@@ -51,6 +56,7 @@ async function publishedSlugsFor(slugs: readonly string[]): Promise<Set<string>>
       .from("corpus_words")
       .select("audio_slug")
       .eq("status", "published")
+      .eq("has_audio", true)
       .in("audio_slug", chunk);
     for (const row of (data ?? []) as { audio_slug: string | null }[]) {
       if (row.audio_slug) out.add(row.audio_slug);
