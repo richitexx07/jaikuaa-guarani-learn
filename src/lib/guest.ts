@@ -31,8 +31,13 @@ export const GUEST_GAMES = [
   "/trivia",
 ] as const;
 
+import { GUEST_LESSONS } from "./guest-lessons";
+export { GUEST_LESSONS };
+
 export function isGuestPath(pathname: string): boolean {
   const p = pathname.replace(/\/+$/, "") || "/";
+  const leccion = /^\/curso\/guarani\/leccion\/(\d+)$/.exec(p);
+  if (leccion) return (GUEST_LESSONS as readonly number[]).includes(Number(leccion[1]));
   // Cada categoría de la trivia (/trivia/historia, /trivia/comidas…).
   if (/^\/trivia\/[a-z0-9-]+$/i.test(p)) return true;
   return (GUEST_GAMES as readonly string[]).includes(p);

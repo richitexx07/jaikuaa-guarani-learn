@@ -16,6 +16,8 @@ import jaiPiensa from "@/assets/jai/jai-piensa.webp";
 
 import { Button } from "@/components/ui/button";
 import { getLanguage } from "@/lib/languages";
+import { getCourseLessonGuest } from "@/lib/guest.functions";
+import { authMode, useIsGuest } from "@/lib/guest";
 import { getCourseLesson, type CourseLesson, type CourseVocabItem as VocabItem } from "@/lib/lessons.functions";
 import { useRecordOnMount, useRecordVisit } from "@/lib/gamification";
 import { logAnswer } from "@/lib/answer-log";
@@ -41,7 +43,7 @@ export const Route = createFileRoute("/_authenticated/curso/$lang/leccion/$n")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  loader: async ({ params }) => {
+  loader: async ({ params, context }) => {
     const lang = getLanguage(params.lang);
     if (!lang) throw notFound();
     if (params.lang !== "guarani") {
@@ -49,7 +51,9 @@ export const Route = createFileRoute("/_authenticated/curso/$lang/leccion/$n")({
     }
     const n = Number(params.n);
     if (!Number.isInteger(n) || n < 1) throw notFound();
-    const { lesson } = await withOfflineCache(K.lesson(n), () => getCourseLesson({ data: { n } }), {
+    // Sin cuenta se puede hacer la primera lección (ver GUEST_LESSONS).
+    const sinCuenta = !(context as { user?: unknown }).user;
+    const { lesson } = await withOfflineCache(K.lesson(n), () => (sinCuenta ? getCourseLessonGuest({ data: { n } }) : getCourseLesson({ data: { n } })), {
       label: `La lección ${n}`,
     });
     if (!lesson) throw notFound();
@@ -198,6 +202,7 @@ function LessonPage() {
   const appLang = useAppLang();
   const lesson = useMemo(() => (crudo ? { ...crudo, vocab: localizarVocab(crudo.vocab, appLang) } : null), [crudo, appLang]);
   const navigate = useNavigate();
+  const guest = useIsGuest();
   const [phase, setPhaseState] = useState<Phase>("intro");
   const [resumed, setResumed] = useState(false);
   const [round, setRound] = useState(0);
@@ -274,7 +279,7 @@ function LessonPage() {
       <header className="border-b border-border/50">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-4 sm:px-6">
           <Link
-            to="/curso/$lang"
+            to={guest ? "/" : "/curso/$lang"}
             params={{ lang: lang.slug }}
             className="flex items-center gap-2 font-display text-lg font-bold text-primary"
           >
@@ -284,7 +289,8 @@ function LessonPage() {
             variant="outline"
             size="sm"
             onClick={() =>
-              navigate({ to: "/curso/$lang", params: { lang: lang.slug } })
+              // Sin cuenta se vuelve a la portada (el curso completo pide cuenta).
+              guest ? navigate({ to: "/" }) : navigate({ to: "/curso/$lang", params: { lang: lang.slug } })
             }
           >
             {tx("exit")}
@@ -839,6 +845,7 @@ function DoneStep({
   langSlug: string;
 }) {
   const tx = useTX();
+  const guest = useIsGuest();
   const xp = 10 + lesson.vocab.length * 2;
   useRecordOnMount({
     xp,
@@ -876,16 +883,29 @@ function DoneStep({
         </a>
       )}
 
-      <div className="mt-4 grid gap-2 sm:grid-cols-2">
-        <Button asChild variant="outline" size="lg">
-          <Link to="/curso/$lang" params={{ lang: langSlug }}>
-            {tx("backCourse")}
-          </Link>
-        </Button>
-        <Button asChild variant="cta" size="lg">
-          <Link to="/dashboard">{tx("goPanel")}</Link>
-        </Button>
-      </div>
+      {guest ? (
+        // Sin cuenta: terminó la primera lección; la cuenta se pide para guardar y seguir.
+        <div className="mt-4 grid gap-2">
+          <Button asChild variant="cta" size="lg">
+            <Link to="/auth" search={{ mode: authMode() }}>{tx("lsGuestSeguir", { n: lesson.n + 1 })}</Link>
+          </Button>
+          <p className="text-sm text-muted-foreground">{tx("lsGuestGuarda")}</p>
+          <Button asChild variant="ghost" size="lg">
+            <Link to="/">{tx("lsGuestInicio")}</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          <Button asChild variant="outline" size="lg">
+            <Link to="/curso/$lang" params={{ lang: langSlug }}>
+              {tx("backCourse")}
+            </Link>
+          </Button>
+          <Button asChild variant="cta" size="lg">
+            <Link to="/dashboard">{tx("goPanel")}</Link>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

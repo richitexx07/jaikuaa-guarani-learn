@@ -4,6 +4,8 @@ import { z } from "zod";
 import type { GameWord } from "@/lib/games.functions";
 import type { JuegoId, JuegoTexto } from "@/lib/juego-textos";
 import type { Frase } from "@/lib/mostrador";
+import type { CourseLesson, CourseVocabItem } from "@/lib/lessons.functions";
+import { GUEST_LESSONS } from "@/lib/guest-lessons";
 
 /**
  * Lo mínimo para jugar sin cuenta: SOLO contenido ya publicado (lo mismo que ve cualquiera que se registra).
@@ -177,3 +179,33 @@ export const listPalabrasConVozGuest = createServerFn({ method: "GET" }).handler
   if (error) throw new Error(error.message);
   return { items: (data ?? []) as { gn: string; es: string }[] };
 });
+
+/* ------------------- Lección del curso sin cuenta ------------------- */
+
+/** Solo las lecciones abiertas (GUEST_LESSONS) y solo palabras publicadas: lo mismo que ve quien tiene cuenta. */
+export const getCourseLessonGuest = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ n: z.number().int().min(1).max(10000) }).parse(d))
+  .handler(async ({ data }) => {
+    if (!(GUEST_LESSONS as readonly number[]).includes(data.n)) return { lesson: null as CourseLesson | null };
+    await guard("leccion");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: lesson } = await supabaseAdmin
+      .from("lessons")
+      .select("id, sort_order, title, theme")
+      .eq("status", "published")
+      .eq("sort_order", data.n)
+      .maybeSingle();
+    if (!lesson) return { lesson: null as CourseLesson | null };
+    const { data: links, error } = await supabaseAdmin
+      .from("lesson_words")
+      .select("position, corpus_words!inner(gn, es, status, validated_by, significados)")
+      .eq("lesson_id", lesson.id)
+      .eq("corpus_words.status", "published")
+      .order("position");
+    if (error) throw new Error(error.message);
+    const vocab: CourseVocabItem[] = (links ?? []).map((x) => {
+      const w = x.corpus_words as unknown as { gn: string; es: string; validated_by: string | null; significados?: CourseVocabItem["sig"] | null };
+      return { gn: w.gn, es: w.es, validated: !!w.validated_by, sig: w.significados ?? {} };
+    });
+    return { lesson: { n: lesson.sort_order, title: lesson.title, theme: lesson.theme, vocab } as CourseLesson };
+  });

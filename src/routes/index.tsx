@@ -104,23 +104,25 @@ function Hero() {
             Ya son más de 100 palabras grabadas por paraguayos, y seguimos grabando.
           </p>
 
-          {/* Menos fricción: primero se juega, la cuenta se pide después (cuando ya ganó sus primeros puntos). */}
+          {/* Menos fricción: primero se estudia (o se juega) sin cuenta; la cuenta se pide después. Estudiar va primero. */}
           <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 lg:mx-0">
+            <Link
+              to="/curso/$lang/leccion/$n"
+              params={{ lang: "guarani", n: "1" }}
+              className="hero-cta flex h-16 items-center justify-center gap-3 rounded-2xl bg-accent px-6 font-display text-xl font-bold text-accent-foreground shadow-lg transition active:scale-[.98]"
+            >
+              <span aria-hidden>📚</span> Estudiá ahora, sin cuenta
+            </Link>
             <Link
               to="/juegos/penales"
               search={{ de: "portada" } as never}
-              className="hero-cta flex h-16 items-center justify-center gap-3 rounded-2xl bg-accent px-6 font-display text-xl font-bold text-accent-foreground shadow-lg transition active:scale-[.98]"
+              className="flex h-16 items-center justify-center gap-3 rounded-2xl bg-primary px-6 font-display text-xl font-bold text-primary-foreground shadow-lg transition active:scale-[.98]"
             >
               <span aria-hidden>⚽</span> Jugá ahora, sin cuenta
             </Link>
-            <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" size="lg" asChild>
-                <Link to="/comenzar">Lecciones</Link>
-              </Button>
-              <Button variant="ghost" size="lg" asChild>
-                <Link to="/auth" search={{ mode: "login" }}>Iniciar sesión</Link>
-              </Button>
-            </div>
+            <Button variant="ghost" size="lg" asChild>
+              <Link to="/auth" search={{ mode: "login" }}>Ya tengo cuenta: iniciar sesión</Link>
+            </Button>
           </div>
           <p className="mt-4 text-sm lg:text-left">
             <Link to="/juegos" className="font-semibold text-primary underline underline-offset-4">
