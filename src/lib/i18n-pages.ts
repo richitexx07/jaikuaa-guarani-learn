@@ -105,6 +105,8 @@ const T = {
   lsMatchTitle: ["Uní las parejas", "Ligue os pares", "Match the pairs", "Ordne die Paare zu", "Associez les paires", "配對"],
   lsMatchDone: ["¡Todas unidas! Terminaste los ejercicios.", "Todas ligadas! Você terminou os exercícios.", "All matched! You finished the exercises.", "Alle zugeordnet! Übungen geschafft.", "Tout est associé ! Exercices terminés.", "全部配對完成！題目做完了。"],
   lsMatchWrong: ["Esa no va. Probá con otra.", "Essa não combina. Tente outra.", "That's not it. Try another.", "Das passt nicht. Versuch ein anderes.", "Ce n'est pas ça. Essayez une autre.", "不對，換一個試試。"],
+  lsMatchPaso1: ["Paso 1: tocá una palabra en guaraní 👇", "Passo 1: toque uma palavra em guarani 👇", "Step 1: tap a Guarani word 👇", "Schritt 1: Tippe ein Guaraní-Wort an 👇", "Étape 1 : touchez un mot en guarani 👇", "第 1 步：點一個瓜拉尼語詞 👇"],
+  lsMatchPaso2: ["Paso 2: ahora tocá qué significa «{w}» 👉", "Passo 2: agora toque o que significa «{w}» 👉", "Step 2: now tap what “{w}” means 👉", "Schritt 2: Tippe jetzt an, was „{w}“ bedeutet 👉", "Étape 2 : touchez maintenant ce que veut dire « {w} » 👉", "第 2 步：點「{w}」的意思 👉"],
   lsMatchHow: ["Tocá una palabra en guaraní y después su significado en español.", "Toque uma palavra em guarani e depois o significado em espanhol.", "Tap a Guarani word, then its meaning in Spanish.", "Tippe ein Guaraní-Wort und dann seine Bedeutung auf Spanisch.", "Touchez un mot en guarani, puis son sens en espagnol.", "先點一個瓜拉尼語詞，再點它的西班牙語意思。"],
   lsFinish: ["Terminar la lección", "Terminar a lição", "Finish the lesson", "Lektion beenden", "Terminer la leçon", "完成本課"],
   lsPremio: ["Tu premio", "Seu prêmio", "Your reward", "Deine Belohnung", "Votre récompense", "你的獎勵"],

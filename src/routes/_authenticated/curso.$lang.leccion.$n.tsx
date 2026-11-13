@@ -4,8 +4,9 @@ import { useAppLang } from "@/lib/i18n";
 import { localizarVocab } from "@/lib/significado";
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, X } from "lucide-react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, Check, Pointer, X } from "lucide-react";
+import { playGuarani } from "@/lib/audio";
 import { celebrate } from "@/lib/confetti";
 import jaiProfe from "@/assets/jai-profe.webp";
 import jaiFesteja from "@/assets/jai/jai-trofeo.webp";
@@ -150,7 +151,15 @@ const LESSON_CSS = `
 @keyframes lx-pop { from { opacity: 0; transform: translateY(8px) scale(.97); } }
 .lx-shake { animation: lx-shake .35s ease-in-out; }
 @keyframes lx-shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
-@media (prefers-reduced-motion: reduce) { .lx-pop, .lx-shake { animation: none; } }
+.lx-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: lx-draw .5s cubic-bezier(.3,.7,.2,1) forwards; }
+@keyframes lx-draw { to { stroke-dashoffset: 0; } }
+.lx-hand { animation: lx-hand 1.1s ease-in-out infinite; }
+@keyframes lx-hand { 50% { transform: translate(-6px, -6px) scale(.92); } }
+.lx-nudge { animation: lx-nudge .9s ease-in-out infinite; }
+@keyframes lx-nudge { 50% { transform: translateX(4px); } }
+.lx-match { animation: lx-match .45s cubic-bezier(.2,1.4,.4,1); }
+@keyframes lx-match { 40% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .lx-pop, .lx-shake, .lx-hand, .lx-nudge, .lx-match { animation: none; } .lx-draw { animation: none; stroke-dashoffset: 0; } }
 `;
 
 function LessonPage() {
@@ -554,10 +563,21 @@ function MatchStep({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matched]);
   const [wrong, setWrong] = useState<{ gn: string; es: string } | null>(null);
+  const [justMatched, setJustMatched] = useState<string | null>(null);
 
   const lookup = useMemo(() => {
     const m = new Map<string, string>();
     pairs.forEach((p) => m.set(p.gn, p.es));
+    return m;
+  }, [pairs]);
+
+  // Cada pareja unida lleva su color y su número, en las dos tarjetas y en la línea que las une:
+  // así se ve de un vistazo qué va con qué.
+  const order = [...matched];
+  const pairIdx = (gn: string) => order.indexOf(gn);
+  const gnOfEs = useMemo(() => {
+    const m = new Map<string, string>();
+    pairs.forEach((p) => m.set(p.es, p.gn));
     return m;
   }, [pairs]);
 
@@ -566,19 +586,58 @@ function MatchStep({
     const ok = lookup.get(selectedGn) === es;
     logAnswer(selectedGn, ok, "lesson", lessonRef);
     if (ok) {
-      setMatched((prev) => new Set(prev).add(selectedGn));
+      const gn = selectedGn;
+      setMatched((prev) => new Set(prev).add(gn));
       setSelectedGn(null);
       setWrong(null);
+      setJustMatched(gn);
+      // Al unirla, se escucha la palabra con su voz real.
+      void playGuarani(gn).catch(() => false);
     } else {
       setWrong({ gn: selectedGn, es });
       setTimeout(() => {
         setWrong(null);
         setSelectedGn(null);
-      }, 600);
+      }, 650);
     }
   }
 
+  // Líneas que unen cada pareja: se dibujan sobre las dos columnas.
+  const boxRef = useRef<HTMLDivElement>(null);
+  const leftRefs = useRef(new Map<string, HTMLElement>());
+  const rightRefs = useRef(new Map<string, HTMLElement>());
+  const [lines, setLines] = useState<{ gn: string; d: string; i: number }[]>([]);
+  const measure = useCallback(() => {
+    const box = boxRef.current;
+    if (!box) return;
+    const b = box.getBoundingClientRect();
+    const out: { gn: string; d: string; i: number }[] = [];
+    [...matched].forEach((gn, i) => {
+      const l = leftRefs.current.get(gn);
+      const r = rightRefs.current.get(lookup.get(gn) ?? "");
+      if (!l || !r) return;
+      const a = l.getBoundingClientRect();
+      const c = r.getBoundingClientRect();
+      const x1 = a.right - b.left - 2, y1 = a.top + a.height / 2 - b.top;
+      const x2 = c.left - b.left + 2, y2 = c.top + c.height / 2 - b.top;
+      const mx = (x1 + x2) / 2;
+      out.push({ gn, i, d: `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}` });
+    });
+    setLines(out);
+  }, [matched, lookup]);
+  useLayoutEffect(() => {
+    measure();
+  }, [measure]);
+  useEffect(() => {
+    const box = boxRef.current;
+    if (!box || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(box);
+    return () => ro.disconnect();
+  }, [measure]);
+
   const done = matched.size === pairs.length;
+  const paso = done ? tx("lsMatchDone") : wrong ? tx("lsMatchWrong") : selectedGn ? tx("lsMatchPaso2", { w: selectedGn }) : tx("lsMatchPaso1");
 
   return (
     <div>
@@ -590,56 +649,93 @@ function MatchStep({
       </div>
       <div className="mb-4">
         <JaiSays ok={done ? true : wrong ? false : null}>
-          {done ? tx("lsMatchDone") : wrong ? tx("lsMatchWrong") : tx("lsMatchHow")}
+          <span aria-live="polite">{paso}</span>
         </JaiSays>
       </div>
-      <div className="grid grid-cols-2 gap-2.5">
+      <div ref={boxRef} className="relative grid grid-cols-2 gap-x-9 sm:gap-x-14">
+        <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden>
+          {lines.map((ln) => (
+            <g key={ln.gn}>
+              <path d={ln.d} fill="none" stroke="var(--background, #fff)" strokeWidth="9" strokeLinecap="round" pathLength={1} className="lx-draw" />
+              <path d={ln.d} fill="none" stroke={PAIR_COLORS[ln.i % PAIR_COLORS.length]!.c} strokeWidth="5" strokeLinecap="round" pathLength={1} className="lx-draw" />
+            </g>
+          ))}
+        </svg>
         <div className="space-y-2.5">
-          {leftItems.map((gn) => {
+          {leftItems.map((gn, idx) => {
             const isMatched = matched.has(gn);
             const isSelected = selectedGn === gn;
             const isWrong = wrong?.gn === gn;
+            const pc = isMatched ? PAIR_COLORS[pairIdx(gn) % PAIR_COLORS.length]! : null;
             let cls =
-              "flex min-h-14 w-full items-center gap-2 rounded-2xl border-2 border-border/70 bg-card p-2.5 text-base font-display font-semibold shadow-sm transition";
-            if (isMatched) cls += " border-emerald-600 bg-emerald-50 text-emerald-800 opacity-70 dark:bg-emerald-900/30 dark:text-emerald-200";
+              "relative flex min-h-14 w-full items-center gap-2 rounded-2xl border-2 p-2.5 text-base font-display font-semibold shadow-sm transition";
+            if (isMatched) cls += " bg-card text-foreground";
             else if (isWrong) cls += " lx-shake border-accent bg-accent/10 text-accent";
-            else if (isSelected) cls += " border-primary bg-primary/10 text-primary";
-            else cls += " hover:border-accent/60";
-            // El parlante va al lado del botón de la palabra, no adentro: un botón dentro de otro
-            // hacía que escuchar la palabra también la seleccionara.
+            else if (isSelected) cls += " -translate-y-0.5 scale-[1.03] border-[#E0A800] bg-[#FFF4CC] text-[#13233A] shadow-lg ring-4 ring-[#F6C445]/40 dark:bg-[#4A3A0A] dark:text-[#FFF4CC]";
+            else cls += " border-border/70 bg-card hover:border-[#F6C445]";
+            if (isMatched && justMatched === gn) cls += " lx-match";
             return (
-              <div key={gn} className={cls}>
+              <div
+                key={gn}
+                ref={(e) => {
+                  if (e) leftRefs.current.set(gn, e);
+                  else leftRefs.current.delete(gn);
+                }}
+                className={cls}
+                style={pc ? { borderColor: pc.c, background: pc.bg } : undefined}
+              >
                 <SpeakerButton gn={gn} />
                 <button
                   type="button"
                   disabled={isMatched}
                   aria-pressed={isSelected}
-                  onClick={() => setSelectedGn(gn)}
+                  onClick={() => setSelectedGn(isSelected ? null : gn)}
                   className="flex-1 self-stretch text-left"
                 >
                   {gn}
                 </button>
+                {pc && <PairBadge n={pairIdx(gn) + 1} pc={pc} side="right" />}
+                {isSelected && (
+                  <span className="lx-nudge absolute -right-8 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full bg-[#F6C445] text-[#13233A] shadow sm:-right-11" aria-hidden>
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                )}
+                {!done && matched.size === 0 && !selectedGn && idx === 0 && (
+                  <span className="lx-hand pointer-events-none absolute -bottom-3 right-3 grid h-9 w-9 place-items-center rounded-full bg-[#F6C445] text-[#13233A] shadow-lg" aria-hidden>
+                    <Pointer className="h-5 w-5" />
+                  </span>
+                )}
               </div>
             );
           })}
         </div>
         <div className="space-y-2.5">
           {rightItems.map((es) => {
-            const isMatched = [...matched].some((gn) => lookup.get(gn) === es);
+            const gnM = gnOfEs.get(es);
+            const isMatched = !!gnM && matched.has(gnM);
             const isWrong = wrong?.es === es;
+            const pc = isMatched ? PAIR_COLORS[pairIdx(gnM!) % PAIR_COLORS.length]! : null;
             let cls =
-              "flex min-h-14 w-full items-center rounded-2xl border-2 border-border/70 bg-card p-3 text-left text-base font-medium shadow-sm transition active:scale-[0.98]";
-            if (isMatched) cls += " border-emerald-600 bg-emerald-50 text-emerald-800 opacity-70 dark:bg-emerald-900/30 dark:text-emerald-200";
+              "relative flex min-h-14 w-full items-center rounded-2xl border-2 p-3 text-left text-base font-medium shadow-sm transition active:scale-[0.98]";
+            if (isMatched) cls += " bg-card text-foreground";
             else if (isWrong) cls += " lx-shake border-accent bg-accent/10 text-accent";
-            else cls += " hover:border-accent/60";
+            else if (selectedGn) cls += " border-[#F6C445] bg-card hover:bg-[#FFF4CC] dark:hover:bg-[#4A3A0A]";
+            else cls += " border-border/70 bg-card opacity-80";
+            if (isMatched && justMatched === gnM) cls += " lx-match";
             return (
               <button
                 key={es}
+                ref={(e) => {
+                  if (e) rightRefs.current.set(es, e);
+                  else rightRefs.current.delete(es);
+                }}
                 type="button"
-                disabled={isMatched}
+                disabled={isMatched || !selectedGn}
                 onClick={() => tryMatch(es)}
                 className={cls}
+                style={pc ? { borderColor: pc.c, background: pc.bg, opacity: 1 } : undefined}
               >
+                {pc && <PairBadge n={pairIdx(gnM!) + 1} pc={pc} side="left" />}
                 {es}
               </button>
             );
@@ -653,6 +749,28 @@ function MatchStep({
         </Button>
       )}
     </div>
+  );
+}
+
+/** Colores de las parejas unidas: los de la bandera y la marca, con su fondo suave. */
+const PAIR_COLORS = [
+  { c: "#D52B1E", bg: "rgba(213,43,30,.10)", fg: "#fff" },
+  { c: "#0038A8", bg: "rgba(0,56,168,.10)", fg: "#fff" },
+  { c: "#E0A800", bg: "rgba(246,196,69,.18)", fg: "#13233A" },
+  { c: "#1F7A4D", bg: "rgba(31,122,77,.12)", fg: "#fff" },
+  { c: "#7B3FA0", bg: "rgba(123,63,160,.10)", fg: "#fff" },
+  { c: "#0E8A8A", bg: "rgba(14,138,138,.12)", fg: "#fff" },
+] as const;
+
+function PairBadge({ n, pc, side }: { n: number; pc: (typeof PAIR_COLORS)[number]; side: "left" | "right" }) {
+  return (
+    <span
+      className={`absolute -top-2 grid h-6 w-6 place-items-center rounded-full text-xs font-bold shadow ${side === "right" ? "-right-2" : "-left-2"}`}
+      style={{ background: pc.c, color: pc.fg }}
+      aria-hidden
+    >
+      {n}
+    </span>
   );
 }
 
