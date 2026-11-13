@@ -7,7 +7,11 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Bell, BookOpen, Check, ChevronRight, Gamepad2, Play } from "lucide-react";
+import {
+  Award, BadgeCheck, Bell, BookA, BookOpen, Check, ChevronRight, Clapperboard, Gamepad2, GraduationCap, HandHeart,
+  Keyboard, Languages, Library, MapPin, Medal, MessageCircleQuestion, MessagesSquare, Mic2, Music2, NotebookPen, Play,
+  School, Scissors, Sparkles, Store, Tractor, Trophy, Users, type LucideIcon,
+} from "lucide-react";
 import { listCourseLessons } from "@/lib/lessons.functions";
 import { getWordOfDay } from "@/lib/games.functions";
 import { withOfflineCache } from "@/lib/offline-data";
@@ -67,6 +71,33 @@ const T = {
   jaiHoy: { es: "¡Ya practicaste hoy! Jai te aplaude.", pt: "Você já praticou hoje! O Jai te aplaude.", en: "You already practiced today! Jai is cheering.", de: "Heute schon geübt! Jai applaudiert.", fr: "Vous avez déjà pratiqué aujourd'hui ! Jai applaudit.", zh: "今天已經練習了！Jai 為你鼓掌。" },
   jaiRacha: { es: "¡{n} días seguidos! Jai levanta la copa por vos.", pt: "{n} dias seguidos! O Jai ergue a taça por você.", en: "{n} days in a row! Jai raises the cup for you.", de: "{n} Tage am Stück! Jai hebt den Pokal für dich.", fr: "{n} jours d'affilée ! Jai lève la coupe pour vous.", zh: "連續 {n} 天！Jai 為你舉起獎盃。" },
   jaiVolver: { es: "¡Qué bueno verte! ¿Seguimos?", pt: "Que bom te ver! Vamos continuar?", en: "Great to see you! Shall we continue?", de: "Schön, dich zu sehen! Machen wir weiter?", fr: "Content de vous revoir ! On continue ?", zh: "很高興見到你！我們繼續吧？" },
+  todo: { es: "Todo Jaikuaa", pt: "Todo o Jaikuaa", en: "All of Jaikuaa", de: "Ganz Jaikuaa", fr: "Tout Jaikuaa", zh: "Jaikuaa 全部功能" },
+  todoD: { es: "Todo a la vista, en un toque.", pt: "Tudo à vista, num toque.", en: "Everything in sight, one tap away.", de: "Alles auf einen Blick, mit einem Tipp.", fr: "Tout en vue, en un geste.", zh: "一目了然，點一下就到。" },
+  gAprender: { es: "Aprender", pt: "Aprender", en: "Learn", de: "Lernen", fr: "Apprendre", zh: "學習" },
+  gJugar: { es: "Jugar", pt: "Jogar", en: "Play", de: "Spielen", fr: "Jouer", zh: "遊戲" },
+  gCultura: { es: "Cultura paraguaya", pt: "Cultura paraguaia", en: "Paraguayan culture", de: "Paraguayische Kultur", fr: "Culture paraguayenne", zh: "巴拉圭文化" },
+  gMas: { es: "Comunidad y trabajo", pt: "Comunidade e trabalho", en: "Community and work", de: "Gemeinschaft und Arbeit", fr: "Communauté et travail", zh: "社群與工作" },
+  enRevision: { es: "en revisión docente", pt: "em revisão docente", en: "in teacher review", de: "in Prüfung durch Lehrkräfte", fr: "en révision par des enseignants", zh: "教師審閱中" },
+  iCurso: { es: "Curso", pt: "Curso", en: "Course", de: "Kurs", fr: "Cours", zh: "課程" },
+  iEscolar: { es: "Escolar", pt: "Escolar", en: "School", de: "Schule", fr: "Scolaire", zh: "學校" },
+  iPronunciar: { es: "Pronunciar", pt: "Pronunciar", en: "Pronounce", de: "Aussprache", fr: "Prononcer", zh: "發音" },
+  iGlosario: { es: "Glosario", pt: "Glossário", en: "Glossary", de: "Glossar", fr: "Glossaire", zh: "詞彙表" },
+  iCuaderno: { es: "Cuaderno", pt: "Caderno", en: "Notebook", de: "Heft", fr: "Cahier", zh: "筆記本" },
+  iClase: { es: "Mi clase", pt: "Minha turma", en: "My class", de: "Meine Klasse", fr: "Ma classe", zh: "我的班級" },
+  iTeclado: { es: "Teclado", pt: "Teclado", en: "Keyboard", de: "Tastatur", fr: "Clavier", zh: "鍵盤" },
+  iJuegos: { es: "Juegos", pt: "Jogos", en: "Games", de: "Spiele", fr: "Jeux", zh: "遊戲" },
+  iRanking: { es: "Ranking", pt: "Ranking", en: "Ranking", de: "Rangliste", fr: "Classement", zh: "排行榜" },
+  iLogros: { es: "Mis logros", pt: "Conquistas", en: "Achievements", de: "Erfolge", fr: "Succès", zh: "成就" },
+  iLibreria: { es: "Librería", pt: "Livraria", en: "Bookstore", de: "Bücher", fr: "Librairie", zh: "書店" },
+  iTurismo: { es: "Turismo", pt: "Turismo", en: "Tourism", de: "Tourismus", fr: "Tourisme", zh: "旅遊" },
+  iCine: { es: "Cine", pt: "Cinema", en: "Cinema", de: "Kino", fr: "Cinéma", zh: "電影" },
+  iEmbajadores: { es: "Invitar", pt: "Convidar", en: "Invite", de: "Einladen", fr: "Inviter", zh: "邀請" },
+  iCertificado: { es: "Certificado", pt: "Certificado", en: "Certificate", de: "Zertifikat", fr: "Certificat", zh: "證書" },
+  iMostrador: { es: "Atender", pt: "Atender", en: "Serve customers", de: "Kunden", fr: "Accueil", zh: "接待顧客" },
+  iAgro: { es: "Agro", pt: "Agro", en: "Farming", de: "Landwirtschaft", fr: "Agro", zh: "農業" },
+  iExpertos: { es: "Expertos", pt: "Especialistas", en: "Experts", de: "Fachleute", fr: "Experts", zh: "專家" },
+  iTraductor: { es: "Traductor", pt: "Tradutor", en: "Translator", de: "Übersetzer", fr: "Traducteur", zh: "翻譯" },
+  iTutor: { es: "Tutor", pt: "Tutor", en: "Tutor", de: "Tutor", fr: "Tuteur", zh: "導師" },
   triviaD: { es: "Preguntas y respuestas", pt: "Perguntas e respostas", en: "Questions and answers", de: "Fragen und Antworten", fr: "Questions et réponses", zh: "問與答" },
 } satisfies Record<string, L>;
 
@@ -325,5 +356,111 @@ export function NovedadesCampana({ children }: { children: ReactNode }) {
         <div className="pb-8">{children}</div>
       </SheetContent>
     </Sheet>
+  );
+}
+
+type Atajo = { href: string; icon: LucideIcon; t: keyof typeof T | null; nombre?: string; revision?: boolean };
+type Grupo = { titulo: keyof typeof T; tono: string; items: Atajo[] };
+
+function gruposTodo(ia: boolean): Grupo[] {
+  return [
+    {
+      titulo: "gAprender",
+      tono: "bg-primary text-primary-foreground",
+      items: [
+        { href: "/curso/guarani", icon: GraduationCap, t: "iCurso" },
+        { href: "/guarani-escolar", icon: School, t: "iEscolar", revision: true },
+        { href: "/pronunciar", icon: Mic2, t: "iPronunciar" },
+        { href: "/glosario", icon: BookA, t: "iGlosario" },
+        { href: "/cuaderno", icon: NotebookPen, t: "iCuaderno" },
+        { href: "/aula", icon: Users, t: "iClase" },
+        { href: "/teclado", icon: Keyboard, t: "iTeclado" },
+        { href: "/nhe-mbytepe", icon: MessagesSquare, t: null, nombre: "Ñe'ẽ Mbytépe", revision: true },
+        ...(ia
+          ? [
+              { href: "/traductor", icon: Languages, t: "iTraductor" as const },
+              { href: "/tutor", icon: Sparkles, t: "iTutor" as const },
+            ]
+          : []),
+      ],
+    },
+    {
+      titulo: "gJugar",
+      tono: "bg-[#F6C445] text-[#13233A]",
+      items: [
+        { href: "/juegos", icon: Gamepad2, t: "iJuegos" },
+        { href: "/trivia", icon: MessageCircleQuestion, t: "trivia", revision: true },
+        { href: "/ranking", icon: Trophy, t: "iRanking" },
+        { href: "/logros", icon: Medal, t: "iLogros" },
+      ],
+    },
+    {
+      titulo: "gCultura",
+      tono: "bg-[#D52B1E] text-white",
+      items: [
+        { href: "/libreria", icon: Library, t: "iLibreria" },
+        { href: "/purahei", icon: Music2, t: null, nombre: "Purahéi" },
+        { href: "/tembiapo", icon: Scissors, t: null, nombre: "Tembiapo" },
+        { href: "/turismo", icon: MapPin, t: "iTurismo" },
+        { href: "/cine", icon: Clapperboard, t: "iCine" },
+      ],
+    },
+    {
+      titulo: "gMas",
+      tono: "bg-[#0038A8] text-white",
+      items: [
+        { href: "/embajadores", icon: HandHeart, t: "iEmbajadores" },
+        { href: "/certificado", icon: Award, t: "iCertificado" },
+        { href: "/mostrador", icon: Store, t: "iMostrador", revision: true },
+        { href: "/agro", icon: Tractor, t: "iAgro" },
+        { href: "/expertos", icon: BadgeCheck, t: "iExpertos" },
+      ],
+    },
+  ];
+}
+
+/**
+ * Todo Jaikuaa a la vista: cada sección es un ícono chico con su nombre, agrupado por color
+ * (como la pantalla de un celular). Nada queda escondido detrás de pestañas y nada compite con la lección.
+ */
+export function TodoJaikuaa({ ia = false }: { ia?: boolean }) {
+  const t = useTD();
+  return (
+    <section aria-labelledby="inicio-todo" className="mt-10">
+      <h2 id="inicio-todo" className="font-display text-xl font-bold text-foreground">{t("todo")}</h2>
+      <p className="text-sm text-muted-foreground">{t("todoD")}</p>
+      <div className="mt-4 space-y-5">
+        {gruposTodo(ia).map((g) => (
+          <div key={g.titulo}>
+            <h3 className="mb-2 text-sm font-semibold text-muted-foreground">{t(g.titulo)}</h3>
+            <ul className="grid grid-cols-4 gap-x-2 gap-y-3 sm:grid-cols-6 lg:grid-cols-8">
+              {g.items.map((it) => {
+                const Icon = it.icon;
+                const nombre = it.t ? t(it.t) : it.nombre!;
+                return (
+                  <li key={it.href}>
+                    <a href={it.href} className="group flex flex-col items-center gap-1.5 rounded-2xl p-1 text-center transition active:scale-95">
+                      <span className={`relative grid h-14 w-14 place-items-center rounded-2xl shadow-sm transition group-hover:-translate-y-0.5 ${g.tono}`}>
+                        <Icon className="h-6 w-6" aria-hidden />
+                        {it.revision && (
+                          <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-amber-400 ring-2 ring-background" title={t("enRevision")} />
+                        )}
+                      </span>
+                      <span className="line-clamp-2 text-xs font-medium leading-tight text-foreground">
+                        {nombre}
+                        {it.revision && <span className="sr-only"> ({t("enRevision")})</span>}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+        <span className="h-2.5 w-2.5 rounded-full bg-amber-400" aria-hidden /> {t("enRevision")}
+      </p>
+    </section>
   );
 }

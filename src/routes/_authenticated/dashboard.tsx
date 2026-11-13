@@ -38,7 +38,7 @@ import { NovedadPurahei } from "@/components/purahei/novedad-purahei";
 import { ConvenioPendiente } from "@/components/convenio-pendiente";
 import { MisLibrosAcceso } from "@/components/libreria/mis-libros-acceso";
 import { RetoCard } from "@/components/games/reto-card";
-import { HeroLeccion, JuegosCarrusel, NovedadesCampana, PalabraDeHoy, useJaiDelMomento } from "@/components/dashboard/inicio-dos-toques";
+import { HeroLeccion, JuegosCarrusel, NovedadesCampana, PalabraDeHoy, TodoJaikuaa, useJaiDelMomento } from "@/components/dashboard/inicio-dos-toques";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import bannerAprender from "@/assets/banners/banner-aprender.webp";
 import bannerCurso from "@/assets/banners/banner-curso.webp";
@@ -330,6 +330,7 @@ function Dashboard() {
               <NovedadPurahei />
               <RetoCard guest={false} />
               <div className="mt-6"><OfflinePackCard /></div>
+              <div className="mt-6"><NhandeMarandu className="" /></div>
             </NovedadesCampana>
             <AppLanguageToggle />
             <DisplayToggles />
@@ -383,100 +384,13 @@ function Dashboard() {
             </p>
           </div>
 
-          <h2 className="mt-10 text-center font-display text-lg font-semibold text-muted-foreground">
-            {t("dash.explore")}
-          </h2>
-
           {/* 3. ACCESO DOCENTE */}
           <AulaPendientes />
           <StaffShortcuts />
           <PilotCard />
 
-          {/* 4. TRES PILARES */}
-          <Tabs defaultValue="aprender" className="mt-4">
-            <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-2xl p-1 sm:grid-cols-4">
-              <TabsTrigger value="aprender" className="min-h-11 rounded-xl py-2.5 text-sm">
-                <BookOpen className="mr-1.5 h-4 w-4" aria-hidden /> {t("nav.learn")}
-              </TabsTrigger>
-              <TabsTrigger value="jugar" className="min-h-11 rounded-xl py-2.5 text-sm">
-                <Gamepad2 className="mr-1.5 h-4 w-4" aria-hidden /> {t("dash.play")}
-              </TabsTrigger>
-              <TabsTrigger value="herramientas" className="min-h-11 rounded-xl py-2.5 text-sm">
-                <Wrench className="mr-1.5 h-4 w-4" aria-hidden /> {t("dash.tools")}
-              </TabsTrigger>
-              <TabsTrigger value="noticias" className="min-h-11 rounded-xl py-2.5 text-sm">
-                <Newspaper className="mr-1.5 h-4 w-4" aria-hidden /> {t("dash.news")}
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="aprender" className="mt-6">
-              <img
-                src={bannerAprender}
-                alt="Jai escucha audio en el celular, recostado junto a un libro abierto, al atardecer"
-                className="mb-4 aspect-[16/9] w-full rounded-2xl object-cover sm:aspect-[21/9]"
-                width={1280}
-                height={720}
-                loading="lazy"
-              />
-              <p className="mb-4 text-sm text-muted-foreground">
-                {t("d.learnIntro")}
-              </p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <FreeCard to="/curso/guarani" img={bannerCurso} cover title={t("d.course.t")} desc={t("d.course.d")} accent="accent" />
-                <FreeCard to="/guarani-escolar" img={bannerEscolar} cover title={t("d.school.t")} desc={t("d.school.d")} accent="accent" inValidation />
-                <FreeCard to="/logros" img={medallaPrimerPaso} title={t("d.ach.t")} desc={t("d.ach.d")} accent="primary" />
-                <FreeCard to="/embajadores" img={jaiEmbajador} title={t("d.invite.t")} desc={t("d.invite.d")} accent="primary" />
-                <FreeCard to="/certificado" img={jaiGraduado} title={t("d.cert.t")} desc={t("d.cert.d")} accent="primary" />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="jugar" className="mt-6">
-              <p className="mb-4 text-sm text-muted-foreground">
-                {t("d.playIntro")}
-              </p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <FreeCard to="/trivia" img={coverTrivia} cover title={t("d.trivia.t")} desc={t("d.trivia.d")} accent="accent" inValidation />
-                <FreeCard to="/juegos" img={coverPenales} cover title={t("d.games.t")} desc={t("d.games.d")} accent="accent" />
-                <FreeCard to="/ranking" img={jaiTrofeo} title={t("d.rank.t")} desc={t("d.rank.d")} accent="primary" />
-              </div>
-              <div className="mt-6 rounded-2xl border border-dashed border-border bg-muted/40 p-4">
-                <p className="font-display font-bold text-foreground">{t("d.more.t")}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {t("d.more.d")}
-                </p>
-                <Link to="/juegos" className="mt-2 inline-block text-sm font-semibold text-primary">
-                  {t("d.more.link")} →
-                </Link>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="herramientas" className="mt-6">
-              <p className="mb-4 text-sm text-muted-foreground">
-                {t("d.toolsIntro")}
-              </p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <FreeCard to="/libreria" icon={BookOpen} title="Librería Jaikuaa" desc="Libros que se leen y libros que hablan. En desarrollo." accent="accent" />
-                <FreeCard to="/purahei" icon={Mic2} title="Purahéi Jaikuaa" desc="Artistas paraguayos: su voz real, sus letras explicadas y contacto directo." accent="accent" />
-                <FreeCard to="/aula" img={jaiProfe} title={t("d.aula.t")} desc={t("d.aula.d")} accent="primary" />
-                <FreeCard to="/pronunciar" img={jaiBienvenida} title={t("d.pron.t")} desc={t("d.pron.d")} accent="primary" />
-                <FreeCard to="/mostrador" img={jaiAtencion} title={t("d.mostr.t")} desc={t("d.mostr.d")} accent="primary" inValidation />
-                <FreeCard to="/teclado" icon={Keyboard} title={t("d.kb.t")} desc={t("d.kb.d")} accent="primary" />
-                <FreeCard to="/glosario" img={triviaVocabulario} title={t("d.gloss.t")} desc={t("d.gloss.d")} accent="primary" />
-                <FreeCard to="/agro" img={jaiAgro} title="Jaikuaa Agro-Rural" desc={t("d.agro.d")} accent="primary" />
-                {AI_GUARANI_TOOLS_ENABLED && (
-                  <>
-                    <FreeCard to="/traductor" icon={Languages} title="Traductor" desc="Consulta rápida guaraní – español." accent="primary" experimental />
-                    <FreeCard to="/tutor" icon={Sparkles} title="Tutor IA" desc="Conversá con un asistente para practicar." accent="primary" experimental />
-                  </>
-                )}
-                <FreeCard to="/nhe-mbytepe" icon={MessagesSquare} title="Ñe'ẽ Mbytépe" desc={t("d.street.d")} accent="primary" inValidation />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="noticias" className="mt-6">
-              <NhandeMarandu className="" />
-            </TabsContent>
-          </Tabs>
+          {/* 4. TODO JAIKUAA a la vista: íconos chicos agrupados, nada escondido en pestañas */}
+          <TodoJaikuaa ia={AI_GUARANI_TOOLS_ENABLED} />
         </div>
       </main>
       <SiteFooter />
