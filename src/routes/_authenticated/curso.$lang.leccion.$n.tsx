@@ -153,7 +153,10 @@ function JaiSays({ ok, children }: { ok: boolean | null; children: React.ReactNo
 function useVozConTiempo() {
   const [sonando, setSonando] = useState<string | null>(null);
   const vivo = useRef(true);
-  useEffect(() => () => { vivo.current = false; }, []);
+  useEffect(() => {
+    vivo.current = true;
+    return () => { vivo.current = false; };
+  }, []);
   const decir = useCallback((gn: string, respiro = 450) => {
     setSonando(gn);
     let hecho = false;
