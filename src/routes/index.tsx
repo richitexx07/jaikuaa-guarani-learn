@@ -154,9 +154,10 @@ function Hero() {
 }
 
 const ADENTRO = [
+  // Orden pedido por Richard: primero lo escolar, después las lecciones y al final los juegos.
+  { img: bannerEscolar, title: "Guaraní Escolar", desc: "Por grado, para entender la tarea y llegar tranquilo al examen." },
   { img: bannerCurso, title: "Un curso paso a paso", desc: "Lecciones cortas, para hacer en la parada del colectivo o en la ronda de tereré." },
   { img: coverKaraoke, title: "15 juegos", desc: "Karaoke con arpa, penales, cocina paraguaya, duelos con amigos y guaraní para el trabajo." },
-  { img: bannerEscolar, title: "Guaraní Escolar", desc: "Por grado, para entender la tarea y llegar tranquilo al examen." },
 ];
 
 function Adentro() {
