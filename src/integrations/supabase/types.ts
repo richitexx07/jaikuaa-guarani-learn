@@ -231,6 +231,69 @@ export type Database = {
         }
         Relationships: []
       }
+      colaboradores_postulaciones: {
+        Row: {
+          aportes: string[]
+          capacitacion: boolean
+          ciudad: string
+          comentario: string
+          created_at: string
+          departamento: string
+          email: string | null
+          estado: string
+          id: string
+          institucion: string
+          lenguas: string
+          nombre: string
+          nota_interna: string
+          origen: string
+          perfil: string
+          revisado_por: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          aportes: string[]
+          capacitacion?: boolean
+          ciudad?: string
+          comentario?: string
+          created_at?: string
+          departamento: string
+          email?: string | null
+          estado?: string
+          id?: string
+          institucion?: string
+          lenguas?: string
+          nombre: string
+          nota_interna?: string
+          origen?: string
+          perfil: string
+          revisado_por?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          aportes?: string[]
+          capacitacion?: boolean
+          ciudad?: string
+          comentario?: string
+          created_at?: string
+          departamento?: string
+          email?: string | null
+          estado?: string
+          id?: string
+          institucion?: string
+          lenguas?: string
+          nombre?: string
+          nota_interna?: string
+          origen?: string
+          perfil?: string
+          revisado_por?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       content_proposals: {
         Row: {
           es: string
@@ -371,6 +434,111 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      convenios_firmados: {
+        Row: {
+          adjunto_at: string | null
+          adjunto_path: string | null
+          adjunto_tipo: string | null
+          artesano_id: string | null
+          artista_id: string | null
+          ci: string
+          ciudad: string
+          codigo: string
+          dispositivo: string
+          email: string
+          estado: string
+          firmado_at: string
+          huella: string
+          id: string
+          ip: string
+          nombre: string
+          nota: string
+          obras: Json
+          permisos: string[]
+          programa: string
+          revisado_at: string | null
+          revisado_por: string | null
+          roles: string[]
+          updated_at: string
+          user_id: string | null
+          version: string
+          whatsapp: string
+        }
+        Insert: {
+          adjunto_at?: string | null
+          adjunto_path?: string | null
+          adjunto_tipo?: string | null
+          artesano_id?: string | null
+          artista_id?: string | null
+          ci: string
+          ciudad?: string
+          codigo: string
+          dispositivo?: string
+          email: string
+          estado?: string
+          firmado_at?: string
+          huella: string
+          id?: string
+          ip?: string
+          nombre: string
+          nota?: string
+          obras: Json
+          permisos: string[]
+          programa: string
+          revisado_at?: string | null
+          revisado_por?: string | null
+          roles: string[]
+          updated_at?: string
+          user_id?: string | null
+          version: string
+          whatsapp: string
+        }
+        Update: {
+          adjunto_at?: string | null
+          adjunto_path?: string | null
+          adjunto_tipo?: string | null
+          artesano_id?: string | null
+          artista_id?: string | null
+          ci?: string
+          ciudad?: string
+          codigo?: string
+          dispositivo?: string
+          email?: string
+          estado?: string
+          firmado_at?: string
+          huella?: string
+          id?: string
+          ip?: string
+          nombre?: string
+          nota?: string
+          obras?: Json
+          permisos?: string[]
+          programa?: string
+          revisado_at?: string | null
+          revisado_por?: string | null
+          roles?: string[]
+          updated_at?: string
+          user_id?: string | null
+          version?: string
+          whatsapp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "convenios_firmados_artesano_id_fkey"
+            columns: ["artesano_id"]
+            isOneToOne: false
+            referencedRelation: "tembiapo_artesanos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "convenios_firmados_artista_id_fkey"
+            columns: ["artista_id"]
+            isOneToOne: false
+            referencedRelation: "purahei_artistas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       corpus_sentence_words: {
         Row: {
@@ -539,6 +707,9 @@ export type Database = {
           has_audio: boolean
           id: string
           notes: string
+          significados: Json
+          significados_propuestos: Json
+          significados_revision: Json
           status: string
           updated_at: string
           validated_at: string | null
@@ -553,6 +724,9 @@ export type Database = {
           has_audio?: boolean
           id?: string
           notes?: string
+          significados?: Json
+          significados_propuestos?: Json
+          significados_revision?: Json
           status?: string
           updated_at?: string
           validated_at?: string | null
@@ -567,6 +741,9 @@ export type Database = {
           has_audio?: boolean
           id?: string
           notes?: string
+          significados?: Json
+          significados_propuestos?: Json
+          significados_revision?: Json
           status?: string
           updated_at?: string
           validated_at?: string | null
@@ -1187,6 +1364,140 @@ export type Database = {
         }
         Relationships: []
       }
+      purahei_artistas: {
+        Row: {
+          bio: string
+          ciudad: string
+          contacto: string
+          creado_por: string | null
+          created_at: string
+          enlaces: Json
+          foto_path: string | null
+          id: string
+          nombre: string
+          permiso_imagen: boolean
+          publicado: boolean
+          slug: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          bio?: string
+          ciudad?: string
+          contacto?: string
+          creado_por?: string | null
+          created_at?: string
+          enlaces?: Json
+          foto_path?: string | null
+          id?: string
+          nombre: string
+          permiso_imagen?: boolean
+          publicado?: boolean
+          slug: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          bio?: string
+          ciudad?: string
+          contacto?: string
+          creado_por?: string | null
+          created_at?: string
+          enlaces?: Json
+          foto_path?: string | null
+          id?: string
+          nombre?: string
+          permiso_imagen?: boolean
+          publicado?: boolean
+          slug?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      purahei_obras: {
+        Row: {
+          anio: number | null
+          artista_id: string
+          audio_path: string | null
+          autor: string
+          cargado_por: string | null
+          created_at: string
+          descripcion: string
+          estilo: string
+          glosario: Json
+          id: string
+          interprete: string
+          karaoke: Json | null
+          permiso_autor: boolean
+          permiso_interprete: boolean
+          permiso_productor: boolean
+          productor: string
+          publicado: boolean
+          revisado_at: string | null
+          revisado_por: string | null
+          titulo: string
+          updated_at: string
+          versos: Json
+        }
+        Insert: {
+          anio?: number | null
+          artista_id: string
+          audio_path?: string | null
+          autor?: string
+          cargado_por?: string | null
+          created_at?: string
+          descripcion?: string
+          estilo?: string
+          glosario?: Json
+          id?: string
+          interprete?: string
+          karaoke?: Json | null
+          permiso_autor?: boolean
+          permiso_interprete?: boolean
+          permiso_productor?: boolean
+          productor?: string
+          publicado?: boolean
+          revisado_at?: string | null
+          revisado_por?: string | null
+          titulo: string
+          updated_at?: string
+          versos?: Json
+        }
+        Update: {
+          anio?: number | null
+          artista_id?: string
+          audio_path?: string | null
+          autor?: string
+          cargado_por?: string | null
+          created_at?: string
+          descripcion?: string
+          estilo?: string
+          glosario?: Json
+          id?: string
+          interprete?: string
+          karaoke?: Json | null
+          permiso_autor?: boolean
+          permiso_interprete?: boolean
+          permiso_productor?: boolean
+          productor?: string
+          publicado?: boolean
+          revisado_at?: string | null
+          revisado_por?: string | null
+          titulo?: string
+          updated_at?: string
+          versos?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purahei_obras_artista_id_fkey"
+            columns: ["artista_id"]
+            isOneToOne: false
+            referencedRelation: "purahei_artistas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rate_limits: {
         Row: {
           bucket_key: string
@@ -1360,6 +1671,261 @@ export type Database = {
           note?: string
           status?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      tembiapo_artesanos: {
+        Row: {
+          bio: string
+          ciudad: string
+          comunidad: string
+          consentimiento_comunidad: boolean
+          contacto: string
+          creado_por: string | null
+          created_at: string
+          departamento: string
+          foto_path: string | null
+          id: string
+          maestro_ipa: boolean
+          nombre: string
+          oficio: string
+          permiso_imagen: boolean
+          publicado: boolean
+          ruta_id: string | null
+          slug: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          bio?: string
+          ciudad?: string
+          comunidad?: string
+          consentimiento_comunidad?: boolean
+          contacto?: string
+          creado_por?: string | null
+          created_at?: string
+          departamento?: string
+          foto_path?: string | null
+          id?: string
+          maestro_ipa?: boolean
+          nombre: string
+          oficio: string
+          permiso_imagen?: boolean
+          publicado?: boolean
+          ruta_id?: string | null
+          slug: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          bio?: string
+          ciudad?: string
+          comunidad?: string
+          consentimiento_comunidad?: boolean
+          contacto?: string
+          creado_por?: string | null
+          created_at?: string
+          departamento?: string
+          foto_path?: string | null
+          id?: string
+          maestro_ipa?: boolean
+          nombre?: string
+          oficio?: string
+          permiso_imagen?: boolean
+          publicado?: boolean
+          ruta_id?: string | null
+          slug?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tembiapo_artesanos_ruta_id_fkey"
+            columns: ["ruta_id"]
+            isOneToOne: false
+            referencedRelation: "tembiapo_rutas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tembiapo_glosario: {
+        Row: {
+          artesano_id: string | null
+          audio_path: string | null
+          cargado_por: string | null
+          created_at: string
+          id: string
+          oficio: string
+          publicado: boolean
+          revisado_at: string | null
+          revisado_por: string | null
+          significado: string
+          termino: string
+          updated_at: string
+        }
+        Insert: {
+          artesano_id?: string | null
+          audio_path?: string | null
+          cargado_por?: string | null
+          created_at?: string
+          id?: string
+          oficio: string
+          publicado?: boolean
+          revisado_at?: string | null
+          revisado_por?: string | null
+          significado?: string
+          termino: string
+          updated_at?: string
+        }
+        Update: {
+          artesano_id?: string | null
+          audio_path?: string | null
+          cargado_por?: string | null
+          created_at?: string
+          id?: string
+          oficio?: string
+          publicado?: boolean
+          revisado_at?: string | null
+          revisado_por?: string | null
+          significado?: string
+          termino?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tembiapo_glosario_artesano_id_fkey"
+            columns: ["artesano_id"]
+            isOneToOne: false
+            referencedRelation: "tembiapo_artesanos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tembiapo_piezas: {
+        Row: {
+          artesano_id: string
+          created_at: string
+          descripcion: string
+          fotos: Json
+          id: string
+          materiales: string
+          medidas: string
+          orden: number
+          publicado: boolean
+          tecnica: string
+          tiempo: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          artesano_id: string
+          created_at?: string
+          descripcion?: string
+          fotos?: Json
+          id?: string
+          materiales?: string
+          medidas?: string
+          orden?: number
+          publicado?: boolean
+          tecnica?: string
+          tiempo?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          artesano_id?: string
+          created_at?: string
+          descripcion?: string
+          fotos?: Json
+          id?: string
+          materiales?: string
+          medidas?: string
+          orden?: number
+          publicado?: boolean
+          tecnica?: string
+          tiempo?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tembiapo_piezas_artesano_id_fkey"
+            columns: ["artesano_id"]
+            isOneToOne: false
+            referencedRelation: "tembiapo_artesanos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tembiapo_rutas: {
+        Row: {
+          auspiciante: string
+          auspiciante_url: string | null
+          created_at: string
+          descripcion: string
+          foto_path: string | null
+          id: string
+          lugares: Json
+          nombre: string
+          orden: number
+          publicado: boolean
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          auspiciante?: string
+          auspiciante_url?: string | null
+          created_at?: string
+          descripcion?: string
+          foto_path?: string | null
+          id?: string
+          lugares?: Json
+          nombre: string
+          orden?: number
+          publicado?: boolean
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          auspiciante?: string
+          auspiciante_url?: string | null
+          created_at?: string
+          descripcion?: string
+          foto_path?: string | null
+          id?: string
+          lugares?: Json
+          nombre?: string
+          orden?: number
+          publicado?: boolean
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      textos_traducidos: {
+        Row: {
+          aprobado: string
+          es: string
+          juego: string
+          lang: string
+          revisado_at: string
+          revisado_por: string | null
+        }
+        Insert: {
+          aprobado: string
+          es: string
+          juego: string
+          lang: string
+          revisado_at?: string
+          revisado_por?: string | null
+        }
+        Update: {
+          aprobado?: string
+          es?: string
+          juego?: string
+          lang?: string
+          revisado_at?: string
+          revisado_por?: string | null
         }
         Relationships: []
       }
