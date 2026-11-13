@@ -118,6 +118,8 @@ const T = {
   lsPremioJugar: ["Jugar ahora", "Jogar agora", "Play now", "Jetzt spielen", "Jouer maintenant", "立即開始"],
   lsGuestSeguir: ["Creá tu cuenta gratis y seguí con la Lección {n}", "Crie sua conta grátis e siga com a Lição {n}", "Create your free account and go on to Lesson {n}", "Erstelle dein kostenloses Konto und mach mit Lektion {n} weiter", "Crée ton compte gratuit et continue avec la leçon {n}", "免費建立帳號，繼續第 {n} 課"],
   lsGuestGuarda: ["Así se guarda lo que aprendiste y tus puntos.", "Assim fica salvo o que você aprendeu e seus pontos.", "That way what you learned and your points are saved.", "So werden dein Lernfortschritt und deine Punkte gespeichert.", "Ainsi, ce que tu as appris et tes points sont enregistrés.", "這樣就能保存你學到的內容和積分。"],
+  lsGuestSiguiente: ["Seguí con la Lección {n}", "Siga com a Lição {n}", "Go on to Lesson {n}", "Weiter mit Lektion {n}", "Continue avec la leçon {n}", "繼續第 {n} 課"],
+  lsGuestCrear: ["Crear mi cuenta gratis", "Criar minha conta grátis", "Create my free account", "Mein kostenloses Konto erstellen", "Créer mon compte gratuit", "免費建立我的帳號"],
   lsGuestInicio: ["Volver al inicio", "Voltar ao início", "Back to the start", "Zurück zum Anfang", "Retour à l'accueil", "回到首頁"],
   lsCompleted: ["¡Lección completada!", "Lição concluída!", "Lesson complete!", "Lektion geschafft!", "Leçon terminée !", "課程完成！"],
   lsFinished: ["Terminaste “{t}”.", "Você terminou “{t}”.", "You finished “{t}”.", "Du hast „{t}“ abgeschlossen.", "Vous avez terminé « {t} ».", "你完成了「{t}」。"],

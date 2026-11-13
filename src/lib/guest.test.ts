@@ -23,10 +23,11 @@ describe("jugar sin cuenta", () => {
     expect(isGuestPath("/admin/corpus")).toBe(false);
   });
 
-  it("solo la primera lección del curso se hace sin cuenta", () => {
+  it("las tres primeras lecciones del curso se hacen sin cuenta", () => {
     expect(isGuestPath("/curso/guarani/leccion/1")).toBe(true);
     expect(isGuestPath("/curso/guarani/leccion/1/")).toBe(true);
-    expect(isGuestPath("/curso/guarani/leccion/2")).toBe(false);
+    expect(isGuestPath("/curso/guarani/leccion/3")).toBe(true);
+    expect(isGuestPath("/curso/guarani/leccion/4")).toBe(false);
     expect(isGuestPath("/curso/guarani")).toBe(false);
     expect(isGuestPath("/curso/ingles/leccion/1")).toBe(false);
   });

@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { getLanguage } from "@/lib/languages";
 import { getCourseLessonGuest } from "@/lib/guest.functions";
 import { authMode, useIsGuest } from "@/lib/guest";
+import { GUEST_LESSONS } from "@/lib/guest-lessons";
 import { reiniciarAciertos, sumarAcierto } from "@/lib/desafio-leccion";
 import { DesafioCompartir, DesafioRecibido, useDesafioRecibido } from "@/components/desafio-leccion";
 import { getCourseLesson, type CourseLesson, type CourseVocabItem as VocabItem } from "@/lib/lessons.functions";
@@ -906,9 +907,21 @@ function DoneStep({
       {guest ? (
         // Sin cuenta: terminó la primera lección; la cuenta se pide para guardar y seguir.
         <div className="mt-4 grid gap-2">
-          <Button asChild variant="cta" size="lg" className="h-auto min-h-12 whitespace-normal py-3 leading-snug">
-            <Link to="/auth" search={{ mode: authMode() }}>{tx("lsGuestSeguir", { n: lesson.n + 1 })}</Link>
-          </Button>
+          {(GUEST_LESSONS as readonly number[]).includes(lesson.n + 1) ? (
+            <>
+              {/* La siguiente también es sin cuenta: se sigue de una. La cuenta queda como opción para guardar. */}
+              <Button asChild variant="cta" size="lg" className="h-auto min-h-12 whitespace-normal py-3 leading-snug">
+                <a href={`/curso/${langSlug}/leccion/${lesson.n + 1}`}>{tx("lsGuestSiguiente", { n: lesson.n + 1 })}</a>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="h-auto min-h-12 whitespace-normal py-3 leading-snug">
+                <Link to="/auth" search={{ mode: authMode() }}>{tx("lsGuestCrear")}</Link>
+              </Button>
+            </>
+          ) : (
+            <Button asChild variant="cta" size="lg" className="h-auto min-h-12 whitespace-normal py-3 leading-snug">
+              <Link to="/auth" search={{ mode: authMode() }}>{tx("lsGuestSeguir", { n: lesson.n + 1 })}</Link>
+            </Button>
+          )}
           <p className="text-sm text-muted-foreground">{tx("lsGuestGuarda")}</p>
           <Button asChild variant="ghost" size="lg">
             <Link to="/">{tx("lsGuestInicio")}</Link>
