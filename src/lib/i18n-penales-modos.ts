@@ -62,6 +62,11 @@ const T = {
   kit_noche: { es: "Noche de estadio", pt: "Noite de estádio", en: "Stadium night", de: "Stadionnacht", fr: "Nuit de stade", zh: "球場之夜" },
   kit_fuego: { es: "Fuego", pt: "Fogo", en: "Fire", de: "Feuer", fr: "Feu", zh: "烈焰" },
   kit_leyenda: { es: "Leyenda", pt: "Lenda", en: "Legend", de: "Legende", fr: "Légende", zh: "傳奇" },
+  modos: { es: "Modos", pt: "Modos", en: "Modes", de: "Modi", fr: "Modes", zh: "模式" },
+  modosAria: { es: "Elegir otro modo de juego", pt: "Escolher outro modo de jogo", en: "Choose another game mode", de: "Anderen Spielmodus wählen", fr: "Choisir un autre mode de jeu", zh: "選擇其他遊戲模式" },
+  aprenderBien: { es: "Aprendé bien estas palabras", pt: "Aprenda bem estas palavras", en: "Learn these words properly", de: "Lerne diese Wörter richtig", fr: "Apprenez bien ces mots", zh: "好好學會這些詞" },
+  repasarLeccion: { es: "Repasá la lección {n}", pt: "Revise a lição {n}", en: "Review lesson {n}", de: "Lektion {n} wiederholen", fr: "Revoir la leçon {n}", zh: "複習第 {n} 課" },
+  irAlCurso: { es: "Seguí con tu curso", pt: "Continue seu curso", en: "Continue your course", de: "Mach mit deinem Kurs weiter", fr: "Continuez votre cours", zh: "繼續你的課程" },
   rachaTuya: { es: "Tu mejor racha: {n} días", pt: "Sua melhor sequência: {n} dias", en: "Your best streak: {n} days", de: "Deine beste Serie: {n} Tage", fr: "Votre meilleure série : {n} jours", zh: "你的最佳連續紀錄：{n} 天" },
 } satisfies Record<string, L>;
 

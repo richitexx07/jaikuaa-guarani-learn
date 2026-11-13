@@ -38,28 +38,13 @@ import { NovedadPurahei } from "@/components/purahei/novedad-purahei";
 import { ConvenioPendiente } from "@/components/convenio-pendiente";
 import { MisLibrosAcceso } from "@/components/libreria/mis-libros-acceso";
 import { RetoCard } from "@/components/games/reto-card";
+import { HeroLeccion, JuegosCarrusel, NovedadesCampana } from "@/components/dashboard/inicio-dos-toques";
 import jaiImg from "@/assets/jai/jai-saluda.webp";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import bannerAprender from "@/assets/banners/banner-aprender.webp";
 import bannerCurso from "@/assets/banners/banner-curso.webp";
 import bannerEscolar from "@/assets/banners/banner-escolar.webp";
 import bannerCastellano from "@/assets/banners/banner-castellano-tecnico.webp";
-import coverKaraoke from "@/assets/covers/cover-karaoke.webp";
-import miniKaraoke from "@/assets/covers/mini/mini-karaoke.webp";
-import miniPenales from "@/assets/covers/mini/mini-penales.webp";
-import miniTembiu from "@/assets/covers/mini/mini-tembiu.webp";
-import miniTaanga from "@/assets/covers/mini/mini-taanga.webp";
-import miniTrivia from "@/assets/covers/mini/mini-trivia-duelo.webp";
-import miniTekojoja from "@/assets/covers/mini/mini-tekojoja.webp";
-import miniMemoria from "@/assets/covers/mini/mini-memoria.webp";
-import miniConsultorio from "@/assets/covers/mini/mini-consultorio.webp";
-import miniDuelo from "@/assets/covers/mini/mini-duelo.webp";
-import miniSopa from "@/assets/covers/mini/mini-sopa-de-letras.webp";
-import miniAhorcado from "@/assets/covers/mini/mini-ahorcado.webp";
-import miniNeeRape from "@/assets/covers/mini/mini-nee-rape.webp";
-import miniVentanilla from "@/assets/covers/mini/mini-ventanilla.webp";
-import miniChacra from "@/assets/covers/mini/mini-chacra.webp";
-import coverPalabra from "@/assets/covers/cover-palabra-del-dia.webp";
 import coverPenales from "@/assets/covers/cover-penales.webp";
 import coverTrivia from "@/assets/covers/cover-trivia-duelo.webp";
 import medallaPrimerPaso from "@/assets/medallas/medalla-primer-paso.webp";
@@ -70,8 +55,6 @@ import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 import jaiProfe from "@/assets/jai-profe.webp";
 import jaiAtencion from "@/assets/jai-atencion-pro.webp";
 import jaiAgro from "@/assets/jai-agro.webp";
-import { forgetPlace, useLastPlace } from "@/lib/last-place";
-import { X } from "lucide-react";
 import { shouldShowWelcome, welcomeSeen } from "@/lib/welcome";
 import triviaVocabulario from "@/assets/trivia/trivia-vocabulario.webp";
 const jaiAsset = { url: jaiImg };
@@ -119,38 +102,6 @@ function StaffShortcuts() {
         {data.isAdmin && <StaffLink to="/admin/jai" icon={MessageCircleQuestion} label="Qué le preguntan a Jai" />}
       </div>
     </section>
-  );
-}
-
-/** «Seguí donde quedaste»: un toque para volver al último juego o lección. */
-function ResumeCard() {
-  const place = useLastPlace();
-  const [hidden, setHidden] = useState(false);
-  if (!place || hidden) return null;
-  return (
-    <div className="relative">
-    <button
-      type="button"
-      aria-label="Cerrar «Seguí donde quedaste»"
-      onClick={() => { forgetPlace(); setHidden(true); }}
-      className="absolute right-2 top-7 z-10 grid h-9 w-9 place-items-center rounded-full bg-primary-foreground/15 text-primary-foreground"
-    >
-      <X className="h-4 w-4" aria-hidden />
-    </button>
-    <a
-      href={place.href}
-      className="mt-5 flex min-h-16 items-center gap-3 rounded-2xl bg-primary px-4 py-3 text-primary-foreground shadow-lift transition active:scale-[0.98]"
-    >
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-foreground/15">
-        {place.kind === "lesson" ? <BookOpen className="h-5 w-5" aria-hidden /> : <Gamepad2 className="h-5 w-5" aria-hidden />}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-xs font-semibold opacity-80">Seguí donde quedaste</span>
-        <span className="block truncate font-display text-lg font-bold leading-tight">{place.title}</span>
-      </span>
-      <ChevronRight className="mr-9 h-5 w-5 shrink-0" aria-hidden />
-    </a>
-    </div>
   );
 }
 
@@ -232,82 +183,6 @@ function PilotCard() {
         Pedí tu acceso
       </Link>
     </p>
-  );
-}
-
-/** Los juegos que van pasando en el botón «Jugar» (empieza con Jai y el arpa). */
-const JUEGOS_ROTAN: { img: string; nombre: string }[] = [
-  { img: miniKaraoke, nombre: "Karaoke" },
-  { img: miniPenales, nombre: "Penales" },
-  { img: miniTembiu, nombre: "Tembi'u" },
-  { img: miniTrivia, nombre: "Trivia" },
-  { img: miniTaanga, nombre: "Ta'anga" },
-  { img: miniMemoria, nombre: "Memoria" },
-  { img: miniConsultorio, nombre: "Consultorio" },
-  { img: miniVentanilla, nombre: "Ventanilla" },
-  { img: miniChacra, nombre: "Chacra" },
-  { img: miniDuelo, nombre: "Duelo" },
-  { img: miniTekojoja, nombre: "Tekojoja" },
-  { img: miniSopa, nombre: "Sopa" },
-  { img: miniAhorcado, nombre: "Ahorcado" },
-  { img: miniNeeRape, nombre: "Ñe'ẽ Rape" },
-];
-
-/** Imagen que va cambiando suave de un juego a otro (quieta si el celular pide menos movimiento). */
-function RotatingThumb({ items, className }: { items: { img: string; nombre: string }[]; className: string }) {
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    if (typeof window === "undefined" || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    const t = window.setInterval(() => {
-      if (document.visibilityState === "visible") setI((n) => (n + 1) % items.length);
-    }, 2600);
-    return () => window.clearInterval(t);
-  }, [items.length]);
-  return (
-    <span className={`relative block overflow-hidden ${className}`} aria-hidden>
-      {items.map((it, k) => (
-        <img
-          key={it.nombre}
-          src={it.img}
-          alt=""
-          width={184}
-          height={144}
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-700 ease-out"
-          style={{ opacity: k === i ? 1 : 0, transform: k === i ? "scale(1)" : "scale(1.08)" }}
-        />
-      ))}
-      <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1 pb-0.5 pt-3 text-center text-[10px] font-bold leading-none text-white">
-        {items[i]?.nombre}
-      </span>
-    </span>
-  );
-}
-
-function BigAction({ to, img, rotate, title, desc, tone }: { to: "/curso/$lang" | "/juegos" | "/juegos/palabra-del-dia"; img: string; rotate?: { img: string; nombre: string }[]; title: string; desc: string; tone: "primary" | "accent" | "card" }) {
-  const cls =
-    tone === "primary"
-      ? "bg-primary text-primary-foreground"
-      : tone === "accent"
-        ? "bg-accent text-accent-foreground"
-        : "bg-card text-foreground border-2 border-primary/30";
-  return (
-    <Link
-      to={to}
-      params={to === "/curso/$lang" ? { lang: "guarani" } : undefined}
-      className={`flex min-h-[76px] items-center gap-3 overflow-hidden rounded-2xl p-2 pr-4 shadow-lift transition-transform active:scale-[0.98] sm:min-h-[88px] ${cls}`}
-    >
-      {rotate ? (
-        <RotatingThumb items={rotate} className="h-[60px] w-[76px] shrink-0 rounded-xl sm:h-[72px] sm:w-[92px]" />
-      ) : (
-        <img src={img} alt="" className="h-[60px] w-[76px] shrink-0 rounded-xl object-cover sm:h-[72px] sm:w-[92px]" loading="lazy" />
-      )}
-      <span className="min-w-0 flex-1">
-        <span className="block font-display text-lg font-bold leading-tight sm:text-xl">{title}</span>
-        <span className="block text-xs leading-snug opacity-90 sm:text-sm">{desc}</span>
-      </span>
-      <ChevronRight className="h-6 w-6 shrink-0" aria-hidden />
-    </Link>
   );
 }
 
@@ -449,6 +324,14 @@ function Dashboard() {
             <BrandLogo className="hidden sm:inline-flex" />
           </Link>
           <div className="flex min-w-0 items-center gap-1 sm:gap-2">
+            {/* Novedades y avisos: en la campana, para que no compitan con la lección. */}
+            <NovedadesCampana>
+              <NovedadLibreria />
+              <MisLibrosAcceso />
+              <NovedadPurahei />
+              <RetoCard guest={false} />
+              <div className="mt-6"><OfflinePackCard /></div>
+            </NovedadesCampana>
             <AppLanguageToggle />
             <DisplayToggles />
             <AdminCorpusLink />
@@ -483,32 +366,19 @@ function Dashboard() {
           </div>
 
           <ConvenioPendiente />
-          <ResumeCard />
 
-          {/* 2. TRES BOTONES GIGANTES */}
-          <nav aria-label={t("dash.question")} className="mt-5 grid gap-3 sm:grid-cols-3">
-            <BigAction to="/curso/$lang" img={bannerCurso} title={t("nav.learn")} desc={t("dash.learnDesc")} tone="primary" />
-            <BigAction to="/juegos" img={coverKaraoke} rotate={JUEGOS_ROTAN} title={t("dash.play")} desc={t("dash.playDesc")} tone="accent" />
-            <BigAction to="/juegos/palabra-del-dia" img={coverPalabra} title={t("dash.word")} desc={t("dash.wordDesc")} tone="card" />
-          </nav>
+          {/* 2. UN SOLO BOTÓN PROTAGONISTA: seguir aprendiendo (a dos toques de la lección) */}
+          <HeroLeccion />
 
-          {/* NOVEDAD — Librería Jaikuaa */}
-          <NovedadLibreria />
-          <MisLibrosAcceso />
-
-          {/* NOVEDAD — Purahéi Jaikuaa, la vitrina de artistas */}
-          <NovedadPurahei />
-
-          {/* RETAR — la tarjeta de «¿Quién sabe más guaraní?», con su código de embajador */}
-          <RetoCard guest={false} />
+          {/* 3. LOS JUEGOS, con sus portadas, para jugar y repasar */}
+          <JuegosCarrusel />
 
           <div className="mt-6 space-y-3">
+            <StreakBanner />
             <StatsBar />
             <p className="px-1 text-xs text-muted-foreground">
               <span className="font-semibold text-foreground">{t("dash.xpStrong")}</span> {t("dash.xpRest")}
             </p>
-            <StreakBanner />
-            <OfflinePackCard />
           </div>
 
           <h2 className="mt-10 text-center font-display text-lg font-semibold text-muted-foreground">

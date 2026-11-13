@@ -107,6 +107,9 @@ const T = {
   lsMatchWrong: ["Esa no va. Probá con otra.", "Essa não combina. Tente outra.", "That's not it. Try another.", "Das passt nicht. Versuch ein anderes.", "Ce n'est pas ça. Essayez une autre.", "不對，換一個試試。"],
   lsMatchHow: ["Tocá una palabra en guaraní y después su significado en español.", "Toque uma palavra em guarani e depois o significado em espanhol.", "Tap a Guarani word, then its meaning in Spanish.", "Tippe ein Guaraní-Wort und dann seine Bedeutung auf Spanisch.", "Touchez un mot en guarani, puis son sens en espagnol.", "先點一個瓜拉尼語詞，再點它的西班牙語意思。"],
   lsFinish: ["Terminar la lección", "Terminar a lição", "Finish the lesson", "Lektion beenden", "Terminer la leçon", "完成本課"],
+  lsPremio: ["Tu premio", "Seu prêmio", "Your reward", "Deine Belohnung", "Votre récompense", "你的獎勵"],
+  lsPremioT: ["Pateá una tanda de penales con las palabras de esta lección", "Bata uma série de pênaltis com as palavras desta lição", "Take a penalty shootout with this lesson's words", "Schieß Elfmeter mit den Wörtern dieser Lektion", "Tirez des penalties avec les mots de cette leçon", "用這一課的詞來踢點球"],
+  lsPremioJugar: ["Jugar ahora", "Jogar agora", "Play now", "Jetzt spielen", "Jouer maintenant", "立即開始"],
   lsCompleted: ["¡Lección completada!", "Lição concluída!", "Lesson complete!", "Lektion geschafft!", "Leçon terminée !", "課程完成！"],
   lsFinished: ["Terminaste “{t}”.", "Você terminou “{t}”.", "You finished “{t}”.", "Du hast „{t}“ abgeschlossen.", "Vous avez terminé « {t} ».", "你完成了「{t}」。"],
   // Barra de progreso

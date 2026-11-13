@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { usePM } from '@/lib/i18n-penales-modos';
 import { useQuery } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
-import { Loader2, UserRound, UsersRound, RotateCcw, Wifi, Trophy, Hand, ArrowUpLeft, ArrowUp, ArrowUpRight, ArrowDownLeft, ArrowDown, ArrowDownRight } from 'lucide-react';
+import { BookOpen, Settings2, Loader2, UserRound, UsersRound, RotateCcw, Wifi, Trophy, Hand, ArrowUpLeft, ArrowUp, ArrowUpRight, ArrowDownLeft, ArrowDown, ArrowDownRight } from 'lucide-react';
 import { FinalDia, TarjetaPenalDia, useResultadoDia } from '@/components/games/penalties/penal-dia';
 import { CopaFlow } from '@/components/games/penalties/copa-flow';
 import { Atajar } from '@/components/games/penalties/atajar';
@@ -55,6 +55,8 @@ function Penalties(){return <GameStage title="Penales" sponsorSlot="penales" css
 function Reflectores(){return <div className="pn-lights flex justify-between px-2" aria-hidden>{[0,1].map(g=><div key={g} className="grid grid-cols-4 gap-1 rounded-md bg-black/40 p-1.5">{Array.from({length:8},(_,i)=><span key={i} className="h-2.5 w-2.5 rounded-full" style={{background:'#FFF7D6',boxShadow:'0 0 10px #FFF7D6'}}/>)}</div>)}</div>;}
 type Especial='dia'|'copa'|'atajar';
 function especialDeLaUrl():Especial|null{if(typeof window==='undefined')return null;const q=new URLSearchParams(window.location.search);return q.get('dia')?'dia':q.get('copa')?'copa':q.get('atajar')?'atajar':null;}
+/** ?leccion=N: el premio al terminar una lección (patear con las palabras de esa lección). */
+function leccionDeLaUrl():number|null{if(typeof window==='undefined')return null;const n=Number(new URLSearchParams(window.location.search).get('leccion'));return Number.isInteger(n)&&n>0&&n<=10000?n:null;}
 function sinDuplicados(ws:GameWord[]){const seen=new Set<string>();return ws.filter(w=>{const key=w.es.trim().toLowerCase();if(!key||seen.has(key))return false;seen.add(key);return true;});}
 function PenaltiesContent(){
  const {muted}=useGameKit();const {p}=usePT();const pm=usePM();
@@ -63,20 +65,20 @@ function PenaltiesContent(){
  const qAll=useGameWords(null),wordsAll=useMemo(()=>sinDuplicados(qAll.data?.words??[]),[qAll.data]);
  const hoy=hoyPy(),mazoDia=useMemo(()=>palabrasDelDia(wordsAll,hoy),[wordsAll,hoy]);
  const partida=useRetoPartida('penales',{total:5}),{reto,seed,otra}=partida;
- const [lesson,setLesson]=useState<number|null>(()=>leccionDeReto(reto)),q=useGameWords(lesson);
+ const [lesson,setLesson]=useState<number|null>(()=>leccionDeReto(reto)??leccionDeLaUrl()),q=useGameWords(lesson);
  useEffect(()=>{if(reto)setLesson(leccionDeReto(reto));},[reto?.id]);// eslint-disable-line react-hooks/exhaustive-deps
  const guest=useIsGuest(),fn=useServerFn(getPenaltiesLed),led=useQuery({queryKey:['penales-led'],enabled:!guest,queryFn:()=>fn()});
  const demo=useDemoBrands(),ledText=demo.length?demoLedText(demo):(led.data?.text??'JAIKUAA · TU MARCA AQUÍ');
  const [remote,setRemote]=useState<{code:string;host:boolean}|null>(()=>{const c=salaDeLaUrl();return c?{code:c,host:false}:null;}),[joinCode,setJoinCode]=useState('');
  const [miKit]=useMiKit(),lang=useAppLang(),[paisesDuelo,setPaisesDuelo]=useState<[Pais,Pais]>(['PY','PY']);
- const [mode,setMode]=useState<'solo'|'duel'|'remote'>('solo'),[names,setNames]=useState<[string,string]>(['','']),[started,setStarted]=useState(false),[round,setRound]=useState(0);
+ const [mode,setMode]=useState<'solo'|'duel'|'remote'>('solo'),[names,setNames]=useState<[string,string]>(['','']),[started,setStarted]=useState(true),[round,setRound]=useState(0);
  const words=useMemo(()=>sinDuplicados(q.data?.words??[]),[q.data]);
  const salir=()=>{const r=leerResultadoDia();if(r)setResDia(r);setEspecial(null);setStarted(false);};
  const partidoBase={partida,lesson:null,duel:false,names:[p('player',{n:1}),p('player',{n:2})] as [string,string],kits:[miKit],ledText,muted,onAgain:()=>{},onModes:salir};
  return <div className="penalties-game mx-auto max-w-xl">
- <Reflectores/><div className={`pn-dark mt-3 flex-wrap items-center justify-center gap-2 ${remote||especial?'hidden':'flex'}`}><LessonFilter value={lesson} onChange={v=>{otra();setLesson(v);setStarted(false);setRound(r=>r+1);}}/></div>
- {!remote&&!especial&&<RetoBanner partida={partida} extra={lesson===null?undefined:String(lesson)} className="mt-3" onJugar={started?undefined:()=>{setMode('solo');setStarted(true);window.scrollTo({top:0,behavior:'smooth'});}}/>}
- <DemoBrandPanel/>
+ <Reflectores/><div className={`pn-dark mt-3 flex-wrap items-center justify-center gap-2 ${remote||especial||started?'hidden':'flex'}`}><LessonFilter value={lesson} onChange={v=>{otra();setLesson(v);setStarted(false);setRound(r=>r+1);}}/></div>
+ {!remote&&!especial&&(!started||partida.reto)&&<RetoBanner partida={partida} extra={lesson===null?undefined:String(lesson)} className="mt-3" onJugar={started?undefined:()=>{setMode('solo');setStarted(true);window.scrollTo({top:0,behavior:'smooth'});}}/>}
+ {!started&&<DemoBrandPanel/>}
  {especial&&!remote?(qAll.isLoading?<div className="flex justify-center py-10"><Loader2 className="animate-spin"/></div>:wordsAll.length<5?<NotEnough min={5}/>:especial==='dia'?(resDia?<div className="space-y-3 py-4"><TarjetaPenalDia resultado={resDia} onJugar={()=>{}}/><div className="text-center"><button type="button" className="h-11 rounded-2xl px-4 text-sm font-semibold text-white/80" onClick={salir}>{pm('volverModos')}</button></div></div>:<Match key={`dia-${hoy}`} {...partidoBase} seed={semillaDelDia(hoy)} words={wordsAll} mazo={mazoDia} etiqueta={pm('diaTitulo')} final={({outcomes})=><FinalDia outcomes={outcomes} onGuardar={guardarResultadoDia} onModes={salir}/>}/>):especial==='copa'?<CopaFlow onSalir={salir} jugar={o=><Match key={o.key} {...partidoBase} seed={o.seed} words={wordsAll} total={o.total} etiqueta={o.etiqueta} final={o.final}/>}/>:<Atajar key={vuelta} words={wordsAll} seed={(seed+vuelta*101)>>>0} muted={muted} ledText={ledText} onModes={salir} onAgain={()=>setVuelta(v=>v+1)}/>)
  :remote?<div className="pt-4"><PenalesLive key={remote.code} code={remote.code} host={remote.host} words={words} ledText={ledText} muted={muted} onExit={()=>{setRemote(null);ponerSalaEnLaUrl(null);setStarted(false);}}/></div>:q.isLoading?<div className="flex justify-center py-10"><Loader2 className="animate-spin"/></div>:q.isError?<p className="py-8 text-center">{p('loadErr')}</p>:words.length<5?<NotEnough min={5}/>:!started?<div className="space-y-5 py-5">
  <div className="text-center"><h1 className="font-display text-5xl font-bold leading-none tracking-tight sm:text-6xl">{p('title')}</h1><p className="mt-2 text-white/75">{p('tagline')}</p></div>
@@ -103,16 +105,21 @@ function Match({seed,partida,lesson,words,duel,names,kits,ledText,muted,onAgain,
  const options=useMemo(()=>{if(!word)return [];const mezclar=shufflerFor(seed,turn+1);return mezclar([word,...mezclar(orderedBy(words.filter(w=>w.gn!==word.gn),w=>w.gn)).slice(0,2)]);},[word,words,seed,turn]);
  const player=duel?turn%2:0,results=[played.filter(p=>p.player===0).map(p=>p.outcome),played.filter(p=>p.player===1).map(p=>p.outcome)],goals=results.map(r=>r.filter(isGoal).length),xp=xpFor(results[0]),recorded=useRef(false);
  useEffect(()=>{if(!finished||recorded.current)return;recorded.current=true;recordCompletion({source:'game',sourceRef:'penales',xp});if(duel||goals[0]>=3)celebrate('big');},[finished,xp]);
+ const nextRef=useRef<()=>void>(()=>{});
+ /* Sin toques de más: en el juego solo, después del festejo el siguiente penal llega solo. */
+ useEffect(()=>{if(!last||duel||finished)return;const t=window.setTimeout(()=>nextRef.current(),1500);return()=>window.clearTimeout(t);},[last,duel,finished]);
  if(!word)return null;
  function endBy(e:DuelEnd){setEnd(e);setFinished(true);}
  const champ:0|1=end?.kind==='forfeit'?(end.loser===0?1:0):goals[0]>=goals[1]?0:1;
  const knew=choice===word.gn;
  function answer(gn:string){if(choice!==null)return;setChoice(gn);if(word.hasAudio&&!muted)void playGuarani(word.gn);}
  function next(){const done=duel?duelFinished(results[0],results[1]):played.length>=total;if(done){setFinished(true);return;}setTurn(t=>t+1);setChoice(null);setLast(null);setGuess(null);}
+ nextRef.current=next;
  const sudden=duel&&turn>=10;
  const message=finished?(duel?(end?endTitle(end,champ,''):goals[0]===goals[1]?p('drawMsg'):p('wonMsg',{n:goals[0]>goals[1]?names[0]:names[1]})):p('doneMsg')) :last?msg(last):choice!==null?(knew?p('rightMsg'):p('wrongMsg')):`${duel?names[player]+': ':''}${p('goNext')}`;
  const stars=goals[0]>=5?3:goals[0]>=3?2:goals[0]>=1?1:0;
  return <div className="space-y-4 pt-3">
+ {!duel&&!finished&&<div className="flex justify-end"><button type="button" onClick={onModes} aria-label={pm('modosAria')} className="inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-white/85 ring-1 ring-white/30 transition hover:bg-white/10 active:scale-95"><Settings2 className="h-4 w-4" aria-hidden/>{pm('modos')}</button></div>}
  {duel&&!finished&&<><RefereeMenu open={menu} onClose={()=>setMenu(false)} onEnd={endBy} colors={['#0E7C86','#B5452B']} ink={P.noche}/><div className="flex justify-end"><PauseButton onClick={()=>setMenu(true)} className="text-white hover:bg-white/10"/></div></>}
  {/* Marcador de luces */}
  <div className="rounded-2xl border-4 bg-black p-3" style={{borderColor:'#1C2B44'}}>
@@ -129,6 +136,7 @@ function Match({seed,partida,lesson,words,duel,names,kits,ledText,muted,onAgain,
  <h2 className="font-display text-3xl font-bold">{duel?(end?endTitle(end,champ,''):goals[0]===goals[1]?p('draw'):p('won',{n:goals[0]>goals[1]?names[0]:names[1]})):p('ofFive',{n:goals[0]})}</h2><p className="font-bold" style={{color:P.led}}>+{xp} XP{duel?` · ${p('player',{n:1})}`:''}</p>
  <ul className="divide-y divide-white/10 rounded-2xl bg-white/[.06] px-3 text-left">{played.map((pl,i)=><li key={i} className="flex items-center gap-2 py-3 text-sm"><span className="h-3 w-3 shrink-0 rounded-full" style={{background:isGoal(pl.outcome)?P.gol:P.mal}} aria-label={isGoal(pl.outcome)?p('goal'):p('missed')}/><div className="min-w-0 flex-1">{duel&&<span className="block text-xs text-white/60">{names[pl.player]}</span>}<span className="font-semibold">{pl.word.gn}</span><span className="text-white/60"> — {pl.word.es}</span></div>{pl.word.hasAudio&&<SpeakerButton gn={pl.word.gn}/>}</li>)}</ul>
  <div className="flex flex-wrap justify-center gap-2"><button type="button" onClick={onAgain} className="inline-flex h-12 items-center gap-2 rounded-2xl tap-3d-dark px-6 font-bold" style={{background:P.led,color:P.noche}}><RotateCcw className="h-5 w-5"/>{duel?p('rematch'):p('again')}</button><button type="button" className="h-12 rounded-2xl px-4 font-semibold text-white/80" onClick={onModes}>{p('changeMode')}</button></div>
+{!duel&&<a href={lesson===null?'/curso/guarani':`/curso/guarani/leccion/${lesson}`} className="flex min-h-16 items-center gap-3 rounded-2xl bg-white/[.08] p-4 text-left ring-1 ring-white/20 transition active:scale-[.98]"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full" style={{background:P.led,color:P.noche}} aria-hidden><BookOpen className="h-5 w-5"/></span><span className="min-w-0 flex-1"><span className="block text-xs font-semibold text-white/70">{pm('aprenderBien')}</span><b className="block font-display text-lg leading-tight">{lesson===null?pm('irAlCurso'):pm('repasarLeccion',{n:lesson})}</b></span></a>}
 {!duel&&<RetoFinal partida={partida} puntaje={goals[0]} extra={lesson===null?undefined:String(lesson)}/>}
  </div>:duel&&!guess?<KeeperPick keeper={names[1-player]} shooter={names[player]} onPick={setGuess}/>:<><div className="overflow-hidden rounded-2xl ring-4 ring-black/40"><PenaltyPitch key={turn} kit={kits[player]??kits[0]} guess={duel?guess??undefined:undefined} knew={knew} ready={choice!==null} muted={muted} ledText={ledText} onShot={outcome=>{setLast(outcome);setPlayed(prev=>[...prev,{word,outcome,player}]);if(isGoal(outcome)&&!muted)relatarGol(outcome==='angle'?'golazo':'gol');}}/></div>
  <div className="space-y-3 text-center"><p className="text-xs font-bold uppercase tracking-wide" style={{color:P.led}}>{[etiqueta,sudden?p('sudden',{n:Math.floor((turn-10)/2)+1}):total===1?'':total===5?p('penN',{n:duel?Math.floor(turn/2)+1:turn+1}):pm('penNof',{n:turn+1,t:total})].filter(Boolean).join(' · ')}{duel?` · ${names[player]}`:''}</p><p className="text-sm text-white/70">{p('howSay')}</p><h2 className="break-words font-display text-3xl font-bold">{word.es}</h2><div className="grid grid-cols-1 gap-2 sm:grid-cols-3">{options.map(o=>{const ok=choice!==null&&o.gn===word.gn,bad=choice===o.gn&&!ok;return <button key={o.gn} type="button" disabled={choice!==null} onClick={()=>answer(o.gn)} className="pn-opt min-h-14 whitespace-normal break-words rounded-2xl tap-3d-dark px-3 py-3 font-display text-lg font-bold transition active:scale-95 disabled:cursor-default" style={ok?{background:P.gol,color:P.noche,boxShadow:'none'}:bad?{background:P.mal,color:'#fff',boxShadow:'none'}:choice!==null?{opacity:.4}:undefined}>{o.gn}</button>;})}</div>

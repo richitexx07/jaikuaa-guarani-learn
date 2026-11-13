@@ -1,3 +1,4 @@
+import miniPenales from "@/assets/covers/mini/mini-penales.webp";
 import { useTX, type TXKey } from "@/lib/i18n-pages";
 import { useAppLang } from "@/lib/i18n";
 import { localizarVocab } from "@/lib/significado";
@@ -685,7 +686,22 @@ function DoneStep({
         +{xp} XP
       </div>
 
-      <div className="mt-8 grid gap-2 sm:grid-cols-2">
+      {/* El premio: el juego refuerza lo que se acaba de aprender (con las palabras de esta lección). */}
+      {langSlug === "guarani" && lesson.vocab.length >= 5 && (
+        <a
+          href={`/juegos/penales?leccion=${lesson.n}`}
+          className="mt-8 flex items-center gap-3 overflow-hidden rounded-2xl bg-primary p-2 pr-4 text-left text-primary-foreground shadow-lift transition active:scale-[0.98]"
+        >
+          <img src={miniPenales} alt="" width={184} height={144} className="h-[72px] w-[92px] shrink-0 rounded-xl object-cover" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-xs font-semibold uppercase tracking-wide text-[#F6C445]">{tx("lsPremio")}</span>
+            <span className="block font-display text-base font-bold leading-tight sm:text-lg">{tx("lsPremioT")}</span>
+          </span>
+          <span className="shrink-0 rounded-xl bg-[#F6C445] px-3 py-2 text-sm font-bold text-[#13233A]">{tx("lsPremioJugar")}</span>
+        </a>
+      )}
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
         <Button asChild variant="outline" size="lg">
           <Link to="/curso/$lang" params={{ lang: langSlug }}>
             {tx("backCourse")}
