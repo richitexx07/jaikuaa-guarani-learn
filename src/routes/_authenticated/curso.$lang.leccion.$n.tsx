@@ -5,7 +5,7 @@ import { localizarVocab } from "@/lib/significado";
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, Check, Pointer, X } from "lucide-react";
+import { ArrowRight, Check, Pointer, Volume2, X } from "lucide-react";
 import { playGuarani } from "@/lib/audio";
 import { celebrate } from "@/lib/confetti";
 import jaiProfe from "@/assets/jai-profe.webp";
@@ -144,6 +144,29 @@ function JaiSays({ ok, children }: { ok: boolean | null; children: React.ReactNo
       <p className="min-w-0 flex-1 text-sm font-medium text-foreground">{children}</p>
     </div>
   );
+}
+
+/**
+ * La voz con su tiempo: suena la palabra y, mientras suena (y un respiro después), la lección
+ * no se apura. Así se escucha entera y se puede repetir en voz alta.
+ */
+function useVozConTiempo() {
+  const [sonando, setSonando] = useState<string | null>(null);
+  const vivo = useRef(true);
+  useEffect(() => () => { vivo.current = false; }, []);
+  const decir = useCallback((gn: string, respiro = 450) => {
+    setSonando(gn);
+    let hecho = false;
+    const fin = () => {
+      if (hecho) return;
+      hecho = true;
+      window.setTimeout(() => { if (vivo.current) setSonando(null); }, respiro);
+    };
+    // Si el audio no llega, la lección sigue igual a los pocos segundos.
+    window.setTimeout(fin, 4000);
+    return playGuarani(gn).catch(() => false).finally(fin);
+  }, []);
+  return { sonando, decir };
 }
 
 const LESSON_CSS = `
@@ -353,14 +376,39 @@ function VocabStep({
   onNext: () => void;
 }) {
   const tx = useTX();
+  const { sonando, decir } = useVozConTiempo();
+  const [enRonda, setEnRonda] = useState(false);
+  const corta = useRef(false);
+  useEffect(() => () => { corta.current = true; }, []);
+  // Una por una, con un respiro entre palabra y palabra para repetirla en voz alta.
+  async function escucharTodas() {
+    if (enRonda) { corta.current = true; return; }
+    corta.current = false;
+    setEnRonda(true);
+    for (const v of lesson.vocab) {
+      if (corta.current) break;
+      await decir(v.gn, 0);
+      if (corta.current) break;
+      await new Promise((r) => window.setTimeout(r, 1600));
+    }
+    setEnRonda(false);
+  }
   return (
     <div>
       <JaiSays ok={null}>{tx("lsListenTip")}</JaiSays>
+      <button
+        type="button"
+        onClick={() => void escucharTodas()}
+        className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary/30 bg-primary/5 px-4 font-display text-base font-bold text-primary transition hover:bg-primary/10 active:scale-[0.99]"
+      >
+        {enRonda ? <X className="h-5 w-5" aria-hidden /> : <Volume2 className="h-5 w-5" aria-hidden />}
+        {enRonda ? tx("lsEscuchaParar") : tx("lsEscuchaTodas")}
+      </button>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
         {lesson.vocab.map((v) => (
           <li
             key={v.gn}
-            className="relative flex min-h-[88px] items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-sm"
+            className={`relative flex min-h-[88px] items-center gap-3 rounded-2xl border bg-card p-4 shadow-sm transition ${sonando === v.gn ? "border-[#E0A800] ring-4 ring-[#F6C445]/40" : "border-border/60"}`}
           >
             <SpeakerButton gn={v.gn} size="md" />
             <div className="min-w-0 flex-1">
@@ -429,6 +477,7 @@ function ChoiceStep({
   const [i, setI] = useState(initial?.i ?? 0);
   const [picked, setPicked] = useState<string | null>(initial?.picked ?? null);
   const [correct, setCorrect] = useState(initial?.correct ?? 0);
+  const { sonando, decir } = useVozConTiempo();
 
   // Cada respuesta queda guardada en el teléfono.
   useEffect(() => {
@@ -496,6 +545,8 @@ function ChoiceStep({
                   setPicked(opt);
                   if (opt === answer) setCorrect((c) => c + 1);
                   logAnswer(q.item.gn, opt === answer, "lesson", lessonRef);
+                  // Acierte o no, se escucha cómo se dice, entera y sin apuro.
+                  void decir(q.item.gn);
                 }}
                 className={cls}
               >
@@ -516,12 +567,13 @@ function ChoiceStep({
               variant="cta"
               size="lg"
               className="h-14 w-full text-base"
+              disabled={sonando !== null}
               onClick={() => {
                 setPicked(null);
                 setI((x) => x + 1);
               }}
             >
-              {tx("next")}
+              {sonando ? <><Volume2 className="h-5 w-5 motion-safe:animate-pulse" aria-hidden /> {tx("lsEscuchando")}</> : tx("next")}
             </Button>
           </div>
         )}
@@ -564,6 +616,7 @@ function MatchStep({
   }, [matched]);
   const [wrong, setWrong] = useState<{ gn: string; es: string } | null>(null);
   const [justMatched, setJustMatched] = useState<string | null>(null);
+  const { sonando, decir } = useVozConTiempo();
 
   const lookup = useMemo(() => {
     const m = new Map<string, string>();
@@ -582,7 +635,7 @@ function MatchStep({
   }, [pairs]);
 
   function tryMatch(es: string) {
-    if (!selectedGn) return;
+    if (!selectedGn || sonando) return;
     const ok = lookup.get(selectedGn) === es;
     logAnswer(selectedGn, ok, "lesson", lessonRef);
     if (ok) {
@@ -591,8 +644,8 @@ function MatchStep({
       setSelectedGn(null);
       setWrong(null);
       setJustMatched(gn);
-      // Al unirla, se escucha la palabra con su voz real.
-      void playGuarani(gn).catch(() => false);
+      // Al unirla, se escucha la palabra con su voz real, entera antes de seguir.
+      void decir(gn);
     } else {
       setWrong({ gn: selectedGn, es });
       setTimeout(() => {
@@ -637,7 +690,7 @@ function MatchStep({
   }, [measure]);
 
   const done = matched.size === pairs.length;
-  const paso = done ? tx("lsMatchDone") : wrong ? tx("lsMatchWrong") : selectedGn ? tx("lsMatchPaso2", { w: selectedGn }) : tx("lsMatchPaso1");
+  const paso = sonando ? tx("lsMatchEscucha", { w: sonando }) : done ? tx("lsMatchDone") : wrong ? tx("lsMatchWrong") : selectedGn ? tx("lsMatchPaso2", { w: selectedGn }) : tx("lsMatchPaso1");
 
   return (
     <div>
@@ -674,6 +727,7 @@ function MatchStep({
             else if (isSelected) cls += " -translate-y-0.5 scale-[1.03] border-[#E0A800] bg-[#FFF4CC] text-[#13233A] shadow-lg ring-4 ring-[#F6C445]/40 dark:bg-[#4A3A0A] dark:text-[#FFF4CC]";
             else cls += " border-border/70 bg-card hover:border-[#F6C445]";
             if (isMatched && justMatched === gn) cls += " lx-match";
+            if (sonando === gn) cls += " ring-4 ring-[#F6C445]/50";
             return (
               <div
                 key={gn}
@@ -689,7 +743,7 @@ function MatchStep({
                   type="button"
                   disabled={isMatched}
                   aria-pressed={isSelected}
-                  onClick={() => setSelectedGn(isSelected ? null : gn)}
+                  onClick={() => { if (!sonando) setSelectedGn(isSelected ? null : gn); }}
                   className="flex-1 self-stretch text-left"
                 >
                   {gn}
@@ -744,7 +798,7 @@ function MatchStep({
       </div>
 
       {done && (
-        <Button variant="cta" size="lg" className="mt-6 h-14 w-full text-base" onClick={onNext}>
+        <Button variant="cta" size="lg" className="mt-6 h-14 w-full text-base" disabled={sonando !== null} onClick={onNext}>
           {tx("lsFinish")}
         </Button>
       )}
