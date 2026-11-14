@@ -114,7 +114,12 @@ function Consultorio() {
     () =>
       (cuerpoQ.data?.words ?? [])
         .filter((w) => w.hasAudio)
-        .map((w) => ({ gn: w.gn, es: w.es, region: regionDe(w.es) }))
+        // El juego busca la parte del cuerpo por su nombre en castellano (y traduce él mismo al portugués):
+        // usa el significado original, no el ya traducido al idioma de la app.
+        .map((w) => {
+          const es = (w as { orig?: string }).orig ?? w.es;
+          return { gn: w.gn, es, region: regionDe(es) };
+        })
         .filter((w): w is PalabraCuerpo => w.region !== null),
     [cuerpoQ.data],
   );

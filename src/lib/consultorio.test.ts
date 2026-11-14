@@ -101,3 +101,14 @@ describe("triage", () => {
     expect(triageDe(() => 0.9)).toBe("verde");
   });
 });
+
+import { localizarVocab } from "./significado";
+
+describe("consultorio con la app en otro idioma", () => {
+  it("encuentra la parte del cuerpo aunque el significado ya venga traducido", () => {
+    const [w] = localizarVocab([{ gn: "x", es: "Cabeza", sig: { pt: "Cabeça", en: "Head" } }], "pt");
+    expect(w.es).toBe("Cabeça");
+    expect(regionDe(w.es)).toBeNull(); // lo que pasaba antes
+    expect(regionDe(w.orig)).toBe("cabeza"); // lo que usa el juego ahora
+  });
+});
