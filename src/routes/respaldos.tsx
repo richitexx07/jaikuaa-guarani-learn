@@ -5,7 +5,6 @@ import { HeroJai } from "@/components/marketing/page-parts";
 import jaiGraduado from "@/assets/jai/jai-graduado.webp";
 import { FileText } from "lucide-react";
 import { MarketingHeader } from "@/components/marketing/page-parts";
-import mecDocumento from "@/assets/respaldos/mec-resolucion-1572-2026.pdf.asset.json";
 
 export const Route = createFileRoute("/respaldos")({
   head: () => ({
@@ -55,7 +54,7 @@ const RESPALDOS: Respaldo[] = [
     what: "De interés educativo",
     detail:
       "Dictada el 9 de noviembre de 2026. Declara de interés educativo el proyecto Jaikuaa, organizado por Guaraní Global Tech E.A.S. Reconoce su aporte como herramienta pedagógica digital para la enseñanza y el aprendizaje de la lengua guaraní; no constituye un software especializado de corrección ortográfica o gramatical.",
-    pdf: mecDocumento.url,
+    pdf: "/respaldos/mec-resolucion-1572-2026.pdf",
   },
   {
     who: "Secretaría de Políticas Lingüísticas",

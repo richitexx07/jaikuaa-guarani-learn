@@ -14,6 +14,8 @@ import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
 import bannerCurso from "@/assets/banners/banner-curso.webp";
 import bannerEscolar from "@/assets/banners/banner-escolar.webp";
 import coverKaraoke from "@/assets/covers/cover-karaoke.webp";
+import coverConsultorio from "@/assets/covers/cover-consultorio.webp";
+import coverTekojoja from "@/assets/covers/cover-tekojoja.webp";
 import { RetoCard } from "@/components/games/reto-card";
 import { useIsGuest } from "@/lib/guest";
 import { MarketingHeader } from "@/components/marketing/page-parts";
@@ -51,6 +53,7 @@ function Index() {
         <Hero />
         <RetoPortada />
         <Adentro />
+        <ParaElTrabajo />
         <LiveAudioPreview />
         <FoundingSponsors />
         <div className="border-t border-border/50 px-4 py-12 sm:px-6">
@@ -176,6 +179,41 @@ function Adentro() {
                 <p className="mt-1 text-sm text-muted-foreground">{a.desc}</p>
               </figcaption>
             </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Guaraní para el trabajo: médico y jurídico, a la vista desde la portada (se juegan sin cuenta). */
+const TRABAJO = [
+  { img: coverConsultorio, to: "/juegos/consultorio", title: "Guaraní médico", desc: "Consultorio de Jai: atendé a pacientes que hablan guaraní." },
+  { img: coverTekojoja, to: "/juegos/tekojoja", title: "Guaraní jurídico", desc: "Tekojoja, Juzgado de Paz: resolvé casos y aprendé términos jurídicos." },
+] as const;
+
+function ParaElTrabajo() {
+  return (
+    <section className="px-4 pb-16 sm:px-6">
+      <div className="mx-auto max-w-4xl">
+        <h2 className="text-center font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          Guaraní para el trabajo
+        </h2>
+        <p className="mt-2 text-center text-sm text-muted-foreground">Para quienes atienden a la gente en su idioma.</p>
+        <div className="mt-8 grid gap-5 sm:grid-cols-2">
+          {TRABAJO.map((t) => (
+            <Link
+              key={t.to}
+              to={t.to}
+              className="block overflow-hidden rounded-3xl border border-border/60 bg-card shadow-elegant transition active:scale-[.99] hover:border-accent/40"
+            >
+              <img src={t.img} alt="" className="aspect-[4/3] w-full object-cover" width={800} height={600} loading="lazy" decoding="async" />
+              <div className="p-5">
+                <p className="font-display text-lg font-bold text-foreground">{t.title}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{t.desc}</p>
+                <p className="mt-3 text-sm font-semibold text-primary">Probalo sin cuenta</p>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
