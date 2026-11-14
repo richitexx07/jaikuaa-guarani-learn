@@ -57,9 +57,11 @@ export function faltaPostulacion(p: Postulacion, whatsappValido: (n: string) => 
   if (p.nombre.trim().length < 3) f.push("tu nombre completo");
   if (!DEPARTAMENTOS.includes(p.departamento as (typeof DEPARTAMENTOS)[number])) f.push("dónde vivís");
   const wa = p.whatsapp.trim(), em = p.email.trim();
-  if (!wa && !em) f.push("un WhatsApp o un correo");
-  if (wa && !whatsappValido(wa)) f.push("un WhatsApp válido");
-  if (em && !EMAIL.test(em)) f.push("un correo válido");
+  // Para registrarse como colaborador se piden los dos: teléfono y correo.
+  if (!wa) f.push("tu número de teléfono");
+  else if (!whatsappValido(wa)) f.push("un número de teléfono válido");
+  if (!em) f.push("tu correo");
+  else if (!EMAIL.test(em)) f.push("un correo válido");
   if (!PERFILES.some((x) => x.id === p.perfil)) f.push("tu perfil");
   if (!p.aportes.length) f.push("cómo querés colaborar");
   if (p.capacitacion === null) f.push("si querés capacitación");

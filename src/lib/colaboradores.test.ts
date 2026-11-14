@@ -5,7 +5,7 @@ import { normalizarWhatsapp } from "@/lib/purahei";
 
 const ok = (n: string) => !!normalizarWhatsapp(n);
 const base: Postulacion = {
-  nombre: "Ana Benítez", departamento: "Central", ciudad: "Luque", whatsapp: "0981 123 456", email: "", perfil: "docente",
+  nombre: "Ana Benítez", departamento: "Central", ciudad: "Luque", whatsapp: "0981 123 456", email: "ana@escuela.edu.py", perfil: "docente",
   institucion: "", lenguas: "", aportes: ["revisar"], capacitacion: true, comentario: "", acepto: true,
 };
 
@@ -13,10 +13,11 @@ describe("Colaboradores: postulación", () => {
   it("una postulación completa no tiene faltantes", () => {
     expect(faltaPostulacion(base, ok)).toEqual([]);
   });
-  it("pide WhatsApp o correo, y que sean válidos", () => {
-    expect(faltaPostulacion({ ...base, whatsapp: "" }, ok)).toContain("un WhatsApp o un correo");
-    expect(faltaPostulacion({ ...base, whatsapp: "", email: "ana@escuela.edu.py" }, ok)).toEqual([]);
-    expect(faltaPostulacion({ ...base, whatsapp: "12" }, ok)).toContain("un WhatsApp válido");
+  it("pide teléfono y correo, los dos, y que sean válidos", () => {
+    expect(faltaPostulacion({ ...base, whatsapp: "" }, ok)).toContain("tu número de teléfono");
+    expect(faltaPostulacion({ ...base, email: "" }, ok)).toContain("tu correo");
+    expect(faltaPostulacion({ ...base, whatsapp: "12" }, ok)).toContain("un número de teléfono válido");
+    expect(faltaPostulacion({ ...base, email: "ana" }, ok)).toContain("un correo válido");
   });
   it("pide lugar, perfil, cómo colaborar, capacitación y autorización", () => {
     const f = faltaPostulacion({ ...base, departamento: "", perfil: "", aportes: [], capacitacion: null, acepto: false }, ok);

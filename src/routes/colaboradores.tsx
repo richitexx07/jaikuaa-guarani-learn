@@ -106,11 +106,11 @@ function ColaboradoresPage() {
                   <label className="block text-sm font-medium" htmlFor="co-ciudad">Ciudad o distrito
                     <Input id="co-ciudad" value={f.ciudad} onChange={(e) => set("ciudad", e.target.value)} maxLength={120} className="mt-1 h-12 text-base" />
                   </label>
-                  <label className="block text-sm font-medium" htmlFor="co-wa">WhatsApp
+                  <label className="block text-sm font-medium" htmlFor="co-wa">Número de teléfono (WhatsApp)
                     <Input id="co-wa" value={f.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} maxLength={25} inputMode="tel" autoComplete="tel" placeholder="0981 123 456" className="mt-1 h-12 text-base" />
                   </label>
-                  <label className="block text-sm font-medium" htmlFor="co-email">Correo (opcional si dejás WhatsApp)
-                    <Input id="co-email" type="email" value={f.email} onChange={(e) => set("email", e.target.value)} maxLength={255} autoComplete="email" className="mt-1 h-12 text-base" />
+                  <label className="block text-sm font-medium" htmlFor="co-email">Correo electrónico
+                    <Input id="co-email" type="email" value={f.email} onChange={(e) => set("email", e.target.value)} maxLength={255} autoComplete="email" inputMode="email" placeholder="nombre@correo.com" className="mt-1 h-12 text-base" />
                   </label>
                 </div>
 
