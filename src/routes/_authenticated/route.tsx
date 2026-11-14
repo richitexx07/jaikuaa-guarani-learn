@@ -51,6 +51,9 @@ export const Route = createFileRoute("/_authenticated")({
       }
     }
     if (guest) return guest;
+    // La app instalada en el celular abre en /dashboard: sin sesión, se muestra la portada
+    // («Estudiá ahora, sin cuenta» / «Jugá ahora, sin cuenta» / «Ya tengo cuenta»), no la pantalla de ingreso.
+    if (location.pathname.replace(/\/+$/, "") === "/dashboard") throw redirect({ to: "/" });
     rememberAfterLogin(location.href);
     // Quien nunca tuvo cuenta en este celular ve «Crear cuenta»; quien ya tuvo, «Iniciar sesión».
     throw redirect({ to: "/auth", search: { mode: authMode() } });
