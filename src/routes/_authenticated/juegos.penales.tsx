@@ -33,6 +33,7 @@ import { RetoBanner, RetoFinal, useRetoPartida, type Partida } from '@/component
 import { leccionDeReto, orderedBy, shufflerFor } from '@/lib/reto';
 import { PauseButton, RefereeMenu, useEndTitle, type DuelEnd } from '@/components/games/duel-referee';
 import { useIsGuest } from '@/lib/guest';
+import { anotarReciente, leerRecientes, priorizarNuevas } from '@/lib/rotacion';
 import { ElegirCamiseta } from '@/components/games/penalties/elegir-camiseta';
 import { PAISES, nombrePais, useMiKit, type Kit, type Pais } from '@/components/games/penalties/camisetas';
 import { useAppLang } from '@/lib/i18n';
@@ -99,9 +100,12 @@ type Played={word:GameWord;outcome:Outcome;player:number};
 function Match({seed,partida,lesson,words,duel,names,kits,ledText,muted,onAgain,onModes,total=5,mazo,final,etiqueta}:{kits:Kit[];seed:number;partida:Partida;lesson:number|null;words:GameWord[];duel:boolean;names:[string,string];ledText:string;muted:boolean;onAgain:()=>void;onModes:()=>void;total?:number;mazo?:GameWord[];final?:(r:{goals:number;outcomes:Outcome[]})=>ReactNode;etiqueta?:string}){
  const pm=usePM();
  const {p,msg,label}=usePT();
- const deck=useMemo(()=>mazo&&mazo.length?mazo:shufflerFor(seed)(orderedBy(words,w=>w.gn)),[words,seed,mazo]);
+ // Sin reto, las palabras que pateaste hace poco van al final: cada partida trae palabras distintas. En un reto, el mazo es el mismo para los dos.
+ const [recientes]=useState(()=>partida.reto?[]:leerRecientes('penales'));
+ const deck=useMemo(()=>mazo&&mazo.length?mazo:priorizarNuevas(shufflerFor(seed)(orderedBy(words,w=>w.gn)),recientes,w=>w.gn),[words,seed,mazo,recientes]);
  const [turn,setTurn]=useState(0),[choice,setChoice]=useState<string|null>(null),[played,setPlayed]=useState<Played[]>([]),[last,setLast]=useState<Outcome|null>(null),[finished,setFinished]=useState(false),[guess,setGuess]=useState<Dive|null>(null),[menu,setMenu]=useState(false),[end,setEnd]=useState<DuelEnd|null>(null),endTitle=useEndTitle();
  const word=deck[turn%deck.length];
+ useEffect(()=>{if(word&&!partida.reto)anotarReciente('penales',word.gn);},[word?.gn]);// eslint-disable-line react-hooks/exhaustive-deps
  const options=useMemo(()=>{if(!word)return [];const mezclar=shufflerFor(seed,turn+1);return mezclar([word,...mezclar(orderedBy(words.filter(w=>w.gn!==word.gn),w=>w.gn)).slice(0,2)]);},[word,words,seed,turn]);
  const player=duel?turn%2:0,results=[played.filter(p=>p.player===0).map(p=>p.outcome),played.filter(p=>p.player===1).map(p=>p.outcome)],goals=results.map(r=>r.filter(isGoal).length),xp=xpFor(results[0]),recorded=useRef(false);
  useEffect(()=>{if(!finished||recorded.current)return;recorded.current=true;recordCompletion({source:'game',sourceRef:'penales',xp});if(duel||goals[0]>=3)celebrate('big');},[finished,xp]);
