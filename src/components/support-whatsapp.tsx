@@ -450,7 +450,7 @@ export function SupportWhatsApp() {
         </div>
       )}
 
-      {!open && teaser && (
+      {!open && teaser && pathname !== "/dashboard" && (
         <div className="jai-msg-in mb-2 ml-auto w-fit max-w-[240px] rounded-2xl rounded-br-md bg-card px-3.5 py-2.5 text-sm shadow-lift">
           <button type="button" onClick={() => setTeaser(false)} aria-label="Cerrar saludo" className="float-right -mr-1 -mt-1 ml-2 rounded-full p-0.5 text-muted-foreground hover:text-foreground">
             <X className="h-3.5 w-3.5" />
@@ -459,7 +459,7 @@ export function SupportWhatsApp() {
         </div>
       )}
 
-      {!open && <JaiLauncher launcherRef={launcherRef} onOpen={() => { setOpen(true); setTeaser(false); }} />}
+      {!open && pathname !== "/dashboard" && <JaiLauncher launcherRef={launcherRef} onOpen={() => { setOpen(true); setTeaser(false); }} />}
     </div>
   );
 }

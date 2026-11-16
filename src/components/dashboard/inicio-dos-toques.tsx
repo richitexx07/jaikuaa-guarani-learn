@@ -17,7 +17,9 @@ import { getWordOfDay } from "@/lib/games.functions";
 import { withOfflineCache } from "@/lib/offline-data";
 import { K } from "@/lib/offline-pack";
 import { pendingLessonRefs, useStats } from "@/lib/gamification";
-import { hoyPy } from "@/lib/meta-diaria";
+import { hoyPy, METAS, elegirMeta, useMetaDiaria } from "@/lib/meta-diaria";
+import { Button } from "@/components/ui/button";
+import bannerCurso from "@/assets/banners/banner-curso.webp";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import jaiSaluda from "@/assets/jai/jai-saluda.webp";
 import jaiAplaude from "@/assets/jai/jai-aplaude.webp";
@@ -146,7 +148,7 @@ function useCursoGuarani() {
     pend.has(`guarani:${l.n}`) ? { ...l, completed: true } : l,
   );
   const done = lessons.filter((l) => l.completed).length;
-  const next = lessons.find((l, i) => !l.completed && l.publishedWords > 0 && (i === 0 || lessons[i - 1]!.completed));
+  const next = lessons.find((l, i) => !l.completed && l.publishedWords > 0 && (i === 0 || lessons[i - 1]?.completed));
   return { lessons, done, total: lessons.length, next };
 }
 
@@ -157,7 +159,7 @@ function useCursoGuarani() {
 export function MiNanduti({ lessons, className = "" }: { lessons: LeccionCurso[]; className?: string }) {
   const total = Math.max(lessons.length, 1);
   const nextIdx = lessons.findIndex((l) => !l.completed);
-  const tonos = ["#F6C445", "#FFFFFF", "#E8483C", "#7FA7E8"];
+  const tonos = ["var(--learning-gold)", "var(--learning-cover-text)", "var(--accent)", "var(--muted-foreground)"];
   // Con muchas lecciones los pétalos se afinan para no pisarse.
   const w = Math.min(11, ((Math.PI * 60) / total) * 0.95);
   const petalo = `M0,-30 C${w},-44 ${w},-66 0,-90 C${-w},-66 ${-w},-44 0,-30 Z`;
@@ -166,7 +168,7 @@ export function MiNanduti({ lessons, className = "" }: { lessons: LeccionCurso[]
     <svg viewBox="-100 -100 200 200" className={className} aria-hidden>
       <style>{`.mn-late{animation:mn-late 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}@keyframes mn-late{50%{opacity:.35}}.mn-gira{animation:mn-gira 160s linear infinite;transform-box:view-box;transform-origin:0 0}@keyframes mn-gira{to{transform:rotate(360deg)}}@media (prefers-reduced-motion: reduce){.mn-late,.mn-gira{animation:none}}`}</style>
       <g className="mn-gira">
-        <g fill="none" stroke="#FFFFFF" strokeOpacity="0.28" strokeWidth="0.7">
+        <g fill="none" stroke="var(--learning-cover-text)" strokeOpacity="0.28" strokeWidth="0.7">
           {[22, 46, 70, 94].map((r) => <circle key={r} r={r} />)}
           {Array.from({ length: 32 }, (_, i) => (
             <line key={i} x1="0" y1="-22" x2="0" y2="-94" transform={`rotate(${(i * 360) / 32})`} />
@@ -183,7 +185,7 @@ export function MiNanduti({ lessons, className = "" }: { lessons: LeccionCurso[]
               transform={`rotate(${a})`}
               fill={color}
               fillOpacity={l.completed ? 0.95 : 0}
-              stroke={isNext ? "#F6C445" : "#FFFFFF"}
+              stroke={isNext ? "var(--learning-gold)" : "var(--learning-cover-text)"}
               strokeOpacity={l.completed ? 0 : isNext ? 1 : 0.55}
               strokeWidth={isNext ? 2.4 : 1}
               strokeDasharray={l.completed || isNext ? undefined : "3 3"}
@@ -192,9 +194,9 @@ export function MiNanduti({ lessons, className = "" }: { lessons: LeccionCurso[]
           );
         })}
       </g>
-      <circle r="20" fill="#F6C445" />
-      <circle r="13" fill="none" stroke="#13233A" strokeOpacity="0.35" strokeWidth="1.2" />
-      <circle r="5" fill="#13233A" fillOpacity="0.55" />
+      <circle r="20" fill="var(--learning-gold)" />
+      <circle r="13" fill="none" stroke="var(--learning-ink)" strokeOpacity="0.35" strokeWidth="1.2" />
+      <circle r="5" fill="var(--learning-ink)" fillOpacity="0.55" />
     </svg>
   );
 }
@@ -213,50 +215,22 @@ export function HeroLeccion() {
   const completo = curso.total > 0 && curso.done >= curso.total;
   return (
     <section aria-label={empezo ? t("seguir") : t("empezar")} className="mt-5">
-      <a
-        href={href}
-        className="relative block overflow-hidden rounded-3xl bg-primary p-5 text-primary-foreground shadow-lift transition active:scale-[0.99] sm:p-7"
-      >
-        <NandutiDisc className="pointer-events-none absolute -bottom-24 -left-20 h-56 w-56 text-primary-foreground opacity-[0.08]" />
-        <span className="relative flex items-start gap-4">
-          <span className="min-w-0 flex-1">
-            <span className="block text-xs font-bold uppercase tracking-wide text-[#F6C445]">
-              {empezo ? t("seguir") : t("empezar")}
-            </span>
-            <span className="mt-1.5 block font-display text-2xl font-bold leading-tight sm:text-3xl">{titulo}</span>
-            <span className="mt-1 block text-sm opacity-85">{t("sub")}</span>
-          </span>
-          {curso.total > 0 && (
-            <MiNanduti lessons={curso.lessons} className="h-28 w-28 shrink-0 drop-shadow sm:h-36 sm:w-36" />
-          )}
-        </span>
-        {curso.total > 0 && (
-          <span className="relative mt-4 block rounded-2xl bg-white/10 px-3 py-2 text-sm">
-            <span className="font-semibold text-[#F6C445]">{t("tuNanduti")}</span>{" "}
-            <span className="opacity-90">
-              {completo
-                ? t("completo")
-                : curso.done === 0
-                  ? t("cadaLeccion")
-                  : `${t("tejido", { d: String(curso.done), t: String(curso.total) })}. ${t("cadaLeccion")}`}
-            </span>
-          </span>
-        )}
-        <span className="relative mt-4 flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#F6C445] font-display text-lg font-bold text-[#13233A] shadow">
-          <Play className="h-5 w-5 fill-current" aria-hidden />
-          {empezo ? t("continuar") : t("empezarBtn")}
-        </span>
-      </a>
-      {juego && (
-        <a
-          href={juego.href}
-          className="mt-2 flex min-h-12 items-center gap-2 rounded-2xl border border-border bg-card px-4 text-sm font-semibold text-foreground transition active:scale-[0.99]"
-        >
-          <Gamepad2 className="h-4 w-4 text-primary" aria-hidden />
-          <span className="min-w-0 flex-1 truncate">{t("volverJuego", { t: juego.title })}</span>
-          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-        </a>
-      )}
+      <div className="relative isolate overflow-hidden rounded-lg bg-learning-cover text-learning-cover-text">
+        <img src={bannerCurso} alt="Jai con su pañuelo de ñandutí, recorriendo un camino" width={1280} height={720} className="h-32 w-full object-cover object-[center_55%] sm:h-60" />
+        <div className="relative px-5 pb-5 pt-4 sm:px-7 sm:pb-7">
+          <span className="text-sm font-semibold text-learning-gold">{empezo ? t("seguir") : t("empezar")}</span>
+          <h2 className="mt-1 font-display text-2xl font-bold leading-tight sm:text-3xl">{titulo}</h2>
+          <p className="mt-2 text-base text-learning-cover-text/85">{t("sub")}</p>
+          {curso.total > 0 && <div className="mt-3 flex items-center gap-3">
+            <MiNanduti lessons={curso.lessons} className="h-9 w-9 shrink-0 sm:h-12 sm:w-12" />
+            <div className="min-w-0 text-sm"><p className="font-semibold text-learning-gold">{t("tuNanduti")}</p><p>{completo ? t("completo") : t("tejido", { d: String(curso.done), t: String(curso.total) })}</p></div>
+          </div>}
+          <Button asChild variant="ghost" className="mt-4 h-12 w-full whitespace-normal rounded-lg bg-learning-gold px-4 font-display text-base font-bold text-learning-ink hover:bg-learning-gold/90 active:scale-[0.98]">
+            <a href={href}><Play className="fill-current" aria-hidden />{empezo ? t("continuar") : t("empezarBtn")}</a>
+          </Button>
+        </div>
+      </div>
+      {juego && <Button asChild variant="link" className="mt-2 h-auto min-h-11 max-w-full justify-start whitespace-normal px-0 text-sm"><a href={juego.href}><Gamepad2 aria-hidden /><span>{t("volverJuego", { t: juego.title })}</span><ChevronRight aria-hidden /></a></Button>}
     </section>
   );
 }
@@ -270,26 +244,32 @@ export function PalabraDeHoy() {
   if (!w) return null;
   const jugada = q.data?.played;
   return (
-    <section aria-labelledby="inicio-palabra" className="mt-4 flex items-center gap-3 rounded-3xl border border-[#F6C445]/50 bg-[#FDF1D3] p-4 text-[#13233A] dark:bg-[#2A2410] dark:text-[#FDF1D3]">
-      <SpeakerButton gn={w.gn} size="md" className="shrink-0" />
-      <div className="min-w-0 flex-1">
-        <h2 id="inicio-palabra" className="text-xs font-bold uppercase tracking-wide opacity-70">{t("palabraHoy")}</h2>
-        <p className="truncate font-display text-2xl font-bold leading-tight">{w.gn}</p>
-        <p className="text-sm opacity-80">
-          {jugada ? (jugada.answer ? t("significa", { a: jugada.answer }) : t("hechoHoy")) : t("adivina")}
-        </p>
+    <section aria-labelledby="inicio-palabra" className="mt-7 border-y border-border bg-learning-paper px-4 py-5 sm:rounded-lg sm:border">
+      <h2 id="inicio-palabra" className="font-display text-lg font-bold text-foreground">{t("palabraHoy")}</h2>
+      <div className="mt-3 flex items-center gap-4">
+        <SpeakerButton gn={w.gn} size="md" className="h-12 w-12 shrink-0" />
+        <p className="min-w-0 break-words font-display text-3xl font-bold leading-tight text-foreground">{w.gn}</p>
       </div>
-      {jugada ? (
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#1F7A4D] text-white" aria-label={t("hechoHoy")}>
-          <Check className="h-5 w-5" aria-hidden />
-        </span>
-      ) : (
-        <a href="/juegos/palabra-del-dia" aria-label={t("adivina")} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#13233A] text-[#F6C445] transition active:scale-95">
-          <ChevronRight className="h-6 w-6" aria-hidden />
-        </a>
-      )}
+      {jugada ? <p className="mt-3 flex items-center gap-2 text-base text-foreground"><Check className="h-5 w-5 shrink-0 text-learning-success" aria-hidden />{jugada.answer ? t("significa", { a: jugada.answer }) : t("hechoHoy")}</p> :
+        <Button asChild variant="link" className="mt-2 h-auto min-h-11 w-full justify-between whitespace-normal px-0 text-left text-base"><a href="/juegos/palabra-del-dia">{t("adivina")}<ChevronRight aria-hidden /></a></Button>}
     </section>
   );
+}
+
+/** Uses the existing goal and streak stores; no points or completion rules change. */
+export function RitmoDiario() {
+  const stats = useStats();
+  const { meta, hoy } = useMetaDiaria();
+  const [editing, setEditing] = useState(false);
+  const ready = meta !== null && hoy >= meta;
+  return <section aria-label="Tu práctica diaria" className="mt-4 border-y border-border py-3">
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-2 text-sm font-semibold"><span className="grid h-10 w-10 place-items-center rounded-full bg-accent/10 text-accent"><Sparkles className="h-5 w-5 motion-safe:transition-transform hover:scale-110" aria-hidden /></span><span>{stats.streak} {stats.streak === 1 ? "día" : "días"}<span className="block text-xs font-normal text-muted-foreground">de racha</span></span></div>
+      <Button variant="link" onClick={() => setEditing(!editing)} aria-expanded={editing} className="h-auto min-h-11 max-w-[60%] whitespace-normal px-0 text-right text-sm"><span className={ready ? "learning-goal-complete text-learning-success" : ""}>{meta === null ? "Elegí tu meta diaria" : ready ? "Meta cumplida" : `${Math.min(hoy, meta)} / ${meta} puntos hoy`}</span>{ready ? <Check aria-hidden /> : <ChevronRight aria-hidden />}</Button>
+    </div>
+    {meta !== null && <progress aria-label="Meta diaria" value={Math.min(hoy, meta)} max={meta} className="mt-2 h-1.5 w-full accent-accent" />}
+    {editing && <div className="mt-3 grid grid-cols-3 gap-2">{METAS.map(m => <Button key={m.id} variant={meta === m.pts ? "default" : "outline"} className="min-h-12 whitespace-normal rounded-lg" onClick={() => { elegirMeta(m.pts); setEditing(false); }}>{m.min} min</Button>)}</div>}
+  </section>;
 }
 
 /** Jai cambia según el momento: da la bienvenida, aplaude si ya practicaste hoy y levanta la copa con una buena racha. */
@@ -315,24 +295,24 @@ const JUEGOS = [
 export function JuegosCarrusel() {
   const t = useTD();
   return (
-    <section aria-labelledby="inicio-juegos" className="mt-7">
+    <section aria-labelledby="inicio-juegos" className="mt-9">
       <div className="flex items-baseline justify-between gap-3">
         <h2 id="inicio-juegos" className="font-display text-xl font-bold text-foreground">{t("jugar")}</h2>
-        <Link to="/juegos" className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
+        <Link to="/juegos" className="flex min-h-11 items-center text-sm font-semibold text-primary underline-offset-4 hover:underline">
           {t("verTodos")}
         </Link>
       </div>
-      <ul className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 lg:grid-cols-6">
+      <ul className="learning-shelf -mx-4 mt-3 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0">
         {JUEGOS.map((j) => (
-          <li key={j.href} className="w-40 shrink-0 snap-start sm:w-auto">
+          <li key={j.href} className="w-44 shrink-0 snap-start sm:w-48">
             <a
               href={j.href}
-              className="block overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition active:scale-[0.98]"
+              className="block overflow-hidden rounded-lg border border-border bg-card shadow-elegant transition active:scale-[0.98]"
             >
               <img src={j.img} alt="" width={800} height={600} loading="lazy" decoding="async" className="aspect-[4/3] w-full object-cover" />
               <span className="block px-3 pb-3 pt-2">
                 <span className="block font-display text-base font-bold leading-tight text-foreground">{t(j.t)}</span>
-                <span className="block truncate text-xs text-muted-foreground">{t(j.d)}</span>
+                <span className="mt-1 block text-sm text-muted-foreground">{t(j.d)}</span>
               </span>
             </a>
           </li>
@@ -361,14 +341,15 @@ export function NovedadesCampana({ children }: { children: ReactNode }) {
       }}
     >
       <SheetTrigger asChild>
-        <button
+        <Button
+          variant="ghost"
           type="button"
           aria-label={t("novedades")}
-          className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full border border-border bg-background text-primary transition hover:border-primary/40"
+          className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full border border-border bg-background text-primary transition hover:border-primary/40"
         >
           <Bell className="h-5 w-5" aria-hidden />
           {punto && <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-accent ring-2 ring-background" aria-hidden />}
-        </button>
+        </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md">
         <SheetHeader>
@@ -448,25 +429,25 @@ export function TodoJaikuaa({ ia = false }: { ia?: boolean }) {
   return (
     <section aria-labelledby="inicio-todo" className="mt-10">
       <h2 id="inicio-todo" className="font-display text-xl font-bold text-foreground">{t("todo")}</h2>
-      <p className="text-sm text-muted-foreground">{t("todoD")}</p>
-      <div className="mt-4 space-y-6">
+
+      <div className="mt-5 space-y-7">
         {gruposTodo(ia).map((g) => (
           <div key={g.titulo}>
             <h3 className="mb-2 font-display text-base font-bold text-foreground">{t(g.titulo)}</h3>
             {/* Estanterías como las tiendas de apps: en el celular se deslizan de costado; en pantalla grande, en grilla. */}
-            <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0 lg:grid-cols-8">
+            <ul className="learning-shelf -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-4 sm:overflow-visible sm:px-0 lg:grid-cols-5">
               {g.items.map((it) => {
-                const nombre = it.t ? t(it.t) : it.nombre!;
+                const nombre = it.t ? t(it.t) : it.nombre ?? "";
                 return (
-                  <li key={it.href} className="w-[6.75rem] shrink-0 snap-start sm:w-auto">
-                    <a href={it.href} className="group block rounded-[22px] text-left outline-none transition active:scale-[.97] focus-visible:ring-2 focus-visible:ring-ring">
-                      <span className="relative block aspect-[4/5] overflow-hidden rounded-[22px] bg-muted shadow-[0_6px_18px_-8px_rgba(0,0,0,.45)] ring-1 ring-black/5 transition group-hover:-translate-y-0.5 group-hover:shadow-[0_12px_26px_-10px_rgba(0,0,0,.5)]">
+                  <li key={it.href} className="w-36 shrink-0 snap-start sm:w-auto">
+                    <a href={it.href} className="group block rounded-lg text-left outline-none transition active:scale-[.97] focus-visible:ring-2 focus-visible:ring-ring">
+                      <span className="relative block aspect-[4/3] overflow-hidden rounded-lg bg-muted shadow-elegant ring-1 ring-border transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
                         <img src={it.img} alt="" width={288} height={360} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]" />
                         {it.revision && (
-                          <span className="absolute right-2 top-2 h-3 w-3 rounded-full bg-amber-400 ring-2 ring-white" title={t("enRevision")} />
+                          <span className="absolute right-2 top-2 h-3 w-3 rounded-full bg-learning-gold ring-2 ring-card" title={t("enRevision")} />
                         )}
                       </span>
-                      <span className="mt-1.5 block truncate px-0.5 text-[13px] font-semibold leading-tight text-foreground">
+                      <span className="mt-2 block break-words px-0.5 text-base font-semibold leading-tight text-foreground">
                         {nombre}
                         {it.revision && <span className="sr-only"> ({t("enRevision")})</span>}
                       </span>
@@ -479,7 +460,7 @@ export function TodoJaikuaa({ ia = false }: { ia?: boolean }) {
         ))}
       </div>
       <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-        <span className="h-2.5 w-2.5 rounded-full bg-amber-400" aria-hidden /> {t("enRevision")}
+        <span className="h-2.5 w-2.5 rounded-full bg-learning-gold" aria-hidden /> {t("enRevision")}
       </p>
     </section>
   );

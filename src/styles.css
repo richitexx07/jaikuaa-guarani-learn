@@ -37,6 +37,12 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-learning-gold: var(--learning-gold);
+  --color-learning-ink: var(--learning-ink);
+  --color-learning-paper: var(--learning-paper);
+  --color-learning-success: var(--learning-success);
+  --color-learning-cover: var(--learning-cover);
+  --color-learning-cover-text: var(--learning-cover-text);
   --color-ring-offset-background: var(--background);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -124,6 +130,47 @@
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(1 0 0 / 15%);
   --sidebar-ring: oklch(0.53037 0.2074 22.317 / 50%);
+}
+
+/* Fixed light surfaces must not inherit dark form tokens from the page. */
+html:has(.learning-home), body:has(.learning-home) { overflow-x: clip; }
+.learning-home {
+  overflow-x: hidden;
+  --background: oklch(0.985 0.003 250);
+  --learning-gold: oklch(0.84 0.15 88);
+  --learning-ink: oklch(0.25 0.05 255);
+  --learning-paper: oklch(0.97 0.025 88);
+  --learning-success: oklch(0.42 0.1 160);
+  --learning-cover: oklch(0.25 0.05 255);
+  --learning-cover-text: oklch(0.99 0.002 250);
+  letter-spacing: 0;
+}
+.dark .learning-home {
+  --primary: oklch(0.96 0.005 250);
+  --primary-foreground: oklch(0.25 0.05 255);
+  --background: oklch(0.19 0.015 255);
+  --card: oklch(0.25 0.018 255);
+  --foreground: oklch(0.96 0.005 250);
+  --muted: oklch(0.29 0.018 255);
+  --muted-foreground: oklch(0.78 0.015 250);
+  --border: oklch(0.85 0.01 255 / 18%);
+  --learning-paper: oklch(0.27 0.025 88);
+  --learning-success: oklch(0.78 0.1 160);
+}
+.learning-home :is(h1, h2, h3, a, button) { letter-spacing: 0; }
+.learning-home button { min-height: 44px; }
+.learning-home .learning-shelf {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+@keyframes learning-celebrate { 50% { transform: scale(1.08); } }
+.learning-goal-complete { animation: learning-celebrate 600ms ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .learning-home *, .learning-home *::before, .learning-home *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Fixed light surfaces must not inherit dark form tokens from the page. */

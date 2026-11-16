@@ -38,7 +38,8 @@ import { NovedadPurahei } from "@/components/purahei/novedad-purahei";
 import { ConvenioPendiente } from "@/components/convenio-pendiente";
 import { MisLibrosAcceso } from "@/components/libreria/mis-libros-acceso";
 import { RetoCard } from "@/components/games/reto-card";
-import { HeroLeccion, JuegosCarrusel, NovedadesCampana, PalabraDeHoy, TodoJaikuaa, useJaiDelMomento } from "@/components/dashboard/inicio-dos-toques";
+import { HeroLeccion, JuegosCarrusel, NovedadesCampana, PalabraDeHoy, TodoJaikuaa, RitmoDiario, useJaiDelMomento } from "@/components/dashboard/inicio-dos-toques";
+import { JAI_OPEN_EVENT } from "@/lib/jai-events";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import bannerAprender from "@/assets/banners/banner-aprender.webp";
 import bannerCurso from "@/assets/banners/banner-curso.webp";
@@ -187,9 +188,9 @@ function PilotCard() {
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Jaikuaa — Tu panel" },
+      { title: "Aprender — Jaikuaa" },
       { name: "description", content: "Retomá tu curso de guaraní, consultá tu progreso y encontrá juegos y actividades de Jaikuaa." },
-      { property: "og:title", content: "Jaikuaa — Tu panel" },
+      { property: "og:title", content: "Aprender — Jaikuaa" },
       { property: "og:description", content: "Tu espacio de aprendizaje: curso, juegos, progreso y actividades de guaraní." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -253,7 +254,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const [name, setName] = useState<string>(() => readCachedName());
   const [openTeaser, setOpenTeaser] = useState<TeaserKey>(null);
-  const greeting = useMemo(() => greetingFor(new Date().getHours()), []);
+
   const jai = useJaiDelMomento();
 
   const claim = useServerFn(claimReferral);
@@ -312,7 +313,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="learning-home flex min-h-screen flex-col bg-background">
       <header className="border-b border-border/50">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
           <Link
@@ -323,8 +324,10 @@ function Dashboard() {
             <BrandLogo className="hidden sm:inline-flex" />
           </Link>
           <div className="flex min-w-0 items-center gap-1 sm:gap-2">
+            <Button variant="ghost" size="icon" className="h-11 w-11 shrink-0 rounded-full" aria-label="Abrir ayuda de Jai" title="Ayuda de Jai" onClick={() => window.dispatchEvent(new Event(JAI_OPEN_EVENT))}><img src={jai.img} alt="" className="h-10 w-10 object-contain" /></Button>
             {/* Novedades y avisos: en la campana, para que no compitan con la lección. */}
             <NovedadesCampana>
+              <div className="mb-4"><AdminCorpusLink /></div>
               <NovedadLibreria />
               <MisLibrosAcceso />
               <NovedadPurahei />
@@ -334,7 +337,6 @@ function Dashboard() {
             </NovedadesCampana>
             <AppLanguageToggle />
             <DisplayToggles />
-            <AdminCorpusLink />
             <Button
               variant="outline"
               size="sm"
@@ -342,47 +344,28 @@ function Dashboard() {
               aria-label={t("signOut")}
             >
               <LogOut aria-hidden />
-              <span className="sm:hidden">Salir</span>
               <span className="hidden sm:inline">{t("signOut")}</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 px-4 py-6 sm:px-6 sm:py-12">
+      <main className="flex-1 px-4 pb-24 pt-6 sm:px-6 sm:pt-9">
         <div className="mx-auto max-w-5xl">
-          {/* 1. SALUDO DE JAI */}
-          <div className="nanduti-bg relative flex items-center gap-3 overflow-hidden rounded-3xl border border-border bg-card p-4 shadow-elegant sm:gap-5 sm:p-5">
-            <div className="relative h-24 w-24 shrink-0 sm:h-32 sm:w-32">
-              <NandutiDisc className="absolute inset-0 h-full w-full text-primary" />
-              <img src={jai.img} alt="Jai, el jaguarete" className="relative h-full w-full object-contain drop-shadow-lg" />
-            </div>
+          <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="font-display text-2xl font-bold leading-tight text-foreground sm:text-4xl">
-                ¡Mba'éichapa, {name ? <span className="text-accent">{name}</span> : t("dash.friend")}! {greeting.emoji}
-              </h1>
-              <p className="mt-1 text-base text-muted-foreground">{jai.msg}</p>
+              <p className="mb-1 text-sm font-semibold text-muted-foreground">Aprender</p>
+              <h1 className="break-words font-display text-2xl font-bold leading-tight text-foreground sm:text-3xl">Mba'éichapa{name ? <>, <span className="text-accent">{name}</span></> : ""}</h1>
+              <p className="mt-2 text-base text-muted-foreground">{jai.msg}</p>
             </div>
+            <img src={jai.img} alt="Jai, el jaguarete" className="h-20 w-20 shrink-0 object-contain sm:h-24 sm:w-24" />
           </div>
-
-          <ConvenioPendiente />
-
-          {/* 2. UN SOLO BOTÓN PROTAGONISTA: seguir aprendiendo (a dos toques de la lección) */}
-          <HeroLeccion />
-
-          {/* La palabra de hoy, con su voz real */}
-          <PalabraDeHoy />
-
-          {/* 3. LOS JUEGOS, con sus portadas, para jugar y repasar */}
+          <div className="lg:grid lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start lg:gap-8">
+            <div><RitmoDiario /><HeroLeccion /></div>
+            <div className="lg:pt-1"><PalabraDeHoy /><div className="mt-6"><StatsBar /></div></div>
+          </div>
           <JuegosCarrusel />
-
-          <div className="mt-6 space-y-3">
-            <StreakBanner />
-            <StatsBar />
-            <p className="px-1 text-xs text-muted-foreground">
-              <span className="font-semibold text-foreground">{t("dash.xpStrong")}</span> {t("dash.xpRest")}
-            </p>
-          </div>
+          <ConvenioPendiente />
 
           {/* 3. ACCESO DOCENTE */}
           <AulaPendientes />

@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Rediseñar Aprender: lección protagonista, estanterías ilustradas, meta y racha arriba, ayuda sin superposición; comprobar celular claro/oscuro y computadora.
 - [x] Entregar TXT completo de Jaikuaa: identidad, reglas, módulos, estado y pendientes.
 - [x] Librería y Expertos: corregir contraste de formularios y comprobar escritura móvil en ambos modos.
 - [x] Tembi'u: dibujos propios de los platos
