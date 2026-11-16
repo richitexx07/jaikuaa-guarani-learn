@@ -197,7 +197,7 @@ function Board({ words, seed, partida, lesson, onNext }: { words: GameWord[]; se
               data-shown={shown}
               data-matched={matched.has(c.pair)}
               aria-label={shown ? c.text : g("hiddenCard")}
-              className="memory-card aspect-[3/4] w-full rounded-xl"
+              className="memory-card aspect-[5/6] w-full rounded-xl sm:aspect-[3/4]"
               style={{ ["--hilo" as string]: hilo }}
             >
               <span className="memory-inner block">

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2 } from "lucide-react";
@@ -192,6 +192,14 @@ function WordOfDayContent() {
     }
   }
 
+  // Al responder, la pantalla baja sola hasta el resultado (antes había que buscarlo con el dedo).
+  const resultadoRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!result) return;
+    const reducir = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    resultadoRef.current?.scrollIntoView({ block: "nearest", behavior: reducir ? "auto" : "smooth" });
+  }, [result]);
+
   const fecha = d ? fechaLarga(d.day) : null;
   return (
     <>
@@ -209,31 +217,33 @@ function WordOfDayContent() {
             <div className="flex justify-center gap-16 pt-2" aria-hidden>
               <span className="h-3 w-3 rounded-full bg-[#3A1A05]/70" /><span className="h-3 w-3 rounded-full bg-[#3A1A05]/70" />
             </div>
+            {/* En el celular la fecha va en una sola línea: así las opciones se ven sin bajar. */}
             <div className="mx-3 mt-1 rounded-lg py-2 text-white" style={{ background: D.rojo }}>
-              <p className="text-sm font-semibold capitalize">{fecha!.dia}</p>
+              <p className="text-sm font-semibold first-letter:uppercase sm:hidden">{fecha!.dia} {fecha!.num} de {fecha!.mes}</p>
+              <p className="hidden text-sm font-semibold capitalize sm:block">{fecha!.dia}</p>
             </div>
-            <p className="font-display text-7xl font-bold leading-none" style={{ color: D.rojo }}>{fecha!.num}</p>
-            <p className="text-sm opacity-70">{fecha!.mes}</p>
-            <div className="mx-6 my-4 border-t border-dashed border-[#E8D9BC]" />
+            <p className="hidden font-display text-7xl font-bold leading-none sm:block" style={{ color: D.rojo }}>{fecha!.num}</p>
+            <p className="hidden text-sm opacity-70 sm:block">{fecha!.mes}</p>
+            <div className="mx-6 my-3 border-t border-dashed border-[#E8D9BC] sm:my-4" />
             <p className="text-sm opacity-75">{tr("wotdListen")}</p>
-            <div className="dd-sol mx-auto mt-4 grid h-24 w-24 place-items-center rounded-full" style={{ background: `radial-gradient(circle at 35% 30%, #FFF1B8, ${D.sol})` }}>
-              <SpeakerButton gn={d.word.gn} size="md" className="h-20 w-20 [&_svg]:h-10 [&_svg]:w-10" />
+            <div className="dd-sol mx-auto mt-3 grid h-20 w-20 place-items-center rounded-full sm:mt-4 sm:h-24 sm:w-24" style={{ background: `radial-gradient(circle at 35% 30%, #FFF1B8, ${D.sol})` }}>
+              <SpeakerButton gn={d.word.gn} size="md" className="h-16 w-16 sm:h-20 sm:w-20 [&_svg]:h-9 [&_svg]:w-9 sm:[&_svg]:h-10 sm:[&_svg]:w-10" />
             </div>
-            <div className="px-4 pb-6 pt-4">
+            <div className="px-4 pb-4 pt-3 sm:pb-6 sm:pt-4">
               {played ? (
-                <div className="font-display text-5xl font-bold">{d.word.gn}</div>
+                <div className="font-display text-4xl font-bold sm:text-5xl">{d.word.gn}</div>
               ) : (
-                <div className="font-display text-4xl font-bold tracking-[0.3em] opacity-25" aria-hidden>? ? ?</div>
+                <div className="font-display text-3xl font-bold tracking-[0.3em] opacity-25 sm:text-4xl" aria-hidden>? ? ?</div>
               )}
             </div>
             {played?.correct && (
-              <span className="dd-sello absolute bottom-24 right-3 rotate-[-14deg] bg-[#FFFDF7]/90 rounded-lg border-[3px] px-2 py-1 text-xs font-bold uppercase" style={{ borderColor: D.verde, color: D.verde }}>
+              <span className="dd-sello absolute bottom-16 right-3 sm:bottom-24 rotate-[-14deg] bg-[#FFFDF7]/90 rounded-lg border-[3px] px-2 py-1 text-xs font-bold uppercase" style={{ borderColor: D.verde, color: D.verde }}>
                 ★ Coleccionada
               </span>
             )}
           </div>
           <p className="text-center text-xs font-medium opacity-70">{tr("wotdSame")}</p>
-          <div className="mx-auto grid max-w-md gap-2 sm:grid-cols-2">
+          <div className="mx-auto grid max-w-md grid-cols-2 gap-2">
             {d.word.options.map((o) => {
               const isAnswer = played && o === played.answer;
               const isWrongChoice = played && o === played.choice && !played.correct;
@@ -243,7 +253,7 @@ function WordOfDayContent() {
                   type="button"
                   disabled={!!played || busy}
                   onClick={() => void choose(o)}
-                  className="min-h-14 rounded-2xl px-4 py-3 text-left font-display text-lg font-bold shadow transition active:scale-[.98]"
+                  className="min-h-14 rounded-2xl px-3 py-3 text-left font-display text-base font-bold shadow transition active:scale-[.98] sm:px-4 sm:text-lg"
                   style={{
                     background: isAnswer ? D.verde : isWrongChoice ? D.rojo : D.hoja,
                     color: isAnswer || isWrongChoice ? "#fff" : D.tinta,
@@ -256,7 +266,7 @@ function WordOfDayContent() {
             })}
           </div>
           {played && (
-            <div className="mx-auto max-w-md space-y-1 rounded-2xl bg-white/70 p-4 text-center">
+            <div ref={resultadoRef} className="mx-auto max-w-md scroll-mt-4 space-y-1 rounded-2xl bg-white/70 p-4 text-center">
               <p className="font-display text-xl font-bold">
                 {played.correct ? tr("correct") : tr("itWas", { a: verOpcion(played.answer) })}
               </p>

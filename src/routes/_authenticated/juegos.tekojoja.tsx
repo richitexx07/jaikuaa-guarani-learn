@@ -91,6 +91,14 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
   const cases = useMemo(() => shufflerFor(seed)(all).slice(0, ROUNDS), []);
   const [i, setI] = useState(0);
   const [pick, setPick] = useState<string | null>(null);
+  const seccionRef = useRef<HTMLElement>(null);
+  const siguienteRef = useRef<HTMLButtonElement>(null);
+  // Al decidir, la explicación y «Siguiente caso» aparecen abajo: la pantalla baja sola hasta el botón.
+  useEffect(() => {
+    if (!pick) return;
+    const suave = !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    siguienteRef.current?.scrollIntoView({ block: "nearest", behavior: suave ? "smooth" : "auto" });
+  }, [pick]);
   const [score, setScore] = useState(0);
   const c = cases[i];
   const options = useMemo(() => (c ? shuffle([c.answer, ...c.wrong]) : []), [c]);
@@ -138,15 +146,15 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
   const ok = pick === c.answer;
 
   return (
-    <section className="space-y-4 pt-1">
+    <section ref={seccionRef} className="scroll-mt-2 space-y-3 pt-1 sm:space-y-4">
       {JAI_JUEZ ? (
         /* El estrado: el juzgado de fondo y el Jai juez que da el martillazo al decidir */
-        <div className="relative h-36 overflow-hidden rounded-2xl ring-1 ring-white/15 sm:h-44" style={{ background: J.bordo }}>
+        <div className="relative h-24 overflow-hidden rounded-2xl ring-1 ring-white/15 sm:h-44" style={{ background: J.bordo }}>
           {JUZGADO && <img src={JUZGADO} alt="" width={1600} height={900} className="absolute inset-0 h-full w-full object-cover" />}
           <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(40,12,10,.92) 0%, rgba(40,12,10,.75) 45%, rgba(40,12,10,0) 75%)" }} />
           <div className="relative max-w-[60%] p-4 sm:p-5">
             <p className="font-display text-xl font-bold leading-tight sm:text-2xl">{tt("tjYouAre")}</p>
-            <p className="mt-1 text-sm text-white/80">{tt("tjRead")}</p>
+            <p className="mt-1 hidden text-sm text-white/80 sm:block">{tt("tjRead")}</p>
           </div>
           <img
             key={pick ? "golpe" : "espera"}
@@ -169,12 +177,12 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
 
       <div key={i} className="tj-in relative">
         <div className="ml-4 h-5 w-32 rounded-t-lg" style={{ background: "#E3CF9F" }} />
-        <div className="relative rounded-lg rounded-tl-none p-5 shadow-2xl" style={{ background: J.carpeta, color: J.tinta }}>
+        <div className="relative rounded-lg rounded-tl-none p-3 shadow-2xl sm:p-5" style={{ background: J.carpeta, color: J.tinta }}>
           <div className="flex items-center justify-between text-xs font-semibold opacity-70">
             <span>{tt("tjFile", { n: String(i + 1).padStart(3, "0") })}</span>
             <span>{tt("tjCaseOf", { i: i + 1, n: ROUNDS, s: score })}</span>
           </div>
-          <div className="mt-3 rounded p-4" style={{ background: J.papel }}>
+          <div className="mt-2 rounded p-3 sm:mt-3 sm:p-4" style={{ background: J.papel }}>
             <div className="flex gap-3">
               <span className="text-4xl" aria-hidden>{c.emoji}</span>
               <div className="min-w-0">
@@ -198,7 +206,7 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
             ? right ? { background: J.verde, color: "#fff" } : o === pick ? { background: J.rojo, color: "#fff" } : { background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.45)" }
             : { background: "rgba(255,255,255,.08)", color: "#fff", boxShadow: `inset 0 0 0 2px rgba(232,194,106,.45)` };
           return (
-            <button key={o} type="button" onClick={() => choose(o)} disabled={!!pick} className="min-h-14 rounded-2xl tap-3d-dark px-4 py-3 text-left font-display text-lg font-bold transition active:scale-[.98]" style={estilo}>
+            <button key={o} type="button" onClick={() => choose(o)} disabled={!!pick} className="min-h-12 rounded-2xl tap-3d-dark px-4 py-2.5 text-left font-display text-base font-bold transition active:scale-[.98] sm:min-h-14 sm:py-3 sm:text-lg" style={estilo}>
               {tr(o)}
             </button>
           );
@@ -217,7 +225,7 @@ function Court({ onAgain, all, seed, partida }: { onAgain: () => void; all: Case
               <p className="mt-2 text-xs text-white/60">{tt("tjPending")}</p>
             )}
           </div>
-          <button type="button" className="h-14 w-full rounded-2xl tap-3d-dark font-display text-lg font-bold" style={{ background: J.oro, color: J.tinta }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
+          <button ref={siguienteRef} type="button" className="h-14 w-full scroll-mb-4 rounded-2xl tap-3d-dark font-display text-lg font-bold" style={{ background: J.oro, color: J.tinta }} onClick={() => { setI((n) => n + 1); setPick(null); const suave = !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches; seccionRef.current?.scrollIntoView({ block: "start", behavior: suave ? "smooth" : "auto" }); }}>
             {i + 1 === ROUNDS ? tt("tjSeeRuling") : tt("tjNext")}
           </button>
         </div>

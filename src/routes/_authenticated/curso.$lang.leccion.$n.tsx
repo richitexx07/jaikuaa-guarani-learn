@@ -499,6 +499,18 @@ function ChoiceStep({
   const [correct, setCorrect] = useState(initial?.correct ?? 0);
   const { sonando, decir } = useVozConTiempo();
 
+  // Al pasar a la palabra siguiente, la pantalla vuelve sola a la pregunta: en el celular
+  // quedaba abajo y había que subir con el dedo para ver la palabra nueva.
+  const raiz = useRef<HTMLDivElement>(null);
+  const primera = useRef(true);
+  useEffect(() => {
+    if (primera.current) { primera.current = false; return; }
+    const el = raiz.current;
+    if (!el) return;
+    const reducir = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView({ block: "start", behavior: reducir ? "auto" : "smooth" });
+  }, [i]);
+
   // Cada respuesta queda guardada en el teléfono.
   useEffect(() => {
     onChange?.({
@@ -532,7 +544,7 @@ function ChoiceStep({
   const answer = rev ? q.item.gn : q.item.es;
   const isCorrect = picked !== null && picked === answer;
   return (
-    <div>
+    <div ref={raiz} className="scroll-mt-4">
       <div className="mb-3 flex items-center justify-between text-xs font-semibold text-muted-foreground">
         <span>{rev ? tx("lsHowGn") : tx("lsMeaning")}</span>
         <span className="rounded-full bg-muted px-2.5 py-0.5">
@@ -580,7 +592,9 @@ function ChoiceStep({
         </div>
 
         {picked && (
-          <div className="mt-5 space-y-3">
+          // En el celular, la respuesta de Jai y «Siguiente» quedan fijos abajo, al alcance del pulgar,
+          // sin tener que bajar. En pantallas grandes siguen debajo de las opciones.
+          <div className="fixed inset-x-0 bottom-0 z-50 space-y-3 border-t border-border bg-background/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] backdrop-blur-md sm:static sm:z-auto sm:mt-5 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none">
             <JaiSays ok={isCorrect}>
               {isCorrect ? tx("lsRight") : <>{tx("lsAlmost")} <strong>{q.item.gn}</strong> {tx("lsMeans")} «{q.item.es}».</>}
             </JaiSays>
@@ -598,6 +612,8 @@ function ChoiceStep({
             </Button>
           </div>
         )}
+        {/* Lugar para la barra fija de abajo, así no tapa las últimas opciones. */}
+        {picked && <div aria-hidden className="h-44 sm:hidden" />}
       </div>
     </div>
   );

@@ -113,26 +113,28 @@ function NeeRape() {
     >
       <div className="nr">
       {mode === "menu" && (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <Sendero />
-          <div className="grid gap-3 sm:grid-cols-2">
+          {/* En el celular, los senderos en dos columnas y sin la explicación larga: así «Desafiar» se ve sin bajar. */}
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {SENDEROS.map((s) => (
               <button
                 key={s.id}
                 type="button"
                 disabled={!s.ready}
                 onClick={() => setSendero(s.id)}
-                className={`rounded-2xl border-2 p-4 text-left transition ${sendero === s.id ? "border-primary bg-primary/10 shadow-md" : "border-border bg-card"} ${s.ready ? "hover:border-primary/60" : "opacity-60"}`}
+                className={`rounded-2xl border-2 p-3 text-left transition sm:p-4 ${sendero === s.id ? "border-primary bg-primary/10 shadow-md" : "border-border bg-card"} ${s.ready ? "hover:border-primary/60" : "opacity-60"}`}
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl" aria-hidden>{s.emoji}</span>
-                  <div>
+                  <span className="text-xl sm:text-2xl" aria-hidden>{s.emoji}</span>
+                  <div className="min-w-0">
                     <p className="font-display font-bold text-foreground">{s.gn}</p>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tt(`nrEs_${s.id}` as JUKey)}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground sm:text-xs">{tt(`nrEs_${s.id}` as JUKey)}</p>
                   </div>
-                  {!s.ready && <span className="ml-auto rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold">{tt("nrSoon")}</span>}
+                  {!s.ready && <span className="ml-auto hidden rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold sm:inline">{tt("nrSoon")}</span>}
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">{tt(`nrDesc_${s.id}` as JUKey)}</p>
+                {!s.ready && <span className="mt-1 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold sm:hidden">{tt("nrSoon")}</span>}
+                <p className="mt-2 hidden text-sm text-muted-foreground sm:block">{tt(`nrDesc_${s.id}` as JUKey)}</p>
               </button>
             ))}
           </div>
@@ -195,7 +197,7 @@ function Sendero() {
   const tt = useJU();
   return (
     <div className="relative overflow-hidden rounded-3xl ring-1 ring-white/10" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.3))" }}>
-      <svg viewBox="0 0 400 150" className="mx-auto block max-h-44 w-full" aria-hidden>
+      <svg viewBox="0 0 400 150" className="mx-auto block max-h-24 w-full sm:max-h-44" aria-hidden>
         <path d="M0 125 Q100 100 200 120 T400 110 V150 H0Z" fill="#174A34" />
         <path d="M46 100 C90 40 170 150 240 70 S330 40 352 30" fill="none" stroke="#F3E3B5" strokeWidth="5" strokeDasharray="2 12" strokeLinecap="round" className="nr-paso" />
         {[[14, 74], [352, 6]].map(([x, y], i) => (
@@ -206,8 +208,8 @@ function Sendero() {
         ))}
         <circle r="9" fill="#F2C14E" className="nr-viaje" />
       </svg>
-      <div className="px-5 pb-5">
-        <h1 className="font-display text-4xl font-bold leading-none tracking-tight">Ñe'ẽ Rape</h1>
+      <div className="px-5 pb-4 sm:pb-5">
+        <h1 className="font-display text-3xl font-bold leading-none tracking-tight sm:text-4xl">Ñe'ẽ Rape</h1>
         <p className="mt-2 text-sm opacity-80">{tt("nrIntro")}</p>
       </div>
     </div>

@@ -100,7 +100,8 @@ function Claqueta({ escena, toma, lugar, cerrada }: { escena: number; toma: numb
   const tt = useJU();
   return (
     <div className={`relative mx-auto w-full sm:max-w-md ${cerrada ? "tg-clap" : ""}`}>
-      <svg viewBox="0 -40 320 100" className="block w-full" aria-hidden>
+      {/* En el celular se ve solo la pizarra con escena y toma: el brazo de la claqueta empujaba las respuestas fuera de la pantalla. */}
+      <svg viewBox="0 -40 320 100" className="hidden w-full sm:block" aria-hidden>
         <g className="tg-arm">
           <rect x="0" y="18" width="320" height="22" rx="3" fill={F.tinta} />
           {Array.from({ length: 10 }, (_, i) => (
@@ -132,6 +133,14 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
   const [score, setScore] = useState(0);
   const [tomas, setTomas] = useState<boolean[]>([]);
   const [tc, setTc] = useState(0);
+  const seccionRef = useRef<HTMLElement>(null);
+  const siguienteRef = useRef<HTMLButtonElement>(null);
+  // Al responder, si «Siguiente escena» quedó abajo, la pantalla baja sola hasta el botón.
+  useEffect(() => {
+    if (!pick) return;
+    const suave = !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    siguienteRef.current?.scrollIntoView({ block: "nearest", behavior: suave ? "smooth" : "auto" });
+  }, [pick]);
   const scene = scenes[i];
   const options = useMemo(() => (scene ? shuffle([scene.ok, ...scene.wrong]) : []), [scene]);
   const done = i >= ROUNDS;
@@ -196,7 +205,7 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
   const codigo = `00:${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}:${String(f).padStart(2, "0")}`;
 
   return (
-    <section className="space-y-4 pt-1">
+    <section ref={seccionRef} className="scroll-mt-2 space-y-3 pt-1 sm:space-y-4">
       <Claqueta key={i} escena={i + 1} toma={1} lugar={tr(scene.place)} cerrada={!!pick && right} />
 
       {/* El monitor de cámara: arriba el lugar, abajo el subtítulo con el diálogo. */}
@@ -253,7 +262,7 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
               type="button"
               onClick={() => choose(o)}
               disabled={!!pick}
-              className="tg-frame min-h-20 rounded-md px-3 py-5 font-display text-lg font-bold transition active:scale-95 sm:text-xl"
+              className="tg-frame min-h-14 rounded-md px-3 py-3 font-display text-lg font-bold transition active:scale-95 sm:min-h-20 sm:py-5 sm:text-xl"
               style={{
                 backgroundColor: estado === "ok" ? "#2F7A4A" : estado === "mal" ? "#8E2320" : F.panel,
                 color: "#fff",
@@ -267,7 +276,7 @@ function Set({ onAgain, all, seed, partida }: { onAgain: () => void; all: Scene[
         })}
       </div>
       {pick && (
-        <button type="button" className="h-14 w-full rounded-2xl tap-3d-dark font-display text-lg font-bold" style={{ background: F.tungsteno, color: F.carbon }} onClick={() => { setI((n) => n + 1); setPick(null); }}>
+        <button ref={siguienteRef} type="button" className="h-14 w-full scroll-mb-4 rounded-2xl tap-3d-dark font-display text-lg font-bold" style={{ background: F.tungsteno, color: F.carbon }} onClick={() => { setI((n) => n + 1); setPick(null); const suave = !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches; seccionRef.current?.scrollIntoView({ block: "start", behavior: suave ? "smooth" : "auto" }); }}>
           {i + 1 === ROUNDS ? tt("tgSeeCredits") : tt("tgNext")}
         </button>
       )}

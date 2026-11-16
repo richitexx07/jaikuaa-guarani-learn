@@ -15,6 +15,11 @@ describe("botón Volver", () => {
     expect(showsBackButton("/juegos/ahorcado")).toBe(false);
     expect(showsBackButton("/juegos/penales")).toBe(false);
   });
+  it("no tapa las palabras de la lección (ya tiene «Salir» arriba)", () => {
+    expect(showsBackButton("/curso/guarani/leccion/1")).toBe(false);
+    expect(showsBackButton("/curso/guarani")).toBe(true);
+  });
+
   it("sin historial lleva a la sección superior", () => {
     expect(fallbackBackPath("/juegos/ahorcado")).toBe("/juegos");
     expect(fallbackBackPath("/laboratorio")).toBe("/");

@@ -89,11 +89,18 @@ function Pronunciar() {
         </div>
       </header>
 
-      <main className="flex-1 px-4 pb-28 pt-6 sm:px-6 sm:py-10">
+      <main className="flex-1 px-4 pb-28 pt-4 sm:px-6 sm:py-10">
         <div className="mx-auto max-w-3xl">
-          <PageHero img={jaiBienvenida} imgAlt="Jai con auriculares" eyebrow="Pronunciación" title="Grabate y compará">
-            Escuchá a un hablante paraguayo, grabate diciendo lo mismo y compará las dos voces.
-          </PageHero>
+          {/* En el celular, una línea en vez del cartel grande: así los cuatro pasos entran en la pantalla. */}
+          <div className="hidden sm:block">
+            <PageHero img={jaiBienvenida} imgAlt="Jai con auriculares" eyebrow="Pronunciación" title="Grabate y compará">
+              Escuchá a un hablante paraguayo, grabate diciendo lo mismo y compará las dos voces.
+            </PageHero>
+          </div>
+          <div className="sm:hidden">
+            <h1 className="font-display text-2xl font-bold text-foreground">Grabate y compará</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Escuchá a un hablante paraguayo, grabate y compará las dos voces.</p>
+          </div>
 
           {isLoading && <Loader2 className="mx-auto mt-10 h-6 w-6 animate-spin text-muted-foreground" />}
           {error && <p className="mt-6 text-sm text-destructive">{(error as Error).message}</p>}
@@ -104,7 +111,7 @@ function Pronunciar() {
           )}
 
           {elegida && (
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <GrabateCompara key={elegida.gn} gn={elegida.gn} es={elegida.es} />
               <Button variant="outline" className="mt-3 h-11 w-full" onClick={alAzar} disabled={items.length < 2}>
                 <Shuffle className="h-4 w-4" /> Otra palabra al azar

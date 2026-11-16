@@ -20,6 +20,8 @@ export function showsBackButton(pathname: string): boolean {
   if (p.startsWith("/constancia-convenio/")) return false;
   // El modo aula (proyectar a la clase) tiene «Salir» arriba y sus botones grandes abajo.
   if (p.startsWith("/clase/")) return false;
+  // La lección tiene «Salir» arriba; el flotante tapaba las palabras y las opciones en el celular.
+  if (/^\/curso\/[^/]+\/leccion\//.test(p)) return false;
   return !HIDDEN.has(p);
 }
 

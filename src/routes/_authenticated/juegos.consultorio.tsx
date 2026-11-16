@@ -456,16 +456,28 @@ function Intro({
   return (
     <section className="cj-enter pt-4 text-white">
       <div className="overflow-hidden rounded-3xl border border-white/15 bg-[#062A2E] shadow-2xl">
-        <Ecg velocidad={2.4} alto={90} />
-        <div className="grid items-end gap-4 px-6 pb-6 sm:grid-cols-[1fr_auto]">
+        <Ecg velocidad={2.4} alto={56} />
+        {/* En el celular Jai va al lado del título (antes ocupaba media pantalla y «Empezar el turno» quedaba muy abajo). */}
+        <div className="grid grid-cols-[1fr_auto] items-end gap-3 px-5 pb-5 sm:gap-4 sm:px-6 sm:pb-6">
           <div>
-            <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">{t("titulo", idioma)}</h1>
-            <p className="mt-3 max-w-md text-base leading-relaxed text-white/80">{t("bajada", idioma)}</p>
+            <h1 className="font-display text-3xl font-bold leading-none tracking-tight sm:text-5xl">{t("titulo", idioma)}</h1>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-white/80 sm:mt-3 sm:text-base">{t("bajada", idioma)}</p>
           </div>
-          <img src={jaiImg} alt="Jai, el doctor del consultorio" className="mx-auto h-48 w-auto drop-shadow-xl sm:h-60" />
+          <img src={jaiImg} alt="Jai, el doctor del consultorio" className="h-28 w-auto drop-shadow-xl sm:h-60" />
         </div>
       </div>
-      <ul className="mt-5 grid gap-2 text-sm text-white/85 sm:grid-cols-3">
+      {/* El botón para jugar va primero; los niveles y los detalles, después. */}
+      <button
+        type="button"
+        onClick={onEmpezar}
+        disabled={cargando || !puede}
+        className="mt-4 flex h-16 w-full items-center justify-center gap-3 rounded-2xl text-lg font-bold text-[#062A2E] shadow-lg transition active:scale-[0.98] disabled:opacity-50"
+        style={{ background: C.fosforo }}
+      >
+        {cargando ? <Loader2 className="h-6 w-6 animate-spin" /> : <Stethoscope className="h-6 w-6" />}
+        {t("empezar", idioma)}
+      </button>
+      <ul className="mt-5 grid grid-cols-3 gap-2 text-xs text-white/85 sm:text-sm">
         <li className="rounded-2xl bg-white/10 p-3">
           <span className="block font-semibold text-white">{PACIENTES_POR_TURNO} pacientes</span>
           {idioma === "es" ? "por turno, con voces reales" : "por plantão, com vozes reais"}
@@ -481,16 +493,6 @@ function Intro({
       </ul>
       <Niveles idioma={idioma} />
       {pocos && !cargando && <p className="mt-4 rounded-2xl border border-[#F2B544]/50 bg-[#F2B544]/10 p-3 text-sm text-[#FBE3A6]">{t("pocos", idioma)}</p>}
-      <button
-        type="button"
-        onClick={onEmpezar}
-        disabled={cargando || !puede}
-        className="mt-6 flex h-16 w-full items-center justify-center gap-3 rounded-2xl text-lg font-bold text-[#062A2E] shadow-lg transition active:scale-[0.98] disabled:opacity-50"
-        style={{ background: C.fosforo }}
-      >
-        {cargando ? <Loader2 className="h-6 w-6 animate-spin" /> : <Stethoscope className="h-6 w-6" />}
-        {t("empezar", idioma)}
-      </button>
     </section>
   );
 }

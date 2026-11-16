@@ -132,6 +132,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
   const dishes = useMemo(() => shufflerFor(seed)(DISHES).slice(0, ROUNDS), []);
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<string[]>([]);
+  const seccion = useRef<HTMLElement>(null);
   const [checked, setChecked] = useState(false);
   const [score, setScore] = useState(0);
   const [platos, setPlatos] = useState<{ dish: Dish; ok: boolean }[]>([]);
@@ -227,11 +228,16 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
     setGaveUp(true);
     setPlatos((p) => [...p, { dish, ok: false }]);
   }
-  function next() { setI((n) => n + 1); setPicked([]); setChecked(false); setGaveUp(false); setSure(false); }
+  function next() {
+    setI((n) => n + 1); setPicked([]); setChecked(false); setGaveUp(false); setSure(false);
+    // El plato nuevo arranca arriba: la comanda queda a la vista sin subir con el dedo.
+    const suave = !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    seccion.current?.scrollIntoView({ block: "start", behavior: suave ? "smooth" : "auto" });
+  }
   const good = checked && !gaveUp && picked.every((x) => dish.ok.includes(x));
 
   return (
-    <section className="space-y-4 pt-1">
+    <section ref={seccion} className="scroll-mt-2 space-y-4 pt-1">
       <div className="flex items-center justify-between text-sm">
         <div className="flex gap-1.5" aria-label={tt("tbDish", { i: i + 1, n: ROUNDS })}>
           {Array.from({ length: ROUNDS }, (_, k) => (
@@ -241,16 +247,17 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
         <span className="text-white/80">{tt("tbPerfectCount")} <b className="text-white">{score}</b></span>
       </div>
 
-      <div className="grid items-center gap-2 sm:grid-cols-[1fr_1.1fr]">
-        <div key={i} className="tb-card relative mx-auto w-full max-w-sm rounded-xl p-5 pt-6 shadow-2xl" style={{ background: T.papel, color: T.tinta }}>
+      {/* En el celular la comanda y la olla van lado a lado: así los ingredientes y «¡A cocinar!» se ven sin bajar. */}
+      <div className="grid grid-cols-[1fr_8.5rem] items-center gap-2 sm:grid-cols-[1fr_1.1fr]">
+        <div key={i} className="tb-card relative mx-auto w-full max-w-sm rounded-xl p-3 pt-5 shadow-2xl sm:p-5 sm:pt-6" style={{ background: T.papel, color: T.tinta }}>
           <span className="absolute left-1/2 top-0 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full shadow" style={{ background: T.rojo }} aria-hidden />
           <p className="text-xs font-semibold opacity-60">{tt("tbOrder", { i: i + 1, n: ROUNDS })}</p>
           <div className="mt-1 flex items-center gap-3">
-            <DishPic dish={dish} className="h-20 w-20 shrink-0 rounded-2xl text-5xl shadow-md ring-2 ring-white" />
-            <h2 className="font-display text-3xl font-bold leading-none">{dish.name}</h2>
+            <DishPic dish={dish} className="h-12 w-12 shrink-0 rounded-2xl text-3xl shadow-md ring-2 ring-white sm:h-20 sm:w-20 sm:text-5xl" />
+            <h2 className="font-display text-2xl font-bold leading-none sm:text-3xl">{dish.name}</h2>
           </div>
-          <p className="mt-2 text-sm opacity-80">{tr(dish.info)}</p>
-          <div className="mt-3 border-t border-dashed pt-2 text-sm" style={{ borderColor: "#D8C6AA" }}>
+          <p className="mt-2 text-xs opacity-80 sm:text-sm">{tr(dish.info)}</p>
+          <div className="mt-2 border-t border-dashed pt-2 text-xs sm:mt-3 sm:text-sm" style={{ borderColor: "#D8C6AA" }}>
             {tt("tbChoose")} <b>{tt("tbFive")}</b>
           </div>
         </div>
@@ -260,7 +267,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
             {Array.from({ length: 5 }, (_, k) => (
               <span key={k} className="h-3 w-3 rounded-full ring-2 ring-white/50" style={{ background: k < picked.length ? T.ocre : "transparent" }} />
             ))}
-            <span className="ml-1 text-xs font-medium text-white/80">Mba'e oĩ ollápe: {picked.length}/5</span>
+            <span className="ml-1 hidden text-xs font-medium text-white/80 sm:inline">Mba'e oĩ ollápe: {picked.length}/5</span>
           </div>
         </div>
       </div>
@@ -282,10 +289,10 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
               type="button"
               onClick={() => toggle(x)}
               aria-pressed={on}
-              className="tb-pick tap-3d-dark relative flex min-h-28 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-center"
+              className="tb-pick tap-3d-dark relative flex min-h-24 flex-col sm:min-h-28 items-center justify-center gap-1 rounded-2xl px-1 py-2 text-center"
               style={{ background: T.papel, color: T.tinta, boxShadow: `0 0 0 4px ${ring}, 0 10px 18px -8px rgba(0,0,0,.6)`, opacity: checked && !right && !on ? 0.45 : 1 }}
             >
-              <span className="grid h-12 w-12 place-items-center rounded-full text-3xl" style={{ background: "#F3DFC0" }} aria-hidden>{ing[x]?.emoji}</span>
+              <span className="grid h-10 w-10 place-items-center rounded-full text-2xl sm:h-12 sm:w-12 sm:text-3xl" style={{ background: "#F3DFC0" }} aria-hidden>{ing[x]?.emoji}</span>
               <b className="text-sm leading-tight sm:text-base">{ing[x]?.gn}</b>
               <span className="text-[11px] leading-tight opacity-70">{ing[x] ? tr(ing[x]!.es) : null}</span>
               {on && !checked && <span className="absolute right-2 top-2 grid h-5 w-5 place-items-center rounded-full text-xs font-bold" style={{ background: T.ocre }}>✓</span>}
@@ -293,6 +300,8 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
           );
         })}
       </div>
+      {/* «¡A cocinar!» queda siempre a mano, pegado abajo, mientras se eligen los ingredientes. */}
+      <div className="sticky bottom-2 z-10">
       {checked ? (
         <button type="button" className="btn-3d [--btn-base:#E0A030] h-14 w-full rounded-2xl font-display text-lg font-bold" style={{ background: T.ocre, color: T.tinta }} onClick={next}>
           {i + 1 === ROUNDS ? tt("tbSeeTable") : tt("tbNext")}
@@ -302,6 +311,7 @@ function Kitchen({ onAgain, ing, seed, partida }: { onAgain: () => void; ing: ty
           {tt("tbCook")}
         </button>
       )}
+      </div>
       {!checked && (
         <button type="button" onClick={giveUp} className="h-11 w-full rounded-2xl text-sm font-bold text-white ring-1 ring-white/30 hover:bg-white/10">
           {sure ? g("giveUpRecipeSure") : g("giveUpRecipe")}
