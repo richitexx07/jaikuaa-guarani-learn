@@ -17,3 +17,12 @@ export function significado(v: ConSignificado, lang: AppLang): string {
 export function localizarVocab<T extends ConSignificado>(vocab: T[], lang: AppLang): (T & { orig: string })[] {
   return vocab.map((v) => ({ ...v, orig: v.es, es: significado(v, lang) }));
 }
+
+/**
+ * El castellano original de la palabra, aunque la app esté en otro idioma.
+ * Sirve para *identificar* la palabra (de qué se trata, si está repetida, buscarla);
+ * para mostrarla al usuario se usa `es`, que ya viene en su idioma.
+ */
+export function castellano(v: { es: string; orig?: string }): string {
+  return v.orig ?? v.es;
+}

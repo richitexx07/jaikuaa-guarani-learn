@@ -16,6 +16,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SpeakerButton } from '@/components/audio/speaker-button';
 import { LessonFilter, NotEnough, useGameWords } from '@/components/games/game-shell';
+import { castellano } from '@/lib/significado';
+import { opcionesPenal } from '@/components/games/penalties/opciones';
 import { GameStage } from '@/components/games/game-stage';
 import { PenaltyPitch } from '@/components/games/penalties/pitch';
 import { GameMascot as PenaltyMascot } from '@/components/games/game-mascot';
@@ -58,7 +60,7 @@ type Especial='dia'|'copa'|'atajar';
 function especialDeLaUrl():Especial|null{if(typeof window==='undefined')return null;const q=new URLSearchParams(window.location.search);return q.get('dia')?'dia':q.get('copa')?'copa':q.get('atajar')?'atajar':null;}
 /** ?leccion=N: el premio al terminar una lección (patear con las palabras de esa lección). */
 function leccionDeLaUrl():number|null{if(typeof window==='undefined')return null;const n=Number(new URLSearchParams(window.location.search).get('leccion'));return Number.isInteger(n)&&n>0&&n<=10000?n:null;}
-function sinDuplicados(ws:GameWord[]){const seen=new Set<string>();return ws.filter(w=>{const key=w.es.trim().toLowerCase();if(!key||seen.has(key))return false;seen.add(key);return true;});}
+function sinDuplicados(ws:GameWord[]){const seen=new Set<string>();return ws.filter(w=>{const key=castellano(w).trim().toLowerCase();if(!key||seen.has(key))return false;seen.add(key);return true;});}
 function PenaltiesContent(){
  const {muted}=useGameKit();const {p}=usePT();const pm=usePM();
  const [especial,setEspecial]=useState<Especial|null>(null),[vuelta,setVuelta]=useState(0),[resDia,setResDia]=useResultadoDia();
@@ -106,7 +108,7 @@ function Match({seed,partida,lesson,words,duel,names,kits,ledText,muted,onAgain,
  const [turn,setTurn]=useState(0),[choice,setChoice]=useState<string|null>(null),[played,setPlayed]=useState<Played[]>([]),[last,setLast]=useState<Outcome|null>(null),[finished,setFinished]=useState(false),[guess,setGuess]=useState<Dive|null>(null),[menu,setMenu]=useState(false),[end,setEnd]=useState<DuelEnd|null>(null),endTitle=useEndTitle();
  const word=deck[turn%deck.length];
  useEffect(()=>{if(word&&!partida.reto)anotarReciente('penales',word.gn);},[word?.gn]);// eslint-disable-line react-hooks/exhaustive-deps
- const options=useMemo(()=>{if(!word)return [];const mezclar=shufflerFor(seed,turn+1);return mezclar([word,...mezclar(orderedBy(words.filter(w=>w.gn!==word.gn),w=>w.gn)).slice(0,2)]);},[word,words,seed,turn]);
+ const options=useMemo(()=>word?opcionesPenal(word,words,seed,turn):[],[word,words,seed,turn]);
  const player=duel?turn%2:0,results=[played.filter(p=>p.player===0).map(p=>p.outcome),played.filter(p=>p.player===1).map(p=>p.outcome)],goals=results.map(r=>r.filter(isGoal).length),xp=xpFor(results[0]),recorded=useRef(false);
  useEffect(()=>{if(!finished||recorded.current)return;recorded.current=true;recordCompletion({source:'game',sourceRef:'penales',xp});if(duel||goals[0]>=3)celebrate('big');},[finished,xp]);
  const nextRef=useRef<()=>void>(()=>{});

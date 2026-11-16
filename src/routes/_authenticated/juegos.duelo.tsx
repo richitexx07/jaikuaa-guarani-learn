@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, RotateCcw, Volume2 } from "lucide-react";
 import { LessonFilter, NotEnough, pickDistinct, shuffle, useGameWords } from "@/components/games/game-shell";
+import { castellano } from "@/lib/significado";
 import { GameStage } from "@/components/games/game-stage";
 import { ShareResult } from "@/components/games/share-result";
 import { useGameFeedback } from "@/components/games/game-kit";
@@ -46,7 +47,7 @@ function Duel() {
   const pool = useMemo(() => {
     const seen = new Set<string>();
     return pickDistinct(q.data?.words ?? [], 500).filter((w) => {
-      const k = w.es.trim().toLowerCase();
+      const k = castellano(w).trim().toLowerCase();
       if (seen.has(k)) return false;
       seen.add(k);
       return true;

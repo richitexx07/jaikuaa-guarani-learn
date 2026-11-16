@@ -14,7 +14,7 @@ import { ReportErrorButton } from "@/components/report-error-button";
 import { PageHero } from "@/components/page-hero";
 import jaiProfe from "@/assets/jai-profe.webp";
 import { listGlossary } from "@/lib/glossary.functions";
-import { localizarVocab } from "@/lib/significado";
+import { castellano, localizarVocab } from "@/lib/significado";
 import { useAppLang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/glosario")({
@@ -55,7 +55,7 @@ function GlossaryPage() {
   const shown = useMemo(() => {
     const needle = plain(q.trim());
     if (!needle) return items;
-    return items.filter((w) => plain(w.gn).includes(needle) || plain(w.es).includes(needle));
+    return items.filter((w) => plain(w.gn).includes(needle) || plain(w.es).includes(needle) || plain(castellano(w)).includes(needle));
   }, [items, q]);
 
   return (
