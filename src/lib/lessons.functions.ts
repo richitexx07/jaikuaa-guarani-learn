@@ -7,7 +7,7 @@ export type CourseVocabItem = { gn: string; es: string; validated: boolean; sig?
 export type CourseLesson = { n: number; title: string; theme: string; vocab: CourseVocabItem[] };
 
 /**
- * Lecciones publicadas del Curso de Guaraní, leídas con los permisos del usuario.
+ * Lecciones publicadas del Curso de Guaraní.
  * Solo se cuentan palabras publicadas del corpus.
  */
 export const listCourseLessons = createServerFn({ method: "GET" })
@@ -21,8 +21,10 @@ export const listCourseLessons = createServerFn({ method: "GET" })
       .order("sort_order");
     if (error) throw new Error(error.message);
     const ids = (lessons ?? []).map((l) => l.id);
+    // Las palabras de cada lección se cuentan desde el servidor: la base no deja leerlas directo desde afuera.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: links } = ids.length
-      ? await sb
+      ? await supabaseAdmin
           .from("lesson_words")
           .select("lesson_id, corpus_words!inner(status)")
           .in("lesson_id", ids)
@@ -53,7 +55,12 @@ export const getCourseLesson = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ n: z.number().int().min(1).max(10000) }).parse(d))
   .handler(async ({ data, context }) => {
-    const sb = context.supabase;
+    const { vigilarPedidos } = await import("@/lib/corpus-guard.server");
+    if (!(await vigilarPedidos("lecciones", { userId: context.userId }, 300))) {
+      throw new Error("Demasiadas consultas seguidas. Esperá un rato y volvé a intentar.");
+    }
+    // Desde el servidor: la base no deja leer el corpus directo desde afuera.
+    const { supabaseAdmin: sb } = await import("@/integrations/supabase/client.server");
     const { data: lesson } = await sb
       .from("lessons")
       .select("id, sort_order, title, theme")

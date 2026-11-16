@@ -5,14 +5,19 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 /** `sig`: el significado en otros idiomas, solo lo aprobado por un docente (ver significado.ts). */
 export type GameWord = { gn: string; es: string; hasAudio: boolean; sig?: Partial<Record<"en" | "pt" | "de" | "fr" | "zh", string>> };
 
-/** Palabras publicadas del corpus para los juegos; opcionalmente solo las de una lección publicada. */
+/**
+ * Palabras publicadas del corpus para los juegos; opcionalmente solo las de una lección publicada.
+ * Se leen desde el servidor (la base no deja leer el corpus directo desde afuera) y con tope por persona.
+ */
 export const getGameWords = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
     z.object({ lesson: z.number().int().min(1).max(10000).nullable().default(null) }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    const sb = context.supabase;
+    const { vigilarPedidos } = await import("@/lib/corpus-guard.server");
+    if (!(await vigilarPedidos("juegos", { userId: context.userId }, 300))) throw new Error(DEMASIADO);
+    const { supabaseAdmin: sb } = await import("@/integrations/supabase/client.server");
     if (data.lesson !== null) {
       const { data: lesson } = await sb
         .from("lessons")
@@ -42,6 +47,8 @@ export const getGameWords = createServerFn({ method: "POST" })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return { words: (rows ?? []).map((w: any) => ({ gn: w.gn, es: w.es, hasAudio: w.has_audio, sig: (w.significados ?? {}) as GameWord["sig"] })) };
   });
+
+export const DEMASIADO = "Demasiadas consultas seguidas. Esperá un rato y volvé a intentar.";
 
 /* --------------------------- PALABRA DEL DÍA --------------------------- */
 

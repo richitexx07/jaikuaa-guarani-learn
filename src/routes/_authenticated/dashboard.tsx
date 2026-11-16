@@ -6,7 +6,7 @@ import { AI_GUARANI_TOOLS_ENABLED } from "@/lib/features";
 import { BrandLogo } from "@/components/brand-logo";
 import { AppLanguageToggle } from "@/components/app-language-toggle";
 import { useT } from "@/lib/i18n";
-import { Music2, BarChart3, BookOpen, CheckCircle2, ChevronRight, FlaskConical, Gamepad2, GraduationCap, Keyboard, Languages, MessageCircleQuestion, FileSignature, Mic2, MessagesSquare, Newspaper, NotebookPen, RefreshCw, School, Sparkles, Stethoscope, Wrench, Zap, LogOut, type LucideIcon, HandHeart, HeartHandshake } from "lucide-react";
+import { Music2, BarChart3, BookOpen, CheckCircle2, ChevronRight, FlaskConical, Gamepad2, GraduationCap, Keyboard, Languages, MessageCircleQuestion, FileSignature, Mic2, MessagesSquare, Newspaper, NotebookPen, RefreshCw, School, Sparkles, Stethoscope, Wrench, Zap, LogOut, type LucideIcon, HandHeart, HeartHandshake, ShieldAlert } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -99,6 +99,7 @@ function StaffShortcuts() {
         {data.isAdmin && <StaffLink to="/admin/libros" icon={BookOpen} label="Librería: libros y accesos" />}
         {data.isAdmin && <StaffLink to="/admin/convenios" icon={FileSignature} label="Convenios firmados (artistas y autores)" />}
         {data.isAdmin && <StaffLink to="/admin/jai" icon={MessageCircleQuestion} label="Qué le preguntan a Jai" />}
+        {data.isAdmin && <StaffLink to="/admin/cuidado-corpus" icon={ShieldAlert} label="Cuidado del corpus: quién pidió de más" />}
       </div>
     </section>
   );

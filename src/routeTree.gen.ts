@@ -81,6 +81,7 @@ import { Route as VerificarCodeRouteImport } from './routes/verificar.$code'
 import { Route as AuthenticatedAdminColaboradoresRouteImport } from './routes/_authenticated/admin.colaboradores'
 import { Route as AuthenticatedAdminConveniosRouteImport } from './routes/_authenticated/admin.convenios'
 import { Route as AuthenticatedAdminCorpusRouteImport } from './routes/_authenticated/admin.corpus'
+import { Route as AuthenticatedAdminCuidadoCorpusRouteImport } from './routes/_authenticated/admin.cuidado-corpus'
 import { Route as AuthenticatedAdminInformeAuspicianteRouteImport } from './routes/_authenticated/admin.informe-auspiciante'
 import { Route as AuthenticatedAdminJaiRouteImport } from './routes/_authenticated/admin.jai'
 import { Route as AuthenticatedAdminLibrosRouteImport } from './routes/_authenticated/admin.libros'
@@ -502,6 +503,12 @@ const AuthenticatedAdminCorpusRoute =
     path: '/admin/corpus',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminCuidadoCorpusRoute =
+  AuthenticatedAdminCuidadoCorpusRouteImport.update({
+    id: '/admin/cuidado-corpus',
+    path: '/admin/cuidado-corpus',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminInformeAuspicianteRoute =
   AuthenticatedAdminInformeAuspicianteRouteImport.update({
     id: '/admin/informe-auspiciante',
@@ -887,6 +894,7 @@ export interface FileRoutesByFullPath {
   '/admin/colaboradores': typeof AuthenticatedAdminColaboradoresRoute
   '/admin/convenios': typeof AuthenticatedAdminConveniosRoute
   '/admin/corpus': typeof AuthenticatedAdminCorpusRoute
+  '/admin/cuidado-corpus': typeof AuthenticatedAdminCuidadoCorpusRoute
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/admin/libros': typeof AuthenticatedAdminLibrosRoute
@@ -1013,6 +1021,7 @@ export interface FileRoutesByTo {
   '/admin/colaboradores': typeof AuthenticatedAdminColaboradoresRoute
   '/admin/convenios': typeof AuthenticatedAdminConveniosRoute
   '/admin/corpus': typeof AuthenticatedAdminCorpusRoute
+  '/admin/cuidado-corpus': typeof AuthenticatedAdminCuidadoCorpusRoute
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/admin/libros': typeof AuthenticatedAdminLibrosRoute
@@ -1140,6 +1149,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/colaboradores': typeof AuthenticatedAdminColaboradoresRoute
   '/_authenticated/admin/convenios': typeof AuthenticatedAdminConveniosRoute
   '/_authenticated/admin/corpus': typeof AuthenticatedAdminCorpusRoute
+  '/_authenticated/admin/cuidado-corpus': typeof AuthenticatedAdminCuidadoCorpusRoute
   '/_authenticated/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/_authenticated/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/_authenticated/admin/libros': typeof AuthenticatedAdminLibrosRoute
@@ -1269,6 +1279,7 @@ export interface FileRouteTypes {
     | '/admin/colaboradores'
     | '/admin/convenios'
     | '/admin/corpus'
+    | '/admin/cuidado-corpus'
     | '/admin/informe-auspiciante'
     | '/admin/jai'
     | '/admin/libros'
@@ -1395,6 +1406,7 @@ export interface FileRouteTypes {
     | '/admin/colaboradores'
     | '/admin/convenios'
     | '/admin/corpus'
+    | '/admin/cuidado-corpus'
     | '/admin/informe-auspiciante'
     | '/admin/jai'
     | '/admin/libros'
@@ -1521,6 +1533,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/colaboradores'
     | '/_authenticated/admin/convenios'
     | '/_authenticated/admin/corpus'
+    | '/_authenticated/admin/cuidado-corpus'
     | '/_authenticated/admin/informe-auspiciante'
     | '/_authenticated/admin/jai'
     | '/_authenticated/admin/libros'
@@ -2143,6 +2156,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCorpusRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/cuidado-corpus': {
+      id: '/_authenticated/admin/cuidado-corpus'
+      path: '/admin/cuidado-corpus'
+      fullPath: '/admin/cuidado-corpus'
+      preLoaderRoute: typeof AuthenticatedAdminCuidadoCorpusRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/informe-auspiciante': {
       id: '/_authenticated/admin/informe-auspiciante'
       path: '/admin/informe-auspiciante'
@@ -2604,6 +2624,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminColaboradoresRoute: typeof AuthenticatedAdminColaboradoresRoute
   AuthenticatedAdminConveniosRoute: typeof AuthenticatedAdminConveniosRoute
   AuthenticatedAdminCorpusRoute: typeof AuthenticatedAdminCorpusRoute
+  AuthenticatedAdminCuidadoCorpusRoute: typeof AuthenticatedAdminCuidadoCorpusRoute
   AuthenticatedAdminInformeAuspicianteRoute: typeof AuthenticatedAdminInformeAuspicianteRoute
   AuthenticatedAdminJaiRoute: typeof AuthenticatedAdminJaiRoute
   AuthenticatedAdminLibrosRoute: typeof AuthenticatedAdminLibrosRoute
@@ -2669,6 +2690,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminColaboradoresRoute: AuthenticatedAdminColaboradoresRoute,
   AuthenticatedAdminConveniosRoute: AuthenticatedAdminConveniosRoute,
   AuthenticatedAdminCorpusRoute: AuthenticatedAdminCorpusRoute,
+  AuthenticatedAdminCuidadoCorpusRoute: AuthenticatedAdminCuidadoCorpusRoute,
   AuthenticatedAdminInformeAuspicianteRoute:
     AuthenticatedAdminInformeAuspicianteRoute,
   AuthenticatedAdminJaiRoute: AuthenticatedAdminJaiRoute,

@@ -8,17 +8,22 @@ import type { CourseLesson, CourseVocabItem } from "@/lib/lessons.functions";
 import { GUEST_LESSONS } from "@/lib/guest-lessons";
 
 /**
- * Lo mínimo para jugar sin cuenta: SOLO contenido ya publicado (lo mismo que ve cualquiera que se registra).
- * Con tope por dirección de internet para que nadie descargue el corpus a lo bruto.
+ * Lo mínimo para jugar sin cuenta: SOLO contenido ya publicado, y nunca la lista entera de una vez.
+ * Con tope por dirección de internet y aviso al administrador si alguien se pasa (posible copia del corpus).
  */
-// Alto a propósito: muchos celulares comparten la misma IP de la empresa de telefonía.
-const LIMIT_GUEST_PER_HOUR = 3000;
+// No tan bajo: muchos celulares comparten la misma IP de la empresa de telefonía.
+// Lo que de verdad frena la copia es la muestra del día (pedir mil veces da las mismas palabras).
+const LIMIT_GUEST_PER_HOUR = 1000;
 
-async function guard(kind: string) {
-  const { consumeRateLimit, clientIp } = await import("@/lib/server-guards.server");
+/** Suma el pedido y devuelve la IP (para elegir la muestra del día de esa conexión). */
+async function guard(kind: string): Promise<string> {
+  const { clientIp } = await import("@/lib/server-guards.server");
+  const { vigilarPedidos } = await import("@/lib/corpus-guard.server");
   const headers = getRequest()?.headers ?? new Headers();
-  const ok = await consumeRateLimit(`guest:${kind}:ip:${clientIp(headers)}`, LIMIT_GUEST_PER_HOUR, 3600).catch(() => true);
+  const ip = clientIp(headers);
+  const ok = await vigilarPedidos(`invitado-${kind}`, { ip }, LIMIT_GUEST_PER_HOUR);
   if (!ok) throw new Error("Demasiadas consultas seguidas. Creá tu cuenta gratis para seguir jugando.");
+  return ip;
 }
 
 /** Palabras publicadas para los juegos, para quien juega sin cuenta. */
@@ -27,9 +32,11 @@ export const getGameWordsGuest = createServerFn({ method: "POST" })
     z.object({ lesson: z.number().int().min(1).max(10000).nullable().default(null) }).parse(d),
   )
   .handler(async ({ data }) => {
-    await guard("words");
+    const ip = await guard("words");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (data.lesson !== null) {
+      // Sin cuenta solo se abren las primeras lecciones: las demás palabras, con cuenta.
+      if (!(GUEST_LESSONS as readonly number[]).includes(data.lesson)) return { words: [] as GameWord[] };
       const { data: lesson } = await supabaseAdmin
         .from("lessons")
         .select("id")
@@ -56,7 +63,10 @@ export const getGameWordsGuest = createServerFn({ method: "POST" })
       .limit(2000);
     if (error) throw new Error(error.message);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return { words: (rows ?? []).map((w: any) => ({ gn: w.gn, es: w.es, hasAudio: w.has_audio, sig: (w.significados ?? {}) as GameWord["sig"] })) as GameWord[] };
+    const todas = (rows ?? []).map((w: any) => ({ gn: w.gn, es: w.es, hasAudio: w.has_audio, sig: (w.significados ?? {}) as GameWord["sig"] })) as GameWord[];
+    // Nunca la lista entera: una porción por día y por conexión (cambia cada día, así el juego no aburre).
+    const { muestraDelDia, MUESTRA_INVITADO_JUEGOS } = await import("@/lib/corpus-guard");
+    return { words: muestraDelDia(todas, MUESTRA_INVITADO_JUEGOS, `juegos:${hoyAsuncion()}:${ip}`) };
   });
 
 /** Textos en guaraní de los juegos (escritos por docentes), para quien juega sin cuenta. */
@@ -167,7 +177,7 @@ export const answerWordOfDayGuest = createServerFn({ method: "POST" })
 
 /** Palabras publicadas con voz grabada, para «Pronunciá» sin cuenta. */
 export const listPalabrasConVozGuest = createServerFn({ method: "GET" }).handler(async () => {
-  await guard("voz");
+  const ip = await guard("voz");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
     .from("corpus_words")
@@ -177,7 +187,10 @@ export const listPalabrasConVozGuest = createServerFn({ method: "GET" }).handler
     .order("gn")
     .limit(5000);
   if (error) throw new Error(error.message);
-  return { items: (data ?? []) as { gn: string; es: string }[] };
+  // Sin cuenta, una porción por día (con cuenta se ven todas).
+  const { muestraDelDia, MUESTRA_INVITADO_VOZ } = await import("@/lib/corpus-guard");
+  const items = muestraDelDia((data ?? []) as { gn: string; es: string }[], MUESTRA_INVITADO_VOZ, `voz:${hoyAsuncion()}:${ip}`);
+  return { items: items.sort((a, b) => a.gn.localeCompare(b.gn)) };
 });
 
 /* ------------------- Lección del curso sin cuenta ------------------- */
