@@ -132,6 +132,11 @@ function Hero() {
               O mirá todos los juegos
             </Link>
           </p>
+          <p className="mt-2 text-sm lg:text-left">
+            <Link to="/clase" className="font-semibold text-primary underline underline-offset-4">
+              ¿Sos docente? Usá el modo aula con toda la clase
+            </Link>
+          </p>
           <EarlyAccessBadge className="mt-7 lg:mx-0" />
           <p className="mx-auto mt-6 max-w-md text-xs text-muted-foreground lg:mx-0">
             No vendemos tus datos ni los compartimos con terceros para publicidad.

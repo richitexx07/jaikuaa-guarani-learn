@@ -18,6 +18,8 @@ export function showsBackButton(pathname: string): boolean {
   if (p.startsWith("/purahei/obra/")) return false;
   // La constancia del convenio se imprime y tiene su «Volver» arriba.
   if (p.startsWith("/constancia-convenio/")) return false;
+  // El modo aula (proyectar a la clase) tiene «Salir» arriba y sus botones grandes abajo.
+  if (p.startsWith("/clase/")) return false;
   return !HIDDEN.has(p);
 }
 

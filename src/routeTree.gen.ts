@@ -68,6 +68,8 @@ import { Route as AuthenticatedValidacionRouteImport } from './routes/_authentic
 import { Route as AuthenticatedValidarRouteImport } from './routes/_authenticated/validar'
 import { Route as ApiRecordatorioRouteImport } from './routes/api/recordatorio'
 import { Route as ApiTutorRouteImport } from './routes/api/tutor'
+import { Route as ClaseIndexRouteImport } from './routes/clase.index'
+import { Route as ClaseNRouteImport } from './routes/clase.$n'
 import { Route as ConvenioProgramaRouteImport } from './routes/convenio.$programa'
 import { Route as PuraheiIndexRouteImport } from './routes/purahei.index'
 import { Route as PuraheiSlugRouteImport } from './routes/purahei.$slug'
@@ -430,6 +432,16 @@ const ApiRecordatorioRoute = ApiRecordatorioRouteImport.update({
 const ApiTutorRoute = ApiTutorRouteImport.update({
   id: '/api/tutor',
   path: '/api/tutor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClaseIndexRoute = ClaseIndexRouteImport.update({
+  id: '/clase/',
+  path: '/clase/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClaseNRoute = ClaseNRouteImport.update({
+  id: '/clase/$n',
+  path: '/clase/$n',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConvenioProgramaRoute = ConvenioProgramaRouteImport.update({
@@ -862,11 +874,13 @@ export interface FileRoutesByFullPath {
   '/validar': typeof AuthenticatedValidarRoute
   '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/clase/$n': typeof ClaseNRoute
   '/convenio/$programa': typeof ConvenioProgramaRoute
   '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar-convenio/$codigo': typeof VerificarConvenioCodigoRoute
   '/verificar/$code': typeof VerificarCodeRoute
+  '/clase/': typeof ClaseIndexRoute
   '/purahei/': typeof PuraheiIndexRoute
   '/studio/': typeof StudioIndexRoute
   '/tembiapo/': typeof TembiapoIndexRoute
@@ -986,11 +1000,13 @@ export interface FileRoutesByTo {
   '/validar': typeof AuthenticatedValidarRoute
   '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/clase/$n': typeof ClaseNRoute
   '/convenio/$programa': typeof ConvenioProgramaRoute
   '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar-convenio/$codigo': typeof VerificarConvenioCodigoRoute
   '/verificar/$code': typeof VerificarCodeRoute
+  '/clase': typeof ClaseIndexRoute
   '/purahei': typeof PuraheiIndexRoute
   '/studio': typeof StudioIndexRoute
   '/tembiapo': typeof TembiapoIndexRoute
@@ -1111,11 +1127,13 @@ export interface FileRoutesById {
   '/_authenticated/validar': typeof AuthenticatedValidarRoute
   '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/clase/$n': typeof ClaseNRoute
   '/convenio/$programa': typeof ConvenioProgramaRoute
   '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar-convenio/$codigo': typeof VerificarConvenioCodigoRoute
   '/verificar/$code': typeof VerificarCodeRoute
+  '/clase/': typeof ClaseIndexRoute
   '/purahei/': typeof PuraheiIndexRoute
   '/studio/': typeof StudioIndexRoute
   '/tembiapo/': typeof TembiapoIndexRoute
@@ -1238,11 +1256,13 @@ export interface FileRouteTypes {
     | '/validar'
     | '/api/recordatorio'
     | '/api/tutor'
+    | '/clase/$n'
     | '/convenio/$programa'
     | '/purahei/$slug'
     | '/studio/$'
     | '/verificar-convenio/$codigo'
     | '/verificar/$code'
+    | '/clase/'
     | '/purahei/'
     | '/studio/'
     | '/tembiapo/'
@@ -1362,11 +1382,13 @@ export interface FileRouteTypes {
     | '/validar'
     | '/api/recordatorio'
     | '/api/tutor'
+    | '/clase/$n'
     | '/convenio/$programa'
     | '/purahei/$slug'
     | '/studio/$'
     | '/verificar-convenio/$codigo'
     | '/verificar/$code'
+    | '/clase'
     | '/purahei'
     | '/studio'
     | '/tembiapo'
@@ -1486,11 +1508,13 @@ export interface FileRouteTypes {
     | '/_authenticated/validar'
     | '/api/recordatorio'
     | '/api/tutor'
+    | '/clase/$n'
     | '/convenio/$programa'
     | '/purahei/$slug'
     | '/studio/$'
     | '/verificar-convenio/$codigo'
     | '/verificar/$code'
+    | '/clase/'
     | '/purahei/'
     | '/studio/'
     | '/tembiapo/'
@@ -1595,11 +1619,13 @@ export interface RootRouteChildren {
   ZhRoute: typeof ZhRoute
   ApiRecordatorioRoute: typeof ApiRecordatorioRoute
   ApiTutorRoute: typeof ApiTutorRoute
+  ClaseNRoute: typeof ClaseNRoute
   ConvenioProgramaRoute: typeof ConvenioProgramaRoute
   PuraheiSlugRoute: typeof PuraheiSlugRoute
   StudioSplatRoute: typeof StudioSplatRoute
   VerificarConvenioCodigoRoute: typeof VerificarConvenioCodigoRoute
   VerificarCodeRoute: typeof VerificarCodeRoute
+  ClaseIndexRoute: typeof ClaseIndexRoute
   PuraheiIndexRoute: typeof PuraheiIndexRoute
   StudioIndexRoute: typeof StudioIndexRoute
   TembiapoIndexRoute: typeof TembiapoIndexRoute
@@ -2024,6 +2050,20 @@ declare module '@tanstack/react-router' {
       path: '/api/tutor'
       fullPath: '/api/tutor'
       preLoaderRoute: typeof ApiTutorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clase/': {
+      id: '/clase/'
+      path: '/clase'
+      fullPath: '/clase/'
+      preLoaderRoute: typeof ClaseIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clase/$n': {
+      id: '/clase/$n'
+      path: '/clase/$n'
+      fullPath: '/clase/$n'
+      preLoaderRoute: typeof ClaseNRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/convenio/$programa': {
@@ -2719,11 +2759,13 @@ const rootRouteChildren: RootRouteChildren = {
   ZhRoute: ZhRoute,
   ApiRecordatorioRoute: ApiRecordatorioRoute,
   ApiTutorRoute: ApiTutorRoute,
+  ClaseNRoute: ClaseNRoute,
   ConvenioProgramaRoute: ConvenioProgramaRoute,
   PuraheiSlugRoute: PuraheiSlugRoute,
   StudioSplatRoute: StudioSplatRoute,
   VerificarConvenioCodigoRoute: VerificarConvenioCodigoRoute,
   VerificarCodeRoute: VerificarCodeRoute,
+  ClaseIndexRoute: ClaseIndexRoute,
   PuraheiIndexRoute: PuraheiIndexRoute,
   StudioIndexRoute: StudioIndexRoute,
   TembiapoIndexRoute: TembiapoIndexRoute,
