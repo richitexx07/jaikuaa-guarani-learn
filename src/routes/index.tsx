@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { LanzamientoBanner } from "@/components/lanzamiento-banner";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
@@ -16,6 +17,7 @@ import bannerEscolar from "@/assets/banners/banner-escolar.webp";
 import coverKaraoke from "@/assets/covers/cover-karaoke.webp";
 import coverConsultorio from "@/assets/covers/cover-consultorio.webp";
 import coverTekojoja from "@/assets/covers/cover-tekojoja.webp";
+import jaiProfe from "@/assets/jai-profe.webp";
 import { RetoCard } from "@/components/games/reto-card";
 import { useIsGuest } from "@/lib/guest";
 import { MarketingHeader } from "@/components/marketing/page-parts";
@@ -51,11 +53,12 @@ function Index() {
           <LanzamientoBanner className="mx-auto max-w-5xl" />
         </div>
         <Hero />
-        {/* Orden pedido por Richard: primero las lecciones; el cartel verde del reto abre la parte de juegos. */}
+        {/* Orden pedido por Richard: primero el curso para todos, después «Elegí tu camino» (nadie queda primero ni último);
+            el cartel verde del reto abre la parte de juegos. */}
         <Lecciones />
+        <Caminos />
         <RetoPortada />
         <Juegos />
-        <ParaElTrabajo />
         <LiveAudioPreview />
         <FoundingSponsors />
         <div className="border-t border-border/50 px-4 py-12 sm:px-6">
@@ -165,26 +168,27 @@ function Hero() {
 
 type Tarjeta = { img: string; title: string; desc: string; cta: string } & (
   | { to: "/curso/$lang/leccion/$n"; params: { lang: string; n: string } }
-  | { to: "/guarani-escolar" | "/juegos"; params?: undefined }
+  | { to: "/juegos"; params?: undefined }
 );
 
-// Orden pedido por Richard: primero lo escolar, después el curso. Los juegos van después del reto.
-const LECCIONES: Tarjeta[] = [
-  { img: bannerEscolar, title: "Guaraní Escolar", desc: "Por grado, para entender la tarea y llegar tranquilo al examen.", cta: "Ver Guaraní Escolar (pide cuenta)", to: "/guarani-escolar" },
-  { img: bannerCurso, title: "Un curso paso a paso", desc: "Lecciones cortas, para hacer en la parada del colectivo o en la ronda de tereré.", cta: "Empezá la lección 1, sin cuenta", to: "/curso/$lang/leccion/$n", params: { lang: "guarani", n: "1" } },
-];
+const CURSO: Tarjeta = {
+  img: bannerCurso,
+  title: "Un curso paso a paso, para todos",
+  desc: "Lecciones cortas con voces reales, para hacer en la parada del colectivo o en la ronda de tereré.",
+  cta: "Empezá la lección 1, sin cuenta",
+  to: "/curso/$lang/leccion/$n",
+  params: { lang: "guarani", n: "1" },
+};
 
 const JUEGOS: Tarjeta[] = [
-  { img: coverKaraoke, title: "15 juegos", desc: "Karaoke con arpa, penales, cocina paraguaya, duelos con amigos y guaraní para el trabajo.", cta: "Ver todos los juegos", to: "/juegos" },
+  { img: coverKaraoke, title: "15 juegos", desc: "Karaoke con arpa, penales, cocina paraguaya, duelos con amigos y más.", cta: "Ver todos los juegos", to: "/juegos" },
 ];
+
+const tarjetaCls = "block overflow-hidden rounded-3xl border border-border/60 bg-card shadow-elegant transition active:scale-[.99] hover:border-accent/40";
 
 function TarjetaPortada({ t }: { t: Tarjeta }) {
   return (
-    <Link
-      to={t.to}
-      params={t.params as never}
-      className="block overflow-hidden rounded-3xl border border-border/60 bg-card shadow-elegant transition active:scale-[.99] hover:border-accent/40"
-    >
+    <Link to={t.to} params={t.params as never} className={tarjetaCls}>
       <img src={t.img} alt="" className="aspect-[16/10] w-full object-cover" width={800} height={500} loading="lazy" decoding="async" />
       <div className="p-5">
         <p className="font-display text-lg font-bold text-foreground">{t.title}</p>
@@ -197,15 +201,81 @@ function TarjetaPortada({ t }: { t: Tarjeta }) {
 
 function Lecciones() {
   return (
-    <section className="px-4 pb-16 sm:px-6">
+    <section className="px-4 pb-12 sm:px-6">
       <div className="mx-auto max-w-4xl">
         <h2 className="text-center font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
           Lecciones
         </h2>
-        <div className="mt-8 grid gap-5 sm:grid-cols-2">
-          {LECCIONES.map((t) => (
-            <TarjetaPortada key={t.title} t={t} />
-          ))}
+        <div className="mx-auto mt-8 max-w-2xl">
+          <TarjetaPortada t={CURSO} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Un enlace dentro de una tarjeta de camino: grande para el dedo, con aviso si pide cuenta. */
+function EnlaceCamino({ children, pide }: { children: ReactNode; pide?: boolean }) {
+  return (
+    <span className="flex min-h-11 items-center justify-between gap-2 rounded-xl bg-primary/5 px-3 py-2 text-sm font-semibold text-primary">
+      <span>{children}</span>
+      {pide && <span className="shrink-0 text-xs font-medium text-muted-foreground">pide cuenta</span>}
+    </span>
+  );
+}
+
+const enlaceCls = "block rounded-xl transition active:scale-[.99] hover:bg-primary/10";
+
+/**
+ * Elegí tu camino: estudiantes, trabajo y docentes, al mismo nivel. Así una institución o un universitario
+ * no se encuentra primero con «Guaraní Escolar». El aula con código sirve para escuelas, institutos y universidades.
+ */
+function Caminos() {
+  return (
+    <section className="px-4 pb-16 sm:px-6">
+      <div className="mx-auto max-w-6xl">
+        <h2 className="text-center font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          Elegí tu camino
+        </h2>
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+          <article className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-elegant">
+            <img src={bannerEscolar} alt="" className="aspect-[16/10] w-full object-cover" width={800} height={500} loading="lazy" decoding="async" />
+            <div className="p-5">
+              <h3 className="font-display text-lg font-bold text-foreground">Estudiantes</h3>
+              <p className="mt-1 text-sm text-muted-foreground">Del colegio a la universidad: guaraní por grado y el aula de tu profe.</p>
+              <div className="mt-4 grid gap-2">
+                <Link to="/guarani-escolar" className={enlaceCls}><EnlaceCamino pide>Guaraní Escolar, por grado</EnlaceCamino></Link>
+                <Link to="/aula" className={enlaceCls}><EnlaceCamino pide>Tengo el código de mi aula</EnlaceCamino></Link>
+              </div>
+            </div>
+          </article>
+          <article className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-elegant">
+            <div className="grid aspect-[16/10] grid-cols-2">
+              <img src={coverConsultorio} alt="" className="h-full w-full object-cover" width={400} height={500} loading="lazy" decoding="async" />
+              <img src={coverTekojoja} alt="" className="h-full w-full object-cover" width={400} height={500} loading="lazy" decoding="async" />
+            </div>
+            <div className="p-5">
+              <h3 className="font-display text-lg font-bold text-foreground">Trabajo</h3>
+              <p className="mt-1 text-sm text-muted-foreground">Para quienes atienden a la gente en su idioma.</p>
+              <div className="mt-4 grid gap-2">
+                <Link to="/juegos/consultorio" className={enlaceCls}><EnlaceCamino>Guaraní médico</EnlaceCamino></Link>
+                <Link to="/juegos/tekojoja" className={enlaceCls}><EnlaceCamino>Guaraní jurídico</EnlaceCamino></Link>
+              </div>
+            </div>
+          </article>
+          <article className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-elegant">
+            <div className="flex aspect-[16/10] items-end justify-center bg-gradient-to-br from-primary/15 via-accent/10 to-primary/5">
+              <img src={jaiProfe} alt="" className="h-[92%] w-auto object-contain drop-shadow-xl" width={400} height={400} loading="lazy" decoding="async" />
+            </div>
+            <div className="p-5">
+              <h3 className="font-display text-lg font-bold text-foreground">Docentes e instituciones</h3>
+              <p className="mt-1 text-sm text-muted-foreground">Escuelas, institutos y universidades: usalo en clase y seguí el avance de cada alumno.</p>
+              <div className="mt-4 grid gap-2">
+                <Link to="/clase" className={enlaceCls}><EnlaceCamino>Proyectar en clase</EnlaceCamino></Link>
+                <Link to="/aula/docente" className={enlaceCls}><EnlaceCamino pide>Armar mi aula con código</EnlaceCamino></Link>
+              </div>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -222,41 +292,6 @@ function Juegos() {
         <div className="mx-auto mt-8 max-w-md">
           {JUEGOS.map((t) => (
             <TarjetaPortada key={t.title} t={t} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/** Guaraní para el trabajo: médico y jurídico, a la vista desde la portada (se juegan sin cuenta). */
-const TRABAJO = [
-  { img: coverConsultorio, to: "/juegos/consultorio", title: "Guaraní médico", desc: "Consultorio de Jai: atendé a pacientes que hablan guaraní." },
-  { img: coverTekojoja, to: "/juegos/tekojoja", title: "Guaraní jurídico", desc: "Tekojoja, Juzgado de Paz: resolvé casos y aprendé términos jurídicos." },
-] as const;
-
-function ParaElTrabajo() {
-  return (
-    <section className="px-4 pb-16 sm:px-6">
-      <div className="mx-auto max-w-4xl">
-        <h2 className="text-center font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-          Guaraní para el trabajo
-        </h2>
-        <p className="mt-2 text-center text-sm text-muted-foreground">Para quienes atienden a la gente en su idioma.</p>
-        <div className="mt-8 grid gap-5 sm:grid-cols-2">
-          {TRABAJO.map((t) => (
-            <Link
-              key={t.to}
-              to={t.to}
-              className="block overflow-hidden rounded-3xl border border-border/60 bg-card shadow-elegant transition active:scale-[.99] hover:border-accent/40"
-            >
-              <img src={t.img} alt="" className="aspect-[4/3] w-full object-cover" width={800} height={600} loading="lazy" decoding="async" />
-              <div className="p-5">
-                <p className="font-display text-lg font-bold text-foreground">{t.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{t.desc}</p>
-                <p className="mt-3 text-sm font-semibold text-primary">Probalo sin cuenta</p>
-              </div>
-            </Link>
           ))}
         </div>
       </div>
