@@ -170,7 +170,7 @@ type Tarjeta = { img: string; title: string; desc: string; cta: string } & (
 
 // Orden pedido por Richard: primero lo escolar, después el curso. Los juegos van después del reto.
 const LECCIONES: Tarjeta[] = [
-  { img: bannerEscolar, title: "Guaraní Escolar", desc: "Por grado, para entender la tarea y llegar tranquilo al examen.", cta: "Ver Guaraní Escolar", to: "/guarani-escolar" },
+  { img: bannerEscolar, title: "Guaraní Escolar", desc: "Por grado, para entender la tarea y llegar tranquilo al examen.", cta: "Ver Guaraní Escolar (pide cuenta)", to: "/guarani-escolar" },
   { img: bannerCurso, title: "Un curso paso a paso", desc: "Lecciones cortas, para hacer en la parada del colectivo o en la ronda de tereré.", cta: "Empezá la lección 1, sin cuenta", to: "/curso/$lang/leccion/$n", params: { lang: "guarani", n: "1" } },
 ];
 
