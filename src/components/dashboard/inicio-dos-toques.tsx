@@ -28,6 +28,30 @@ import { useLastPlace } from "@/lib/last-place";
 import { NandutiDisc } from "@/components/nanduti-disc";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import coverPenales from "@/assets/covers/cover-penales.webp";
+import a_curso from "@/assets/atajos/curso.webp";
+import a_escolar from "@/assets/atajos/escolar.webp";
+import a_pronunciar from "@/assets/atajos/pronunciar.webp";
+import a_glosario from "@/assets/atajos/glosario.webp";
+import a_cuaderno from "@/assets/atajos/cuaderno.webp";
+import a_clase from "@/assets/atajos/clase.webp";
+import a_teclado from "@/assets/atajos/teclado.webp";
+import a_mbytepe from "@/assets/atajos/mbytepe.webp";
+import a_traductor from "@/assets/atajos/traductor.webp";
+import a_tutor from "@/assets/atajos/tutor.webp";
+import a_juegos from "@/assets/atajos/juegos.webp";
+import a_trivia from "@/assets/atajos/trivia.webp";
+import a_ranking from "@/assets/atajos/ranking.webp";
+import a_logros from "@/assets/atajos/logros.webp";
+import a_libreria from "@/assets/atajos/libreria.webp";
+import a_purahei from "@/assets/atajos/purahei.webp";
+import a_tembiapo from "@/assets/atajos/tembiapo.webp";
+import a_turismo from "@/assets/atajos/turismo.webp";
+import a_cine from "@/assets/atajos/cine.webp";
+import a_embajadores from "@/assets/atajos/embajadores.webp";
+import a_certificado from "@/assets/atajos/certificado.webp";
+import a_mostrador from "@/assets/atajos/mostrador.webp";
+import a_agro from "@/assets/atajos/agro.webp";
+import a_expertos from "@/assets/atajos/expertos.webp";
 import coverPalabra from "@/assets/covers/cover-palabra-del-dia.webp";
 import coverMemoria from "@/assets/covers/cover-memoria.webp";
 import coverKaraoke from "@/assets/covers/cover-karaoke.webp";
@@ -359,61 +383,57 @@ export function NovedadesCampana({ children }: { children: ReactNode }) {
   );
 }
 
-type Atajo = { href: string; icon: LucideIcon; t: keyof typeof T | null; nombre?: string; revision?: boolean };
-type Grupo = { titulo: keyof typeof T; tono: string; items: Atajo[] };
+type Atajo = { href: string; img: string; t: keyof typeof T | null; nombre?: string; revision?: boolean };
+type Grupo = { titulo: keyof typeof T; items: Atajo[] };
 
 function gruposTodo(ia: boolean): Grupo[] {
   return [
     {
       titulo: "gAprender",
-      tono: "bg-primary text-primary-foreground",
       items: [
-        { href: "/curso/guarani", icon: GraduationCap, t: "iCurso" },
-        { href: "/guarani-escolar", icon: School, t: "iEscolar", revision: true },
-        { href: "/pronunciar", icon: Mic2, t: "iPronunciar" },
-        { href: "/glosario", icon: BookA, t: "iGlosario" },
-        { href: "/cuaderno", icon: NotebookPen, t: "iCuaderno" },
-        { href: "/aula", icon: Users, t: "iClase" },
-        { href: "/teclado", icon: Keyboard, t: "iTeclado" },
-        { href: "/nhe-mbytepe", icon: MessagesSquare, t: null, nombre: "Ñe'ẽ Mbytépe", revision: true },
+        { href: "/curso/guarani", img: a_curso, t: "iCurso" },
+        { href: "/guarani-escolar", img: a_escolar, t: "iEscolar", revision: true },
+        { href: "/pronunciar", img: a_pronunciar, t: "iPronunciar" },
+        { href: "/glosario", img: a_glosario, t: "iGlosario" },
+        { href: "/cuaderno", img: a_cuaderno, t: "iCuaderno" },
+        { href: "/aula", img: a_clase, t: "iClase" },
+        { href: "/teclado", img: a_teclado, t: "iTeclado" },
+        { href: "/nhe-mbytepe", img: a_mbytepe, t: null, nombre: "Ñe'ẽ Mbytépe", revision: true },
         ...(ia
           ? [
-              { href: "/traductor", icon: Languages, t: "iTraductor" as const },
-              { href: "/tutor", icon: Sparkles, t: "iTutor" as const },
+              { href: "/traductor", img: a_traductor, t: "iTraductor" as const },
+              { href: "/tutor", img: a_tutor, t: "iTutor" as const },
             ]
           : []),
       ],
     },
     {
       titulo: "gJugar",
-      tono: "bg-[#F6C445] text-[#13233A]",
       items: [
-        { href: "/juegos", icon: Gamepad2, t: "iJuegos" },
-        { href: "/trivia", icon: MessageCircleQuestion, t: "trivia", revision: true },
-        { href: "/ranking", icon: Trophy, t: "iRanking" },
-        { href: "/logros", icon: Medal, t: "iLogros" },
+        { href: "/juegos", img: a_juegos, t: "iJuegos" },
+        { href: "/trivia", img: a_trivia, t: "trivia", revision: true },
+        { href: "/ranking", img: a_ranking, t: "iRanking" },
+        { href: "/logros", img: a_logros, t: "iLogros" },
       ],
     },
     {
       titulo: "gCultura",
-      tono: "bg-[#D52B1E] text-white",
       items: [
-        { href: "/libreria", icon: Library, t: "iLibreria" },
-        { href: "/purahei", icon: Music2, t: null, nombre: "Purahéi" },
-        { href: "/tembiapo", icon: Scissors, t: null, nombre: "Tembiapo" },
-        { href: "/turismo", icon: MapPin, t: "iTurismo" },
-        { href: "/cine", icon: Clapperboard, t: "iCine" },
+        { href: "/libreria", img: a_libreria, t: "iLibreria" },
+        { href: "/purahei", img: a_purahei, t: null, nombre: "Purahéi" },
+        { href: "/tembiapo", img: a_tembiapo, t: null, nombre: "Tembiapo" },
+        { href: "/turismo", img: a_turismo, t: "iTurismo" },
+        { href: "/cine", img: a_cine, t: "iCine" },
       ],
     },
     {
       titulo: "gMas",
-      tono: "bg-[#0038A8] text-white",
       items: [
-        { href: "/embajadores", icon: HandHeart, t: "iEmbajadores" },
-        { href: "/certificado", icon: Award, t: "iCertificado" },
-        { href: "/mostrador", icon: Store, t: "iMostrador", revision: true },
-        { href: "/agro", icon: Tractor, t: "iAgro" },
-        { href: "/expertos", icon: BadgeCheck, t: "iExpertos" },
+        { href: "/embajadores", img: a_embajadores, t: "iEmbajadores" },
+        { href: "/certificado", img: a_certificado, t: "iCertificado" },
+        { href: "/mostrador", img: a_mostrador, t: "iMostrador", revision: true },
+        { href: "/agro", img: a_agro, t: "iAgro" },
+        { href: "/expertos", img: a_expertos, t: "iExpertos" },
       ],
     },
   ];
@@ -429,24 +449,24 @@ export function TodoJaikuaa({ ia = false }: { ia?: boolean }) {
     <section aria-labelledby="inicio-todo" className="mt-10">
       <h2 id="inicio-todo" className="font-display text-xl font-bold text-foreground">{t("todo")}</h2>
       <p className="text-sm text-muted-foreground">{t("todoD")}</p>
-      <div className="mt-4 space-y-5">
+      <div className="mt-4 space-y-6">
         {gruposTodo(ia).map((g) => (
           <div key={g.titulo}>
-            <h3 className="mb-2 text-sm font-semibold text-muted-foreground">{t(g.titulo)}</h3>
-            <ul className="grid grid-cols-4 gap-x-2 gap-y-3 sm:grid-cols-6 lg:grid-cols-8">
+            <h3 className="mb-2 font-display text-base font-bold text-foreground">{t(g.titulo)}</h3>
+            {/* Estanterías como las tiendas de apps: en el celular se deslizan de costado; en pantalla grande, en grilla. */}
+            <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0 lg:grid-cols-8">
               {g.items.map((it) => {
-                const Icon = it.icon;
                 const nombre = it.t ? t(it.t) : it.nombre!;
                 return (
-                  <li key={it.href}>
-                    <a href={it.href} className="group flex flex-col items-center gap-1.5 rounded-2xl p-1 text-center transition active:scale-95">
-                      <span className={`relative grid h-14 w-14 place-items-center rounded-2xl shadow-sm transition group-hover:-translate-y-0.5 ${g.tono}`}>
-                        <Icon className="h-6 w-6" aria-hidden />
+                  <li key={it.href} className="w-[6.75rem] shrink-0 snap-start sm:w-auto">
+                    <a href={it.href} className="group block rounded-[22px] text-left outline-none transition active:scale-[.97] focus-visible:ring-2 focus-visible:ring-ring">
+                      <span className="relative block aspect-[4/5] overflow-hidden rounded-[22px] bg-muted shadow-[0_6px_18px_-8px_rgba(0,0,0,.45)] ring-1 ring-black/5 transition group-hover:-translate-y-0.5 group-hover:shadow-[0_12px_26px_-10px_rgba(0,0,0,.5)]">
+                        <img src={it.img} alt="" width={288} height={360} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]" />
                         {it.revision && (
-                          <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-amber-400 ring-2 ring-background" title={t("enRevision")} />
+                          <span className="absolute right-2 top-2 h-3 w-3 rounded-full bg-amber-400 ring-2 ring-white" title={t("enRevision")} />
                         )}
                       </span>
-                      <span className="line-clamp-2 text-xs font-medium leading-tight text-foreground">
+                      <span className="mt-1.5 block truncate px-0.5 text-[13px] font-semibold leading-tight text-foreground">
                         {nombre}
                         {it.revision && <span className="sr-only"> ({t("enRevision")})</span>}
                       </span>
