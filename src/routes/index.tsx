@@ -51,8 +51,10 @@ function Index() {
           <LanzamientoBanner className="mx-auto max-w-5xl" />
         </div>
         <Hero />
+        {/* Orden pedido por Richard: primero las lecciones; el cartel verde del reto abre la parte de juegos. */}
+        <Lecciones />
         <RetoPortada />
-        <Adentro />
+        <Juegos />
         <ParaElTrabajo />
         <LiveAudioPreview />
         <FoundingSponsors />
@@ -161,29 +163,65 @@ function Hero() {
   );
 }
 
-const ADENTRO = [
-  // Orden pedido por Richard: primero lo escolar, después las lecciones y al final los juegos.
-  { img: bannerEscolar, title: "Guaraní Escolar", desc: "Por grado, para entender la tarea y llegar tranquilo al examen." },
-  { img: bannerCurso, title: "Un curso paso a paso", desc: "Lecciones cortas, para hacer en la parada del colectivo o en la ronda de tereré." },
-  { img: coverKaraoke, title: "15 juegos", desc: "Karaoke con arpa, penales, cocina paraguaya, duelos con amigos y guaraní para el trabajo." },
+type Tarjeta = { img: string; title: string; desc: string; cta: string } & (
+  | { to: "/curso/$lang/leccion/$n"; params: { lang: string; n: string } }
+  | { to: "/guarani-escolar" | "/juegos"; params?: undefined }
+);
+
+// Orden pedido por Richard: primero lo escolar, después el curso. Los juegos van después del reto.
+const LECCIONES: Tarjeta[] = [
+  { img: bannerEscolar, title: "Guaraní Escolar", desc: "Por grado, para entender la tarea y llegar tranquilo al examen.", cta: "Ver Guaraní Escolar", to: "/guarani-escolar" },
+  { img: bannerCurso, title: "Un curso paso a paso", desc: "Lecciones cortas, para hacer en la parada del colectivo o en la ronda de tereré.", cta: "Empezá la lección 1, sin cuenta", to: "/curso/$lang/leccion/$n", params: { lang: "guarani", n: "1" } },
 ];
 
-function Adentro() {
+const JUEGOS: Tarjeta[] = [
+  { img: coverKaraoke, title: "15 juegos", desc: "Karaoke con arpa, penales, cocina paraguaya, duelos con amigos y guaraní para el trabajo.", cta: "Ver todos los juegos", to: "/juegos" },
+];
+
+function TarjetaPortada({ t }: { t: Tarjeta }) {
+  return (
+    <Link
+      to={t.to}
+      params={t.params as never}
+      className="block overflow-hidden rounded-3xl border border-border/60 bg-card shadow-elegant transition active:scale-[.99] hover:border-accent/40"
+    >
+      <img src={t.img} alt="" className="aspect-[16/10] w-full object-cover" width={800} height={500} loading="lazy" decoding="async" />
+      <div className="p-5">
+        <p className="font-display text-lg font-bold text-foreground">{t.title}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t.desc}</p>
+        <p className="mt-3 text-sm font-semibold text-primary">{t.cta}</p>
+      </div>
+    </Link>
+  );
+}
+
+function Lecciones() {
   return (
     <section className="px-4 pb-16 sm:px-6">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-4xl">
         <h2 className="text-center font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-          Adentro de Jaikuaa
+          Lecciones
         </h2>
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
-          {ADENTRO.map((a) => (
-            <figure key={a.title} className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-elegant">
-              <img src={a.img} alt="" className="aspect-[16/10] w-full object-cover" width={800} height={500} loading="lazy" decoding="async" />
-              <figcaption className="p-5">
-                <p className="font-display text-lg font-bold text-foreground">{a.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{a.desc}</p>
-              </figcaption>
-            </figure>
+        <div className="mt-8 grid gap-5 sm:grid-cols-2">
+          {LECCIONES.map((t) => (
+            <TarjetaPortada key={t.title} t={t} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Juegos() {
+  return (
+    <section className="px-4 pb-16 sm:px-6">
+      <div className="mx-auto max-w-4xl">
+        <h2 className="text-center font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          Juegos
+        </h2>
+        <div className="mx-auto mt-8 max-w-md">
+          {JUEGOS.map((t) => (
+            <TarjetaPortada key={t.title} t={t} />
           ))}
         </div>
       </div>
