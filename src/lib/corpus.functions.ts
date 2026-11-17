@@ -1005,11 +1005,11 @@ export const uploadWordAudio = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    await assertRole(context.supabase, context.userId, "editor");
+    const roles = await assertRole(context.supabase, context.userId, "editor");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: word, error: wErr } = await supabaseAdmin
       .from("corpus_words")
-      .select("id, audio_slug")
+      .select("id, audio_slug, status, validated_by")
       .eq("id", data.id)
       .maybeSingle();
     if (wErr || !word?.audio_slug) throw new Error("Palabra no encontrada");
@@ -1024,12 +1024,31 @@ export const uploadWordAudio = createServerFn({ method: "POST" })
       .from("guarani-audio")
       .upload(path, bin, { contentType: "audio/mpeg", upsert: true });
     if (upErr) throw new Error(upErr.message);
+    // Cuando un docente validador graba su voz, la palabra queda revisada y publicada en el mismo paso:
+    // antes quedaba en borrador hasta tocar «Aprobar» y la docente no veía su trabajo en la plataforma.
+    // Si solo sube el administrador (sin rol docente), la palabra sigue esperando la revisión de un docente.
+    const firma = roles.isEditor && !word.validated_by;
+    const patch: Record<string, unknown> = { has_audio: true };
+    if (firma) Object.assign(patch, { status: "published", validated_by: context.userId, validated_at: new Date().toISOString() });
     const { error } = await supabaseAdmin
       .from("corpus_words")
-      .update({ has_audio: true } as never)
+      .update(patch as never)
       .eq("id", data.id);
     if (error) throw new Error(error.message);
-    return { ok: true, path };
+    if (firma) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: logError } = await (supabaseAdmin as any).from("corpus_word_changes").insert({
+        word_id: data.id,
+        changed_by: context.userId,
+        changes: {
+          validacion: { antes: "sin validar", despues: "validada" },
+          ...(word.status !== "published" ? { status: { antes: word.status, despues: "published" } } : {}),
+          audio: "grabado por el docente",
+        },
+      });
+      if (logError) console.error("corpus_word_changes:", logError.message);
+    }
+    return { ok: true, path, publicada: firma || word.status === "published" };
   });
 
 /**

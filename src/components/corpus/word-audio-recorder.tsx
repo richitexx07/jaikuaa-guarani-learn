@@ -95,8 +95,8 @@ export function WordAudioRecorder({
     setSaving(true);
     try {
       const base64 = isMp3File ? await fileToBase64(blob) : await toMp3Base64(blob);
-      await upload({ data: { id: wordId, base64 } });
-      toast.success(`Audio guardado como ${slug}.mp3`);
+      const r = await upload({ data: { id: wordId, base64 } });
+      toast.success(r.publicada ? "Audio guardado. La palabra ya está publicada en Jaikuaa." : `Audio guardado como ${slug}.mp3. Falta que un docente la apruebe para publicarla.`);
       setBlob(null);
       setOpen(false);
       onSaved();
