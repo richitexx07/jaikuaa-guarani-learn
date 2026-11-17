@@ -259,20 +259,20 @@ function RepasoContent() {
       <div className="relative mx-auto max-w-xl px-4 pt-2">
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm font-bold">Palabra {i + 1} de {ronda.length}</span>
-          <div className="flex gap-1.5" aria-hidden>
+          <div className="flex gap-1.5" aria-hidden="true">
             {ronda.map((_, k) => (
               <span key={k} className="h-2.5 w-6 rounded-full" style={{ background: k < i ? C.turquesa : k === i ? C.sol : "rgba(15,45,58,.18)" }} />
             ))}
           </div>
         </div>
-        <div key={i} className="rp-card mt-3 rounded-3xl p-5 shadow-[0_6px_0_rgba(14,124,114,.25)]" style={{ background: C.hoja }}>
+        <div key={i} className="rp-card mt-2 rounded-3xl p-4 sm:p-5 shadow-[0_6px_0_rgba(14,124,114,.25)]" style={{ background: C.hoja }}>
           <p className="text-sm font-bold opacity-75">¿Qué significa?</p>
           <div className="mt-1 flex items-center justify-between gap-3">
             <span className="font-display text-4xl font-bold leading-tight break-words">{p.item.gn}</span>
             <SpeakerButton gn={p.item.gn} size="md" />
           </div>
         </div>
-        <div className="mt-4 grid gap-3">
+        <div className="mt-3 grid gap-2.5" role="group" aria-label="Opciones">
           {p.opciones.map((o) => {
             const esLaCorrecta = o.gn === p.item.gn;
             const marcada = elegida === o.gn;
@@ -306,7 +306,7 @@ function RepasoContent() {
               className="fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur sm:static sm:mt-4 sm:border-0 sm:bg-transparent sm:p-0"
             >
               <div className="mx-auto max-w-xl">
-                <p className="mb-2 text-base font-semibold">
+                <p className="mb-2 text-base font-semibold" role="status" aria-live="polite">
                   {elegida === p.item.gn ? "¡Iporã! Muy bien." : `Era «${p.item.es}». Vuelve mañana para que no se te olvide.`}
                 </p>
                 <Button variant="cta" className="h-14 w-full text-base" onClick={siguiente}>
@@ -314,7 +314,7 @@ function RepasoContent() {
                 </Button>
               </div>
             </div>
-            <div aria-hidden className="h-40 sm:hidden" />
+            <div aria-hidden className="h-36 sm:hidden" />
           </>
         )}
       </div>

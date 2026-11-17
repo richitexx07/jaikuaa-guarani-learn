@@ -283,7 +283,7 @@ function LessonPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border/50">
-        <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-4 sm:px-6">
+        <div className="mx-auto flex h-14 max-w-3xl sm:h-16 items-center justify-between px-4 sm:px-6">
           <Link
             to={guest ? "/" : "/curso/$lang"}
             params={{ lang: lang.slug }}
@@ -305,17 +305,17 @@ function LessonPage() {
       </header>
 
       {/* pb-28: deja lugar para «Volver» y Jai, que flotan abajo y tapaban las últimas tarjetas. */}
-      <main className="flex-1 px-4 pb-28 pt-6 sm:px-6 sm:pt-8">
+      <main className="flex-1 px-4 pb-24 pt-3 sm:px-6 sm:pt-8 sm:pb-28">
         <style>{LESSON_CSS}</style>
         <div className="mx-auto max-w-2xl">
-          <div className="mb-6">
+          <div className="mb-3 sm:mb-6">
             <div className="text-xs font-semibold uppercase tracking-wide text-accent">
               {tx("lsHeader", { n: lesson.n, l: lang.name })}
             </div>
-            <h1 className="mt-1 font-display text-3xl font-bold text-foreground sm:text-4xl">
+            <h1 className="mt-0.5 font-display text-2xl font-bold leading-tight text-foreground sm:mt-1 sm:text-4xl">
               {lesson.title}
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">{lesson.theme}</p>
+            <p className="mt-0.5 truncate text-sm text-muted-foreground sm:mt-1 sm:whitespace-normal">{lesson.theme}</p>
             <LessonSteps phase={phase} />
           </div>
 
