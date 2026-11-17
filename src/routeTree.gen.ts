@@ -79,6 +79,7 @@ import { Route as StudioSplatRouteImport } from './routes/studio.$'
 import { Route as TembiapoIndexRouteImport } from './routes/tembiapo.index'
 import { Route as VerificarConvenioCodigoRouteImport } from './routes/verificar-convenio.$codigo'
 import { Route as VerificarCodeRouteImport } from './routes/verificar.$code'
+import { Route as VideoPorQueJaikuaaRouteImport } from './routes/video.por-que-jaikuaa'
 import { Route as AuthenticatedAdminColaboradoresRouteImport } from './routes/_authenticated/admin.colaboradores'
 import { Route as AuthenticatedAdminConveniosRouteImport } from './routes/_authenticated/admin.convenios'
 import { Route as AuthenticatedAdminCorpusRouteImport } from './routes/_authenticated/admin.corpus'
@@ -491,6 +492,11 @@ const VerificarCodeRoute = VerificarCodeRouteImport.update({
   path: '/verificar/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VideoPorQueJaikuaaRoute = VideoPorQueJaikuaaRouteImport.update({
+  id: '/video/por-que-jaikuaa',
+  path: '/video/por-que-jaikuaa',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminColaboradoresRoute =
   AuthenticatedAdminColaboradoresRouteImport.update({
     id: '/admin/colaboradores',
@@ -894,6 +900,7 @@ export interface FileRoutesByFullPath {
   '/studio/$': typeof StudioSplatRoute
   '/verificar-convenio/$codigo': typeof VerificarConvenioCodigoRoute
   '/verificar/$code': typeof VerificarCodeRoute
+  '/video/por-que-jaikuaa': typeof VideoPorQueJaikuaaRoute
   '/clase/': typeof ClaseIndexRoute
   '/purahei/': typeof PuraheiIndexRoute
   '/studio/': typeof StudioIndexRoute
@@ -1022,6 +1029,7 @@ export interface FileRoutesByTo {
   '/studio/$': typeof StudioSplatRoute
   '/verificar-convenio/$codigo': typeof VerificarConvenioCodigoRoute
   '/verificar/$code': typeof VerificarCodeRoute
+  '/video/por-que-jaikuaa': typeof VideoPorQueJaikuaaRoute
   '/clase': typeof ClaseIndexRoute
   '/purahei': typeof PuraheiIndexRoute
   '/studio': typeof StudioIndexRoute
@@ -1151,6 +1159,7 @@ export interface FileRoutesById {
   '/studio/$': typeof StudioSplatRoute
   '/verificar-convenio/$codigo': typeof VerificarConvenioCodigoRoute
   '/verificar/$code': typeof VerificarCodeRoute
+  '/video/por-que-jaikuaa': typeof VideoPorQueJaikuaaRoute
   '/clase/': typeof ClaseIndexRoute
   '/purahei/': typeof PuraheiIndexRoute
   '/studio/': typeof StudioIndexRoute
@@ -1282,6 +1291,7 @@ export interface FileRouteTypes {
     | '/studio/$'
     | '/verificar-convenio/$codigo'
     | '/verificar/$code'
+    | '/video/por-que-jaikuaa'
     | '/clase/'
     | '/purahei/'
     | '/studio/'
@@ -1410,6 +1420,7 @@ export interface FileRouteTypes {
     | '/studio/$'
     | '/verificar-convenio/$codigo'
     | '/verificar/$code'
+    | '/video/por-que-jaikuaa'
     | '/clase'
     | '/purahei'
     | '/studio'
@@ -1538,6 +1549,7 @@ export interface FileRouteTypes {
     | '/studio/$'
     | '/verificar-convenio/$codigo'
     | '/verificar/$code'
+    | '/video/por-que-jaikuaa'
     | '/clase/'
     | '/purahei/'
     | '/studio/'
@@ -1650,6 +1662,7 @@ export interface RootRouteChildren {
   StudioSplatRoute: typeof StudioSplatRoute
   VerificarConvenioCodigoRoute: typeof VerificarConvenioCodigoRoute
   VerificarCodeRoute: typeof VerificarCodeRoute
+  VideoPorQueJaikuaaRoute: typeof VideoPorQueJaikuaaRoute
   ClaseIndexRoute: typeof ClaseIndexRoute
   PuraheiIndexRoute: typeof PuraheiIndexRoute
   StudioIndexRoute: typeof StudioIndexRoute
@@ -2152,6 +2165,13 @@ declare module '@tanstack/react-router' {
       path: '/verificar/$code'
       fullPath: '/verificar/$code'
       preLoaderRoute: typeof VerificarCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/video/por-que-jaikuaa': {
+      id: '/video/por-que-jaikuaa'
+      path: '/video/por-que-jaikuaa'
+      fullPath: '/video/por-que-jaikuaa'
+      preLoaderRoute: typeof VideoPorQueJaikuaaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/colaboradores': {
@@ -2808,6 +2828,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudioSplatRoute: StudioSplatRoute,
   VerificarConvenioCodigoRoute: VerificarConvenioCodigoRoute,
   VerificarCodeRoute: VerificarCodeRoute,
+  VideoPorQueJaikuaaRoute: VideoPorQueJaikuaaRoute,
   ClaseIndexRoute: ClaseIndexRoute,
   PuraheiIndexRoute: PuraheiIndexRoute,
   StudioIndexRoute: StudioIndexRoute,

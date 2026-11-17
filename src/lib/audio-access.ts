@@ -19,6 +19,10 @@ export const PUBLIC_SLUGS = new Set([
   "kuarahy",
   "yvoty",
   "che-vya",
+  // Las tres voces del video vertical /video/por-que-jaikuaa (publicadas, grabadas el 05/11/2026).
+  "ogape",
+  "nemuhame",
+  "neeyvoty",
 ]);
 
 export type AudioAccess = {
