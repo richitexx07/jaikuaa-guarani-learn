@@ -41,3 +41,43 @@ export function aBarras(alturas: number[], n = 40): number[] {
 export function segundos(s: number): string {
   return `${(Math.round(s * 10) / 10).toString().replace(".", ",")} s`;
 }
+
+/* ------------------- «Empezar»: corte automático cuando terminás de hablar ------------------- */
+
+export type EstadoEscucha = "esperando" | "hablando" | "fin" | "sin-voz";
+
+export type DetectorFin = {
+  /** Se llama con el volumen (0 a 1) y el momento en milisegundos desde que empezó la grabación. */
+  medir: (volumen: number, ms: number) => EstadoEscucha;
+};
+
+/**
+ * Decide cuándo cortar la grabación sola: espera que la persona hable y corta tras un silencio corto.
+ * Si nadie habla en `esperaMaxMs`, avisa «sin-voz». Nunca pasa de `maxMs`.
+ */
+export function detectorDeFin({
+  umbral = 0.04,
+  silencioMs = 900,
+  esperaMaxMs = 4000,
+  maxMs = 6000,
+  minHablaMs = 250,
+}: { umbral?: number; silencioMs?: number; esperaMaxMs?: number; maxMs?: number; minHablaMs?: number } = {}): DetectorFin {
+  let inicioVoz: number | null = null;
+  let ultimaVoz = 0;
+  return {
+    medir(volumen, ms) {
+      if (volumen >= umbral) {
+        if (inicioVoz === null) inicioVoz = ms;
+        ultimaVoz = ms;
+      }
+      if (ms >= maxMs) return inicioVoz === null ? "sin-voz" : "fin";
+      if (inicioVoz === null) return ms >= esperaMaxMs ? "sin-voz" : "esperando";
+      // Un ruido cortito (un golpe, un clic) no cuenta como haber hablado.
+      if (ultimaVoz - inicioVoz < minHablaMs && ms - ultimaVoz >= silencioMs) {
+        inicioVoz = null;
+        return ms >= esperaMaxMs ? "sin-voz" : "esperando";
+      }
+      return ms - ultimaVoz >= silencioMs ? "fin" : "hablando";
+    },
+  };
+}

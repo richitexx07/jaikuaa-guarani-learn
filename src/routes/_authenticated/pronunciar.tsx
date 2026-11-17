@@ -6,7 +6,7 @@ import { Loader2, Search, Shuffle } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { GrabateCompara } from "@/components/voz/grabate-compara";
+import { cerrarMicro, GrabateCompara } from "@/components/voz/grabate-compara";
 import { withOfflineCache } from "@/lib/offline-data";
 import { PageHero } from "@/components/page-hero";
 import jaiBienvenida from "@/assets/jai/jai-bienvenida.webp";
@@ -70,6 +70,23 @@ function Pronunciar() {
     if (elegida) window.scrollTo({ top: 0, behavior: "smooth" });
   }, [elegida]);
 
+  // «Empezar: solo con tu voz»: la práctica sigue sola de palabra en palabra hasta que la persona toca «Parar».
+  const [manosLibres, setManosLibres] = useState(false);
+  useEffect(() => {
+    if (!manosLibres) cerrarMicro();
+  }, [manosLibres]);
+  useEffect(() => {
+    // Al esconder la app o salir de la pantalla: se para y se apaga el micrófono.
+    const alEsconder = () => {
+      if (document.hidden) setManosLibres(false);
+    };
+    document.addEventListener("visibilitychange", alEsconder);
+    return () => {
+      document.removeEventListener("visibilitychange", alEsconder);
+      cerrarMicro();
+    };
+  }, []);
+
   const lista = useMemo(() => {
     const n = plano(q.trim());
     const base = n ? items.filter((w) => plano(w.gn).includes(n) || plano(w.es).includes(n)) : items;
@@ -112,7 +129,14 @@ function Pronunciar() {
 
           {elegida && (
             <div className="mt-4 sm:mt-6">
-              <GrabateCompara key={elegida.gn} gn={elegida.gn} es={elegida.es} />
+              <GrabateCompara
+                key={elegida.gn}
+                gn={elegida.gn}
+                es={elegida.es}
+                manosLibres={manosLibres}
+                onManosLibres={setManosLibres}
+                onSiguiente={alAzar}
+              />
               <Button variant="outline" className="mt-3 h-11 w-full" onClick={alAzar} disabled={items.length < 2}>
                 <Shuffle className="h-4 w-4" /> Otra palabra al azar
               </Button>
