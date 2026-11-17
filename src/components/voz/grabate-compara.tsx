@@ -4,7 +4,7 @@ import { Loader2, Mic, Play, Repeat, Square, Volume2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { getHumanAudioUrl } from "@/lib/audio";
-import { aBarras, detectorDeFin, picos, recortarSilencio, segundos, type EstadoEscucha } from "@/lib/voz";
+import { aBarras, cortesLimpios, detectorDeFin, picos, recortarSilencio, segundos, wavDe, type EstadoEscucha } from "@/lib/voz";
 
 const MAX_SEGUNDOS = 6;
 const BARRAS = 40;
@@ -78,20 +78,37 @@ async function pitido(): Promise<void> {
 }
 
 /** Graba hasta que la persona termina de hablar. `null` si no habló (o si se canceló). */
-function grabarHastaSilencio(stream: MediaStream, alCambiar: (e: EstadoEscucha) => void): { listo: Promise<Blob | null>; cancelar: () => void } {
+type Toma = { blob: Blob; tramo: { inicio: number; fin: number } | null };
+
+/** Deja solo la voz (sin los silencios de las puntas). Si el teléfono no puede, devuelve la grabación tal cual. */
+async function limpiar(toma: Toma): Promise<Blob> {
+  try {
+    const ctx = contexto();
+    const audio = await ctx.decodeAudioData(await toma.blob.arrayBuffer());
+    const { desde, hasta } = cortesLimpios(audio.duration, toma.tramo);
+    const sr = audio.sampleRate;
+    const canal = audio.getChannelData(0).slice(Math.floor(desde * sr), Math.ceil(hasta * sr));
+    return new Blob([wavDe(canal, sr)], { type: "audio/wav" });
+  } catch {
+    return toma.blob;
+  }
+}
+
+function grabarHastaSilencio(stream: MediaStream, alCambiar: (e: EstadoEscucha) => void): { listo: Promise<Toma | null>; cancelar: () => void } {
   const rec = new MediaRecorder(stream);
   const partes: BlobPart[] = [];
   let resultado: "fin" | "sin-voz" | "cancelado" = "fin";
   let timer = 0;
   let fuente: MediaStreamAudioSourceNode | null = null;
-  const listo = new Promise<Blob | null>((resolve) => {
+  let det: ReturnType<typeof detectorDeFin> | null = null;
+  const listo = new Promise<Toma | null>((resolve) => {
     rec.ondataavailable = (e) => {
       if (e.data.size) partes.push(e.data);
     };
     rec.onstop = () => {
       window.clearInterval(timer);
       fuente?.disconnect();
-      resolve(resultado === "fin" ? new Blob(partes, { type: rec.mimeType || "audio/webm" }) : null);
+      resolve(resultado === "fin" ? { blob: new Blob(partes, { type: rec.mimeType || "audio/webm" }), tramo: det?.tramo() ?? null } : null);
     };
   });
   const terminar = (r: typeof resultado) => {
@@ -118,12 +135,12 @@ function grabarHastaSilencio(stream: MediaStream, alCambiar: (e: EstadoEscucha) 
     return { listo, cancelar: () => terminar("cancelado") };
   }
   const datos = new Float32Array(medidor.fftSize);
-  const det = detectorDeFin({ umbral: 0.025 });
+  det = detectorDeFin();
   timer = window.setInterval(() => {
     medidor!.getFloatTimeDomainData(datos);
     let suma = 0;
     for (let i = 0; i < datos.length; i++) suma += datos[i]! * datos[i]!;
-    const e = det.medir(Math.sqrt(suma / datos.length), performance.now() - t0);
+    const e = det!.medir(Math.sqrt(suma / datos.length), performance.now() - t0);
     alCambiar(e);
     if (e === "fin" || e === "sin-voz") terminar(e);
   }, 50);
@@ -245,10 +262,10 @@ export function GrabateCompara({
       if (e === "hablando") setFase("teEscucho");
     });
     cancelarRef.current = g.cancelar;
-    const blob = await g.listo;
+    const toma = await g.listo;
     cancelarRef.current = null;
     if (!sigue()) return;
-    if (!blob) {
+    if (!toma) {
       if (intento === 0) {
         setFase("sinvoz");
         await espera(900);
@@ -258,6 +275,8 @@ export function GrabateCompara({
       setAviso("Se pausó porque no te escuché. Tocá «Empezar» para seguir.");
       return onManosLibres?.(false);
     }
+    const blob = await limpiar(toma);
+    if (!sigue()) return;
     const miaUrl = URL.createObjectURL(blob);
     setMia((m) => {
       if (m) URL.revokeObjectURL(m.url);
