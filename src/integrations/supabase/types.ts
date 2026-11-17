@@ -540,6 +540,33 @@ export type Database = {
           },
         ]
       }
+      corpus_alertas: {
+        Row: {
+          created_at: string
+          id: string
+          ip: string | null
+          limite_por_hora: number
+          tipo: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip?: string | null
+          limite_por_hora: number
+          tipo: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip?: string | null
+          limite_por_hora?: number
+          tipo?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       corpus_sentence_words: {
         Row: {
           created_at: string
