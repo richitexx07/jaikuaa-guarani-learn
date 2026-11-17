@@ -62,6 +62,7 @@ import { Route as AuthenticatedMisLibrosRouteImport } from './routes/_authentica
 import { Route as AuthenticatedNheMbytepeRouteImport } from './routes/_authenticated/nhe-mbytepe'
 import { Route as AuthenticatedPronunciarRouteImport } from './routes/_authenticated/pronunciar'
 import { Route as AuthenticatedRankingRouteImport } from './routes/_authenticated/ranking'
+import { Route as AuthenticatedRepasoRouteImport } from './routes/_authenticated/repaso'
 import { Route as AuthenticatedTraductorRouteImport } from './routes/_authenticated/traductor'
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
 import { Route as AuthenticatedValidacionRouteImport } from './routes/_authenticated/validacion'
@@ -403,6 +404,11 @@ const AuthenticatedPronunciarRoute = AuthenticatedPronunciarRouteImport.update({
 const AuthenticatedRankingRoute = AuthenticatedRankingRouteImport.update({
   id: '/ranking',
   path: '/ranking',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRepasoRoute = AuthenticatedRepasoRouteImport.update({
+  id: '/repaso',
+  path: '/repaso',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTraductorRoute = AuthenticatedTraductorRouteImport.update({
@@ -875,6 +881,7 @@ export interface FileRoutesByFullPath {
   '/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
   '/pronunciar': typeof AuthenticatedPronunciarRoute
   '/ranking': typeof AuthenticatedRankingRoute
+  '/repaso': typeof AuthenticatedRepasoRoute
   '/traductor': typeof AuthenticatedTraductorRoute
   '/tutor': typeof AuthenticatedTutorRoute
   '/validacion': typeof AuthenticatedValidacionRoute
@@ -1002,6 +1009,7 @@ export interface FileRoutesByTo {
   '/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
   '/pronunciar': typeof AuthenticatedPronunciarRoute
   '/ranking': typeof AuthenticatedRankingRoute
+  '/repaso': typeof AuthenticatedRepasoRoute
   '/traductor': typeof AuthenticatedTraductorRoute
   '/tutor': typeof AuthenticatedTutorRoute
   '/validacion': typeof AuthenticatedValidacionRoute
@@ -1130,6 +1138,7 @@ export interface FileRoutesById {
   '/_authenticated/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
   '/_authenticated/pronunciar': typeof AuthenticatedPronunciarRoute
   '/_authenticated/ranking': typeof AuthenticatedRankingRoute
+  '/_authenticated/repaso': typeof AuthenticatedRepasoRoute
   '/_authenticated/traductor': typeof AuthenticatedTraductorRoute
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
   '/_authenticated/validacion': typeof AuthenticatedValidacionRoute
@@ -1260,6 +1269,7 @@ export interface FileRouteTypes {
     | '/nhe-mbytepe'
     | '/pronunciar'
     | '/ranking'
+    | '/repaso'
     | '/traductor'
     | '/tutor'
     | '/validacion'
@@ -1387,6 +1397,7 @@ export interface FileRouteTypes {
     | '/nhe-mbytepe'
     | '/pronunciar'
     | '/ranking'
+    | '/repaso'
     | '/traductor'
     | '/tutor'
     | '/validacion'
@@ -1514,6 +1525,7 @@ export interface FileRouteTypes {
     | '/_authenticated/nhe-mbytepe'
     | '/_authenticated/pronunciar'
     | '/_authenticated/ranking'
+    | '/_authenticated/repaso'
     | '/_authenticated/traductor'
     | '/_authenticated/tutor'
     | '/_authenticated/validacion'
@@ -2021,6 +2033,13 @@ declare module '@tanstack/react-router' {
       path: '/ranking'
       fullPath: '/ranking'
       preLoaderRoute: typeof AuthenticatedRankingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/repaso': {
+      id: '/_authenticated/repaso'
+      path: '/repaso'
+      fullPath: '/repaso'
+      preLoaderRoute: typeof AuthenticatedRepasoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/traductor': {
@@ -2617,6 +2636,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNheMbytepeRoute: typeof AuthenticatedNheMbytepeRoute
   AuthenticatedPronunciarRoute: typeof AuthenticatedPronunciarRoute
   AuthenticatedRankingRoute: typeof AuthenticatedRankingRoute
+  AuthenticatedRepasoRoute: typeof AuthenticatedRepasoRoute
   AuthenticatedTraductorRoute: typeof AuthenticatedTraductorRoute
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
   AuthenticatedValidacionRoute: typeof AuthenticatedValidacionRoute
@@ -2683,6 +2703,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNheMbytepeRoute: AuthenticatedNheMbytepeRoute,
   AuthenticatedPronunciarRoute: AuthenticatedPronunciarRoute,
   AuthenticatedRankingRoute: AuthenticatedRankingRoute,
+  AuthenticatedRepasoRoute: AuthenticatedRepasoRoute,
   AuthenticatedTraductorRoute: AuthenticatedTraductorRoute,
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
   AuthenticatedValidacionRoute: AuthenticatedValidacionRoute,

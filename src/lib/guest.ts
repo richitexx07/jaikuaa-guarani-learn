@@ -29,6 +29,8 @@ export const GUEST_GAMES = [
   "/juegos/palabra-del-dia",
   "/pronunciar",
   "/trivia",
+  // El repaso usa las palabras de las lecciones abiertas que terminó en este celular.
+  "/repaso",
 ] as const;
 
 import { GUEST_LESSONS } from "./guest-lessons";

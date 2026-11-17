@@ -115,6 +115,17 @@ function GamesHome() {
 
       <RetoCard guest={guest} />
 
+      <Link
+        to="/repaso"
+        className="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-[#C9EEE7] px-4 py-3 text-[#0F2D3A] ring-1 ring-black/10"
+      >
+        <span>
+          <span className="block font-display text-lg font-bold">Repaso de Jai</span>
+          <span className="block text-sm">Dos minutos por día: las palabras de tus lecciones vuelven para que no se olviden.</span>
+        </span>
+        <span className="shrink-0 rounded-xl bg-[#0E7C72] px-3 py-2 text-sm font-bold text-white">Repasar</span>
+      </Link>
+
       {guest && stats.xp > 0 && (
         <Link
           to="/auth"
