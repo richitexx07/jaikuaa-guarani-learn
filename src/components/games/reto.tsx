@@ -43,6 +43,8 @@ export type RetoActivo = {
   resultados?: RetoResultado[];
   miPuntaje?: number | null;
   creadorEsYo?: boolean;
+  /** Comprobante del servidor de cuándo abriste el reto (se guarda el primero). */
+  intento?: string;
 };
 
 export type MetaReto = { total: number; unidad?: string; menosEsMejor?: boolean };
@@ -114,7 +116,12 @@ export function useRetoPartida(juego: RetoJuego, meta: MetaReto) {
     refetchInterval: 20_000,
     retry: 1,
   });
-  const guardado = q.data?.reto && q.data.reto.juego === juego ? desdeGuardado(q.data.reto) : null;
+  // El servidor manda un comprobante nuevo en cada consulta: se guarda el primero,
+  // que marca cuándo se abrió el reto de verdad.
+  const primerIntento = useRef<Record<string, string>>({});
+  const tok = q.data?.reto?.intento;
+  if (id && tok && !primerIntento.current[id]) primerIntento.current[id] = tok;
+  const guardado = q.data?.reto && q.data.reto.juego === juego ? { ...desdeGuardado(q.data.reto), intento: id ? primerIntento.current[id] : undefined } : null;
   const reto: RetoActivo | null = id ? guardado : viejo;
   const seed = guardado?.s ?? seedLocal;
   const cargando = !!id && q.isLoading;
@@ -369,7 +376,7 @@ export function RetoFinal({
   useEffect(() => {
     if (!r?.id || enviado.current) return;
     enviado.current = true;
-    void guardarFn({ data: { id: r.id, puntaje } }).then((res) => { if (res.reto) partida.actualizar(res.reto); }).catch(() => {});
+    void guardarFn({ data: { id: r.id, puntaje, intento: r.intento } }).then((res) => { if (res.reto) partida.actualizar(res.reto); }).catch(() => {});
   }, [r?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const link = r?.id ? retoLink(juego, r.id, r.x ?? extra) : url;

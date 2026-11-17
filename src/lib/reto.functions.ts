@@ -51,6 +51,8 @@ export type RetoGuardado = {
   creadorEsYo: boolean;
   resultados: RetoResultado[];
   miPuntaje: number | null;
+  /** Comprobante firmado de cuándo se abrió el reto (solo con cuenta). */
+  intento?: string;
 };
 
 async function cargar(db: any, id: string, userId: string): Promise<RetoGuardado | null> { // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -123,7 +125,12 @@ export const verReto = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ id: z.string().regex(/^[A-Za-z0-9]{6,12}$/) }).parse(d))
   .handler(async ({ data, context }) => {
     const db = await admin();
-    return { reto: await cargar(db, data.id, context.userId) };
+    const reto = await cargar(db, data.id, context.userId);
+    if (!reto) return { reto };
+    const { firmarIntento } = await import("@/lib/intento");
+    const { secretoIntento } = await import("@/lib/intento.server");
+    reto.intento = await firmarIntento(secretoIntento(), { u: context.userId, k: "reto", r: data.id, t: Date.now() });
+    return { reto };
   });
 
 /** Ver un reto sin cuenta: quien recibe el enlace por WhatsApp entra a la misma partida. */
@@ -137,13 +144,19 @@ export const verRetoPublico = createServerFn({ method: "GET" })
 export const guardarResultadoReto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({ id: z.string().regex(/^[A-Za-z0-9]{6,12}$/), puntaje: z.number().int().min(0).max(100000) }).parse(d),
+    z.object({ id: z.string().regex(/^[A-Za-z0-9]{6,12}$/), puntaje: z.number().int().min(0).max(100000), intento: z.string().max(200).optional() }).parse(d),
   )
   .handler(async ({ data, context }) => {
     const db = await admin();
     const { data: r } = await db.from("retos").select("total, menos_es_mejor, created_at").eq("id", data.id).maybeSingle();
     if (!r) throw new Error("Reto no encontrado");
     if (!puntajeValido(data.puntaje, r.total ?? 0, !!r.menos_es_mejor)) throw new Error("Puntaje no válido");
+    // Solo cuenta si el servidor entregó el reto antes a esta persona y pasó un tiempo real de juego.
+    const { leerIntento, MIN_SEGUNDOS_RETO } = await import("@/lib/intento");
+    const { secretoIntento } = await import("@/lib/intento.server");
+    const inicio = await leerIntento(secretoIntento(), data.intento, context.userId, "reto", data.id, Date.now());
+    if (inicio === null) throw new Error("Reto sin comprobar: abrilo de nuevo");
+    if (Date.now() - inicio < MIN_SEGUNDOS_RETO * 1000) throw new Error("Partida demasiado rápida");
     const ok = await db.rpc("consume_rate_limit", { _key: `reto:${context.userId}`, _limit: 20, _window_seconds: 600 });
     if (ok.data === false) throw new Error("Demasiados intentos. Esperá unos minutos.");
     const nombre = await nombreDe(db, context.userId);

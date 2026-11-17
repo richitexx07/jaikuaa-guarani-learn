@@ -873,7 +873,7 @@ function DoneStep({
   langSlug,
   desafio,
 }: {
-  lesson: { n: number; title: string; vocab: VocabItem[] };
+  lesson: { n: number; title: string; vocab: VocabItem[]; intento?: string };
   langSlug: string;
   desafio: ReturnType<typeof useDesafioRecibido>;
 }) {
@@ -883,6 +883,7 @@ function DoneStep({
   useRecordOnMount({
     xp,
     isGuaraniLesson: langSlug === "guarani",
+    intento: lesson.intento,
     source: "lesson",
     sourceRef: `${langSlug}:${lesson.n}`,
   });

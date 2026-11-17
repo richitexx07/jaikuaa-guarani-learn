@@ -80,7 +80,7 @@ export function checkLessonOrder(
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function assertGuaraniLessonAllowed(db: any, userId: string, sourceRef: string) {
+async function assertGuaraniLessonAllowed(db: any, userId: string, sourceRef: string): Promise<boolean> {
   const m = /^guarani:(\d{1,4})$/.exec(sourceRef);
   if (!m) throw new Error("Lección no válida");
   const n = Number(m[1]);
@@ -100,6 +100,33 @@ async function assertGuaraniLessonAllowed(db: any, userId: string, sourceRef: st
     .filter((d) => Number.isFinite(d.n));
   const err = checkLessonOrder(n, published, rows, Date.now());
   if (err) throw new Error(err);
+  return !rows.some((r) => r.n === n);
+}
+
+/** Puntos fijos que da el servidor por cada actividad (no los decide el celular). */
+export const SERVER_XP: Record<string, number> = {
+  lesson: 0,
+  exam: 0,
+  trivia: 0,
+  weekly: 20,
+  onboarding: 15,
+  visit: 0,
+  game: 10,
+};
+
+async function corregirExamenServidor(sourceRef: string, respuestas: { p: string; r: string }[]) {
+  const { corregirExamen } = await import("@/lib/intento");
+  const { getTema, TEMAS_6TO } = await import("@/lib/guarani-tema");
+  const { TEMAS_3RO, TEMAS_9NO, TEMAS_BACH } = await import("@/lib/guarani-tema-ciclos");
+  const { TEMAS_AGRO } = await import("@/lib/guarani-tema-agro");
+  if (sourceRef === "rescate") {
+    const banco = [...TEMAS_6TO, ...TEMAS_3RO, ...TEMAS_9NO, ...TEMAS_BACH, ...TEMAS_AGRO].flatMap((t) => t.quiz);
+    return corregirExamen(banco, respuestas, Math.min(5, banco.length));
+  }
+  const m = /^tema:([a-z0-9-]{1,80})$/i.exec(sourceRef);
+  const tema = m ? getTema(m[1]) : undefined;
+  if (!tema) return null;
+  return corregirExamen(tema.quiz, respuestas, tema.quiz.length);
 }
 
 export type ServerStats = {
@@ -160,6 +187,10 @@ export const recordActivity = createServerFn({ method: "POST" })
         syncId: z.string().trim().min(8).max(80),
         isGuaraniLesson: z.boolean().default(false),
         perfectExam: z.boolean().default(false),
+        /** Comprobante firmado que entregó el servidor al abrir la lección. */
+        intento: z.string().max(200).optional(),
+        /** Respuestas del examen: el servidor las corrige con su propio banco. */
+        respuestas: z.array(z.object({ p: z.string().max(500), r: z.string().max(500) })).max(30).optional(),
       })
       .parse(d),
   )
@@ -167,8 +198,34 @@ export const recordActivity = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (data.source === "game" && !GAME_REFS.has(data.sourceRef)) throw new Error("Juego no válido");
     const isGuarani = data.source === "lesson" && data.isGuaraniLesson;
+    // Seguridad: los puntos, la lección hecha y la medalla los decide el servidor.
+    // El número que manda el celular (data.xp) ya no cuenta.
+    let serverXp = SERVER_XP[data.source] ?? 0;
+    let perfect = false;
+    let syncId = data.syncId;
+    if (data.source === "game" && data.xp <= 0) serverXp = 0;
     if (isGuarani) {
-      await assertGuaraniLessonAllowed(supabaseAdmin, context.userId, data.sourceRef);
+      const nueva = await assertGuaraniLessonAllowed(supabaseAdmin, context.userId, data.sourceRef);
+      const { data: les } = await supabaseAdmin.from("lessons").select("id").eq("status", "published").eq("sort_order", Number(data.sourceRef.split(":")[1])).maybeSingle();
+      const { count: palabras } = await supabaseAdmin.from("lesson_words").select("id", { count: "exact", head: true }).eq("lesson_id", les?.id ?? "00000000-0000-0000-0000-000000000000");
+      serverXp = 10 + 2 * (palabras ?? 0);
+      if (nueva) {
+        const { leerIntento, minSegundosLeccion } = await import("@/lib/intento");
+        const { secretoIntento } = await import("@/lib/intento.server");
+        const inicio = await leerIntento(secretoIntento(), data.intento, context.userId, "lesson", data.sourceRef, Date.now());
+        if (inicio === null) throw new Error("Lección sin comprobar: abrila de nuevo con internet");
+        if (Date.now() - inicio < minSegundosLeccion(palabras ?? 0) * 1000) throw new Error("Lección terminada demasiado rápido");
+        // Un comprobante sirve una sola vez.
+        syncId = `lesson:${data.intento!.slice(-40)}`;
+      }
+    } else if (data.source === "lesson") {
+      serverXp = 0; // solo cuentan las lecciones del curso, comprobadas arriba
+    }
+    if (data.source === "exam") {
+      const nota = await corregirExamenServidor(data.sourceRef, data.respuestas ?? []);
+      if (!nota) throw new Error("Examen no válido");
+      serverXp = (data.sourceRef === "rescate" ? 30 : 15) + 5 * nota.aciertos;
+      perfect = nota.aciertos === nota.total;
     }
     const okRate = await supabaseAdmin.rpc("consume_rate_limit", {
       _key: `xp:${context.userId}`,
@@ -185,9 +242,9 @@ export const recordActivity = createServerFn({ method: "POST" })
       .gte("created_at", dayStart)
       .limit(1000);
     const already = ((todayRows ?? []) as { amount: number }[]).reduce((a, r) => a + (r.amount ?? 0), 0);
-    const amount = allowedXp(data.xp, data.source, already);
+    const amount = allowedXp(serverXp, data.source, already);
     // Visitas: como máximo una por día por usuario (sync_id fijo por fecha).
-    const syncId = data.source === "visit" ? `visit:${asuncionToday()}` : data.syncId;
+    if (data.source === "visit") syncId = `visit:${asuncionToday()}`;
     const { error } = await supabaseAdmin.rpc("record_activity", {
       _user_id: context.userId,
       _amount: amount,
@@ -196,10 +253,10 @@ export const recordActivity = createServerFn({ method: "POST" })
       _sync_id: syncId,
       _metadata: {
         guarani: data.source === "lesson" && data.isGuaraniLesson,
-        perfect: data.perfectExam,
+        perfect,
         requested_xp: data.xp,
       },
-      _perfect: data.source === "exam" && data.perfectExam,
+      _perfect: data.source === "exam" && perfect,
     } as never);
     if (error) throw new Error("No se pudo guardar el progreso");
     return readStats(context.userId);

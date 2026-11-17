@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEscolarTx, type EscolarKey } from "@/lib/i18n-escolar";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ESCOLAR_GRADES, loadEscolarGrade, saveEscolarGrade, temasFor, type QuizQuestion, type Tema } from "@/lib/guarani-tema";
 import { useRecordOnMount, useRecordVisit } from "@/lib/gamification";
@@ -31,7 +31,7 @@ type Phase =
   | { kind: "plan" }
   | { kind: "review"; topicIndex: number }
   | { kind: "exam" }
-  | { kind: "done"; score: number; nota: number };
+  | { kind: "done"; score: number; nota: number; respuestas: { p: string; r: string }[] };
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -120,8 +120,8 @@ function ModoRescate() {
     return (
       <ExamScreen
         temas={TEMAS}
-        onDone={(score, total) =>
-          setPhase({ kind: "done", score, nota: notaFromScore(score, total) })
+        onDone={(score, total, respuestas) =>
+          setPhase({ kind: "done", score, nota: notaFromScore(score, total), respuestas })
         }
       />
     );
@@ -131,6 +131,7 @@ function ModoRescate() {
     <DoneScreen
       score={phase.score}
       nota={phase.nota}
+      respuestas={phase.respuestas}
       onRetry={() => setPhase({ kind: "exam" })}
     />
   );
@@ -393,11 +394,12 @@ function ReviewScreen({
   );
 }
 
-function ExamScreen({ onDone, temas }: { onDone: (score: number, total: number) => void; temas: Tema[] }) {
+function ExamScreen({ onDone, temas }: { onDone: (score: number, total: number, respuestas: { p: string; r: string }[]) => void; temas: Tema[] }) {
   const questions = useMemo(() => buildExam(temas), [temas]);
   const [i, setI] = useState(0);
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
+  const respuestas = useRef<{ p: string; r: string }[]>([]);
 
   const q = questions[i];
   const isLast = i === questions.length - 1;
@@ -406,12 +408,13 @@ function ExamScreen({ onDone, temas }: { onDone: (score: number, total: number) 
   function choose(opt: string) {
     if (picked) return;
     setPicked(opt);
+    respuestas.current.push({ p: q.prompt, r: opt });
     if (opt === q.answer) setScore((s) => s + 1);
   }
 
   function next() {
     if (isLast) {
-      onDone(score, questions.length);
+      onDone(score, questions.length, respuestas.current);
     } else {
       setI((n) => n + 1);
       setPicked(null);
@@ -481,15 +484,17 @@ function ExamScreen({ onDone, temas }: { onDone: (score: number, total: number) 
 function DoneScreen({
   score,
   nota,
+  respuestas,
   onRetry,
 }: {
   score: number;
   nota: number;
+  respuestas: { p: string; r: string }[];
   onRetry: () => void;
 }) {
   const t = useEscolarTx();
   const feedback = feedbackFor(nota, t);
-  useRecordOnMount({ xp: 30 + score * 5, perfectExam: nota === 5, source: "exam", sourceRef: "rescate" });
+  useRecordOnMount({ xp: 30 + score * 5, perfectExam: nota === 5, respuestas, source: "exam", sourceRef: "rescate" });
   useEffect(() => {
     if (nota >= 3) celebrate(nota === 5 ? "big" : "small");
   }, [nota]);

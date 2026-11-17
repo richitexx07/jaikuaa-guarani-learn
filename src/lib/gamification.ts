@@ -122,6 +122,9 @@ type PendingEvent = {
   syncId: string;
   isGuaraniLesson: boolean;
   perfectExam: boolean;
+  /** Comprobante del servidor (lecciones) y respuestas (exámenes) para que el servidor verifique. */
+  intento?: string;
+  respuestas?: { p: string; r: string }[];
   /** Cuándo se hizo de verdad (puede ser días antes de enviarse). */
   at?: number;
   /** Rechazos del servidor que no fueron por falta de señal. */
@@ -284,6 +287,8 @@ type CompleteOpts = {
   sourceRef?: string;
   isGuaraniLesson?: boolean;
   perfectExam?: boolean;
+  intento?: string;
+  respuestas?: { p: string; r: string }[];
 };
 
 /** Registra una actividad completada en el servidor (y actualiza la caché local). */
@@ -295,6 +300,8 @@ export function recordCompletion(opts: CompleteOpts): void {
     syncId: newSyncId(),
     isGuaraniLesson: !!opts.isGuaraniLesson,
     perfectExam: !!opts.perfectExam,
+    ...(opts.intento ? { intento: opts.intento } : {}),
+    ...(opts.respuestas ? { respuestas: opts.respuestas.slice(0, 30) } : {}),
   };
   // La meta diaria se cuenta en el celular, con o sin cuenta.
   try { sumarPuntosHoy(ev.xp); } catch { /* la meta es un extra: nunca frena los puntos */ }

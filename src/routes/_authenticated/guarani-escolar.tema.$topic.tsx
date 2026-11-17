@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEscolarTx } from "@/lib/i18n-escolar";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getTema, type Tema } from "@/lib/guarani-tema";
@@ -68,6 +68,7 @@ function TemaPage() {
   const t = useEscolarTx();
   const [phase, setPhase] = useState<Phase>("learn");
   const [score, setScore] = useState(0);
+  const [respuestas, setRespuestas] = useState<{ p: string; r: string }[]>([]);
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -98,13 +99,14 @@ function TemaPage() {
       {phase === "quiz" && (
         <QuizStep
           tema={tema}
-          onDone={(s) => {
+          onDone={(s, r) => {
             setScore(s);
+            setRespuestas(r);
             setPhase("done");
           }}
         />
       )}
-      {phase === "done" && <DoneStep tema={tema} score={score} onRetry={() => { setScore(0); setPhase("quiz"); }} />}
+      {phase === "done" && <DoneStep tema={tema} score={score} respuestas={respuestas} onRetry={() => { setScore(0); setPhase("quiz"); }} />}
     </div>
   );
 }
@@ -161,9 +163,10 @@ function QuizStep({
   onDone,
 }: {
   tema: Tema;
-  onDone: (score: number) => void;
+  onDone: (score: number, respuestas: { p: string; r: string }[]) => void;
 }) {
   const questions = useMemo(() => tema.quiz, [tema]);
+  const respuestas = useRef<{ p: string; r: string }[]>([]);
   const t = useEscolarTx();
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
@@ -201,6 +204,7 @@ function QuizStep({
                 disabled={picked !== null}
                 onClick={() => {
                   setPicked(opt);
+                  respuestas.current.push({ p: q.prompt, r: opt });
                   if (opt === q.answer) setCorrect((c) => c + 1);
                 }}
                 className={cls}
@@ -221,7 +225,7 @@ function QuizStep({
             onClick={() => {
               setPicked(null);
               if (i + 1 >= questions.length) {
-                onDone(correct);
+                onDone(correct, respuestas.current);
               } else {
                 setI((x) => x + 1);
               }
@@ -247,17 +251,19 @@ function feedback(score: number, total: number, t: ReturnType<typeof useEscolarT
 function DoneStep({
   tema,
   score,
+  respuestas,
   onRetry,
 }: {
   tema: Tema;
   score: number;
+  respuestas: { p: string; r: string }[];
   onRetry: () => void;
 }) {
   const total = tema.quiz.length;
   const t = useEscolarTx();
   const fb = feedback(score, total, t);
   const xp = 15 + score * 5;
-  useRecordOnMount({ xp, perfectExam: score === total, source: "exam", sourceRef: `tema:${tema.slug}` });
+  useRecordOnMount({ xp, perfectExam: score === total, respuestas, source: "exam", sourceRef: `tema:${tema.slug}` });
   useEffect(() => {
     if (score / total >= 0.6) celebrate(score === total ? "big" : "small");
   }, [score, total]);

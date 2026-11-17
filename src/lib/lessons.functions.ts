@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /** `sig`: el significado en otros idiomas, solo lo que ya revisó un docente (sin clave = se muestra el castellano). */
 export type CourseVocabItem = { gn: string; es: string; validated: boolean; sig?: Partial<Record<"en" | "pt" | "de" | "fr" | "zh", string>> };
-export type CourseLesson = { n: number; title: string; theme: string; vocab: CourseVocabItem[] };
+export type CourseLesson = { n: number; title: string; theme: string; vocab: CourseVocabItem[]; intento?: string };
 
 /**
  * Lecciones publicadas del Curso de Guaraní.
@@ -79,7 +79,11 @@ export const getCourseLesson = createServerFn({ method: "POST" })
       const w = x.corpus_words as unknown as { gn: string; es: string; validated_by: string | null; significados?: CourseVocabItem["sig"] | null };
       return { gn: w.gn, es: w.es, validated: !!w.validated_by, sig: w.significados ?? {} };
     });
+    // Comprobante firmado: al terminar, el servidor verifica que la lección se abrió de verdad.
+    const { firmarIntento } = await import("@/lib/intento");
+    const { secretoIntento } = await import("@/lib/intento.server");
+    const intento = await firmarIntento(secretoIntento(), { u: context.userId, k: "lesson", r: `guarani:${lesson.sort_order}`, t: Date.now() });
     return {
-      lesson: { n: lesson.sort_order, title: lesson.title, theme: lesson.theme, vocab } as CourseLesson,
+      lesson: { n: lesson.sort_order, title: lesson.title, theme: lesson.theme, vocab, intento } as CourseLesson,
     };
   });
