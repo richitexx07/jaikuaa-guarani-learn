@@ -330,7 +330,7 @@ function RepasoContent() {
       {deHoy.length > 0 ? (
         <>
           <p className="mt-2 text-center text-lg">
-            Hoy te tocan <b>{deHoy.length}</b> palabras. Son dos minutos.
+            {deHoy.length === 1 ? <>Hoy te toca <b>1</b> palabra. Es un minuto.</> : <>Hoy te tocan <b>{deHoy.length}</b> palabras. Son dos minutos.</>}
           </p>
           <p className="mt-2 text-center text-sm opacity-80">Respondé antes de ver la respuesta: así es como mejor se recuerda.</p>
           <Button variant="cta" className="mt-5 h-14 w-full text-lg" onClick={empezar}>

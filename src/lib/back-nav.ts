@@ -11,7 +11,7 @@ export function showsBackButton(pathname: string): boolean {
   // Juegos: ya tienen «← Juegos» arriba; el flotante tapaba botones del juego en el celular.
   if (p === "/juegos" || p.startsWith("/juegos/")) return false;
   // Trivia, teclado y «Pronunciá» ya tienen su «Volver»/«Salir» arriba, y abajo sus botones de acción.
-  if (p.startsWith("/trivia/") || p === "/teclado" || p === "/pronunciar") return false;
+  if (p.startsWith("/trivia/") || p === "/teclado" || p === "/pronunciar" || p === "/repaso") return false;
   // El lector de libros tiene «←» arriba y sus botones de página abajo.
   if (p.startsWith("/leer/")) return false;
   // El visor de letras de Purahéi tiene su propia flecha y su botón abajo.
