@@ -21,6 +21,11 @@ export async function vigilarPedidos(tipo: string, quien: Quien, limitePorHora: 
   return ok;
 }
 
+/** Deja el aviso cuando otro control (por ejemplo, el de las voces) frenó a alguien por pedir de más. */
+export async function avisarExceso(tipo: string, quien: Quien, limitePorHora: number): Promise<void> {
+  await avisar(tipo, quien, claveDe(quien), limitePorHora).catch(() => undefined);
+}
+
 async function avisar(tipo: string, quien: Quien, clave: string, limite: number) {
   const { consumeRateLimit } = await import("@/lib/server-guards.server");
   // Un aviso por hora alcanza: no llenar la lista con cada pedido repetido.

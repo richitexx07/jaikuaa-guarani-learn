@@ -27,7 +27,7 @@ function TerminosPage() {
       <main className="flex-1 px-4 py-12 sm:px-6 sm:py-16">
         <article className="mx-auto max-w-3xl">
           {t("legalNote") && <p className="mb-4 rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">{t("legalNote")}</p>}
-          <p className="text-sm text-muted-foreground">Última actualización: junio de 2026</p>
+          <p className="text-sm text-muted-foreground">Última actualización: noviembre de 2026</p>
           <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Términos y Condiciones
           </h1>
@@ -62,6 +62,9 @@ function TerminosPage() {
           <Section title="4. Contenido educativo">
             <p>
               Los contenidos de Jaikuaa (lecciones, textos, imágenes, audios) son propiedad de Jaikuaa o se usan con autorización. Podés usarlos para tu aprendizaje personal; copiarlos o redistribuirlos sin permiso no está permitido.
+            </p>
+            <p>
+              Las palabras, las grabaciones de voz y los textos de Jaikuaa no se pueden descargar en cantidad, copiar con programas automáticos ni usar para armar bases de datos o entrenar sistemas de inteligencia artificial sin autorización escrita de Jaikuaa. Las cuentas que lo intenten pueden ser suspendidas.
             </p>
           </Section>
 

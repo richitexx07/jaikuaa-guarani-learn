@@ -3,8 +3,6 @@
  * Funciones puras (sin base de datos) para usarlas en el servidor y en las pruebas.
  */
 
-/** Cuántas palabras recibe por día quien juega sin cuenta (elegidas al azar, distintas cada día). */
-export const MUESTRA_INVITADO_JUEGOS = 60;
 /** Cuántas palabras con voz ve por día en «Pronunciá» quien no tiene cuenta. */
 export const MUESTRA_INVITADO_VOZ = 40;
 

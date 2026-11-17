@@ -83,7 +83,11 @@ export const getAudioSignedUrl = createServerFn({ method: "POST" })
     const allowed = user
       ? await consumeRateLimit(`audio:user:${user.userId}`, LIMIT_SIGNED_IN, 3600)
       : await consumeRateLimit(`audio:ip:${clientIp(headers)}`, LIMIT_ANON, 3600);
-    if (!allowed) return { signedUrl: null as string | null, denied: "rate" as const };
+    if (!allowed) {
+      const { avisarExceso } = await import("@/lib/corpus-guard.server");
+      await avisarExceso("voces", user ? { userId: user.userId } : { ip: clientIp(headers) }, user ? LIMIT_SIGNED_IN : LIMIT_ANON);
+      return { signedUrl: null as string | null, denied: "rate" as const };
+    }
 
     // Sin sesión solo se firman las muestras; con sesión, lo publicado o la cadena de validación.
     if (user && !PUBLIC_SLUGS.has(slug)) {
@@ -150,7 +154,12 @@ export const getAudioSignedUrls = createServerFn({ method: "POST" })
     const ok = userId
       ? await consumeRateLimit(`audio-batch:user:${userId}`, LIMIT_BATCH_SIGNED_IN, 3600)
       : await consumeRateLimit(`audio-batch:ip:${clientIp(headers)}`, LIMIT_BATCH_ANON, 3600);
-    if (!ok) return { urls, denied: slugs, limited: true };
+    if (!ok) {
+      // Pedir voces sin parar es la forma de llevarse las grabaciones: queda el aviso para el administrador.
+      const { avisarExceso } = await import("@/lib/corpus-guard.server");
+      await avisarExceso("voces", userId ? { userId } : { ip: clientIp(headers) }, userId ? LIMIT_BATCH_SIGNED_IN : LIMIT_BATCH_ANON);
+      return { urls, denied: slugs, limited: true };
+    }
 
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

@@ -8,7 +8,7 @@ import type { CourseLesson, CourseVocabItem } from "@/lib/lessons.functions";
 import { GUEST_LESSONS } from "@/lib/guest-lessons";
 
 /**
- * Lo mínimo para jugar sin cuenta: SOLO contenido ya publicado, y nunca la lista entera de una vez.
+ * Lo mínimo para jugar sin cuenta: SOLO contenido ya publicado.
  * Con tope por dirección de internet y aviso al administrador si alguien se pasa (posible copia del corpus).
  */
 // No tan bajo: muchos celulares comparten la misma IP de la empresa de telefonía.
@@ -32,11 +32,9 @@ export const getGameWordsGuest = createServerFn({ method: "POST" })
     z.object({ lesson: z.number().int().min(1).max(10000).nullable().default(null) }).parse(d),
   )
   .handler(async ({ data }) => {
-    const ip = await guard("words");
+    await guard("words");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (data.lesson !== null) {
-      // Sin cuenta solo se abren las primeras lecciones: las demás palabras, con cuenta.
-      if (!(GUEST_LESSONS as readonly number[]).includes(data.lesson)) return { words: [] as GameWord[] };
       const { data: lesson } = await supabaseAdmin
         .from("lessons")
         .select("id")
@@ -63,10 +61,10 @@ export const getGameWordsGuest = createServerFn({ method: "POST" })
       .limit(2000);
     if (error) throw new Error(error.message);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const todas = (rows ?? []).map((w: any) => ({ gn: w.gn, es: w.es, hasAudio: w.has_audio, sig: (w.significados ?? {}) as GameWord["sig"] })) as GameWord[];
-    // Nunca la lista entera: una porción por día y por conexión (cambia cada día, así el juego no aburre).
-    const { muestraDelDia, MUESTRA_INVITADO_JUEGOS } = await import("@/lib/corpus-guard");
-    return { words: muestraDelDia(todas, MUESTRA_INVITADO_JUEGOS, `juegos:${hoyAsuncion()}:${ip}`) };
+    // Todas las publicadas: el reto del día (Penales) y los desafíos entre amigos tienen que salir iguales para
+    // todos, y el Consultorio necesita todas las partes del cuerpo. Lo que cuida el corpus es que nadie lo lea
+    // directo de la base, el tope por conexión y el aviso al administrador.
+    return { words: (rows ?? []).map((w: any) => ({ gn: w.gn, es: w.es, hasAudio: w.has_audio, sig: (w.significados ?? {}) as GameWord["sig"] })) as GameWord[] };
   });
 
 /** Textos en guaraní de los juegos (escritos por docentes), para quien juega sin cuenta. */

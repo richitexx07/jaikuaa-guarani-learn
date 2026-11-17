@@ -21,6 +21,7 @@ const TIPO: Record<string, string> = {
   glosario: "glosario",
   voz: "palabras con voz",
   lecciones: "lecciones",
+  voces: "voces grabadas",
 };
 
 /** Quién pidió palabras de más en los últimos 30 días (posibles intentos de copiar el corpus). Solo administración. */
