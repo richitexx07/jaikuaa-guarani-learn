@@ -4,7 +4,8 @@ import { playGuarani, prefetchAudio } from "@/lib/audio";
 import arpa from "@/assets/video/arpa-atlas-paraguay.mp3.asset.json";
 import captura from "@/assets/video/leccion-captura.webp.asset.json";
 import logo from "@/assets/jaikuaa-logo.webp";
-import jai from "@/assets/jai/jai-saluda.webp";
+import jai from "@/assets/ejecutivos/jai-ejecutivo-docente.webp";
+import jaiSaluda from "@/assets/ejecutivos/jai-ejecutivo-saluda.webp";
 
 // Página oculta para grabar con el celular el video vertical «Por qué hago Jaikuaa».
 // Solo voces humanas publicadas (05/11/2026). Sin enlaces desde menús ni sitemap.
@@ -23,26 +24,67 @@ export const Route = createFileRoute("/video/por-que-jaikuaa")({
   component: VideoPorQue,
 });
 
-type Escena = { t: number; voz?: string };
+type Escena = { t: number; g: number; voz?: string; ok?: boolean };
 const ESCENAS: Escena[] = [
-  { t: 0 }, { t: 4 }, { t: 7.5, voz: "Ógape" }, { t: 11.5, voz: "Ñemuháme" }, { t: 15.5 },
-  { t: 20 }, { t: 23.5 }, { t: 27.5, voz: "Ñe'ẽyvoty" }, { t: 31 }, { t: 34 }, { t: 37.5 },
+  { t: 0, g: 0 }, { t: 4, g: 1 },
+  { t: 7, g: 2 }, { t: 9.5, g: 2, voz: "Ógape", ok: true },
+  { t: 14, g: 3 }, { t: 16.5, g: 3, voz: "Ñemuháme", ok: true },
+  { t: 21, g: 4 }, { t: 23.5, g: 4, voz: "Ñe'ẽyvoty", ok: true },
+  { t: 28, g: 5 }, { t: 32, g: 6 }, { t: 35.5, g: 7 },
 ];
 const FIN = 43;
 const VOL = 0.35;
 const VOL_BAJO = 0.08;
 
-const GOLD = "#f2c14e";
+function acierto() {
+  try {
+    const c = new AudioContext(); const t = c.currentTime;
+    [659, 988].forEach((f, i) => {
+      const o = c.createOscillator(); const v = c.createGain();
+      o.frequency.value = f; o.type = "triangle";
+      v.gain.setValueAtTime(0.0001, t + i * 0.12); v.gain.exponentialRampToValueAtTime(0.25, t + i * 0.12 + 0.02);
+      v.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.12 + 0.35);
+      o.connect(v).connect(c.destination); o.start(t + i * 0.12); o.stop(t + i * 0.12 + 0.4);
+    });
+  } catch { /* sin sonido */ }
+}
 
-function Tarjeta({ gn, es, sonando }: { gn: string; es: string; sonando: boolean }) {
+const OPC = ["Ógape", "Ñemuháme", "Ñe'ẽyvoty"];
+function Pregunta({ n, es, gn, ok, sonando }: { n: number; es: string; gn: string; ok: boolean; sonando: boolean }) {
   return (
-    <div className="mt-8 rounded-3xl px-8 py-6 text-center shadow-2xl" style={{ background: "#fff", color: "#0d2342" }}>
-      <div className="text-5xl font-black" style={{ color: "#0d2342" }}>{gn}</div>
-      <div className="mt-2 text-2xl font-semibold opacity-70">{es}</div>
-      <Onda activa={sonando} />
+    <div className="w-[330px] rounded-[2.4rem] border-[10px] border-black bg-white p-5 text-left shadow-2xl" style={{ color: "#0d2342" }}>
+      <div className="flex items-center gap-2">
+        <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-200">
+          <div className="h-full rounded-full transition-all duration-700" style={{ width: `${((n - (ok ? 0 : 1)) / 3) * 100}%`, background: "#22a35a" }} />
+        </div>
+        <span className="text-sm font-bold">{n}/3</span>
+      </div>
+      <div className="mt-4 text-sm font-semibold opacity-60">¿Cómo se dice…?</div>
+      <div className="text-3xl font-black">«{es}»</div>
+      <div className="mt-4 flex flex-col gap-2.5">
+        {OPC.map((o) => {
+          const es_ = o === gn && ok;
+          return (
+            <div key={o} className="relative rounded-2xl border-2 px-4 py-3 text-2xl font-bold transition-all duration-300"
+              style={{ borderColor: es_ ? "#22a35a" : "#d7dde6", background: es_ ? "#e3f7ea" : "#fff", transform: es_ ? "scale(1.04)" : "none" }}>
+              {o}
+              {o === gn && !ok && <span className="vp-dedo absolute right-6 top-1/2 -mt-5 h-10 w-10 rounded-full border-4" style={{ borderColor: GOLD, background: "rgba(242,193,78,.35)" }} aria-hidden />}
+            </div>
+          );
+        })}
+      </div>
+      {ok && (
+        <div className="vp-escena mt-4 flex items-center justify-between rounded-2xl px-4 py-3" style={{ background: "#22a35a", color: "#fff" }}>
+          <div className="whitespace-nowrap"><div className="text-xl font-black">¡Muy bien!</div><div className="text-sm">Escuchá la voz real</div></div>
+          <Onda activa={sonando} />
+          <div className="vp-xp whitespace-nowrap text-2xl font-black">+10 XP</div>
+        </div>
+      )}
     </div>
   );
 }
+
+const GOLD = "#f2c14e";
 
 function Onda({ activa }: { activa: boolean }) {
   return (
@@ -90,6 +132,7 @@ function VideoPorQue() {
         setIdx(i);
         if (e.voz) {
           fundir(m, VOL_BAJO, 300);
+          if (e.ok) acierto();
           await new Promise((r) => setTimeout(r, 600));
           setSonando(true);
           await playGuarani(e.voz);
@@ -110,6 +153,10 @@ function VideoPorQue() {
         @keyframes vp-entra { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
         @keyframes vp-onda { from { height: 6px; } to { height: 40px; } }
         .vp-escena { animation: vp-entra .5s ease-out both; }
+        @keyframes vp-toca { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes vp-sube { from { opacity: 0; transform: translateY(16px) scale(.6); } to { opacity: 1; transform: none; } }
+        .vp-dedo { animation: vp-toca .6s ease-in-out infinite; }
+        .vp-xp { animation: vp-sube .5s .2s ease-out both; }
         .vp-tarde { animation: vp-entra .5s 1.6s ease-out both; }
       `}</style>
       <Franjas arriba />
@@ -120,7 +167,7 @@ function VideoPorQue() {
             Empezar
           </button>
         )}
-        {idx >= 0 && <div key={idx} className="vp-escena flex flex-col items-center">{escena(idx, sonando)}</div>}
+        {idx >= 0 && <div key={ESCENAS[idx].g} className="vp-escena flex flex-col items-center">{escena(idx, sonando)}</div>}
       </div>
       <Franjas />
     </div>
@@ -130,22 +177,24 @@ function VideoPorQue() {
 const T = "text-[2.6rem] leading-tight font-black";
 
 function escena(i: number, sonando: boolean) {
-  switch (i) {
-    case 0: return (<><div className="text-6xl font-black" style={{ color: GOLD }}>Mba'éichapa</div><div className="mt-4 text-3xl font-semibold">Hola, ¿qué tal?</div></>);
-    case 1: return <div className={T}>El guaraní es nuestro.</div>;
-    case 2: return (<><div className={T}>Lo escuchamos en la casa…</div><Tarjeta gn="Ógape" es="En la casa" sonando={sonando} /></>);
-    case 3: return (<><div className={T}>…y en el mercado.</div><Tarjeta gn="Ñemuháme" es="En el mercado" sonando={sonando} /></>);
-    case 4: return (<><div className={T}>Pero muchos lo entendemos…</div><div className={`${T} vp-tarde mt-4`} style={{ color: GOLD }}>y no nos animamos a hablarlo.</div></>);
-    case 5: return (<><img src={logo} alt="Jaikuaa" className="mb-8 w-56 rounded-3xl bg-white p-4" /><div className={T}>Por eso creamos Jaikuaa.</div></>);
-    case 6: return (<><div className="mb-6 text-3xl font-black">Con voces reales de paraguayos</div>
+  const ok = !!ESCENAS[i].ok;
+  switch (ESCENAS[i].g) {
+    case 0: return (<><img src={jaiSaluda} alt="Jai ejecutivo saludando" className="w-60" />
+      <div className="text-5xl font-black" style={{ color: GOLD }}>Mba'éichapa</div>
+      <div className="mt-2 text-3xl font-semibold">Soy Jai. Te enseño guaraní.</div></>);
+    case 1: return (<><img src={jai} alt="Jai ejecutivo docente" className="w-52" />
+      <div className={T}>Mirá cómo se aprende en Jaikuaa</div>
+      <div className="vp-tarde mt-3 text-2xl font-semibold" style={{ color: GOLD }}>Tocás, escuchás y sumás puntos</div></>);
+    case 2: return <Pregunta n={1} es="En la casa" gn="Ógape" ok={ok} sonando={sonando} />;
+    case 3: return <Pregunta n={2} es="En el mercado" gn="Ñemuháme" ok={ok} sonando={sonando} />;
+    case 4: return <Pregunta n={3} es="Poesía" gn="Ñe'ẽyvoty" ok={ok} sonando={sonando} />;
+    case 5: return (<><div className="mb-6 text-3xl font-black">Lecciones con voces reales de paraguayos</div>
       <div className="rounded-[2.6rem] border-[10px] border-black bg-black shadow-2xl" style={{ width: 230 }}>
         <img src={captura.url} alt="Lección de Jaikuaa en el celular" className="block w-full rounded-[1.8rem]" />
       </div></>);
-    case 7: return (<><div className={T}>Hasta la poesía tiene su palabra</div><Tarjeta gn="Ñe'ẽyvoty" es="Poesía" sonando={sonando} /></>);
-    case 8: return <div className={T}>Revisado por docentes especialistas.</div>;
-    case 9: return <div className={T}>Para que el guaraní siga vivo en cada celular.</div>;
+    case 6: return (<><img src={jai} alt="Jai ejecutivo docente" className="w-44" /><div className={T}>Revisado por docentes especialistas.</div></>);
     default: return (<>
-      <img src={jai} alt="Jai saludando" className="w-48" />
+      <img src={jaiSaluda} alt="Jai ejecutivo saludando" className="w-44" />
       <div className="mt-2 text-5xl font-black" style={{ color: GOLD }}>Ñañe'ẽ guaraníme</div>
       <div className="mt-1 text-2xl font-semibold">Hablemos en guaraní</div>
       <div className="mt-6 text-2xl">Estudiá hoy, sin crear cuenta</div>
