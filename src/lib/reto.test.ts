@@ -43,3 +43,17 @@ describe("reto por WhatsApp", () => {
     expect(leccionDeReto({ ...r, x: "8:10" })).toBeNull();
   });
 });
+
+import { perdiEnTabla } from "./reto";
+describe("perdiEnTabla (Revancha)", () => {
+  it("ofrece revancha si alguien hizo más que yo", () => {
+    expect(perdiEnTabla([{ mio: false, puntaje: 5 }, { mio: true, puntaje: 3 }])).toBe(true);
+  });
+  it("no la ofrece si voy primero o empato", () => {
+    expect(perdiEnTabla([{ mio: true, puntaje: 5 }, { mio: false, puntaje: 3 }])).toBe(false);
+    expect(perdiEnTabla([{ mio: false, puntaje: 5 }, { mio: true, puntaje: 5 }])).toBe(false);
+  });
+  it("no la ofrece si todavía no jugué", () => {
+    expect(perdiEnTabla([{ mio: false, puntaje: 5 }])).toBe(false);
+  });
+});

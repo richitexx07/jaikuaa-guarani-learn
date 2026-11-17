@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Copy, Loader2, MessageCircle, Share2, Swords, Trophy, Users } from "lucide-react";
+import { Copy, Loader2, MessageCircle, RotateCcw, Share2, Swords, Trophy, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { crearReto, guardarResultadoReto, verReto, verRetoPublico, type RetoGuardado, type RetoResultado } from "@/lib/reto.functions";
 import { useIsGuest } from "@/lib/guest";
 import { rememberAfterLogin } from "@/lib/after-login";
-import { decodeReto, newSeed, RETO_NOMBRE, RETO_RUTA, retoUrl, veredicto, type RetoJuego } from "@/lib/reto";
+import { decodeReto, newSeed, perdiEnTabla, RETO_NOMBRE, RETO_RUTA, retoUrl, veredicto, type RetoJuego } from "@/lib/reto";
 import { celebrate } from "@/lib/confetti";
 
 const INK = "#13233F";
@@ -396,6 +396,32 @@ export function RetoFinal({
           <p className="flex items-center gap-2 font-display text-lg font-bold"><Trophy className="h-5 w-5 text-[#E0A100]" aria-hidden /> Tabla del reto</p>
           {yaJugado && <p className="mb-1 text-xs opacity-70">En la tabla cuenta tu primer intento ({puntajeDe(r, r.miPuntaje!)}).</p>}
           <div className="mt-2"><Tabla r={r} max={10} /></div>
+          {perdiEnTabla(r.resultados) && (
+            <div className="mt-3 rounded-2xl bg-[#FFF3C4] p-3">
+              <p className="font-display text-base font-bold">Te ganaron… ¡pedí revancha!</p>
+              <p className="text-xs opacity-75">Se arma una partida nueva y le mandás el enlace en un toque.</p>
+              <button
+                type="button"
+                disabled={creando}
+                onClick={async () => {
+                  setCreando(true);
+                  const u = await partida.crear({ extra: r.x ?? extra, total: t });
+                  setCreando(false);
+                  if (!u) return;
+                  const texto = `¡Quiero revancha en ${RETO_NOMBRE[juego]} de Jaikuaa! Jugamos una partida nueva, cada uno cuando pueda:\n${u}`;
+                  if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+                    void navigator.share({ title: "Revancha en Jaikuaa", text: texto }).catch(() => {});
+                  } else {
+                    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank", "noopener");
+                  }
+                }}
+                className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-2xl font-bold text-white"
+                style={{ background: "#C8102E" }}
+              >
+                {creando ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> : <RotateCcw className="h-5 w-5" aria-hidden />} Revancha
+              </button>
+            </div>
+          )}
         </div>
       ) : v ? (
         <div className="text-center">

@@ -175,3 +175,10 @@ export function retoDeLaUrl(juego: RetoJuego): Reto | null {
 export function leccionDeReto(r: { x?: string } | null): number | null {
   return r?.x && /^\d{1,3}$/.test(r.x) ? Number(r.x) : null;
 }
+
+/** En la tabla de un reto (ya ordenada, la mejor primero): ¿alguien me ganó? Sirve para ofrecer «Revancha». */
+export function perdiEnTabla(lista: { mio: boolean; puntaje: number }[] | undefined): boolean {
+  if (!lista?.length) return false;
+  const mia = lista.find((x) => x.mio);
+  return !!mia && lista[0].puntaje !== mia.puntaje;
+}
