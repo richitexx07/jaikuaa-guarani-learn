@@ -207,7 +207,7 @@ export const recordActivity = createServerFn({ method: "POST" })
     if (isGuarani) {
       const nueva = await assertGuaraniLessonAllowed(supabaseAdmin, context.userId, data.sourceRef);
       const { data: les } = await supabaseAdmin.from("lessons").select("id").eq("status", "published").eq("sort_order", Number(data.sourceRef.split(":")[1])).maybeSingle();
-      const { count: palabras } = await supabaseAdmin.from("lesson_words").select("id", { count: "exact", head: true }).eq("lesson_id", les?.id ?? "00000000-0000-0000-0000-000000000000");
+      const { count: palabras } = await supabaseAdmin.from("lesson_words").select("id, corpus_words!inner(status)", { count: "exact", head: true }).eq("corpus_words.status", "published").eq("lesson_id", les?.id ?? "00000000-0000-0000-0000-000000000000");
       serverXp = 10 + 2 * (palabras ?? 0);
       if (nueva) {
         const { leerIntento, minSegundosLeccion } = await import("@/lib/intento");

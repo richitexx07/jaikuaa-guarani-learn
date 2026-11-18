@@ -14,6 +14,8 @@ export type LessonDraft = {
   phase: "intro" | "vocab" | "choice" | "match" | "done";
   choice?: ChoiceDraft;
   match?: MatchDraft;
+  /** Comprobante del primer ingreso: así una pausa no reinicia el reloj del servidor. */
+  intento?: string;
   savedAt: number;
 };
 

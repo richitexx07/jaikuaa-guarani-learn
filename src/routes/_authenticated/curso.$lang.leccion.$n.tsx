@@ -209,7 +209,7 @@ function LessonPage() {
   const [phase, setPhaseState] = useState<Phase>("intro");
   const [resumed, setResumed] = useState(false);
   const [round, setRound] = useState(0);
-  const draft = useRef<Omit<LessonDraft, "savedAt">>({ phase: "intro" });
+  const draft = useRef<Omit<LessonDraft, "savedAt">>({ phase: "intro", intento: crudo?.intento });
   const desafio = useDesafioRecibido(lesson?.n);
   // Respuestas bien / en total, para el desafío por WhatsApp (se cuentan en el celular).
   const anotar = (ok: boolean) => { if (lesson) sumarAcierto(lang.slug, lesson.n, ok); };
@@ -221,7 +221,7 @@ function LessonPage() {
     if (!lesson) return;
     const d = readLessonDraft(lang.slug, lesson.n);
     if (d && d.phase !== "intro" && d.phase !== "done" && draftFitsLesson(d, lesson.vocab)) {
-      draft.current = { phase: d.phase, choice: d.choice, match: d.match };
+      draft.current = { phase: d.phase, choice: d.choice, match: d.match, intento: d.intento ?? lesson.intento };
       setPhaseState(d.phase);
       setResumed(true);
     }
@@ -240,7 +240,7 @@ function LessonPage() {
   };
   const restart = () => {
     if (lesson) { clearLessonDraft(lang.slug, lesson.n); reiniciarAciertos(lang.slug, lesson.n); }
-    draft.current = { phase: "intro" };
+    draft.current = { phase: "intro", intento: lesson?.intento };
     setResumed(false);
     setRound((r) => r + 1);
     setPhaseState("intro");
@@ -356,7 +356,7 @@ function LessonPage() {
               onNext={() => setPhase("done")}
             />
           )}
-          {phase === "done" && <DoneStep lesson={lesson} langSlug={lang.slug} desafio={desafio} />}
+          {phase === "done" && <DoneStep lesson={{ ...lesson, intento: draft.current.intento ?? lesson.intento }} langSlug={lang.slug} desafio={desafio} />}
         </div>
       </main>
     </div>
