@@ -18,6 +18,7 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         cta: "btn-3d [--btn-base:var(--accent)] bg-accent text-accent-foreground hover:bg-accent/90 mb-1",
+        success: "btn-3d [--btn-base:var(--success)] bg-success text-success-foreground hover:bg-success/90 mb-1",
       },
       size: {
         default: "h-9 px-4 py-2",

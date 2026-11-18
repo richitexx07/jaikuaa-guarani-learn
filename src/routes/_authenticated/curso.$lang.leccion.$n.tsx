@@ -378,7 +378,7 @@ function IntroStep({
       <p className="text-base text-foreground">
         {tx("lsIntro", { n: lesson.vocab.length })}
       </p>
-      <Button variant="default" size="lg" className="mt-6 w-full" onClick={onStart}>
+      <Button variant="success" size="lg" className="mt-6 w-full" onClick={onStart}>
         {tx("lsStart")}
       </Button>
       </div>
@@ -444,7 +444,7 @@ function VocabStep({
           </li>
         ))}
       </ul>
-      <Button variant="default" size="lg" className="mt-6 w-full" onClick={onNext}>
+      <Button variant="success" size="lg" className="mt-6 w-full" onClick={onNext}>
         {tx("lsToExercises")}
       </Button>
     </div>
@@ -532,7 +532,7 @@ function ChoiceStep({
         <p className="mt-2 text-sm text-muted-foreground">
           {tx("lsGot", { a: correct, b: questions.length })}
         </p>
-        <Button variant="default" size="lg" className="mt-6 w-full" onClick={onNext}>
+        <Button variant="success" size="lg" className="mt-6 w-full" onClick={onNext}>
           {tx("lsNextMatch")}
         </Button>
       </div>
@@ -599,7 +599,7 @@ function ChoiceStep({
               {isCorrect ? tx("lsRight") : <>{tx("lsAlmost")} <strong>{q.item.gn}</strong> {tx("lsMeans")} «{q.item.es}».</>}
             </JaiSays>
             <Button
-              variant="default"
+              variant="success"
               size="lg"
               className="h-14 w-full text-base"
               disabled={sonando !== null}
@@ -838,7 +838,7 @@ function MatchStep({
       </div>
 
       {done && (
-        <Button variant="default" size="lg" className="mt-6 h-14 w-full text-base" disabled={sonando !== null} onClick={onNext}>
+        <Button variant="success" size="lg" className="mt-6 h-14 w-full text-base" disabled={sonando !== null} onClick={onNext}>
           {tx("lsFinish")}
         </Button>
       )}
