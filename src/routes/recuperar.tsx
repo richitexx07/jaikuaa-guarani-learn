@@ -114,7 +114,7 @@ function RecuperarPage() {
                   {errorMsg}
                 </div>
               )}
-              <Button type="submit" variant="cta" size="lg" className="w-full" disabled={loading}>
+              <Button type="submit" variant="default" size="lg" className="w-full" disabled={loading}>
                 {loading ? "Enviando..." : "Enviar correo de recuperación"}
               </Button>
               <p className="text-center text-sm text-muted-foreground">

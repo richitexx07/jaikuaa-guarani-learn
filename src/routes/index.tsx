@@ -117,7 +117,7 @@ function Hero() {
             <Link
               to="/curso/$lang/leccion/$n"
               params={{ lang: "guarani", n: "1" }}
-              className="hero-cta flex h-16 items-center justify-center gap-3 rounded-2xl bg-accent px-6 font-display text-xl font-bold text-accent-foreground shadow-lg transition active:scale-[.98]"
+              className="hero-cta flex h-16 items-center justify-center gap-3 rounded-2xl bg-success px-6 font-display text-xl font-bold text-success-foreground shadow-lg transition active:scale-[.98]"
             >
               <span aria-hidden>📚</span> Estudiá ahora, sin cuenta
             </Link>

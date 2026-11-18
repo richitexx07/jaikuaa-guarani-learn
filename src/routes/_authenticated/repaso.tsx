@@ -224,7 +224,7 @@ function RepasoContent() {
         <Jai />
         <h2 className="mt-2 text-center font-display text-2xl font-bold">Primero, una lección</h2>
         <p className="mt-2 text-center">El repaso usa las palabras de las lecciones que ya terminaste. Hacé la primera y mañana Jai te las vuelve a preguntar.</p>
-        <Button asChild variant="cta" className="mt-5 h-14 w-full text-base">
+        <Button asChild variant="default" className="mt-5 h-14 w-full text-base">
           <Link to="/curso/$lang/leccion/$n" params={{ lang: "guarani", n: "1" }}>Empezar la lección 1</Link>
         </Button>
       </Hoja>
@@ -245,7 +245,7 @@ function RepasoContent() {
         <p className="mt-1 text-center text-sm opacity-80">
           Palabras firmes: {firmes(pool, estado)} de {pool.length}. {proximo ? `Próximo repaso: ${fechaLinda(proximo)}.` : ""}
         </p>
-        <Button asChild variant="cta" className="mt-5 h-14 w-full text-base">
+        <Button asChild variant="default" className="mt-5 h-14 w-full text-base">
           <Link to="/juegos">Seguir jugando</Link>
         </Button>
       </Hoja>
@@ -309,7 +309,7 @@ function RepasoContent() {
                 <p className="mb-2 text-base font-semibold" role="status" aria-live="polite">
                   {elegida === p.item.gn ? "¡Iporã! Muy bien." : `Era «${p.item.es}». Vuelve mañana para que no se te olvide.`}
                 </p>
-                <Button variant="cta" className="h-14 w-full text-base" onClick={siguiente}>
+                <Button variant={elegida === p.item.gn ? "success" : "default"} className="h-14 w-full text-base" onClick={siguiente}>
                   {i + 1 < ronda.length ? "Siguiente" : "Terminar"}
                 </Button>
               </div>
@@ -333,7 +333,7 @@ function RepasoContent() {
             {deHoy.length === 1 ? <>Hoy te toca <b>1</b> palabra. Es un minuto.</> : <>Hoy te tocan <b>{deHoy.length}</b> palabras. Son dos minutos.</>}
           </p>
           <p className="mt-2 text-center text-sm opacity-80">Respondé antes de ver la respuesta: así es como mejor se recuerda.</p>
-          <Button variant="cta" className="mt-5 h-14 w-full text-lg" onClick={empezar}>
+          <Button variant="default" className="mt-5 h-14 w-full text-lg" onClick={empezar}>
             Empezar el repaso
           </Button>
         </>
@@ -343,7 +343,7 @@ function RepasoContent() {
           <p className="mt-1 text-center text-sm opacity-80">
             {proximo ? `Tu próximo repaso es ${fechaLinda(proximo)}.` : ""} Mientras tanto, una lección nueva suma palabras.
           </p>
-          <Button asChild variant="cta" className="mt-5 h-14 w-full text-base">
+          <Button asChild variant="default" className="mt-5 h-14 w-full text-base">
             <Link to="/curso/$lang" params={{ lang: "guarani" }}>Ir al curso</Link>
           </Button>
         </>

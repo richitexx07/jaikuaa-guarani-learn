@@ -65,7 +65,7 @@ function Progress({ step }: { step: 1 | 2 | 3 }) {
   return (
     <div className="flex items-center gap-2" aria-label={tx("czStep", { n: step })}>
       {[1, 2, 3].map((n) => (
-        <span key={n} className={`h-2 w-10 rounded-full transition-colors ${n <= step ? "bg-accent" : "bg-muted"}`} />
+        <span key={n} className={`h-2 w-10 rounded-full transition-colors ${n <= step ? "bg-success" : "bg-muted"}`} />
       ))}
     </div>
   );
@@ -158,7 +158,7 @@ function Onboarding() {
             <p className="rounded-2xl bg-card px-6 py-5 font-display text-lg leading-relaxed text-foreground shadow-sm sm:text-xl">
               {tx(`czR.${motivation}` as TXKey)}
             </p>
-            <Button variant="cta" size="lg" className="w-full" onClick={() => setStep(3)}>
+            <Button variant="default" size="lg" className="w-full" onClick={() => setStep(3)}>
               {tx("czStart")}
             </Button>
           </section>
@@ -181,7 +181,7 @@ function Onboarding() {
                 <p className="text-base text-muted-foreground"><span className="sr-only">{tx("czMeaning")}: </span>{MINI_LESSON[lessonIdx].es}</p>
               </div>
               <Button
-                variant="cta"
+                variant="default"
                 size="lg"
                 className="mt-6 w-full"
                 onClick={() => {
@@ -203,7 +203,7 @@ function Onboarding() {
               <br />
               <span className="text-foreground">{tx("czTomorrow")}</span>
             </p>
-            <Button variant="cta" size="lg" className="w-full" onClick={finishOnboarding}>
+            <Button variant="default" size="lg" className="w-full" onClick={finishOnboarding}>
               {tx("czCreate")}
             </Button>
             <button

@@ -311,7 +311,7 @@ function AuthPage() {
                 {errorMsg}
               </div>
             )}
-            <Button type="submit" variant="cta" size="lg" className="w-full" disabled={loading}>
+            <Button type="submit" variant="default" size="lg" className="w-full" disabled={loading}>
               {loading ? t("auth.loading") : isLogin ? t("auth.login") : t("auth.create")}
             </Button>
           </form>

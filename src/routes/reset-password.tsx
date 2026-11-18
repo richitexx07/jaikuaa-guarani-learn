@@ -151,7 +151,7 @@ function ResetPasswordPage() {
                   {errorMsg}
                 </div>
               )}
-              <Button type="submit" variant="cta" size="lg" className="w-full" disabled={loading}>
+              <Button type="submit" variant="default" size="lg" className="w-full" disabled={loading}>
                 {loading ? "Guardando..." : "Guardar nueva contraseña"}
               </Button>
             </form>

@@ -132,8 +132,8 @@ function LessonSteps({ phase }: { phase: Phase }) {
         const now = at === i;
         return (
           <li key={s.id} className="min-w-0">
-            <span className={`block h-2 rounded-full transition-colors ${done || now ? "bg-accent" : "bg-muted"}`} />
-            <span className={`mt-1 block truncate text-center text-[11px] font-semibold ${now ? "text-accent" : done ? "text-foreground" : "text-muted-foreground"}`}>
+            <span className={`block h-2 rounded-full transition-colors ${done || now ? "bg-success" : "bg-muted"}`} />
+            <span className={`mt-1 block truncate text-center text-[11px] font-semibold ${now ? "text-success" : done ? "text-foreground" : "text-muted-foreground"}`}>
               {tx(s.label)}
             </span>
           </li>
@@ -898,7 +898,7 @@ function DoneStep({
         {tx("lsFinished", { t: lesson.title })} ¡Aguyje!
       </p>
 
-      <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2 font-display text-base font-bold text-accent-foreground shadow">
+      <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-reward px-5 py-2 font-display text-base font-bold text-reward-foreground shadow">
         +{xp} XP
       </div>
 
@@ -927,7 +927,7 @@ function DoneStep({
           {(GUEST_LESSONS as readonly number[]).includes(lesson.n + 1) ? (
             <>
               {/* La siguiente también es sin cuenta: se sigue de una. La cuenta queda como opción para guardar. */}
-              <Button asChild variant="cta" size="lg" className="h-auto min-h-12 whitespace-normal py-3 leading-snug">
+              <Button asChild variant="success" size="lg" className="h-auto min-h-12 whitespace-normal py-3 leading-snug">
                 <a href={`/curso/${langSlug}/leccion/${lesson.n + 1}`}>{tx("lsGuestSiguiente", { n: lesson.n + 1 })}</a>
               </Button>
               <Button asChild variant="outline" size="lg" className="h-auto min-h-12 whitespace-normal py-3 leading-snug">
@@ -935,7 +935,7 @@ function DoneStep({
               </Button>
             </>
           ) : (
-            <Button asChild variant="cta" size="lg" className="h-auto min-h-12 whitespace-normal py-3 leading-snug">
+            <Button asChild variant="default" size="lg" className="h-auto min-h-12 whitespace-normal py-3 leading-snug">
               <Link to="/auth" search={{ mode: authMode() }}>{tx("lsGuestSeguir", { n: lesson.n + 1 })}</Link>
             </Button>
           )}
@@ -951,7 +951,7 @@ function DoneStep({
               {tx("backCourse")}
             </Link>
           </Button>
-          <Button asChild variant="cta" size="lg">
+          <Button asChild variant="success" size="lg">
             <Link to="/dashboard">{tx("goPanel")}</Link>
           </Button>
         </div>
