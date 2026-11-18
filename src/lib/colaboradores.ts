@@ -74,7 +74,8 @@ export function aCsv(filas: Record<string, string | number | boolean>[]): string
   if (!filas.length) return "";
   const cols = Object.keys(filas[0]);
   const esc = (v: string | number | boolean) => {
-    const s = String(v ?? "");
+    let s = String(v ?? "");
+    if (typeof v === "string" && /^[=+\-@\t\r]/.test(s)) s = "'" + s;
     return /[";\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   return "﻿" + [cols.join(";"), ...filas.map((f) => cols.map((c) => esc(f[c])).join(";"))].join("\r\n");
