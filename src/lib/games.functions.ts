@@ -85,9 +85,15 @@ export async function loadWotdWords(): Promise<WotdWord[]> {
   return (data ?? []) as unknown as WotdWord[];
 }
 
+/** Letra del abecedario guaraní cargada en el corpus (no es una palabra con significado). */
+export function esLetraSuelta(w: { es: string }): boolean {
+  return /^letra \d+ del achegety/i.test(w.es.trim());
+}
+
 export async function wordOfDay(day: string, preloaded?: WotdWord[]) {
   const all = preloaded ?? (await loadWotdWords());
-  const withAudio = all.filter((w) => w.has_audio);
+  // Solo palabras reales: las letras sueltas del Achegety («Ch», «Mb»…) no son palabra del día.
+  const withAudio = all.filter((w) => w.has_audio && !esLetraSuelta(w));
   if (withAudio.length === 0) return null;
   const rnd = seeded(`jaikuaa:${day}`);
   const word = withAudio[Math.floor(rnd() * withAudio.length)]!;
