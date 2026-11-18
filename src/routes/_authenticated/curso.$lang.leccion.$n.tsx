@@ -598,6 +598,11 @@ function ChoiceStep({
             <JaiSays ok={isCorrect}>
               {isCorrect ? tx("lsRight") : <>{tx("lsAlmost")} <strong>{q.item.gn}</strong> {tx("lsMeans")} «{q.item.es}».</>}
             </JaiSays>
+            {!isCorrect && (
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <SpeakerButton gn={q.item.gn} /> {tx("rpListenAgain")}
+              </div>
+            )}
             <Button
               variant="success"
               size="lg"

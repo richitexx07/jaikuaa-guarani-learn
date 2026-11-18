@@ -252,6 +252,17 @@ const T = {
   gtSub: ["Contenido para {g}. Cada tema tiene una breve explicación, vocabulario y un quiz de 5 preguntas.", "Conteúdo para {g}. Cada tema tem uma breve explicação, vocabulário e um quiz de 5 perguntas.", "Content for {g}. Each topic has a short explanation, vocabulary and a 5-question quiz.", "Inhalt für {g}. Jedes Thema hat eine kurze Erklärung, Wortschatz und ein Quiz mit 5 Fragen.", "Contenu pour {g}. Chaque thème a une courte explication, du vocabulaire et un quiz de 5 questions.", "{g} 的內容。每個主題都有簡短說明、詞彙和 5 題測驗。"],
   gtCount: ["{a} palabras · {b} preguntas", "{a} palavras · {b} perguntas", "{a} words · {b} questions", "{a} Wörter · {b} Fragen", "{a} mots · {b} questions", "{a} 個詞 · {b} 題"],
   gtPractice: ["Practicar →", "Praticar →", "Practice →", "Üben →", "Pratiquer →", "練習 →"],
+  rpLoading: ["Buscando tus palabras…", "Buscando suas palavras…", "Finding your words…", "Deine Wörter werden gesucht…", "Recherche de vos mots…", "正在找你的詞…"],
+  rpWordOf: ["Palabra {a} de {b}", "Palavra {a} de {b}", "Word {a} of {b}", "Wort {a} von {b}", "Mot {a} sur {b}", "第 {a} 個詞，共 {b} 個"],
+  rpWhat: ["¿Qué significa?", "O que significa?", "What does it mean?", "Was bedeutet das?", "Que signifie-t-il ?", "這是什麼意思？"],
+  rpGood: ["¡Muy bien!", "Muito bem!", "Well done!", "Sehr gut!", "Très bien !", "很好！"],
+  rpWas: ["Era «{w}». Vuelve mañana para que no se te olvide.", "Era «{w}». Volta amanhã para você não esquecer.", "It was “{w}”. It comes back tomorrow so you don't forget it.", "Es war „{w}“. Es kommt morgen wieder, damit du es nicht vergisst.", "C'était « {w} ». Il revient demain pour ne pas l'oublier.", "答案是「{w}」。明天會再出現，免得你忘記。"],
+  rpFinish: ["Terminar", "Terminar", "Finish", "Fertig", "Terminer", "完成"],
+  rpStart: ["Empezar el repaso", "Começar a revisão", "Start the review", "Wiederholung starten", "Commencer la révision", "開始複習"],
+  rpDone: ["¡Repaso hecho!", "Revisão feita!", "Review done!", "Wiederholung geschafft!", "Révision terminée !", "複習完成！"],
+  rpScore: ["Acertaste {a} de {b}.", "Você acertou {a} de {b}.", "You got {a} of {b} right.", "Du hast {a} von {b} richtig.", "Vous avez trouvé {a} sur {b}.", "答對 {a} 題，共 {b} 題。"],
+  rpKeep: ["Seguir jugando", "Continuar jogando", "Keep playing", "Weiterspielen", "Continuer à jouer", "繼續玩"],
+  rpListenAgain: ["Escuchar otra vez", "Ouvir de novo", "Listen again", "Nochmal anhören", "Réécouter", "再聽一次"],
 } satisfies Record<string, Row>;
 
 export type TXKey = keyof typeof T;

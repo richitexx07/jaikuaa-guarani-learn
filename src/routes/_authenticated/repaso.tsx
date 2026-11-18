@@ -6,6 +6,7 @@ import { GameStage } from "@/components/games/game-stage";
 import { LaceBackground, useGameFeedback } from "@/components/games/game-kit";
 import { SpeakerButton } from "@/components/audio/speaker-button";
 import { Button } from "@/components/ui/button";
+import { useTX } from "@/lib/i18n-pages";
 import { supabase } from "@/integrations/supabase/client";
 import { getCourseLesson, listCourseLessons, type CourseVocabItem } from "@/lib/lessons.functions";
 import { getCourseLessonGuest } from "@/lib/guest.functions";
@@ -129,6 +130,7 @@ function fechaLinda(dia: string): string {
 type Pregunta = { item: Palabra; opciones: Palabra[] };
 
 function RepasoContent() {
+  const tx = useTX();
   const q = useQuery({ queryKey: ["repaso-palabras"], queryFn: palabrasAprendidas, staleTime: 5 * 60 * 1000 });
   const feedback = useGameFeedback();
   const [estado, setEstado] = useState<EstadoRepaso>({});
@@ -204,7 +206,7 @@ function RepasoContent() {
   if (q.isLoading) {
     return (
       <div className="relative mx-auto flex max-w-xl items-center justify-center gap-2 px-4 py-24 font-semibold">
-        <Loader2 className="h-5 w-5 animate-spin" /> Buscando tus palabras…
+        <Loader2 className="h-5 w-5 animate-spin" /> {tx("rpLoading")}
       </div>
     );
   }
@@ -237,16 +239,16 @@ function RepasoContent() {
     return (
       <Hoja>
         <Jai />
-        <h2 className="mt-2 text-center font-display text-3xl font-bold">¡Repaso hecho!</h2>
+        <h2 className="mt-2 text-center font-display text-3xl font-bold">{tx("rpDone")}</h2>
         <p className="mt-2 text-center text-lg">
-          Acertaste <b>{aciertos}</b> de <b>{ronda.length}</b>.
+          {tx("rpScore", { a: aciertos, b: ronda.length })}
         </p>
         <p className="mt-3 text-center">Las que te costaron vuelven mañana; las que ya sabés, en unos días.</p>
         <p className="mt-1 text-center text-sm opacity-80">
           Palabras firmes: {firmes(pool, estado)} de {pool.length}. {proximo ? `Próximo repaso: ${fechaLinda(proximo)}.` : ""}
         </p>
         <Button asChild variant="default" className="mt-5 h-14 w-full text-base">
-          <Link to="/juegos">Seguir jugando</Link>
+          <Link to="/juegos">{tx("rpKeep")}</Link>
         </Button>
       </Hoja>
     );
@@ -258,7 +260,7 @@ function RepasoContent() {
     return (
       <div className="relative mx-auto max-w-xl px-4 pt-2">
         <div className="flex items-center justify-between gap-3">
-          <span className="text-sm font-bold">Palabra {i + 1} de {ronda.length}</span>
+          <span className="text-sm font-bold">{tx("rpWordOf", { a: i + 1, b: ronda.length })}</span>
           <div className="flex gap-1.5" aria-hidden="true">
             {ronda.map((_, k) => (
               <span key={k} className="h-2.5 w-6 rounded-full" style={{ background: k < i ? C.turquesa : k === i ? C.sol : "rgba(15,45,58,.18)" }} />
@@ -266,7 +268,7 @@ function RepasoContent() {
           </div>
         </div>
         <div key={i} className="rp-card mt-2 rounded-3xl p-4 sm:p-5 shadow-[0_6px_0_rgba(14,124,114,.25)]" style={{ background: C.hoja }}>
-          <p className="text-sm font-bold opacity-75">¿Qué significa?</p>
+          <p className="text-sm font-bold opacity-75">{tx("rpWhat")}</p>
           <div className="mt-1 flex items-center justify-between gap-3">
             <span className="font-display text-4xl font-bold leading-tight break-words">{p.item.gn}</span>
             <SpeakerButton gn={p.item.gn} size="md" />
@@ -307,10 +309,15 @@ function RepasoContent() {
             >
               <div className="mx-auto max-w-xl">
                 <p className="mb-2 text-base font-semibold" role="status" aria-live="polite">
-                  {elegida === p.item.gn ? "¡Iporã! Muy bien." : `Era «${p.item.es}». Vuelve mañana para que no se te olvide.`}
+                  {elegida === p.item.gn ? <>¡Iporã! {tx("rpGood")}</> : tx("rpWas", { w: p.item.es })}
                 </p>
+                {elegida !== p.item.gn && (
+                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                    <SpeakerButton gn={p.item.gn} /> {tx("rpListenAgain")}
+                  </div>
+                )}
                 <Button variant={elegida === p.item.gn ? "success" : "default"} className="h-14 w-full text-base" onClick={siguiente}>
-                  {i + 1 < ronda.length ? "Siguiente" : "Terminar"}
+                  {i + 1 < ronda.length ? tx("next") : tx("rpFinish")}
                 </Button>
               </div>
             </div>
@@ -334,7 +341,7 @@ function RepasoContent() {
           </p>
           <p className="mt-2 text-center text-sm opacity-80">Respondé antes de ver la respuesta: así es como mejor se recuerda.</p>
           <Button variant="default" className="mt-5 h-14 w-full text-lg" onClick={empezar}>
-            Empezar el repaso
+            {tx("rpStart")}
           </Button>
         </>
       ) : (
