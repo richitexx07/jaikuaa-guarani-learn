@@ -59,6 +59,7 @@ import { Route as AuthenticatedGuaraniEscolarRouteImport } from './routes/_authe
 import { Route as AuthenticatedLaboratorioRouteImport } from './routes/_authenticated/laboratorio'
 import { Route as AuthenticatedLogrosRouteImport } from './routes/_authenticated/logros'
 import { Route as AuthenticatedMisLibrosRouteImport } from './routes/_authenticated/mis-libros'
+import { Route as AuthenticatedMisObrasRouteImport } from './routes/_authenticated/mis-obras'
 import { Route as AuthenticatedNheMbytepeRouteImport } from './routes/_authenticated/nhe-mbytepe'
 import { Route as AuthenticatedPronunciarRouteImport } from './routes/_authenticated/pronunciar'
 import { Route as AuthenticatedRankingRouteImport } from './routes/_authenticated/ranking'
@@ -390,6 +391,11 @@ const AuthenticatedLogrosRoute = AuthenticatedLogrosRouteImport.update({
 const AuthenticatedMisLibrosRoute = AuthenticatedMisLibrosRouteImport.update({
   id: '/mis-libros',
   path: '/mis-libros',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMisObrasRoute = AuthenticatedMisObrasRouteImport.update({
+  id: '/mis-obras',
+  path: '/mis-obras',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNheMbytepeRoute = AuthenticatedNheMbytepeRouteImport.update({
@@ -884,6 +890,7 @@ export interface FileRoutesByFullPath {
   '/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/logros': typeof AuthenticatedLogrosRoute
   '/mis-libros': typeof AuthenticatedMisLibrosRoute
+  '/mis-obras': typeof AuthenticatedMisObrasRoute
   '/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
   '/pronunciar': typeof AuthenticatedPronunciarRoute
   '/ranking': typeof AuthenticatedRankingRoute
@@ -1013,6 +1020,7 @@ export interface FileRoutesByTo {
   '/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/logros': typeof AuthenticatedLogrosRoute
   '/mis-libros': typeof AuthenticatedMisLibrosRoute
+  '/mis-obras': typeof AuthenticatedMisObrasRoute
   '/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
   '/pronunciar': typeof AuthenticatedPronunciarRoute
   '/ranking': typeof AuthenticatedRankingRoute
@@ -1143,6 +1151,7 @@ export interface FileRoutesById {
   '/_authenticated/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/_authenticated/logros': typeof AuthenticatedLogrosRoute
   '/_authenticated/mis-libros': typeof AuthenticatedMisLibrosRoute
+  '/_authenticated/mis-obras': typeof AuthenticatedMisObrasRoute
   '/_authenticated/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
   '/_authenticated/pronunciar': typeof AuthenticatedPronunciarRoute
   '/_authenticated/ranking': typeof AuthenticatedRankingRoute
@@ -1275,6 +1284,7 @@ export interface FileRouteTypes {
     | '/laboratorio'
     | '/logros'
     | '/mis-libros'
+    | '/mis-obras'
     | '/nhe-mbytepe'
     | '/pronunciar'
     | '/ranking'
@@ -1404,6 +1414,7 @@ export interface FileRouteTypes {
     | '/laboratorio'
     | '/logros'
     | '/mis-libros'
+    | '/mis-obras'
     | '/nhe-mbytepe'
     | '/pronunciar'
     | '/ranking'
@@ -1533,6 +1544,7 @@ export interface FileRouteTypes {
     | '/_authenticated/laboratorio'
     | '/_authenticated/logros'
     | '/_authenticated/mis-libros'
+    | '/_authenticated/mis-obras'
     | '/_authenticated/nhe-mbytepe'
     | '/_authenticated/pronunciar'
     | '/_authenticated/ranking'
@@ -2025,6 +2037,13 @@ declare module '@tanstack/react-router' {
       path: '/mis-libros'
       fullPath: '/mis-libros'
       preLoaderRoute: typeof AuthenticatedMisLibrosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mis-obras': {
+      id: '/_authenticated/mis-obras'
+      path: '/mis-obras'
+      fullPath: '/mis-obras'
+      preLoaderRoute: typeof AuthenticatedMisObrasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/nhe-mbytepe': {
@@ -2653,6 +2672,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLaboratorioRoute: typeof AuthenticatedLaboratorioRoute
   AuthenticatedLogrosRoute: typeof AuthenticatedLogrosRoute
   AuthenticatedMisLibrosRoute: typeof AuthenticatedMisLibrosRoute
+  AuthenticatedMisObrasRoute: typeof AuthenticatedMisObrasRoute
   AuthenticatedNheMbytepeRoute: typeof AuthenticatedNheMbytepeRoute
   AuthenticatedPronunciarRoute: typeof AuthenticatedPronunciarRoute
   AuthenticatedRankingRoute: typeof AuthenticatedRankingRoute
@@ -2720,6 +2740,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLaboratorioRoute: AuthenticatedLaboratorioRoute,
   AuthenticatedLogrosRoute: AuthenticatedLogrosRoute,
   AuthenticatedMisLibrosRoute: AuthenticatedMisLibrosRoute,
+  AuthenticatedMisObrasRoute: AuthenticatedMisObrasRoute,
   AuthenticatedNheMbytepeRoute: AuthenticatedNheMbytepeRoute,
   AuthenticatedPronunciarRoute: AuthenticatedPronunciarRoute,
   AuthenticatedRankingRoute: AuthenticatedRankingRoute,

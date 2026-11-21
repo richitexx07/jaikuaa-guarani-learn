@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { PAGOPAR_API, tokenInicio, urlPagoPagopar } from "@/lib/pagopar";
 
 /**
- * Pagos de la Librería con Pagopar.
+ * Pagos de la Librería con Pagopar (libros y módulos de especialización: se compran igual).
  * - Sin claves PAGOPAR_PUBLIC_KEY / PAGOPAR_PRIVATE_KEY: modo prueba, solo el administrador puede simular la compra.
  * - Con claves: se crea el pedido en Pagopar y se manda a pagar; el acceso lo da el aviso (/api/public/pagopar).
  */
@@ -29,8 +29,9 @@ export const comprarLibro = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ libroId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const db = await admin();
-    const { data: libro } = await db.from("libros").select("id, titulo, precio_gs, publicado").eq("id", data.libroId).maybeSingle();
-    if (!libro || !libro.publicado || !libro.precio_gs) throw new Error("Este libro no está a la venta en línea.");
+    const { data: libro } = await db.from("libros").select("id, titulo, precio_gs, publicado, tipo").eq("id", data.libroId).maybeSingle();
+    if (!libro || !libro.publicado || !libro.precio_gs) throw new Error("Esta obra no está a la venta en línea.");
+    const esModulo = libro.tipo === "modulo";
     const { data: ya } = await db.from("libro_accesos").select("id").eq("libro_id", libro.id).eq("user_id", context.userId).maybeSingle();
     if (ya) return { estado: "ya-lo-tenes" as const };
 
@@ -40,7 +41,7 @@ export const comprarLibro = createServerFn({ method: "POST" })
       if (esAdmin !== true) return { estado: "pronto" as const };
       const { data: pago, error } = await db
         .from("pagos")
-        .insert({ user_id: context.userId, ref_id: libro.id, descripcion: libro.titulo, monto_gs: libro.precio_gs, modo: "prueba", estado: "pagado", pagado_at: new Date().toISOString() })
+        .insert({ user_id: context.userId, ref_id: libro.id, tipo: esModulo ? "modulo" : "libro", descripcion: libro.titulo, monto_gs: libro.precio_gs, modo: "prueba", estado: "pagado", pagado_at: new Date().toISOString() })
         .select("id")
         .single();
       if (error) throw new Error(error.message);
@@ -51,7 +52,7 @@ export const comprarLibro = createServerFn({ method: "POST" })
     const { data: perfil } = await db.from("profiles").select("full_name, email").eq("id", context.userId).maybeSingle();
     const { data: pago, error } = await db
       .from("pagos")
-      .insert({ user_id: context.userId, ref_id: libro.id, descripcion: libro.titulo, monto_gs: libro.precio_gs })
+      .insert({ user_id: context.userId, ref_id: libro.id, tipo: esModulo ? "modulo" : "libro", descripcion: libro.titulo, monto_gs: libro.precio_gs })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
@@ -74,7 +75,7 @@ export const comprarLibro = createServerFn({ method: "POST" })
       },
       compras_items: [{
         ciudad: "1", nombre: libro.titulo.slice(0, 100), cantidad: 1, categoria: "909", public_key: k.pub,
-        url_imagen: "", descripcion: "Libro digital con voz humana", id_producto: libro.id, precio_total: libro.precio_gs,
+        url_imagen: "", descripcion: esModulo ? "Módulo de especialización con voz humana" : "Libro digital con voz humana", id_producto: libro.id, precio_total: libro.precio_gs,
         vendedor_telefono: "", vendedor_direccion: "", vendedor_direccion_referencia: "", vendedor_direccion_coordenadas: "",
       }],
     };

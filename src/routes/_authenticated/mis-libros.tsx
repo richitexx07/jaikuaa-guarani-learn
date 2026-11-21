@@ -1,18 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, Loader2, Settings2 } from "lucide-react";
+import { BookOpen, Loader2, PenLine, Settings2 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { misLibros, type LibroCard } from "@/lib/libros.functions";
 import { Portada } from "@/components/libreria/portada";
 
-/** «Mis libros»: la biblioteca de cada persona con los libros que compró en la Librería Jaikuaa. */
+/** «Mis libros»: la biblioteca de cada persona con los libros y módulos que compró en la Librería Jaikuaa. */
 export const Route = createFileRoute("/_authenticated/mis-libros")({
   head: () => ({
     meta: [
-      { title: "Jaikuaa — Mis libros" },
-      { name: "description", content: "Tus libros de la Librería Jaikuaa: leelos en el celular y escuchá cada página con voz humana real." },
+      { title: "Jaikuaa — Mis libros y módulos" },
+      { name: "description", content: "Tus libros y módulos de la Librería Jaikuaa: leelos en el celular y escuchá cada página con voz humana real." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -40,16 +40,23 @@ function MisLibrosPage() {
         <div className="mx-auto max-w-4xl">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl">Mis libros</h1>
+              <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl">Mis libros y módulos</h1>
               <p className="mt-1 text-sm text-muted-foreground">Leé en el celular y escuchá cada página con voz humana real.</p>
             </div>
-            {data?.esAdmin && (
+            <div className="flex flex-wrap gap-2">
               <Button asChild variant="outline" size="sm">
-                <Link to="/admin/libros">
-                  <Settings2 className="mr-1.5 h-4 w-4" /> Administrar libros
+                <Link to="/mis-obras">
+                  <PenLine className="mr-1.5 h-4 w-4" /> Soy autor: mis obras
                 </Link>
               </Button>
-            )}
+              {data?.esAdmin && (
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/admin/libros">
+                    <Settings2 className="mr-1.5 h-4 w-4" /> Administrar libros
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
 
           {isLoading && (
@@ -62,8 +69,8 @@ function MisLibrosPage() {
           {data && data.libros.length === 0 && (
             <div className="mt-8 rounded-2xl border border-dashed border-border p-8 text-center">
               <BookOpen className="mx-auto h-10 w-10 text-muted-foreground" aria-hidden />
-              <p className="mt-3 font-semibold text-foreground">Todavía no tenés libros</p>
-              <p className="mt-1 text-sm text-muted-foreground">Cuando compres un libro de la Librería Jaikuaa, aparece acá con esta misma cuenta.</p>
+              <p className="mt-3 font-semibold text-foreground">Todavía no tenés libros ni módulos</p>
+              <p className="mt-1 text-sm text-muted-foreground">Cuando compres un libro o un módulo de la Librería Jaikuaa, aparece acá con esta misma cuenta.</p>
               <Button asChild className="mt-4">
                 <Link to="/libreria">Ir a la Librería</Link>
               </Button>
