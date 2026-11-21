@@ -56,6 +56,13 @@ async function vendedorHabilitado(userId: string): Promise<{ nombre: string } | 
   return data && data.habilitado ? { nombre: (data.nombre as string) ?? "" } : null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function mercadoAbierto(db: any): Promise<boolean> {
+  const { data } = await db.from("libreria_ajustes").select("mercado_abierto").eq("id", 1).maybeSingle();
+  return data?.mercado_abierto === true;
+}
+const VENTAS_PRONTO = "Las ventas del Mercado abren pronto. Dejanos tu contacto en la portada del Mercado y te avisamos.";
+
 const uuid = z.string().uuid();
 const itemTipoZ = z.enum(["obra", "producto"]);
 
@@ -370,6 +377,8 @@ export const pagarCarrito = createServerFn({ method: "POST" })
     const db = await admin();
     const obrasIds = data.lineas.filter((l) => l.tipo === "obra").map((l) => l.id);
     const prodIds = data.lineas.filter((l) => l.tipo === "producto").map((l) => l.id);
+    // En preinscripción solo se venden las obras de la Librería; los productos esperan a que se abran las ventas.
+    if (prodIds.length && !(await mercadoAbierto(db)) && !(await esAdmin(context.supabase, context.userId))) throw new Error(VENTAS_PRONTO);
     const [o, p, ya] = await Promise.all([
       obrasIds.length ? db.from("libros").select("id, titulo, precio_gs, tipo, publicado").in("id", obrasIds) : { data: [] },
       prodIds.length ? db.from("mercado_productos").select(COLS_PRODUCTO).in("id", prodIds) : { data: [] },
@@ -947,6 +956,7 @@ export const marcarPedidoVendedor = createServerFn({ method: "POST" })
 
 /* ───────────────────────── Administración del Mercado ───────────────────────── */
 
+export type InteresadoAdmin = { id: string; nombre: string; contacto: string; interes: string; avisado: boolean; fecha: string };
 export type PostulacionAdmin = { id: string; nombre: string; categoria: string; descripcion: string; whatsapp: string; ciudad: string; correo: string; fecha: string };
 
 export const adminMercado = createServerFn({ method: "GET" })
@@ -954,10 +964,12 @@ export const adminMercado = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await exigirAdmin(context.supabase, context.userId);
     const db = await admin();
-    const [post, prods, cup] = await Promise.all([
+    const [post, prods, cup, aj, inter] = await Promise.all([
       db.from("mercado_postulaciones").select("id, user_id, nombre, categoria, descripcion, whatsapp, ciudad, created_at").eq("estado", "pendiente").order("created_at").limit(200),
       db.from("mercado_productos").select(COLS_PRODUCTO).order("created_at", { ascending: false }).limit(500),
       db.from("mercado_cupones").select("codigo, porcentaje, vence, usos_max, usos, activo").order("created_at", { ascending: false }).limit(200),
+      db.from("libreria_ajustes").select("mercado_abierto").eq("id", 1).maybeSingle(),
+      db.from("mercado_interesados").select("id, nombre, contacto, interes, avisado, created_at").order("created_at", { ascending: false }).limit(1000),
     ]);
     const posts = (post.data ?? []) as { id: string; user_id: string; nombre: string; categoria: string; descripcion: string; whatsapp: string; ciudad: string; created_at: string }[];
     const correos = new Map<string, string>();
@@ -968,6 +980,10 @@ export const adminMercado = createServerFn({ method: "GET" })
     const rows = (prods.data ?? []) as ProductoRow[];
     const urls = await urlsFotos(rows.flatMap((r) => r.fotos ?? []));
     return {
+      abierto: aj.data?.mercado_abierto === true,
+      interesados: ((inter.data ?? []) as { id: string; nombre: string; contacto: string; interes: string; avisado: boolean; created_at: string }[]).map<InteresadoAdmin>((x) => ({
+        id: x.id, nombre: x.nombre, contacto: x.contacto, interes: x.interes, avisado: x.avisado, fecha: x.created_at,
+      })),
       postulaciones: posts.map<PostulacionAdmin>((x) => ({ id: x.id, nombre: x.nombre, categoria: x.categoria, descripcion: x.descripcion, whatsapp: x.whatsapp, ciudad: x.ciudad, correo: correos.get(x.user_id) ?? "", fecha: x.created_at })),
       productos: rows.map<ProductoTienda>((r) => ({ ...r, fotos: (r.fotos ?? []).map((ruta) => ({ ruta, url: urls.get(ruta) ?? "" })), editable: true, ventas: 0 })),
       cupones: ((cup.data ?? []) as { codigo: string; porcentaje: number; vence: string | null; usos_max: number | null; usos: number; activo: boolean }[]).map<Cupon>((c) => ({
@@ -1107,4 +1123,63 @@ export const productosEnlazados = createServerFn({ method: "POST" })
     return {
       productos: ((rows ?? []) as { id: string; titulo: string; precio_gs: number | null; entrega: Entrega }[]).map((r) => ({ id: r.id, titulo: r.titulo, precioGs: r.precio_gs, entrega: r.entrega })),
     };
+  });
+
+// ---------------------------------------------------------------------------------------------
+// Preinscripción: el Mercado se muestra como vitrina, recibe vendedores y anota a quienes esperan la apertura.
+
+/** Si las ventas de productos del Mercado están abiertas (las obras de la Librería se venden siempre). */
+export const estadoMercado = createServerFn({ method: "GET" }).handler(async () => ({ abierto: await mercadoAbierto(await admin()) }));
+
+const INTERESES = ["todo", "libros", "modulos", "cursos", ...CATEGORIAS_PRODUCTO] as const;
+
+/** «Avisame cuando abra»: nombre y WhatsApp o correo. Sin cuenta. Si el contacto ya estaba, se actualiza. */
+export const anotarInteresado = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        nombre: z.string().trim().min(2).max(120),
+        contacto: z
+          .string()
+          .trim()
+          .min(5)
+          .max(120)
+          .refine((c) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c) || c.replace(/\D/g, "").length >= 6, "Escribí un WhatsApp o un correo válido."),
+        interes: z.enum(INTERESES).catch("todo"),
+        trampa: z.string().max(0).optional(), // campo oculto: si un robot lo llena, se descarta
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const db = await admin();
+    const { data: ya } = await db.from("mercado_interesados").select("id").ilike("contacto", data.contacto.replace(/[%_\\]/g, "\\$&")).maybeSingle();
+    if (ya) await db.from("mercado_interesados").update({ nombre: data.nombre, interes: data.interes }).eq("id", ya.id);
+    else {
+      const { error } = await db.from("mercado_interesados").insert({ nombre: data.nombre, contacto: data.contacto, interes: data.interes });
+      if (error && !String(error.message).includes("duplicate")) throw new Error("No pudimos anotarte. Probá de nuevo en un rato.");
+    }
+    return { ok: true };
+  });
+
+/** El administrador abre o cierra las ventas de productos del Mercado. */
+export const abrirVentasMercado = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ abierto: z.boolean() }).parse(d))
+  .handler(async ({ context, data }) => {
+    await exigirAdmin(context.supabase, context.userId);
+    const db = await admin();
+    const { error } = await db.from("libreria_ajustes").upsert({ id: 1, mercado_abierto: data.abierto, updated_at: new Date().toISOString() }, { onConflict: "id" });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** El administrador marca a un interesado como ya avisado. */
+export const marcarInteresadoAvisado = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: uuid, avisado: z.boolean() }).parse(d))
+  .handler(async ({ context, data }) => {
+    await exigirAdmin(context.supabase, context.userId);
+    const db = await admin();
+    await db.from("mercado_interesados").update({ avisado: data.avisado }).eq("id", data.id);
+    return { ok: true };
   });

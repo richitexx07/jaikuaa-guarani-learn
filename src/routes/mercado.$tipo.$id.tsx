@@ -10,6 +10,7 @@ import { CATEGORIA_NOMBRE, ENTREGA_NOMBRE, MAX_CANTIDAD } from "@/lib/mercado";
 import { SUPPORT_WHATSAPP } from "@/lib/contact";
 import { CabeceraMercado, Estrellas, Fila, ICONO_CATEGORIA, MC as C, Precio } from "@/components/mercado/partes";
 import { useCarrito } from "@/components/mercado/carrito";
+import { Avisame, useMercadoAbierto } from "@/components/mercado/avisame";
 import { SiteFooter } from "@/components/site-footer";
 
 /** Ficha de un producto u obra del Mercado: fotos, precio, compra, vendedor, opiniones y parecidos. */
@@ -171,6 +172,9 @@ function Comprar({ f }: { f: FichaMercado }) {
   const max = f.tipo === "obra" || f.entrega === "digital" ? 1 : Math.min(MAX_CANTIDAD, f.stock ?? MAX_CANTIDAD);
   const agotado = f.agotado;
   const yaLaTengo = f.tipo === "obra" && mio?.comprado;
+  const { abierto } = useMercadoAbierto();
+  // En preinscripción los productos se muestran como vitrina; las obras de la Librería se siguen vendiendo.
+  const prontoAbre = f.tipo === "producto" && f.entrega !== "cotizacion" && !abierto;
 
   return (
     <div className="space-y-2">
@@ -184,6 +188,12 @@ function Comprar({ f }: { f: FichaMercado }) {
         >
           <MessageCircle className="h-5 w-5" /> Pedir cotización por WhatsApp
         </a>
+      ) : prontoAbre ? (
+        <div className="space-y-2 rounded-2xl border border-black/10 p-4">
+          <p className="font-display text-lg font-bold" style={{ color: C.tinta }}>Próximamente a la venta</p>
+          <p className="text-sm text-foreground/80">Estamos abriendo el Mercado. Dejanos tu contacto y te avisamos apenas puedas comprarlo.</p>
+          <Avisame interes={f.categoria} compacto />
+        </div>
       ) : yaLaTengo ? (
         <Link to="/leer/$id" params={{ id: f.id }} className="flex h-12 w-full items-center justify-center gap-2 rounded-full text-base font-bold" style={{ background: C.tinta, color: "#fff" }}>
           <Check className="h-5 w-5" /> Ya es tuyo: leer

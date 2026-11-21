@@ -2,11 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { CheckCircle2, ExternalLink, Loader2, MessageCircle, MessageSquareWarning, PackagePlus, PenLine, Star, Tag, UserCheck, UserX } from "lucide-react";
+import { BellRing, CheckCircle2, Copy, ExternalLink, Mail, Store, Loader2, MessageCircle, MessageSquareWarning, PackagePlus, PenLine, Star, Tag, UserCheck, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  abrirVentasMercado,
   adminMercado,
+  marcarInteresadoAvisado,
+  type InteresadoAdmin,
   crearProducto,
   decidirProducto,
   editarProducto,
@@ -65,6 +68,7 @@ function AdminMercadoPage() {
           {error && <p className="mt-6 text-sm text-destructive">Solo el administrador puede ver esta página.</p>}
           {data && (
             <>
+              <AperturaMercado abierto={data.abierto} interesados={data.interesados} onCambio={refrescar} />
               <Postulaciones lista={data.postulaciones} onCambio={refrescar} />
               <NuevoProductoJaikuaa onCreado={refrescar} />
               <section className="mt-6" aria-labelledby="t-prods">
@@ -422,6 +426,125 @@ function Cupones({ lista, onCambio }: { lista: Cupon[]; onCambio: () => void }) 
             </li>
           ))}
         </ul>
+      )}
+    </section>
+  );
+}
+
+/** Número de WhatsApp para wa.me: los paraguayos suelen escribir 09…, que pasa a 5959…. */
+function aWhatsApp(contacto: string): string | null {
+  if (contacto.includes("@")) return null;
+  let d = contacto.replace(/\D/g, "");
+  if (d.startsWith("0")) d = `595${d.slice(1)}`;
+  return d.length >= 8 ? d : null;
+}
+
+/** Preinscripción o ventas abiertas, y la lista de quienes pidieron que les avisemos. */
+function AperturaMercado({ abierto, interesados, onCambio }: { abierto: boolean; interesados: InteresadoAdmin[]; onCambio: () => void }) {
+  const abrir = useServerFn(abrirVentasMercado);
+  const marcar = useServerFn(marcarInteresadoAvisado);
+  const [confirmar, setConfirmar] = useState(false);
+  const [guardando, setGuardando] = useState(false);
+  const [verTodos, setVerTodos] = useState(false);
+  const pendientes = interesados.filter((i) => !i.avisado).length;
+  const lista = verTodos ? interesados : interesados.slice(0, 30);
+
+  async function cambiar(valor: boolean) {
+    setGuardando(true);
+    try {
+      await abrir({ data: { abierto: valor } });
+      setConfirmar(false);
+      onCambio();
+    } finally {
+      setGuardando(false);
+    }
+  }
+
+  return (
+    <section className="mt-6 rounded-2xl border border-border p-4 sm:p-5" aria-labelledby="t-apertura">
+      <div className="flex flex-wrap items-start gap-3">
+        <Store className="mt-0.5 h-6 w-6 shrink-0 text-primary" aria-hidden />
+        <div className="mr-auto">
+          <h2 id="t-apertura" className="font-semibold text-foreground">
+            {abierto ? "Ventas abiertas" : "Preinscripción: el Mercado todavía no vende productos"}
+          </h2>
+          <p className="mt-1 max-w-xl text-sm text-muted-foreground">
+            {abierto
+              ? "La gente puede comprar artesanía, música, clases y experiencias. Si necesitás frenar las ventas, volvé a preinscripción."
+              : "La gente ve los productos como vitrina, se inscribe para vender y deja su contacto para que le avisemos. Los libros, módulos y cursos de la Librería se siguen vendiendo."}
+          </p>
+        </div>
+        {abierto ? (
+          <Button variant="outline" size="sm" disabled={guardando} onClick={() => void cambiar(false)}>Volver a preinscripción</Button>
+        ) : confirmar ? (
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" disabled={guardando} onClick={() => void cambiar(true)}>{guardando ? "Abriendo…" : "Sí, abrir ventas"}</Button>
+            <Button size="sm" variant="ghost" onClick={() => setConfirmar(false)}>Cancelar</Button>
+          </div>
+        ) : (
+          <Button size="sm" onClick={() => setConfirmar(true)}>Abrir ventas</Button>
+        )}
+      </div>
+
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        <h3 className="mr-auto flex items-center gap-1.5 text-sm font-semibold text-foreground">
+          <BellRing className="h-4 w-4" aria-hidden /> Esperan que les avisemos ({interesados.length}{pendientes !== interesados.length ? `, ${pendientes} sin avisar` : ""})
+        </h3>
+        {interesados.length > 0 && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              const texto = interesados.map((i) => `${i.nombre}\t${i.contacto}\t${i.interes === "todo" ? "Todo" : (CATEGORIA_NOMBRE as Record<string, string>)[i.interes] ?? i.interes}`).join("\n");
+              void navigator.clipboard?.writeText(texto);
+            }}
+          >
+            <Copy className="mr-1 h-4 w-4" /> Copiar lista
+          </Button>
+        )}
+      </div>
+      {interesados.length === 0 ? (
+        <p className="mt-2 text-sm text-muted-foreground">Todavía nadie dejó su contacto.</p>
+      ) : (
+        <ul className="mt-2 divide-y divide-border rounded-xl border border-border">
+          {lista.map((i) => {
+            const wa = aWhatsApp(i.contacto);
+            const mensaje = `Mba'éichapa ${i.nombre}! Ya abrió el Mercado Jaikuaa: libros, artesanía, música, clases y experiencias de nuestra tierra. Entrá acá: https://www.jaikuaa.com/mercado 🇵🇾`;
+            return (
+              <li key={i.id} className="flex flex-wrap items-center gap-2 px-3 py-2 text-sm">
+                <div className="mr-auto min-w-0">
+                  <p className="font-medium text-foreground">{i.nombre}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {i.contacto} · {i.interes === "todo" ? "Le interesa todo" : (CATEGORIA_NOMBRE as Record<string, string>)[i.interes] ?? i.interes} · {new Date(i.fecha).toLocaleDateString("es-PY")}
+                  </p>
+                </div>
+                {wa ? (
+                  <a href={`https://wa.me/${wa}?text=${encodeURIComponent(mensaje)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs font-semibold">
+                    <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
+                  </a>
+                ) : (
+                  <a href={`mailto:${i.contacto}?subject=${encodeURIComponent("Ya abrió el Mercado Jaikuaa")}&body=${encodeURIComponent(mensaje)}`} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs font-semibold">
+                    <Mail className="h-3.5 w-3.5" /> Correo
+                  </a>
+                )}
+                <label className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={i.avisado}
+                    onChange={async (e) => {
+                      await marcar({ data: { id: i.id, avisado: e.target.checked } });
+                      onCambio();
+                    }}
+                  />
+                  Avisado
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {interesados.length > 30 && !verTodos && (
+        <Button size="sm" variant="ghost" className="mt-2" onClick={() => setVerTodos(true)}>Ver los {interesados.length}</Button>
       )}
     </section>
   );

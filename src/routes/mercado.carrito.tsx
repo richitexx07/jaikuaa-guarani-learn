@@ -11,6 +11,7 @@ import { formatoGs } from "@/lib/pagopar";
 import { leerRefCompra } from "@/lib/ambassador";
 import { CabeceraMercado, MC as C } from "@/components/mercado/partes";
 import { useCarrito } from "@/components/mercado/carrito";
+import { useMercadoAbierto } from "@/components/mercado/avisame";
 
 /** Carrito del Mercado: varias cosas, un cupón y un solo pago con Pagopar. */
 export const Route = createFileRoute("/mercado/carrito")({
@@ -48,6 +49,8 @@ function CarritoPage() {
   const total = bruto - descuento;
   const aMano = validas.some((f) => ["fisico", "servicio", "experiencia"].includes(f.item!.entrega));
   const conEnvio = validas.some((f) => f.item!.entrega === "fisico");
+  const { abierto } = useMercadoAbierto();
+  const productosEnEspera = !abierto && validas.some((f) => f.l.tipo === "producto");
   const set = (k: keyof typeof contacto) => (e: React.ChangeEvent<HTMLInputElement>) => setContacto((c) => ({ ...c, [k]: e.target.value }));
   const contactoListo =
     !aMano ||
@@ -184,6 +187,12 @@ function CarritoPage() {
                 {descuento > 0 && <div className="flex justify-between text-emerald-700"><dt>Descuento</dt><dd>−{formatoGs(descuento)}</dd></div>}
                 <div className="flex justify-between border-t border-black/5 pt-2 font-display text-lg font-bold" style={{ color: C.tinta }}><dt>Total</dt><dd>{formatoGs(total)}</dd></div>
               </dl>
+              {productosEnEspera && (
+                <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+                  Las ventas de artesanía, música, clases y experiencias abren pronto. Por ahora podés comprar los libros, módulos y cursos de la Librería.{" "}
+                  <Link to="/mercado" hash="avisame" className="font-semibold underline">Avisame cuando abra</Link>
+                </p>
+              )}
               <button
                 type="button"
                 disabled={!validas.length || validas.length !== filas.length || !contactoListo || pagando || isLoading}

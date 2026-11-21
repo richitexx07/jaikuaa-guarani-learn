@@ -7,6 +7,7 @@ import { BadgeCheck, Loader2, ShieldCheck, Store, Truck, X } from "lucide-react"
 import { catalogoMercado } from "@/lib/mercado.functions";
 import { CATEGORIAS, CATEGORIA_NOMBRE, ORDENES, ORDEN_NOMBRE, filtrarMercado, ordenarMercado, type Categoria, type Orden } from "@/lib/mercado";
 import { CabeceraMercado, Fila, Grilla, ICONO_CATEGORIA, MC as C } from "@/components/mercado/partes";
+import { Avisame, useMercadoAbierto } from "@/components/mercado/avisame";
 import { SiteFooter } from "@/components/site-footer";
 
 /**
@@ -51,6 +52,8 @@ function MercadoPage() {
   const setBusqueda = (q: string) => void navigate({ search: (s) => ({ ...s, q: q || undefined }), replace: true });
   const setCat = (c: Categoria | null) => void navigate({ search: (s) => ({ ...s, cat: c ?? undefined }) });
   const conItems = CATEGORIAS.filter((c) => items.some((i) => i.categoria === c));
+  const { abierto, cargando } = useMercadoAbierto();
+  const preinscripcion = !cargando && !abierto;
 
   return (
     <div className="flex min-h-screen flex-col" style={{ background: "#F6F3EC" }}>
@@ -90,7 +93,31 @@ function MercadoPage() {
       </nav>
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-3 pb-16 sm:px-6">
-        {!filtrando && (
+        {!filtrando && preinscripcion && (
+          <section className="mt-4 overflow-hidden rounded-3xl text-white" style={{ background: `linear-gradient(120deg, ${C.noche}, ${C.azul})` }} aria-labelledby="t-abriendo">
+            <div className="grid gap-6 px-5 py-7 sm:px-10 sm:py-10 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+              <div>
+                <p className="text-sm font-semibold" style={{ color: C.dorado }}>Inscripciones abiertas</p>
+                <h1 id="t-abriendo" className="mt-1 max-w-2xl font-display text-3xl font-bold leading-tight sm:text-5xl">Estamos abriendo el Mercado Jaikuaa</h1>
+                <p className="mt-3 max-w-xl text-[15px] text-white/85 sm:text-lg">
+                  Libros con voz humana, artesanía de maestros artesanos, música, clases, traducciones y experiencias, en un solo lugar. Ya estamos recibiendo a quienes van a vender. Muy pronto abrimos las compras.
+                </p>
+                <ul className="mt-4 space-y-1.5 text-sm text-white/90">
+                  <li><strong style={{ color: C.dorado }}>¿Hacés algo que vale la pena?</strong> Inscribite ahora y tu vitrina queda lista para la apertura.</li>
+                  <li><strong style={{ color: C.dorado }}>¿Querés comprar?</strong> Dejanos tu contacto y te avisamos cuando abra.</li>
+                </ul>
+                <Link to="/mercado/vender" hash="postular" className="mt-5 inline-block rounded-full px-5 py-3 text-sm font-bold" style={{ background: C.dorado, color: C.noche }}>
+                  Quiero vender: inscribirme
+                </Link>
+              </div>
+              <div id="avisame" className="rounded-2xl bg-white p-4 text-left sm:p-5">
+                <Avisame />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {!filtrando && !preinscripcion && (
           <section className="relative mt-4 overflow-hidden rounded-3xl px-5 py-7 text-white sm:px-10 sm:py-12" style={{ background: `linear-gradient(120deg, ${C.noche}, ${C.azul})` }}>
             <p className="text-sm font-semibold" style={{ color: C.dorado }}>Hecho en Paraguay</p>
             <h1 className="mt-1 max-w-2xl font-display text-3xl font-bold leading-tight sm:text-5xl">Lo mejor de nuestra tierra, en un solo lugar</h1>
@@ -177,7 +204,7 @@ function MercadoPage() {
             </div>
           ) : (
             <div id="lo-nuevo">
-              <Fila titulo="Destacados" items={ordenarMercado(items, "relevancia").slice(0, 12)} />
+              <Fila titulo={preinscripcion ? "Un adelanto de lo que viene" : "Destacados"} items={ordenarMercado(items, "relevancia").slice(0, 12)} />
               <Fila titulo="Recién llegados" items={ordenarMercado(items, "nuevos").slice(0, 12)} />
               <Fila titulo="Los mejor valorados" items={ordenarMercado(items.filter((i) => (i.estrellas ?? 0) >= 4), "valorados").slice(0, 12)} />
               {conItems.map((c) => (
