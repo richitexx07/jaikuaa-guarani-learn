@@ -204,6 +204,51 @@ export type Database = {
         }
         Relationships: []
       }
+      autores: {
+        Row: {
+          bio: string
+          ciudad: string
+          created_at: string
+          foto_path: string | null
+          habilitado: boolean
+          habilitado_por: string | null
+          nombre: string
+          slug: string | null
+          updated_at: string
+          user_id: string
+          vitrina: boolean
+          whatsapp: string
+        }
+        Insert: {
+          bio?: string
+          ciudad?: string
+          created_at?: string
+          foto_path?: string | null
+          habilitado?: boolean
+          habilitado_por?: string | null
+          nombre?: string
+          slug?: string | null
+          updated_at?: string
+          user_id: string
+          vitrina?: boolean
+          whatsapp?: string
+        }
+        Update: {
+          bio?: string
+          ciudad?: string
+          created_at?: string
+          foto_path?: string | null
+          habilitado?: boolean
+          habilitado_por?: string | null
+          nombre?: string
+          slug?: string | null
+          updated_at?: string
+          user_id?: string
+          vitrina?: boolean
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       certificates: {
         Row: {
           code: string
@@ -998,6 +1043,27 @@ export type Database = {
           },
         ]
       }
+      libreria_ajustes: {
+        Row: {
+          id: number
+          mercado_abierto: boolean
+          porcentaje_afiliado: number
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          mercado_abierto?: boolean
+          porcentaje_afiliado?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          mercado_abierto?: boolean
+          porcentaje_afiliado?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       libro_accesos: {
         Row: {
           created_at: string
@@ -1042,6 +1108,7 @@ export type Database = {
           libro_id: string
           n: number
           texto: string
+          video_id: string | null
         }
         Insert: {
           audio_path?: string | null
@@ -1051,6 +1118,7 @@ export type Database = {
           libro_id: string
           n: number
           texto?: string
+          video_id?: string | null
         }
         Update: {
           audio_path?: string | null
@@ -1060,6 +1128,7 @@ export type Database = {
           libro_id?: string
           n?: number
           texto?: string
+          video_id?: string | null
         }
         Relationships: [
           {
@@ -1073,40 +1142,115 @@ export type Database = {
       }
       libros: {
         Row: {
+          area: string | null
           autor: string
+          autor_id: string | null
+          autorizacion_firmada: boolean
           creado_por: string | null
           created_at: string
           descripcion: string
+          en_preventa: boolean
+          estado_revision: string
+          fecha_disponible: string | null
           id: string
+          nota_revision: string
+          porcentaje_autor: number | null
           portada_path: string | null
+          precio_fisico_gs: number | null
           precio_gs: number | null
+          precio_institucional_gs: number | null
+          precio_propuesto_gs: number | null
           publicado: boolean
+          publico: string
+          tipo: string
           titulo: string
           updated_at: string
+          variante: string | null
         }
         Insert: {
+          area?: string | null
           autor?: string
+          autor_id?: string | null
+          autorizacion_firmada?: boolean
           creado_por?: string | null
           created_at?: string
           descripcion?: string
+          en_preventa?: boolean
+          estado_revision?: string
+          fecha_disponible?: string | null
           id?: string
+          nota_revision?: string
+          porcentaje_autor?: number | null
           portada_path?: string | null
+          precio_fisico_gs?: number | null
           precio_gs?: number | null
+          precio_institucional_gs?: number | null
+          precio_propuesto_gs?: number | null
           publicado?: boolean
+          publico?: string
+          tipo?: string
           titulo: string
           updated_at?: string
+          variante?: string | null
         }
         Update: {
+          area?: string | null
           autor?: string
+          autor_id?: string | null
+          autorizacion_firmada?: boolean
           creado_por?: string | null
           created_at?: string
           descripcion?: string
+          en_preventa?: boolean
+          estado_revision?: string
+          fecha_disponible?: string | null
           id?: string
+          nota_revision?: string
+          porcentaje_autor?: number | null
           portada_path?: string | null
+          precio_fisico_gs?: number | null
           precio_gs?: number | null
+          precio_institucional_gs?: number | null
+          precio_propuesto_gs?: number | null
           publicado?: boolean
+          publico?: string
+          tipo?: string
           titulo?: string
           updated_at?: string
+          variante?: string | null
+        }
+        Relationships: []
+      }
+      liquidaciones: {
+        Row: {
+          beneficiario_id: string
+          created_at: string
+          id: string
+          monto_gs: number
+          nota: string
+          pagado_el: string
+          registrado_por: string | null
+          rol: string
+        }
+        Insert: {
+          beneficiario_id: string
+          created_at?: string
+          id?: string
+          monto_gs: number
+          nota?: string
+          pagado_el?: string
+          registrado_por?: string | null
+          rol: string
+        }
+        Update: {
+          beneficiario_id?: string
+          created_at?: string
+          id?: string
+          monto_gs?: number
+          nota?: string
+          pagado_el?: string
+          registrado_por?: string | null
+          rol?: string
         }
         Relationships: []
       }
@@ -1178,6 +1322,309 @@ export type Database = {
           stage?: string
           units?: Json
           updated_at?: string
+        }
+        Relationships: []
+      }
+      mercado_cupones: {
+        Row: {
+          activo: boolean
+          codigo: string
+          created_at: string
+          porcentaje: number
+          usos: number
+          usos_max: number | null
+          vence: string | null
+        }
+        Insert: {
+          activo?: boolean
+          codigo: string
+          created_at?: string
+          porcentaje: number
+          usos?: number
+          usos_max?: number | null
+          vence?: string | null
+        }
+        Update: {
+          activo?: boolean
+          codigo?: string
+          created_at?: string
+          porcentaje?: number
+          usos?: number
+          usos_max?: number | null
+          vence?: string | null
+        }
+        Relationships: []
+      }
+      mercado_favoritos: {
+        Row: {
+          created_at: string
+          item_id: string
+          item_tipo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          item_id: string
+          item_tipo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          item_id?: string
+          item_tipo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mercado_interesados: {
+        Row: {
+          avisado: boolean
+          contacto: string
+          created_at: string
+          id: string
+          interes: string
+          nombre: string
+          user_id: string | null
+        }
+        Insert: {
+          avisado?: boolean
+          contacto: string
+          created_at?: string
+          id?: string
+          interes?: string
+          nombre: string
+          user_id?: string | null
+        }
+        Update: {
+          avisado?: boolean
+          contacto?: string
+          created_at?: string
+          id?: string
+          interes?: string
+          nombre?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mercado_ordenes: {
+        Row: {
+          created_at: string
+          cupon: string | null
+          descuento_gs: number
+          estado: string
+          hash_pedido: string | null
+          id: string
+          modo: string
+          total_gs: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          cupon?: string | null
+          descuento_gs?: number
+          estado?: string
+          hash_pedido?: string | null
+          id?: string
+          modo?: string
+          total_gs: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          cupon?: string | null
+          descuento_gs?: number
+          estado?: string
+          hash_pedido?: string | null
+          id?: string
+          modo?: string
+          total_gs?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mercado_postulaciones: {
+        Row: {
+          categoria: string
+          ciudad: string
+          created_at: string
+          descripcion: string
+          estado: string
+          id: string
+          nombre: string
+          nota: string
+          updated_at: string
+          user_id: string
+          whatsapp: string
+        }
+        Insert: {
+          categoria: string
+          ciudad?: string
+          created_at?: string
+          descripcion?: string
+          estado?: string
+          id?: string
+          nombre: string
+          nota?: string
+          updated_at?: string
+          user_id: string
+          whatsapp: string
+        }
+        Update: {
+          categoria?: string
+          ciudad?: string
+          created_at?: string
+          descripcion?: string
+          estado?: string
+          id?: string
+          nombre?: string
+          nota?: string
+          updated_at?: string
+          user_id?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
+      mercado_productos: {
+        Row: {
+          archivo_path: string | null
+          autorizacion_firmada: boolean
+          categoria: string
+          ciudad: string
+          created_at: string
+          descripcion: string
+          destacado: boolean
+          duracion: string
+          entrega: string
+          envio: string
+          estado_revision: string
+          fecha_evento: string | null
+          fotos: Json
+          id: string
+          lugar: string
+          nota_revision: string
+          porcentaje_vendedor: number | null
+          precio_anterior_gs: number | null
+          precio_gs: number | null
+          publicado: boolean
+          ref_artista: string | null
+          ref_pieza: string | null
+          stock: number | null
+          titulo: string
+          updated_at: string
+          vendedor_id: string | null
+          vendedor_nombre: string
+        }
+        Insert: {
+          archivo_path?: string | null
+          autorizacion_firmada?: boolean
+          categoria: string
+          ciudad?: string
+          created_at?: string
+          descripcion?: string
+          destacado?: boolean
+          duracion?: string
+          entrega: string
+          envio?: string
+          estado_revision?: string
+          fecha_evento?: string | null
+          fotos?: Json
+          id?: string
+          lugar?: string
+          nota_revision?: string
+          porcentaje_vendedor?: number | null
+          precio_anterior_gs?: number | null
+          precio_gs?: number | null
+          publicado?: boolean
+          ref_artista?: string | null
+          ref_pieza?: string | null
+          stock?: number | null
+          titulo: string
+          updated_at?: string
+          vendedor_id?: string | null
+          vendedor_nombre?: string
+        }
+        Update: {
+          archivo_path?: string | null
+          autorizacion_firmada?: boolean
+          categoria?: string
+          ciudad?: string
+          created_at?: string
+          descripcion?: string
+          destacado?: boolean
+          duracion?: string
+          entrega?: string
+          envio?: string
+          estado_revision?: string
+          fecha_evento?: string | null
+          fotos?: Json
+          id?: string
+          lugar?: string
+          nota_revision?: string
+          porcentaje_vendedor?: number | null
+          precio_anterior_gs?: number | null
+          precio_gs?: number | null
+          publicado?: boolean
+          ref_artista?: string | null
+          ref_pieza?: string | null
+          stock?: number | null
+          titulo?: string
+          updated_at?: string
+          vendedor_id?: string | null
+          vendedor_nombre?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mercado_productos_ref_artista_fkey"
+            columns: ["ref_artista"]
+            isOneToOne: false
+            referencedRelation: "purahei_artistas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mercado_productos_ref_pieza_fkey"
+            columns: ["ref_pieza"]
+            isOneToOne: false
+            referencedRelation: "tembiapo_piezas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mercado_resenas: {
+        Row: {
+          created_at: string
+          estrellas: number
+          id: string
+          item_id: string
+          item_tipo: string
+          oculta: boolean
+          texto: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          estrellas: number
+          id?: string
+          item_id: string
+          item_tipo: string
+          oculta?: boolean
+          texto?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          estrellas?: number
+          id?: string
+          item_id?: string
+          item_tipo?: string
+          oculta?: boolean
+          texto?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1288,48 +1735,159 @@ export type Database = {
       }
       pagos: {
         Row: {
+          afiliado_id: string | null
+          cantidad: number
           created_at: string
           descripcion: string
           estado: string
+          formato: string
           hash_pedido: string | null
           id: string
+          item_tipo: string
           modo: string
           monto_gs: number
+          orden_id: string | null
           pagado_at: string | null
+          porcentaje_afiliado: number | null
           ref_id: string
           tipo: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          afiliado_id?: string | null
+          cantidad?: number
           created_at?: string
           descripcion?: string
           estado?: string
+          formato?: string
           hash_pedido?: string | null
           id?: string
+          item_tipo?: string
           modo?: string
           monto_gs: number
+          orden_id?: string | null
           pagado_at?: string | null
+          porcentaje_afiliado?: number | null
           ref_id: string
           tipo?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          afiliado_id?: string | null
+          cantidad?: number
           created_at?: string
           descripcion?: string
           estado?: string
+          formato?: string
           hash_pedido?: string | null
           id?: string
+          item_tipo?: string
           modo?: string
           monto_gs?: number
+          orden_id?: string | null
           pagado_at?: string | null
+          porcentaje_afiliado?: number | null
           ref_id?: string
           tipo?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pagos_orden_id_fkey"
+            columns: ["orden_id"]
+            isOneToOne: false
+            referencedRelation: "mercado_ordenes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pedidos_fisicos: {
+        Row: {
+          cantidad: number
+          ciudad: string
+          created_at: string
+          direccion: string
+          entrega: string
+          estado: string
+          id: string
+          libro_id: string | null
+          nombre: string
+          nota: string
+          pago_id: string
+          producto_id: string | null
+          referencia: string
+          telefono: string
+          titulo: string
+          updated_at: string
+          user_id: string
+          vendedor_id: string | null
+        }
+        Insert: {
+          cantidad?: number
+          ciudad: string
+          created_at?: string
+          direccion: string
+          entrega?: string
+          estado?: string
+          id?: string
+          libro_id?: string | null
+          nombre: string
+          nota?: string
+          pago_id: string
+          producto_id?: string | null
+          referencia?: string
+          telefono: string
+          titulo: string
+          updated_at?: string
+          user_id: string
+          vendedor_id?: string | null
+        }
+        Update: {
+          cantidad?: number
+          ciudad?: string
+          created_at?: string
+          direccion?: string
+          entrega?: string
+          estado?: string
+          id?: string
+          libro_id?: string | null
+          nombre?: string
+          nota?: string
+          pago_id?: string
+          producto_id?: string | null
+          referencia?: string
+          telefono?: string
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+          vendedor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pedidos_fisicos_libro_id_fkey"
+            columns: ["libro_id"]
+            isOneToOne: false
+            referencedRelation: "libros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedidos_fisicos_pago_id_fkey"
+            columns: ["pago_id"]
+            isOneToOne: true
+            referencedRelation: "pagos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedidos_fisicos_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "mercado_productos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       practice_answers: {
         Row: {
