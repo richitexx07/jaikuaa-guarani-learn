@@ -58,6 +58,8 @@ import { Route as AuthenticatedGlosarioRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedGuaraniEscolarRouteImport } from './routes/_authenticated/guarani-escolar'
 import { Route as AuthenticatedLaboratorioRouteImport } from './routes/_authenticated/laboratorio'
 import { Route as AuthenticatedLogrosRouteImport } from './routes/_authenticated/logros'
+import { Route as AuthenticatedMiTiendaRouteImport } from './routes/_authenticated/mi-tienda'
+import { Route as AuthenticatedMisComprasRouteImport } from './routes/_authenticated/mis-compras'
 import { Route as AuthenticatedMisLibrosRouteImport } from './routes/_authenticated/mis-libros'
 import { Route as AuthenticatedMisObrasRouteImport } from './routes/_authenticated/mis-obras'
 import { Route as AuthenticatedNheMbytepeRouteImport } from './routes/_authenticated/nhe-mbytepe'
@@ -74,6 +76,9 @@ import { Route as AutorSlugRouteImport } from './routes/autor.$slug'
 import { Route as ClaseIndexRouteImport } from './routes/clase.index'
 import { Route as ClaseNRouteImport } from './routes/clase.$n'
 import { Route as ConvenioProgramaRouteImport } from './routes/convenio.$programa'
+import { Route as MercadoIndexRouteImport } from './routes/mercado.index'
+import { Route as MercadoCarritoRouteImport } from './routes/mercado.carrito'
+import { Route as MercadoVenderRouteImport } from './routes/mercado.vender'
 import { Route as MuestraIdRouteImport } from './routes/muestra.$id'
 import { Route as PuraheiIndexRouteImport } from './routes/purahei.index'
 import { Route as PuraheiSlugRouteImport } from './routes/purahei.$slug'
@@ -90,6 +95,7 @@ import { Route as AuthenticatedAdminCuidadoCorpusRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminInformeAuspicianteRouteImport } from './routes/_authenticated/admin.informe-auspiciante'
 import { Route as AuthenticatedAdminJaiRouteImport } from './routes/_authenticated/admin.jai'
 import { Route as AuthenticatedAdminLibrosRouteImport } from './routes/_authenticated/admin.libros'
+import { Route as AuthenticatedAdminMercadoRouteImport } from './routes/_authenticated/admin.mercado'
 import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
 import { Route as AuthenticatedAdminPuraheiRouteImport } from './routes/_authenticated/admin.purahei'
 import { Route as AuthenticatedAdminTembiapoRouteImport } from './routes/_authenticated/admin.tembiapo'
@@ -131,6 +137,7 @@ import { Route as AuthenticatedPracticaRegistroRouteImport } from './routes/_aut
 import { Route as AuthenticatedTriviaIndexRouteImport } from './routes/_authenticated/trivia.index'
 import { Route as AuthenticatedTriviaCategoryRouteImport } from './routes/_authenticated/trivia.$category'
 import { Route as ApiPublicPagoparRouteImport } from './routes/api/public/pagopar'
+import { Route as MercadoTipoIdRouteImport } from './routes/mercado.$tipo.$id'
 import { Route as PuraheiObraIdRouteImport } from './routes/purahei.obra.$id'
 import { Route as TembiapoMaestroSlugRouteImport } from './routes/tembiapo.maestro.$slug'
 import { Route as TembiapoOficioSlugRouteImport } from './routes/tembiapo.oficio.$slug'
@@ -390,6 +397,16 @@ const AuthenticatedLogrosRoute = AuthenticatedLogrosRouteImport.update({
   path: '/logros',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMiTiendaRoute = AuthenticatedMiTiendaRouteImport.update({
+  id: '/mi-tienda',
+  path: '/mi-tienda',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMisComprasRoute = AuthenticatedMisComprasRouteImport.update({
+  id: '/mis-compras',
+  path: '/mis-compras',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMisLibrosRoute = AuthenticatedMisLibrosRouteImport.update({
   id: '/mis-libros',
   path: '/mis-libros',
@@ -468,6 +485,21 @@ const ClaseNRoute = ClaseNRouteImport.update({
 const ConvenioProgramaRoute = ConvenioProgramaRouteImport.update({
   id: '/convenio/$programa',
   path: '/convenio/$programa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MercadoIndexRoute = MercadoIndexRouteImport.update({
+  id: '/mercado/',
+  path: '/mercado/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MercadoCarritoRoute = MercadoCarritoRouteImport.update({
+  id: '/mercado/carrito',
+  path: '/mercado/carrito',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MercadoVenderRoute = MercadoVenderRouteImport.update({
+  id: '/mercado/vender',
+  path: '/mercado/vender',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MuestraIdRoute = MuestraIdRouteImport.update({
@@ -554,6 +586,12 @@ const AuthenticatedAdminLibrosRoute =
   AuthenticatedAdminLibrosRouteImport.update({
     id: '/admin/libros',
     path: '/admin/libros',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminMercadoRoute =
+  AuthenticatedAdminMercadoRouteImport.update({
+    id: '/admin/mercado',
+    path: '/admin/mercado',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminNoticiasRoute =
@@ -796,6 +834,11 @@ const ApiPublicPagoparRoute = ApiPublicPagoparRouteImport.update({
   path: '/api/public/pagopar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MercadoTipoIdRoute = MercadoTipoIdRouteImport.update({
+  id: '/mercado/$tipo/$id',
+  path: '/mercado/$tipo/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PuraheiObraIdRoute = PuraheiObraIdRouteImport.update({
   id: '/purahei/obra/$id',
   path: '/purahei/obra/$id',
@@ -901,6 +944,8 @@ export interface FileRoutesByFullPath {
   '/guarani-escolar': typeof AuthenticatedGuaraniEscolarRouteWithChildren
   '/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/logros': typeof AuthenticatedLogrosRoute
+  '/mi-tienda': typeof AuthenticatedMiTiendaRoute
+  '/mis-compras': typeof AuthenticatedMisComprasRoute
   '/mis-libros': typeof AuthenticatedMisLibrosRoute
   '/mis-obras': typeof AuthenticatedMisObrasRoute
   '/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
@@ -916,6 +961,8 @@ export interface FileRoutesByFullPath {
   '/autor/$slug': typeof AutorSlugRoute
   '/clase/$n': typeof ClaseNRoute
   '/convenio/$programa': typeof ConvenioProgramaRoute
+  '/mercado/carrito': typeof MercadoCarritoRoute
+  '/mercado/vender': typeof MercadoVenderRoute
   '/muestra/$id': typeof MuestraIdRoute
   '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
@@ -923,6 +970,7 @@ export interface FileRoutesByFullPath {
   '/verificar/$code': typeof VerificarCodeRoute
   '/video/por-que-jaikuaa': typeof VideoPorQueJaikuaaRoute
   '/clase/': typeof ClaseIndexRoute
+  '/mercado/': typeof MercadoIndexRoute
   '/purahei/': typeof PuraheiIndexRoute
   '/studio/': typeof StudioIndexRoute
   '/tembiapo/': typeof TembiapoIndexRoute
@@ -933,6 +981,7 @@ export interface FileRoutesByFullPath {
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/admin/libros': typeof AuthenticatedAdminLibrosRoute
+  '/admin/mercado': typeof AuthenticatedAdminMercadoRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/admin/purahei': typeof AuthenticatedAdminPuraheiRoute
   '/admin/tembiapo': typeof AuthenticatedAdminTembiapoRoute
@@ -967,6 +1016,7 @@ export interface FileRoutesByFullPath {
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
   '/api/public/pagopar': typeof ApiPublicPagoparRoute
+  '/mercado/$tipo/$id': typeof MercadoTipoIdRoute
   '/purahei/obra/$id': typeof PuraheiObraIdRoute
   '/tembiapo/maestro/$slug': typeof TembiapoMaestroSlugRoute
   '/tembiapo/oficio/$slug': typeof TembiapoOficioSlugRoute
@@ -1033,6 +1083,8 @@ export interface FileRoutesByTo {
   '/glosario': typeof AuthenticatedGlosarioRoute
   '/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/logros': typeof AuthenticatedLogrosRoute
+  '/mi-tienda': typeof AuthenticatedMiTiendaRoute
+  '/mis-compras': typeof AuthenticatedMisComprasRoute
   '/mis-libros': typeof AuthenticatedMisLibrosRoute
   '/mis-obras': typeof AuthenticatedMisObrasRoute
   '/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
@@ -1048,6 +1100,8 @@ export interface FileRoutesByTo {
   '/autor/$slug': typeof AutorSlugRoute
   '/clase/$n': typeof ClaseNRoute
   '/convenio/$programa': typeof ConvenioProgramaRoute
+  '/mercado/carrito': typeof MercadoCarritoRoute
+  '/mercado/vender': typeof MercadoVenderRoute
   '/muestra/$id': typeof MuestraIdRoute
   '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
@@ -1055,6 +1109,7 @@ export interface FileRoutesByTo {
   '/verificar/$code': typeof VerificarCodeRoute
   '/video/por-que-jaikuaa': typeof VideoPorQueJaikuaaRoute
   '/clase': typeof ClaseIndexRoute
+  '/mercado': typeof MercadoIndexRoute
   '/purahei': typeof PuraheiIndexRoute
   '/studio': typeof StudioIndexRoute
   '/tembiapo': typeof TembiapoIndexRoute
@@ -1065,6 +1120,7 @@ export interface FileRoutesByTo {
   '/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/admin/libros': typeof AuthenticatedAdminLibrosRoute
+  '/admin/mercado': typeof AuthenticatedAdminMercadoRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/admin/purahei': typeof AuthenticatedAdminPuraheiRoute
   '/admin/tembiapo': typeof AuthenticatedAdminTembiapoRoute
@@ -1097,6 +1153,7 @@ export interface FileRoutesByTo {
   '/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
   '/api/public/pagopar': typeof ApiPublicPagoparRoute
+  '/mercado/$tipo/$id': typeof MercadoTipoIdRoute
   '/purahei/obra/$id': typeof PuraheiObraIdRoute
   '/tembiapo/maestro/$slug': typeof TembiapoMaestroSlugRoute
   '/tembiapo/oficio/$slug': typeof TembiapoOficioSlugRoute
@@ -1166,6 +1223,8 @@ export interface FileRoutesById {
   '/_authenticated/guarani-escolar': typeof AuthenticatedGuaraniEscolarRouteWithChildren
   '/_authenticated/laboratorio': typeof AuthenticatedLaboratorioRoute
   '/_authenticated/logros': typeof AuthenticatedLogrosRoute
+  '/_authenticated/mi-tienda': typeof AuthenticatedMiTiendaRoute
+  '/_authenticated/mis-compras': typeof AuthenticatedMisComprasRoute
   '/_authenticated/mis-libros': typeof AuthenticatedMisLibrosRoute
   '/_authenticated/mis-obras': typeof AuthenticatedMisObrasRoute
   '/_authenticated/nhe-mbytepe': typeof AuthenticatedNheMbytepeRoute
@@ -1181,6 +1240,8 @@ export interface FileRoutesById {
   '/autor/$slug': typeof AutorSlugRoute
   '/clase/$n': typeof ClaseNRoute
   '/convenio/$programa': typeof ConvenioProgramaRoute
+  '/mercado/carrito': typeof MercadoCarritoRoute
+  '/mercado/vender': typeof MercadoVenderRoute
   '/muestra/$id': typeof MuestraIdRoute
   '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
@@ -1188,6 +1249,7 @@ export interface FileRoutesById {
   '/verificar/$code': typeof VerificarCodeRoute
   '/video/por-que-jaikuaa': typeof VideoPorQueJaikuaaRoute
   '/clase/': typeof ClaseIndexRoute
+  '/mercado/': typeof MercadoIndexRoute
   '/purahei/': typeof PuraheiIndexRoute
   '/studio/': typeof StudioIndexRoute
   '/tembiapo/': typeof TembiapoIndexRoute
@@ -1198,6 +1260,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/informe-auspiciante': typeof AuthenticatedAdminInformeAuspicianteRoute
   '/_authenticated/admin/jai': typeof AuthenticatedAdminJaiRoute
   '/_authenticated/admin/libros': typeof AuthenticatedAdminLibrosRoute
+  '/_authenticated/admin/mercado': typeof AuthenticatedAdminMercadoRoute
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/_authenticated/admin/purahei': typeof AuthenticatedAdminPuraheiRoute
   '/_authenticated/admin/tembiapo': typeof AuthenticatedAdminTembiapoRoute
@@ -1232,6 +1295,7 @@ export interface FileRoutesById {
   '/_authenticated/practica/registro': typeof AuthenticatedPracticaRegistroRoute
   '/_authenticated/trivia/$category': typeof AuthenticatedTriviaCategoryRoute
   '/api/public/pagopar': typeof ApiPublicPagoparRoute
+  '/mercado/$tipo/$id': typeof MercadoTipoIdRoute
   '/purahei/obra/$id': typeof PuraheiObraIdRoute
   '/tembiapo/maestro/$slug': typeof TembiapoMaestroSlugRoute
   '/tembiapo/oficio/$slug': typeof TembiapoOficioSlugRoute
@@ -1301,6 +1365,8 @@ export interface FileRouteTypes {
     | '/guarani-escolar'
     | '/laboratorio'
     | '/logros'
+    | '/mi-tienda'
+    | '/mis-compras'
     | '/mis-libros'
     | '/mis-obras'
     | '/nhe-mbytepe'
@@ -1316,6 +1382,8 @@ export interface FileRouteTypes {
     | '/autor/$slug'
     | '/clase/$n'
     | '/convenio/$programa'
+    | '/mercado/carrito'
+    | '/mercado/vender'
     | '/muestra/$id'
     | '/purahei/$slug'
     | '/studio/$'
@@ -1323,6 +1391,7 @@ export interface FileRouteTypes {
     | '/verificar/$code'
     | '/video/por-que-jaikuaa'
     | '/clase/'
+    | '/mercado/'
     | '/purahei/'
     | '/studio/'
     | '/tembiapo/'
@@ -1333,6 +1402,7 @@ export interface FileRouteTypes {
     | '/admin/informe-auspiciante'
     | '/admin/jai'
     | '/admin/libros'
+    | '/admin/mercado'
     | '/admin/noticias'
     | '/admin/purahei'
     | '/admin/tembiapo'
@@ -1367,6 +1437,7 @@ export interface FileRouteTypes {
     | '/practica/registro'
     | '/trivia/$category'
     | '/api/public/pagopar'
+    | '/mercado/$tipo/$id'
     | '/purahei/obra/$id'
     | '/tembiapo/maestro/$slug'
     | '/tembiapo/oficio/$slug'
@@ -1433,6 +1504,8 @@ export interface FileRouteTypes {
     | '/glosario'
     | '/laboratorio'
     | '/logros'
+    | '/mi-tienda'
+    | '/mis-compras'
     | '/mis-libros'
     | '/mis-obras'
     | '/nhe-mbytepe'
@@ -1448,6 +1521,8 @@ export interface FileRouteTypes {
     | '/autor/$slug'
     | '/clase/$n'
     | '/convenio/$programa'
+    | '/mercado/carrito'
+    | '/mercado/vender'
     | '/muestra/$id'
     | '/purahei/$slug'
     | '/studio/$'
@@ -1455,6 +1530,7 @@ export interface FileRouteTypes {
     | '/verificar/$code'
     | '/video/por-que-jaikuaa'
     | '/clase'
+    | '/mercado'
     | '/purahei'
     | '/studio'
     | '/tembiapo'
@@ -1465,6 +1541,7 @@ export interface FileRouteTypes {
     | '/admin/informe-auspiciante'
     | '/admin/jai'
     | '/admin/libros'
+    | '/admin/mercado'
     | '/admin/noticias'
     | '/admin/purahei'
     | '/admin/tembiapo'
@@ -1497,6 +1574,7 @@ export interface FileRouteTypes {
     | '/practica/registro'
     | '/trivia/$category'
     | '/api/public/pagopar'
+    | '/mercado/$tipo/$id'
     | '/purahei/obra/$id'
     | '/tembiapo/maestro/$slug'
     | '/tembiapo/oficio/$slug'
@@ -1565,6 +1643,8 @@ export interface FileRouteTypes {
     | '/_authenticated/guarani-escolar'
     | '/_authenticated/laboratorio'
     | '/_authenticated/logros'
+    | '/_authenticated/mi-tienda'
+    | '/_authenticated/mis-compras'
     | '/_authenticated/mis-libros'
     | '/_authenticated/mis-obras'
     | '/_authenticated/nhe-mbytepe'
@@ -1580,6 +1660,8 @@ export interface FileRouteTypes {
     | '/autor/$slug'
     | '/clase/$n'
     | '/convenio/$programa'
+    | '/mercado/carrito'
+    | '/mercado/vender'
     | '/muestra/$id'
     | '/purahei/$slug'
     | '/studio/$'
@@ -1587,6 +1669,7 @@ export interface FileRouteTypes {
     | '/verificar/$code'
     | '/video/por-que-jaikuaa'
     | '/clase/'
+    | '/mercado/'
     | '/purahei/'
     | '/studio/'
     | '/tembiapo/'
@@ -1597,6 +1680,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/informe-auspiciante'
     | '/_authenticated/admin/jai'
     | '/_authenticated/admin/libros'
+    | '/_authenticated/admin/mercado'
     | '/_authenticated/admin/noticias'
     | '/_authenticated/admin/purahei'
     | '/_authenticated/admin/tembiapo'
@@ -1631,6 +1715,7 @@ export interface FileRouteTypes {
     | '/_authenticated/practica/registro'
     | '/_authenticated/trivia/$category'
     | '/api/public/pagopar'
+    | '/mercado/$tipo/$id'
     | '/purahei/obra/$id'
     | '/tembiapo/maestro/$slug'
     | '/tembiapo/oficio/$slug'
@@ -1695,6 +1780,8 @@ export interface RootRouteChildren {
   AutorSlugRoute: typeof AutorSlugRoute
   ClaseNRoute: typeof ClaseNRoute
   ConvenioProgramaRoute: typeof ConvenioProgramaRoute
+  MercadoCarritoRoute: typeof MercadoCarritoRoute
+  MercadoVenderRoute: typeof MercadoVenderRoute
   MuestraIdRoute: typeof MuestraIdRoute
   PuraheiSlugRoute: typeof PuraheiSlugRoute
   StudioSplatRoute: typeof StudioSplatRoute
@@ -1702,10 +1789,12 @@ export interface RootRouteChildren {
   VerificarCodeRoute: typeof VerificarCodeRoute
   VideoPorQueJaikuaaRoute: typeof VideoPorQueJaikuaaRoute
   ClaseIndexRoute: typeof ClaseIndexRoute
+  MercadoIndexRoute: typeof MercadoIndexRoute
   PuraheiIndexRoute: typeof PuraheiIndexRoute
   StudioIndexRoute: typeof StudioIndexRoute
   TembiapoIndexRoute: typeof TembiapoIndexRoute
   ApiPublicPagoparRoute: typeof ApiPublicPagoparRoute
+  MercadoTipoIdRoute: typeof MercadoTipoIdRoute
   PuraheiObraIdRoute: typeof PuraheiObraIdRoute
   TembiapoMaestroSlugRoute: typeof TembiapoMaestroSlugRoute
   TembiapoOficioSlugRoute: typeof TembiapoOficioSlugRoute
@@ -2058,6 +2147,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLogrosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mi-tienda': {
+      id: '/_authenticated/mi-tienda'
+      path: '/mi-tienda'
+      fullPath: '/mi-tienda'
+      preLoaderRoute: typeof AuthenticatedMiTiendaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mis-compras': {
+      id: '/_authenticated/mis-compras'
+      path: '/mis-compras'
+      fullPath: '/mis-compras'
+      preLoaderRoute: typeof AuthenticatedMisComprasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/mis-libros': {
       id: '/_authenticated/mis-libros'
       path: '/mis-libros'
@@ -2170,6 +2273,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConvenioProgramaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mercado/': {
+      id: '/mercado/'
+      path: '/mercado'
+      fullPath: '/mercado/'
+      preLoaderRoute: typeof MercadoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mercado/carrito': {
+      id: '/mercado/carrito'
+      path: '/mercado/carrito'
+      fullPath: '/mercado/carrito'
+      preLoaderRoute: typeof MercadoCarritoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mercado/vender': {
+      id: '/mercado/vender'
+      path: '/mercado/vender'
+      fullPath: '/mercado/vender'
+      preLoaderRoute: typeof MercadoVenderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/muestra/$id': {
       id: '/muestra/$id'
       path: '/muestra/$id'
@@ -2280,6 +2404,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/libros'
       fullPath: '/admin/libros'
       preLoaderRoute: typeof AuthenticatedAdminLibrosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/mercado': {
+      id: '/_authenticated/admin/mercado'
+      path: '/admin/mercado'
+      fullPath: '/admin/mercado'
+      preLoaderRoute: typeof AuthenticatedAdminMercadoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/noticias': {
@@ -2569,6 +2700,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPagoparRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mercado/$tipo/$id': {
+      id: '/mercado/$tipo/$id'
+      path: '/mercado/$tipo/$id'
+      fullPath: '/mercado/$tipo/$id'
+      preLoaderRoute: typeof MercadoTipoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/purahei/obra/$id': {
       id: '/purahei/obra/$id'
       path: '/purahei/obra/$id'
@@ -2711,6 +2849,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGuaraniEscolarRoute: typeof AuthenticatedGuaraniEscolarRouteWithChildren
   AuthenticatedLaboratorioRoute: typeof AuthenticatedLaboratorioRoute
   AuthenticatedLogrosRoute: typeof AuthenticatedLogrosRoute
+  AuthenticatedMiTiendaRoute: typeof AuthenticatedMiTiendaRoute
+  AuthenticatedMisComprasRoute: typeof AuthenticatedMisComprasRoute
   AuthenticatedMisLibrosRoute: typeof AuthenticatedMisLibrosRoute
   AuthenticatedMisObrasRoute: typeof AuthenticatedMisObrasRoute
   AuthenticatedNheMbytepeRoute: typeof AuthenticatedNheMbytepeRoute
@@ -2728,6 +2868,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminInformeAuspicianteRoute: typeof AuthenticatedAdminInformeAuspicianteRoute
   AuthenticatedAdminJaiRoute: typeof AuthenticatedAdminJaiRoute
   AuthenticatedAdminLibrosRoute: typeof AuthenticatedAdminLibrosRoute
+  AuthenticatedAdminMercadoRoute: typeof AuthenticatedAdminMercadoRoute
   AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
   AuthenticatedAdminPuraheiRoute: typeof AuthenticatedAdminPuraheiRoute
   AuthenticatedAdminTembiapoRoute: typeof AuthenticatedAdminTembiapoRoute
@@ -2779,6 +2920,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedGuaraniEscolarRouteWithChildren,
   AuthenticatedLaboratorioRoute: AuthenticatedLaboratorioRoute,
   AuthenticatedLogrosRoute: AuthenticatedLogrosRoute,
+  AuthenticatedMiTiendaRoute: AuthenticatedMiTiendaRoute,
+  AuthenticatedMisComprasRoute: AuthenticatedMisComprasRoute,
   AuthenticatedMisLibrosRoute: AuthenticatedMisLibrosRoute,
   AuthenticatedMisObrasRoute: AuthenticatedMisObrasRoute,
   AuthenticatedNheMbytepeRoute: AuthenticatedNheMbytepeRoute,
@@ -2797,6 +2940,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAdminInformeAuspicianteRoute,
   AuthenticatedAdminJaiRoute: AuthenticatedAdminJaiRoute,
   AuthenticatedAdminLibrosRoute: AuthenticatedAdminLibrosRoute,
+  AuthenticatedAdminMercadoRoute: AuthenticatedAdminMercadoRoute,
   AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
   AuthenticatedAdminPuraheiRoute: AuthenticatedAdminPuraheiRoute,
   AuthenticatedAdminTembiapoRoute: AuthenticatedAdminTembiapoRoute,
@@ -2886,6 +3030,8 @@ const rootRouteChildren: RootRouteChildren = {
   AutorSlugRoute: AutorSlugRoute,
   ClaseNRoute: ClaseNRoute,
   ConvenioProgramaRoute: ConvenioProgramaRoute,
+  MercadoCarritoRoute: MercadoCarritoRoute,
+  MercadoVenderRoute: MercadoVenderRoute,
   MuestraIdRoute: MuestraIdRoute,
   PuraheiSlugRoute: PuraheiSlugRoute,
   StudioSplatRoute: StudioSplatRoute,
@@ -2893,10 +3039,12 @@ const rootRouteChildren: RootRouteChildren = {
   VerificarCodeRoute: VerificarCodeRoute,
   VideoPorQueJaikuaaRoute: VideoPorQueJaikuaaRoute,
   ClaseIndexRoute: ClaseIndexRoute,
+  MercadoIndexRoute: MercadoIndexRoute,
   PuraheiIndexRoute: PuraheiIndexRoute,
   StudioIndexRoute: StudioIndexRoute,
   TembiapoIndexRoute: TembiapoIndexRoute,
   ApiPublicPagoparRoute: ApiPublicPagoparRoute,
+  MercadoTipoIdRoute: MercadoTipoIdRoute,
   PuraheiObraIdRoute: PuraheiObraIdRoute,
   TembiapoMaestroSlugRoute: TembiapoMaestroSlugRoute,
   TembiapoOficioSlugRoute: TembiapoOficioSlugRoute,

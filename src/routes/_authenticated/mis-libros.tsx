@@ -46,6 +46,9 @@ function MisLibrosPage() {
             </div>
             <div className="flex flex-wrap gap-2">
               <Button asChild variant="outline" size="sm">
+                <Link to="/mis-compras">Mis compras</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
                 <Link to="/mis-obras">
                   <PenLine className="mr-1.5 h-4 w-4" /> Soy autor: mis obras
                 </Link>

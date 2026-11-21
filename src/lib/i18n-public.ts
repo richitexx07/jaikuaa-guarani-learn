@@ -67,6 +67,7 @@ const T = {
   // Cabecera y respaldos
   navTeclado: ["Teclado", "Teclado", "Keyboard", "Tastatur", "Clavier", "鍵盤"],
   navJuegos: ["Juegos", "Jogos", "Games", "Spiele", "Jeux", "遊戲"],
+  navMercado: ["Mercado", "Mercado", "Marketplace", "Marktplatz", "Marché", "マーケット"],
   navLibreria: ["Librería", "Livraria", "Bookstore", "Buchhandlung", "Librairie", "書店"],
   navPurahei: ["Purahéi", "Purahéi", "Purahéi", "Purahéi", "Purahéi", "Purahéi"],
   navTembiapo: ["Tembiapo", "Tembiapo", "Tembiapo", "Tembiapo", "Tembiapo", "Tembiapo"],

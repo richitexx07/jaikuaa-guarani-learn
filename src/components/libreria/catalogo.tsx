@@ -151,6 +151,12 @@ export function CatalogoLibreria() {
             Tus libros, módulos y cursos están en «Mis libros»
           </Link>
         </p>
+        <p className="mt-2 text-center text-sm text-muted-foreground">
+          ¿Buscás artesanía, música, clases o experiencias?{" "}
+          <Link to="/mercado" className="font-semibold underline" style={{ color: C.tinta }}>
+            Entrá al Mercado Jaikuaa
+          </Link>
+        </p>
       </div>
     </section>
   );

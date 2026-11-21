@@ -11,6 +11,7 @@ import { DisplayToggles } from "@/components/display-toggles";
 
 const NAV_LINKS = [
   { to: "/juegos", label: "navJuegos" },
+  { to: "/mercado", label: "navMercado" },
   { to: "/libreria", label: "navLibreria" },
   { to: "/purahei", label: "navPurahei" },
   { to: "/tembiapo", label: "navTembiapo" },

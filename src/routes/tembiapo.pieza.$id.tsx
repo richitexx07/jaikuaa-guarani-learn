@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { EnElMercado } from "@/components/mercado/en-el-mercado";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -81,6 +82,7 @@ function PiezaPage() {
                     {p.artesano.ciudad && <span className="text-xs text-muted-foreground">{p.artesano.ciudad}</span>}
                   </span>
                 </Link>
+                <EnElMercado pieza={id} />
                 {p.artesano.whatsapp && <BotonWhatsappArtesano numero={p.artesano.whatsapp} nombre={p.artesano.nombre} contacto={p.artesano.contacto} pieza={p.titulo} className="mt-5" />}
               </section>
             </div>

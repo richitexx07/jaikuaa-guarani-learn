@@ -16,6 +16,8 @@ export function showsBackButton(pathname: string): boolean {
   if (p.startsWith("/trivia/") || p === "/teclado" || p === "/pronunciar" || p === "/repaso") return false;
   // El lector de libros tiene «←» arriba y sus botones de página abajo.
   if (p.startsWith("/leer/") || p.startsWith("/muestra/")) return false;
+  // El Mercado tiene su propia cabecera (logo, buscador, carrito): el botón flotante taparía precios y botones.
+  if (p === "/mercado" || p.startsWith("/mercado/") || p === "/mis-compras" || p === "/mi-tienda") return false;
   // El visor de letras de Purahéi tiene su propia flecha y su botón abajo.
   if (p.startsWith("/purahei/obra/")) return false;
   // La constancia del convenio se imprime y tiene su «Volver» arriba.

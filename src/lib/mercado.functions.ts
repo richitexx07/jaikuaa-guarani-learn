@@ -1094,3 +1094,17 @@ export const vitrinasParaEnlazar = createServerFn({ method: "GET" })
       artistas: (ar.data ?? []) as { id: string; nombre: string }[],
     };
   });
+
+/** Productos publicados del Mercado enlazados a una pieza de Tembiapo o a un artista de Purahéi. */
+export const productosEnlazados = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ pieza: uuid.optional(), artista: uuid.optional() }).parse(d))
+  .handler(async ({ data }) => {
+    if (!data.pieza && !data.artista) return { productos: [] as { id: string; titulo: string; precioGs: number | null; entrega: Entrega }[] };
+    const db = await admin();
+    let q = db.from("mercado_productos").select("id, titulo, precio_gs, entrega").eq("publicado", true).limit(20);
+    q = data.pieza ? q.eq("ref_pieza", data.pieza) : q.eq("ref_artista", data.artista);
+    const { data: rows } = await q;
+    return {
+      productos: ((rows ?? []) as { id: string; titulo: string; precio_gs: number | null; entrega: Entrega }[]).map((r) => ({ id: r.id, titulo: r.titulo, precioGs: r.precio_gs, entrega: r.entrega })),
+    };
+  });

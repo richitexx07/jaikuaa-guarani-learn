@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { EnElMercado } from "@/components/mercado/en-el-mercado";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, ChevronRight, ExternalLink, Headphones, Loader2, MapPin, Mic2 } from "lucide-react";
@@ -46,6 +47,7 @@ function FichaPage() {
               </div>
             </section>
             {a.whatsapp && <BotonWhatsapp numero={a.whatsapp} artista={a.nombre} contacto={a.contacto} className="mt-5 sm:hidden" />}
+            <EnElMercado artista={a.id} />
 
             {a.bio && (
               <section className="mt-8">

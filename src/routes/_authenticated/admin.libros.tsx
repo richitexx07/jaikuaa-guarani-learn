@@ -65,6 +65,9 @@ function AdminLibrosPage() {
           </Link>
           <div className="flex gap-2">
             <Button asChild variant="outline" size="sm">
+              <Link to="/admin/mercado">Mercado</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
               <Link to="/mis-obras">Mis obras</Link>
             </Button>
             <Button asChild variant="outline" size="sm">

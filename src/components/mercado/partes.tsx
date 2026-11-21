@@ -60,7 +60,7 @@ export function CabeceraMercado({ busqueda, onBuscar }: { busqueda?: string; onB
               setTexto(e.target.value);
               onBuscar?.(e.target.value);
             }}
-            placeholder="Buscar libros, artesanía, clases…"
+            placeholder="Buscar en el Mercado"
             className="h-11 w-full rounded-full border-0 bg-white pl-4 pr-11 text-base text-[#1B2433] shadow-inner"
           />
           <button type="submit" aria-label="Buscar" className="absolute right-1 top-1 grid h-9 w-9 place-items-center rounded-full" style={{ background: C.dorado, color: C.noche }}>
