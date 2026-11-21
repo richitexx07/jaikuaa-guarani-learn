@@ -5,7 +5,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
-  BookOpen, Building2, GraduationCap, Languages, MapPinned, Music, Package, Palette, PlayCircle, Presentation, Search,
+  ArrowLeft, BookOpen, Building2, GraduationCap, Languages, MapPinned, Music, Package, Palette, PlayCircle, Presentation, Search,
   ShoppingBag, Star, Store, UserRound,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
@@ -36,6 +36,13 @@ export function CabeceraMercado({ busqueda, onBuscar }: { busqueda?: string; onB
   return (
     <header className="mercado-claro sticky top-0 z-30 shadow-md" style={{ background: C.noche }}>
       <div className="mx-auto flex max-w-6xl items-center gap-2 px-3 py-2.5 sm:gap-4 sm:px-6">
+        <Link
+          to="/"
+          className="flex h-11 shrink-0 items-center gap-1 rounded-full bg-white/10 px-3 text-sm font-bold text-white hover:bg-white/20"
+          aria-label="Volver a Jaikuaa"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden /> Jaikuaa
+        </Link>
         <Link to="/mercado" className="flex shrink-0 items-center gap-2" aria-label="Mercado Jaikuaa, inicio">
           <BrandLogo withWordmark={false} />
           <span className="hidden font-display text-lg font-bold leading-none text-white sm:block">
