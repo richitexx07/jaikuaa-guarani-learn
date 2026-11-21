@@ -52,8 +52,9 @@ function MercadoPage() {
   const setBusqueda = (q: string) => void navigate({ search: (s) => ({ ...s, q: q || undefined }), replace: true });
   const setCat = (c: Categoria | null) => void navigate({ search: (s) => ({ ...s, cat: c ?? undefined }) });
   const conItems = CATEGORIAS.filter((c) => items.some((i) => i.categoria === c));
-  const { abierto, cargando } = useMercadoAbierto();
-  const preinscripcion = !cargando && !abierto;
+  // Mientras se consulta, se muestra la preinscripción: nunca se anuncia una venta que todavía no está abierta.
+  const { abierto } = useMercadoAbierto();
+  const preinscripcion = !abierto;
 
   return (
     <div className="flex min-h-screen flex-col" style={{ background: "#F6F3EC" }}>
@@ -196,7 +197,7 @@ function MercadoPage() {
               <Store className="mx-auto h-10 w-10" style={{ color: C.azul }} aria-hidden />
               <p className="mt-3 font-display text-xl font-bold" style={{ color: C.tinta }}>Estamos llenando las estanterías</p>
               <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-                Autores, artesanos, artistas y docentes están cargando sus productos. Si querés vender lo tuyo, postulate.
+                Autores, artesanos, artistas y docentes están cargando sus productos. Si querés vender lo tuyo, inscribite.
               </p>
               <Link to="/mercado/vender" className="mt-4 inline-block rounded-full px-5 py-2.5 text-sm font-bold" style={{ background: C.dorado, color: C.noche }}>
                 Quiero vender en el Mercado
