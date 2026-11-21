@@ -5,7 +5,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ImagePlus, Loader2, Mic, RotateCcw, Save, Square, Trash2, Upload, X } from "lucide-react";
+import { ImagePlus, Loader2, Mic, RotateCcw, Save, Square, Trash2, Upload, Video, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { borrarPagina, guardarPagina, urlParaSubir, type MimeLibro } from "@/lib/libros.functions";
@@ -45,7 +45,7 @@ export function useSubirArchivo(libroId: string) {
   };
 }
 
-export type PaginaObra = { n: number; imagen: string | null; audio: string | null; texto: string };
+export type PaginaObra = { n: number; imagen: string | null; audio: string | null; texto: string; video?: string | null };
 
 export function EditorPaginas({
   libroId,
@@ -132,10 +132,12 @@ export function EditorPaginas({
               tieneImagen={!!p.imagen}
               tieneAudio={!!p.audio}
               texto={p.texto}
+              video={p.video ?? null}
               ocupado={!!ocupado}
               soloLectura={soloLectura}
               onAudio={(f) => subirAudio(p.n, f)}
               onTexto={(t) => void correr("Guardando texto…", async () => void (await guardar({ data: { libroId, n: p.n, texto: t } })))}
+              onVideo={(v) => void correr(v ? "Guardando el video…" : "Sacando el video…", async () => void (await guardar({ data: { libroId, n: p.n, video: v } })))}
               onBorrar={() => {
                 if (window.confirm(`¿Borrar la página ${p.n}?`)) void correr("Borrando página…", async () => void (await sacarPagina({ data: { libroId, n: p.n } })));
               }}
@@ -152,25 +154,31 @@ function FilaPagina({
   tieneImagen,
   tieneAudio,
   texto,
+  video,
   ocupado,
   soloLectura,
   onAudio,
   onTexto,
+  onVideo,
   onBorrar,
 }: {
   n: number;
   tieneImagen: boolean;
   tieneAudio: boolean;
   texto: string;
+  video: string | null;
   ocupado: boolean;
   soloLectura: boolean;
   onAudio: (f: Blob | undefined) => void;
   onTexto: (t: string) => void;
+  onVideo: (v: string | null) => void;
   onBorrar: () => void;
 }) {
   const inAudio = useRef<HTMLInputElement>(null);
   const [abierto, setAbierto] = useState(false);
   const [grabando, setGrabando] = useState(false);
+  const [conVideo, setConVideo] = useState(false);
+  const [enlace, setEnlace] = useState(video ? `https://youtu.be/${video}` : "");
   const [t, setT] = useState(texto);
   const puedeGrabar = usePuedeGrabar();
   return (
@@ -179,6 +187,7 @@ function FilaPagina({
         <span className="w-16 font-semibold text-foreground">Pág. {n}</span>
         <span className={tieneImagen ? "text-emerald-700" : "text-muted-foreground"}>{tieneImagen ? "Imagen ✓" : "Sin imagen"}</span>
         <span className={tieneAudio ? "text-emerald-700" : "text-muted-foreground"}>{tieneAudio ? "Voz ✓" : "Sin voz"}</span>
+        {video && <span className="text-emerald-700">Video ✓</span>}
         {!soloLectura && (
           <span className="ml-auto flex flex-wrap gap-1">
             {puedeGrabar && (
@@ -202,6 +211,9 @@ function FilaPagina({
             <Button size="sm" variant="ghost" disabled={ocupado} onClick={() => setAbierto((v) => !v)} aria-expanded={abierto}>
               Texto
             </Button>
+            <Button size="sm" variant="ghost" disabled={ocupado} onClick={() => setConVideo((v) => !v)} aria-expanded={conVideo}>
+              <Video className="mr-1 h-4 w-4" /> Video
+            </Button>
             <Button size="sm" variant="ghost" className="text-destructive" disabled={ocupado} onClick={onBorrar} aria-label={`Borrar página ${n}`}>
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -218,6 +230,40 @@ function FilaPagina({
             setGrabando(false);
           }}
         />
+      )}
+      {conVideo && !soloLectura && (
+        <div className="mt-2 space-y-2 rounded-xl border border-border bg-muted/40 p-3">
+          <p className="text-xs text-muted-foreground">
+            Subí el video a YouTube como «No listado» y pegá el enlace acá. Solo lo ve quien compró, pero ojo: cualquiera que tenga el
+            enlace de YouTube lo puede abrir.
+          </p>
+          <input
+            value={enlace}
+            onChange={(e) => setEnlace(e.target.value)}
+            inputMode="url"
+            placeholder="https://youtu.be/…"
+            aria-label={`Enlace del video de la página ${n}`}
+            className="h-11 w-full rounded-md border border-input bg-background px-3 text-base"
+          />
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" disabled={ocupado || !enlace.trim()} onClick={() => onVideo(enlace.trim())}>
+              Guardar video
+            </Button>
+            {video && (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={ocupado}
+                onClick={() => {
+                  setEnlace("");
+                  onVideo(null);
+                }}
+              >
+                Sacar el video
+              </Button>
+            )}
+          </div>
+        </div>
       )}
       {abierto && !soloLectura && (
         <div className="mt-2 space-y-2">

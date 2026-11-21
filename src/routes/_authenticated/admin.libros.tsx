@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { actualizarLibro, adminLibros, borrarLibro, crearLibro, darAcceso, quitarAcceso, type LibroAdmin } from "@/lib/libros.functions";
 import { asignarAutor, deshabilitarAutor, habilitarAutor, listarAutores } from "@/lib/obras.functions";
-import { AREAS, AREA_NOMBRE, ESTADO_NOMBRE, type Area, type TipoObra } from "@/lib/obras";
+import { AREAS, AREA_NOMBRE, ESTADO_NOMBRE, TIPO_NOMBRE, TIPOS_OBRA, VARIANTES, VARIANTE_NOMBRE, type Area, type TipoObra, type Variante } from "@/lib/obras";
+import { PanelTienda } from "@/components/libreria/admin-tienda";
 import { formatoGs } from "@/lib/pagopar";
 import { Portada } from "@/components/libreria/portada";
 import { EditorPaginas, prepararImagen, useSubirArchivo } from "@/components/libreria/editor-obra";
@@ -44,7 +45,7 @@ function AdminLibrosPage() {
   const [tipo, setTipo] = useState<TipoObra>("libro");
   const [area, setArea] = useState<Area>("medico");
   const nuevo = useMutation({
-    mutationFn: () => crear({ data: { titulo, autor, descripcion, tipo, area: tipo === "modulo" ? area : null } }),
+    mutationFn: () => crear({ data: { titulo, autor, descripcion, tipo, area: tipo === "libro" ? null : area } }),
     onSuccess: () => {
       setTitulo("");
       setAutor("");
@@ -88,6 +89,8 @@ function AdminLibrosPage() {
             </p>
           )}
 
+          <PanelTienda />
+
           <PanelAutores />
 
           <form
@@ -100,10 +103,11 @@ function AdminLibrosPage() {
             <p className="font-semibold text-foreground">Nueva obra (cargada por Jaikuaa)</p>
             <div className="flex flex-wrap gap-2">
               <select aria-label="Tipo de obra" value={tipo} onChange={(e) => setTipo(e.target.value as TipoObra)} className={select}>
-                <option value="libro">Libro</option>
-                <option value="modulo">Módulo de especialización</option>
+                {TIPOS_OBRA.map((t) => (
+                  <option key={t} value={t}>{TIPO_NOMBRE[t]}</option>
+                ))}
               </select>
-              {tipo === "modulo" && (
+              {tipo !== "libro" && (
                 <select aria-label="Rubro del módulo" value={area} onChange={(e) => setArea(e.target.value as Area)} className={select}>
                   {AREAS.map((a) => (
                     <option key={a} value={a}>{AREA_NOMBRE[a]}</option>
@@ -260,14 +264,22 @@ function LibroPanel({ libro, onCambio }: { libro: LibroAdmin; onCambio: () => vo
 
   const guardarNumeros = (form: HTMLFormElement) => {
     const fd = new FormData(form);
-    const precio = String(fd.get("precio") ?? "").replace(/\D/g, "");
-    const pct = String(fd.get("pct") ?? "").replace(/\D/g, "");
+    const num = (k: string) => {
+      const v = String(fd.get(k) ?? "").replace(/\D/g, "");
+      return v ? Number(v) : null;
+    };
+    const pct = num("pct");
+    const fecha = String(fd.get("fecha") ?? "");
     void correr("Guardando…", async () => {
       await actualizar({
         data: {
           id: libro.id,
-          precioGs: precio ? Number(precio) : null,
-          porcentajeAutor: pct ? Math.min(100, Number(pct)) : null,
+          precioGs: num("precio"),
+          porcentajeAutor: pct === null ? null : Math.min(100, pct),
+          precioFisicoGs: num("fisico"),
+          precioInstitucionalGs: num("inst"),
+          enPreventa: fd.get("preventa") === "on",
+          fechaDisponible: /^\d{4}-\d{2}-\d{2}$/.test(fecha) ? fecha : null,
         },
       });
     });
@@ -286,7 +298,7 @@ function LibroPanel({ libro, onCambio }: { libro: LibroAdmin; onCambio: () => vo
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
-              {libro.tipo === "modulo" ? `Módulo · ${libro.area ? AREA_NOMBRE[libro.area] : "sin rubro"}` : "Libro"}
+              {libro.tipo === "libro" ? "Libro" : `${TIPO_NOMBRE[libro.tipo]} · ${libro.area ? AREA_NOMBRE[libro.area] : "sin rubro"}`}
             </span>
             <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${ESTADO_COLOR[libro.estadoRevision]}`}>{ESTADO_NOMBRE[libro.estadoRevision]}</span>
           </div>
@@ -305,14 +317,15 @@ function LibroPanel({ libro, onCambio }: { libro: LibroAdmin; onCambio: () => vo
               value={libro.tipo}
               onChange={(e) => {
                 const t = e.target.value as TipoObra;
-                void correr("Guardando…", async () => void (await actualizar({ data: { id: libro.id, tipo: t, area: t === "modulo" ? (libro.area ?? "medico") : null } })));
+                void correr("Guardando…", async () => void (await actualizar({ data: { id: libro.id, tipo: t, area: t === "libro" ? null : (libro.area ?? "medico") } })));
               }}
               className={select}
             >
-              <option value="libro">Libro</option>
-              <option value="modulo">Módulo de especialización</option>
+              {TIPOS_OBRA.map((t) => (
+                <option key={t} value={t}>{TIPO_NOMBRE[t]}</option>
+              ))}
             </select>
-            {libro.tipo === "modulo" && (
+            {libro.tipo !== "libro" && (
               <select
                 aria-label="Rubro del módulo"
                 value={libro.area ?? "medico"}
@@ -324,7 +337,29 @@ function LibroPanel({ libro, onCambio }: { libro: LibroAdmin; onCambio: () => vo
                 ))}
               </select>
             )}
+            <select
+              aria-label="Lengua de la obra"
+              value={libro.variante ?? ""}
+              onChange={(e) => void correr("Guardando…", async () => void (await actualizar({ data: { id: libro.id, variante: (e.target.value || null) as Variante | null } })))}
+              className={select}
+            >
+              <option value="">Lengua: sin indicar</option>
+              {VARIANTES.map((v) => (
+                <option key={v} value={v}>{VARIANTE_NOMBRE[v]}</option>
+              ))}
+            </select>
           </div>
+          <form
+            className="mt-2 flex gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const v = String(new FormData(e.currentTarget).get("publico") ?? "");
+              void correr("Guardando…", async () => void (await actualizar({ data: { id: libro.id, publico: v } })));
+            }}
+          >
+            <Input name="publico" defaultValue={libro.publico} maxLength={300} placeholder="¿Para quién es? (público objetivo)" aria-label="Público objetivo" className="h-10" />
+            <Button type="submit" size="sm" variant="secondary" disabled={!!ocupado}>Guardar</Button>
+          </form>
 
           <form
             className="mt-3 flex flex-wrap items-end gap-2 text-sm"
@@ -340,6 +375,22 @@ function LibroPanel({ libro, onCambio }: { libro: LibroAdmin; onCambio: () => vo
             <label className="flex flex-col gap-1">
               <span className="font-semibold text-foreground">% del autor (contrato)</span>
               <input name="pct" inputMode="numeric" defaultValue={libro.porcentajeAutor ?? ""} placeholder="Ej. 50" className="h-10 w-28 rounded-lg border border-input bg-background px-2 text-base" />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="font-semibold text-foreground">Impreso, con envío (Gs.)</span>
+              <input name="fisico" inputMode="numeric" defaultValue={libro.precioFisicoGs ?? ""} placeholder="Vacío = sin impreso" className="h-10 w-40 rounded-lg border border-input bg-background px-2 text-base" />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="font-semibold text-foreground">Instituciones, por persona (Gs.)</span>
+              <input name="inst" inputMode="numeric" defaultValue={libro.precioInstitucionalGs ?? ""} placeholder="Vacío = no se muestra" className="h-10 w-40 rounded-lg border border-input bg-background px-2 text-base" />
+            </label>
+            <label className="flex items-center gap-2 self-center pt-5">
+              <input type="checkbox" name="preventa" defaultChecked={libro.enPreventa} className="h-5 w-5" />
+              <span className="font-semibold text-foreground">En preventa</span>
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="font-semibold text-foreground">Lista desde (aprox.)</span>
+              <input type="date" name="fecha" defaultValue={libro.fechaDisponible ?? ""} className="h-10 rounded-lg border border-input bg-background px-2 text-base" />
             </label>
             <Button type="submit" size="sm" variant="secondary" disabled={!!ocupado}>Guardar</Button>
             {libro.precioPropuestoGs && <span className="text-xs text-muted-foreground">El autor propone {formatoGs(libro.precioPropuestoGs)}</span>}

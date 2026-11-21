@@ -27,7 +27,7 @@ function guardarProgreso(id: string, i: number) {
   }
 }
 
-export type Pagina = { n: number; imagen: string | null; audio: string | null; texto: string };
+export type Pagina = { n: number; imagen: string | null; audio: string | null; texto: string; video?: string | null };
 
 export function Lector({
   id,
@@ -148,7 +148,8 @@ export function Lector({
           <p className="mt-16 text-center text-white/70">Este libro todavía no tiene páginas cargadas.</p>
         ) : (
           <div className="w-full max-w-[680px]">
-            <div className="relative overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/20">
+            {pagina.video && <VideoPagina key={`v${pagina.n}`} id={pagina.video} titulo={`${titulo}, página ${pagina.n}`} />}
+            <div className={`relative overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/20 ${pagina.video && !pagina.imagen && !pagina.texto ? "hidden" : ""}`}>
               {pagina.imagen ? (
                 <img
                   key={pagina.n}
@@ -231,6 +232,43 @@ function MarcaDeAgua({ texto }: { texto: string }) {
             {`${texto}     ${texto}     ${texto}`}
           </p>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Video de la página (cursos): un video de YouTube no listado, que solo se muestra a quien compró.
+ * Se carga desde youtube-nocookie y recién cuando la persona toca, para no gastar datos ni sumar rastreo.
+ */
+function VideoPagina({ id, titulo }: { id: string; titulo: string }) {
+  const [ver, setVer] = useState(false);
+  return (
+    <div className="mb-3 overflow-hidden rounded-xl bg-black shadow-2xl ring-1 ring-black/20">
+      <div className="relative aspect-video w-full">
+        {ver ? (
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
+            title={titulo}
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowFullScreen
+            className="absolute inset-0 h-full w-full"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              callarVoz();
+              setVer(true);
+            }}
+            className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#0B1E3A] text-white"
+          >
+            <span className="grid h-16 w-16 place-items-center rounded-full bg-[#F2C230] text-[#1B2A44] shadow-lg">
+              <Play className="h-8 w-8" />
+            </span>
+            <span className="text-sm font-semibold">Ver el video de esta página</span>
+          </button>
+        )}
       </div>
     </div>
   );

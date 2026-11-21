@@ -68,6 +68,20 @@ function LectorPage() {
       </Fondo>
     );
   }
+  if (data.estado === "preventa") {
+    return (
+      <Fondo>
+        <Aviso
+          titulo={`«${data.titulo}» ya es tuyo`}
+          texto={
+            data.fecha
+              ? `Está en preventa: va a estar lista para leer alrededor del ${new Date(`${data.fecha}T12:00:00`).toLocaleDateString("es-PY", { day: "numeric", month: "long" })}. Te queda guardada en «Mis libros».`
+              : "Está en preventa: te queda guardada en «Mis libros» y se abre completa apenas esté lista."
+          }
+        />
+      </Fondo>
+    );
+  }
   return (
     <Lector
       id={id}

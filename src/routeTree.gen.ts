@@ -70,6 +70,7 @@ import { Route as AuthenticatedValidacionRouteImport } from './routes/_authentic
 import { Route as AuthenticatedValidarRouteImport } from './routes/_authenticated/validar'
 import { Route as ApiRecordatorioRouteImport } from './routes/api/recordatorio'
 import { Route as ApiTutorRouteImport } from './routes/api/tutor'
+import { Route as AutorSlugRouteImport } from './routes/autor.$slug'
 import { Route as ClaseIndexRouteImport } from './routes/clase.index'
 import { Route as ClaseNRouteImport } from './routes/clase.$n'
 import { Route as ConvenioProgramaRouteImport } from './routes/convenio.$programa'
@@ -447,6 +448,11 @@ const ApiRecordatorioRoute = ApiRecordatorioRouteImport.update({
 const ApiTutorRoute = ApiTutorRouteImport.update({
   id: '/api/tutor',
   path: '/api/tutor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AutorSlugRoute = AutorSlugRouteImport.update({
+  id: '/autor/$slug',
+  path: '/autor/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClaseIndexRoute = ClaseIndexRouteImport.update({
@@ -907,6 +913,7 @@ export interface FileRoutesByFullPath {
   '/validar': typeof AuthenticatedValidarRoute
   '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/autor/$slug': typeof AutorSlugRoute
   '/clase/$n': typeof ClaseNRoute
   '/convenio/$programa': typeof ConvenioProgramaRoute
   '/muestra/$id': typeof MuestraIdRoute
@@ -1038,6 +1045,7 @@ export interface FileRoutesByTo {
   '/validar': typeof AuthenticatedValidarRoute
   '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/autor/$slug': typeof AutorSlugRoute
   '/clase/$n': typeof ClaseNRoute
   '/convenio/$programa': typeof ConvenioProgramaRoute
   '/muestra/$id': typeof MuestraIdRoute
@@ -1170,6 +1178,7 @@ export interface FileRoutesById {
   '/_authenticated/validar': typeof AuthenticatedValidarRoute
   '/api/recordatorio': typeof ApiRecordatorioRoute
   '/api/tutor': typeof ApiTutorRoute
+  '/autor/$slug': typeof AutorSlugRoute
   '/clase/$n': typeof ClaseNRoute
   '/convenio/$programa': typeof ConvenioProgramaRoute
   '/muestra/$id': typeof MuestraIdRoute
@@ -1304,6 +1313,7 @@ export interface FileRouteTypes {
     | '/validar'
     | '/api/recordatorio'
     | '/api/tutor'
+    | '/autor/$slug'
     | '/clase/$n'
     | '/convenio/$programa'
     | '/muestra/$id'
@@ -1435,6 +1445,7 @@ export interface FileRouteTypes {
     | '/validar'
     | '/api/recordatorio'
     | '/api/tutor'
+    | '/autor/$slug'
     | '/clase/$n'
     | '/convenio/$programa'
     | '/muestra/$id'
@@ -1566,6 +1577,7 @@ export interface FileRouteTypes {
     | '/_authenticated/validar'
     | '/api/recordatorio'
     | '/api/tutor'
+    | '/autor/$slug'
     | '/clase/$n'
     | '/convenio/$programa'
     | '/muestra/$id'
@@ -1680,6 +1692,7 @@ export interface RootRouteChildren {
   ZhRoute: typeof ZhRoute
   ApiRecordatorioRoute: typeof ApiRecordatorioRoute
   ApiTutorRoute: typeof ApiTutorRoute
+  AutorSlugRoute: typeof AutorSlugRoute
   ClaseNRoute: typeof ClaseNRoute
   ConvenioProgramaRoute: typeof ConvenioProgramaRoute
   MuestraIdRoute: typeof MuestraIdRoute
@@ -2127,6 +2140,13 @@ declare module '@tanstack/react-router' {
       path: '/api/tutor'
       fullPath: '/api/tutor'
       preLoaderRoute: typeof ApiTutorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/autor/$slug': {
+      id: '/autor/$slug'
+      path: '/autor/$slug'
+      fullPath: '/autor/$slug'
+      preLoaderRoute: typeof AutorSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/clase/': {
@@ -2863,6 +2883,7 @@ const rootRouteChildren: RootRouteChildren = {
   ZhRoute: ZhRoute,
   ApiRecordatorioRoute: ApiRecordatorioRoute,
   ApiTutorRoute: ApiTutorRoute,
+  AutorSlugRoute: AutorSlugRoute,
   ClaseNRoute: ClaseNRoute,
   ConvenioProgramaRoute: ConvenioProgramaRoute,
   MuestraIdRoute: MuestraIdRoute,

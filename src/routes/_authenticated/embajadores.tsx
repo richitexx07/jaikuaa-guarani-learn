@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { getAmbassadorInfo } from "@/lib/ambassador.functions";
+import { ComisionesLibreria } from "@/components/libreria/comisiones-embajador";
 import { levelFor, MAX_REWARDED_INVITES_PER_MONTH, XP_PER_ACTIVATED_INVITE } from "@/lib/ambassador";
 
 export const Route = createFileRoute("/_authenticated/embajadores")({
@@ -120,6 +121,8 @@ function EmbajadoresPage() {
               <Stat delay=".4s" icon={<Sparkles className="h-5 w-5" />} label={tx("amStarted")} value={data.started} />
               <Stat delay=".5s" icon={<Award className="h-5 w-5" />} label={tx("amXp")} value={data.ambassadorXp} />
             </section>
+
+            <ComisionesLibreria />
 
             <section className="amb-rise mt-4 overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 p-5" style={{ animationDelay: ".55s" }}>
               <p className="flex items-center gap-2 font-display text-lg font-bold text-primary"><JaiPaw size={22} /> {tx("amNoExpire")}</p>

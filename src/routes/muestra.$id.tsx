@@ -6,7 +6,7 @@ import { muestraObra } from "@/lib/libros.functions";
 import { AREA_NOMBRE } from "@/lib/obras";
 import { SUPPORT_WHATSAPP } from "@/lib/contact";
 import { Lector } from "@/components/libreria/lector";
-import { ComprarLibro } from "@/components/libreria/comprar-libro";
+import { ComprarImpreso, ComprarLibro } from "@/components/libreria/comprar-libro";
 
 /**
  * Muestra gratis de una obra publicada de la Librería: las primeras páginas con su voz, sin cuenta.
@@ -69,10 +69,10 @@ function MuestraPage() {
     );
   }
 
-  const queEs = data.tipo === "modulo" ? "el módulo" : "el libro";
+  const queEs = data.tipo === "modulo" ? "el módulo" : data.tipo === "curso" ? "el curso" : "el libro";
   const resto = Math.max(0, data.totalPaginas - data.paginas.length);
   const texto = `Mba'éichapa! Quiero ${queEs} «${data.titulo}» de la Librería Jaikuaa.`;
-  const rubro = data.tipo === "modulo" && data.area ? ` · ${AREA_NOMBRE[data.area]}` : "";
+  const rubro = data.tipo !== "libro" && data.area ? ` · ${AREA_NOMBRE[data.area]}` : "";
 
   return (
     <Lector
@@ -91,9 +91,11 @@ function MuestraPage() {
             {resto > 0
               ? `Faltan ${resto} ${resto === 1 ? "página" : "páginas"} más, todas con voz humana real. Queda guardado en «Mis libros» con tu cuenta.`
               : "Queda guardado en «Mis libros» con tu cuenta, para leerlo y escucharlo cuando quieras."}
+            {data.enPreventa && " Está en preventa: lo reservás ahora y se abre completo cuando esté listo."}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {data.precioGs && <ComprarLibro libroId={id} precioGs={data.precioGs} />}
+            {data.precioGs && <ComprarLibro libroId={id} precioGs={data.precioGs} preventa={data.enPreventa} />}
+            {data.precioFisicoGs && <ComprarImpreso libroId={id} precioGs={data.precioFisicoGs} />}
             <a
               href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent(texto)}`}
               target="_blank"

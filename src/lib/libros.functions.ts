@@ -7,7 +7,9 @@ import {
   ESTADOS,
   MUESTRA_PAGINAS,
   TIPOS_OBRA,
+  VARIANTES,
   esRutaDeLaObra,
+  idYoutube,
   paginasDeMuestra,
   puedeEditarObra,
   puedePublicar,
@@ -15,6 +17,7 @@ import {
   type Area,
   type EstadoRevision,
   type TipoObra,
+  type Variante,
 } from "@/lib/obras";
 
 /**
@@ -97,6 +100,14 @@ export type LibroCard = {
   precioGs: number | null;
   tipo: TipoObra;
   area: Area | null;
+  variante: Variante | null;
+  publico: string;
+  precioInstitucionalGs: number | null;
+  precioFisicoGs: number | null;
+  enPreventa: boolean;
+  fechaDisponible: string | null;
+  /** Enlace a la vitrina pública del autor (jaikuaa.com/autor/…), si la tiene. */
+  autorSlug: string | null;
 };
 
 type LibroRow = {
@@ -116,9 +127,26 @@ type LibroRow = {
   porcentaje_autor: number | null;
   precio_propuesto_gs: number | null;
   nota_revision: string;
+  variante: Variante | null;
+  publico: string;
+  precio_institucional_gs: number | null;
+  precio_fisico_gs: number | null;
+  en_preventa: boolean;
+  fecha_disponible: string | null;
 };
 export const COLS_LIBRO =
-  "id, titulo, autor, descripcion, portada_path, publicado, precio_gs, created_at, tipo, area, autor_id, estado_revision, autorizacion_firmada, porcentaje_autor, precio_propuesto_gs, nota_revision";
+  "id, titulo, autor, descripcion, portada_path, publicado, precio_gs, created_at, tipo, area, autor_id, estado_revision, autorizacion_firmada, porcentaje_autor, precio_propuesto_gs, nota_revision, variante, publico, precio_institucional_gs, precio_fisico_gs, en_preventa, fecha_disponible";
+
+/** Vitrinas públicas de los autores de estas obras: autor_id → slug. */
+async function slugsDeAutores(ids: (string | null)[]): Promise<Map<string, string>> {
+  const unicos = [...new Set(ids.filter((x): x is string => !!x))];
+  const out = new Map<string, string>();
+  if (unicos.length === 0) return out;
+  const db = await admin();
+  const { data } = await db.from("autores").select("user_id, slug").in("user_id", unicos).eq("vitrina", true).eq("habilitado", true).not("slug", "is", null);
+  for (const a of (data ?? []) as { user_id: string; slug: string }[]) out.set(a.user_id, a.slug);
+  return out;
+}
 
 async function contarPaginas(ids: string[]): Promise<Map<string, number>> {
   const out = new Map<string, number>();
@@ -130,7 +158,11 @@ async function contarPaginas(ids: string[]): Promise<Map<string, number>> {
 }
 
 async function aTarjetas(rows: LibroRow[], tengo: Set<string> | "todos"): Promise<LibroCard[]> {
-  const [urls, paginas] = await Promise.all([firmar(rows.map((r) => r.portada_path)), contarPaginas(rows.map((r) => r.id))]);
+  const [urls, paginas, slugs] = await Promise.all([
+    firmar(rows.map((r) => r.portada_path)),
+    contarPaginas(rows.map((r) => r.id)),
+    slugsDeAutores(rows.map((r) => r.autor_id)),
+  ]);
   return rows.map((r) => ({
     id: r.id,
     titulo: r.titulo,
@@ -143,6 +175,13 @@ async function aTarjetas(rows: LibroRow[], tengo: Set<string> | "todos"): Promis
     precioGs: r.precio_gs ?? null,
     tipo: r.tipo ?? "libro",
     area: r.area ?? null,
+    variante: r.variante ?? null,
+    publico: r.publico ?? "",
+    precioInstitucionalGs: r.precio_institucional_gs ?? null,
+    precioFisicoGs: r.precio_fisico_gs ?? null,
+    enPreventa: !!r.en_preventa,
+    fechaDisponible: r.fecha_disponible ?? null,
+    autorSlug: r.autor_id ? (slugs.get(r.autor_id) ?? null) : null,
   }));
 }
 
@@ -154,10 +193,34 @@ export const catalogoLibros = createServerFn({ method: "GET" }).handler(async ()
     .select(COLS_LIBRO)
     .eq("publicado", true)
     .order("created_at", { ascending: false })
-    .limit(60);
+    .limit(300);
   if (error) throw new Error(error.message);
   return { libros: await aTarjetas((data ?? []) as LibroRow[], new Set()) };
 });
+
+/** Vitrina pública de un autor: su presentación y sus obras publicadas. */
+export const vitrinaAutor = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ slug: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/).max(60) }).parse(d))
+  .handler(async ({ data }) => {
+    const db = await admin();
+    const { data: a } = await db
+      .from("autores")
+      .select("user_id, nombre, bio, foto_path, vitrina, habilitado")
+      .eq("slug", data.slug)
+      .maybeSingle();
+    if (!a || !a.vitrina || !a.habilitado) return { estado: "no-existe" as const };
+    const [{ data: rows }, fotos] = await Promise.all([
+      db.from("libros").select(COLS_LIBRO).eq("autor_id", a.user_id).eq("publicado", true).order("created_at", { ascending: false }).limit(100),
+      firmar([a.foto_path]),
+    ]);
+    return {
+      estado: "ok" as const,
+      nombre: (a.nombre as string) || "Autor de la Librería Jaikuaa",
+      bio: (a.bio as string) ?? "",
+      foto: a.foto_path ? (fotos.get(a.foto_path as string) ?? null) : null,
+      obras: await aTarjetas((rows ?? []) as LibroRow[], new Set()),
+    };
+  });
 
 /** «Mis libros»: los que la persona compró. El administrador ve todos (para revisarlos antes de publicar). */
 export const misLibros = createServerFn({ method: "GET" })
@@ -177,7 +240,7 @@ export const misLibros = createServerFn({ method: "GET" })
     return { libros: await aTarjetas((data ?? []) as LibroRow[], soyAdmin ? "todos" : ids), esAdmin: soyAdmin };
   });
 
-export type PaginaLectura = { n: number; imagen: string | null; audio: string | null; texto: string };
+export type PaginaLectura = { n: number; imagen: string | null; audio: string | null; texto: string; video: string | null };
 
 /** Abre un libro para leer. Solo con acceso (o administrador). Devuelve enlaces que vencen en 1 hora. */
 export const leerLibro = createServerFn({ method: "POST" })
@@ -188,21 +251,23 @@ export const leerLibro = createServerFn({ method: "POST" })
     const [soyAdmin, acceso, libro, perfil] = await Promise.all([
       esAdmin(context.supabase, context.userId),
       db.from("libro_accesos").select("id").eq("libro_id", data.id).eq("user_id", context.userId).maybeSingle(),
-      db.from("libros").select("id, titulo, autor, publicado, autor_id").eq("id", data.id).maybeSingle(),
+      db.from("libros").select("id, titulo, autor, publicado, autor_id, en_preventa, fecha_disponible").eq("id", data.id).maybeSingle(),
       db.from("profiles").select("full_name, email").eq("id", context.userId).maybeSingle(),
     ]);
     if (!libro.data) return { estado: "no-existe" as const };
     const revisa = puedeVerSinComprar({ autorId: libro.data.autor_id ?? null }, context.userId, soyAdmin);
     if (!revisa && !acceso.data) return { estado: "sin-acceso" as const, titulo: libro.data.titulo as string };
+    if (!revisa && libro.data.en_preventa)
+      return { estado: "preventa" as const, titulo: libro.data.titulo as string, fecha: (libro.data.fecha_disponible as string | null) ?? null };
 
     const { data: pags, error } = await db
       .from("libro_paginas")
-      .select("n, imagen_path, audio_path, texto")
+      .select("n, imagen_path, audio_path, texto, video_id")
       .eq("libro_id", data.id)
       .order("n")
       .limit(MAX_PAGINAS);
     if (error) throw new Error(error.message);
-    const filas = (pags ?? []) as { n: number; imagen_path: string | null; audio_path: string | null; texto: string }[];
+    const filas = (pags ?? []) as { n: number; imagen_path: string | null; audio_path: string | null; texto: string; video_id: string | null }[];
     const urls = await firmar(filas.flatMap((p) => [p.imagen_path, p.audio_path]));
 
     const nombre = ((perfil.data?.full_name as string | null) ?? "").trim();
@@ -218,6 +283,7 @@ export const leerLibro = createServerFn({ method: "POST" })
         imagen: p.imagen_path ? (urls.get(p.imagen_path) ?? null) : null,
         audio: p.audio_path ? (urls.get(p.audio_path) ?? null) : null,
         texto: p.texto ?? "",
+        video: p.video_id ?? null,
       })),
     };
   });
@@ -232,16 +298,16 @@ export const muestraObra = createServerFn({ method: "POST" })
     const db = await admin();
     const { data: libro } = await db
       .from("libros")
-      .select("id, titulo, autor, descripcion, tipo, area, precio_gs, publicado")
+      .select("id, titulo, autor, descripcion, tipo, area, precio_gs, publicado, precio_fisico_gs, precio_institucional_gs, en_preventa, fecha_disponible")
       .eq("id", data.id)
       .maybeSingle();
     if (!libro || !libro.publicado) return { estado: "no-existe" as const };
     const [{ data: pags, error }, total] = await Promise.all([
-      db.from("libro_paginas").select("n, imagen_path, audio_path, texto").eq("libro_id", data.id).order("n").limit(MUESTRA_PAGINAS),
+      db.from("libro_paginas").select("n, imagen_path, audio_path, texto, video_id").eq("libro_id", data.id).order("n").limit(MUESTRA_PAGINAS),
       contarPaginas([data.id]),
     ]);
     if (error) throw new Error(error.message);
-    const filas = paginasDeMuestra((pags ?? []) as { n: number; imagen_path: string | null; audio_path: string | null; texto: string }[]);
+    const filas = paginasDeMuestra((pags ?? []) as { n: number; imagen_path: string | null; audio_path: string | null; texto: string; video_id: string | null }[]);
     const urls = await firmar(filas.flatMap((p) => [p.imagen_path, p.audio_path]));
     return {
       estado: "ok" as const,
@@ -251,12 +317,17 @@ export const muestraObra = createServerFn({ method: "POST" })
       tipo: ((libro.tipo as TipoObra) ?? "libro") as TipoObra,
       area: (libro.area as Area | null) ?? null,
       precioGs: (libro.precio_gs as number | null) ?? null,
+      precioFisicoGs: (libro.precio_fisico_gs as number | null) ?? null,
+      precioInstitucionalGs: (libro.precio_institucional_gs as number | null) ?? null,
+      enPreventa: !!libro.en_preventa,
+      fechaDisponible: (libro.fecha_disponible as string | null) ?? null,
       totalPaginas: total.get(data.id) ?? filas.length,
       paginas: filas.map<PaginaLectura>((p) => ({
         n: p.n,
         imagen: p.imagen_path ? (urls.get(p.imagen_path) ?? null) : null,
         audio: p.audio_path ? (urls.get(p.audio_path) ?? null) : null,
         texto: p.texto ?? "",
+        video: p.video_id ?? null,
       })),
     };
   });
@@ -273,7 +344,7 @@ export type LibroAdmin = LibroCard & {
   precioPropuestoGs: number | null;
   notaRevision: string;
   ventas: number;
-  lista: { n: number; imagen: string | null; audio: string | null; texto: string }[];
+  lista: { n: number; imagen: string | null; audio: string | null; texto: string; video: string | null }[];
   accesos: { id: string; nombre: string; correo: string; nota: string; fecha: string }[];
 };
 
@@ -290,7 +361,7 @@ export const adminLibros = createServerFn({ method: "GET" })
     const tarjetas = await aTarjetas(rows, "todos");
     const [pags, accs, vent] = ids.length
       ? await Promise.all([
-          db.from("libro_paginas").select("libro_id, n, imagen_path, audio_path, texto").in("libro_id", ids).order("n").limit(MAX_PAGINAS * 20),
+          db.from("libro_paginas").select("libro_id, n, imagen_path, audio_path, texto, video_id").in("libro_id", ids).order("n").limit(MAX_PAGINAS * 20),
           db.from("libro_accesos").select("id, libro_id, user_id, nota, created_at").in("libro_id", ids).order("created_at", { ascending: false }).limit(5000),
           db.from("pagos").select("ref_id").in("ref_id", ids).eq("estado", "pagado").neq("modo", "prueba").limit(20000),
         ])
@@ -304,7 +375,7 @@ export const adminLibros = createServerFn({ method: "GET" })
       const { data: ps } = await db.from("profiles").select("id, full_name, email").in("id", userIds.slice(i, i + 200));
       for (const p of (ps ?? []) as { id: string; full_name: string | null; email: string | null }[]) perfiles.set(p.id, p);
     }
-    const pagRows = (pags.data ?? []) as { libro_id: string; n: number; imagen_path: string | null; audio_path: string | null; texto: string }[];
+    const pagRows = (pags.data ?? []) as { libro_id: string; n: number; imagen_path: string | null; audio_path: string | null; texto: string; video_id: string | null }[];
     const libros: LibroAdmin[] = tarjetas.map((t, i) => ({
       ...t,
       portadaPath: rows[i].portada_path,
@@ -316,7 +387,7 @@ export const adminLibros = createServerFn({ method: "GET" })
       precioPropuestoGs: rows[i].precio_propuesto_gs,
       notaRevision: rows[i].nota_revision ?? "",
       ventas: ventasPor.get(t.id) ?? 0,
-      lista: pagRows.filter((p) => p.libro_id === t.id).map((p) => ({ n: p.n, imagen: p.imagen_path, audio: p.audio_path, texto: p.texto ?? "" })),
+      lista: pagRows.filter((p) => p.libro_id === t.id).map((p) => ({ n: p.n, imagen: p.imagen_path, audio: p.audio_path, texto: p.texto ?? "", video: p.video_id ?? null })),
       accesos: accRows
         .filter((a) => a.libro_id === t.id)
         .map((a) => ({
@@ -366,6 +437,12 @@ export const actualizarLibro = createServerFn({ method: "POST" })
         porcentajeAutor: z.number().int().min(0).max(100).nullable().optional(),
         estadoRevision: z.enum(ESTADOS).optional(),
         notaRevision: z.string().trim().max(2000).optional(),
+        publico: z.string().trim().max(300).optional(),
+        variante: z.enum(VARIANTES).nullable().optional(),
+        precioInstitucionalGs: z.number().int().min(1000).max(10000000).nullable().optional(),
+        precioFisicoGs: z.number().int().min(1000).max(10000000).nullable().optional(),
+        enPreventa: z.boolean().optional(),
+        fechaDisponible: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
       })
       .parse(d),
   )
@@ -378,6 +455,12 @@ export const actualizarLibro = createServerFn({ method: "POST" })
     if (data.porcentajeAutor !== undefined) cambios.porcentaje_autor = data.porcentajeAutor;
     if (data.estadoRevision !== undefined) cambios.estado_revision = data.estadoRevision;
     if (data.notaRevision !== undefined) cambios.nota_revision = data.notaRevision;
+    if (data.publico !== undefined) cambios.publico = data.publico;
+    if (data.variante !== undefined) cambios.variante = data.variante;
+    if (data.precioInstitucionalGs !== undefined) cambios.precio_institucional_gs = data.precioInstitucionalGs;
+    if (data.precioFisicoGs !== undefined) cambios.precio_fisico_gs = data.precioFisicoGs;
+    if (data.enPreventa !== undefined) cambios.en_preventa = data.enPreventa;
+    if (data.fechaDisponible !== undefined) cambios.fecha_disponible = data.fechaDisponible;
     if (data.publicado === true || data.autorizacionFirmada === false) {
       const db0 = await admin();
       const { data: actual } = await db0.from("libros").select("autorizacion_firmada, publicado").eq("id", data.id).maybeSingle();
@@ -457,6 +540,7 @@ export const guardarPagina = createServerFn({ method: "POST" })
         imagen: z.string().max(300).nullable().optional(),
         audio: z.string().max(300).nullable().optional(),
         texto: z.string().max(20000).optional(),
+        video: z.string().trim().max(300).nullable().optional(),
       })
       .parse(d),
   )
@@ -471,6 +555,11 @@ export const guardarPagina = createServerFn({ method: "POST" })
     if (data.imagen !== undefined) fila.imagen_path = data.imagen;
     if (data.audio !== undefined) fila.audio_path = data.audio;
     if (data.texto !== undefined) fila.texto = data.texto;
+    if (data.video !== undefined) {
+      const id = data.video ? idYoutube(data.video) : null;
+      if (data.video && !id) throw new Error("Ese enlace no es de un video de YouTube.");
+      fila.video_id = id;
+    }
     const { error } = await db.from("libro_paginas").upsert(fila, { onConflict: "libro_id,n" });
     if (error) throw new Error(error.message);
     return { ok: true };

@@ -2,12 +2,25 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRef, useState } from "react";
-import { BookPlus, Eye, FileCheck2, Loader2, PenLine, Send, Settings2, Trash2 } from "lucide-react";
+import { BookPlus, Camera, ExternalLink, Eye, FileCheck2, Loader2, PenLine, Send, Settings2, Store, Trash2, UserRound } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { borrarObraAutor, crearObra, editarObra, enviarARevision, miPortalAutor, type ObraAutor } from "@/lib/obras.functions";
-import { AREAS, AREA_NOMBRE, ESTADO_NOMBRE, nombreMes, type Area, type TipoObra } from "@/lib/obras";
+import {
+  borrarObraAutor,
+  crearObra,
+  editarObra,
+  enviarARevision,
+  guardarFotoAutor,
+  guardarMiVitrina,
+  miPortalAutor,
+  urlFotoAutor,
+  type ObraAutor,
+  type SaldoAutor,
+  type VitrinaAutor,
+} from "@/lib/obras.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { AREAS, AREA_NOMBRE, ESTADO_NOMBRE, VARIANTES, VARIANTE_NOMBRE, nombreMes, type Area, type TipoObra, type Variante } from "@/lib/obras";
 import { formatoGs } from "@/lib/pagopar";
 import { EditorPaginas, prepararImagen, useSubirArchivo } from "@/components/libreria/editor-obra";
 
@@ -111,6 +124,8 @@ function MisObrasPage() {
                 publicada, sus 2 primeras páginas se pueden ver y escuchar gratis, para que la gente se anime a comprarla.
               </p>
 
+              {data.habilitado && <MiVitrina vitrina={data.vitrina} onCambio={refrescar} />}
+
               {data.habilitado ? (
                 <NuevaObra onCreada={refrescar} />
               ) : (
@@ -125,7 +140,7 @@ function MisObrasPage() {
                 ))}
               </div>
 
-              <Informe filas={data.informe} />
+              <Informe filas={data.informe} saldo={data.saldo} />
             </>
           )}
         </div>
@@ -141,15 +156,28 @@ function NuevaObra({ onCreada }: { onCreada: () => void }) {
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [precio, setPrecio] = useState("");
+  const [variante, setVariante] = useState<Variante | "">("");
+  const [publico, setPublico] = useState("");
   const m = useMutation({
     mutationFn: () => {
       const p = precio.replace(/\D/g, "");
-      return crear({ data: { titulo, descripcion, tipo, area: tipo === "modulo" ? area : null, precioPropuestoGs: p ? Number(p) : null } });
+      return crear({
+        data: {
+          titulo,
+          descripcion,
+          tipo,
+          area: tipo === "libro" ? null : area,
+          precioPropuestoGs: p ? Number(p) : null,
+          variante: variante || null,
+          publico,
+        },
+      });
     },
     onSuccess: () => {
       setTitulo("");
       setDescripcion("");
       setPrecio("");
+      setPublico("");
       onCreada();
     },
   });
@@ -166,8 +194,9 @@ function NuevaObra({ onCreada }: { onCreada: () => void }) {
         <select aria-label="¿Qué vas a cargar?" value={tipo} onChange={(e) => setTipo(e.target.value as TipoObra)} className={select}>
           <option value="libro">Un libro</option>
           <option value="modulo">Un módulo de especialización</option>
+          <option value="curso">Un curso con video</option>
         </select>
-        {tipo === "modulo" && (
+        {tipo !== "libro" && (
           <select aria-label="Rubro" value={area} onChange={(e) => setArea(e.target.value as Area)} className={select}>
             {AREAS.map((a) => (
               <option key={a} value={a}>{AREA_NOMBRE[a]}</option>
@@ -176,6 +205,13 @@ function NuevaObra({ onCreada }: { onCreada: () => void }) {
         )}
       </div>
       <Input placeholder="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} maxLength={200} className="h-11" />
+      <select aria-label="¿En qué lengua está?" value={variante} onChange={(e) => setVariante(e.target.value as Variante | "")} className={`${select} w-full`}>
+        <option value="">¿En qué lengua está?</option>
+        {VARIANTES.map((v) => (
+          <option key={v} value={v}>{VARIANTE_NOMBRE[v]}</option>
+        ))}
+      </select>
+      <Input placeholder="¿Para quién es? (ej. enfermeras y médicos de guardia)" value={publico} onChange={(e) => setPublico(e.target.value)} maxLength={300} className="h-11" />
       <textarea
         placeholder="Descripción corta: de qué trata y para quién es"
         value={descripcion}
@@ -220,7 +256,7 @@ function ObraPanel({ obra, onCambio }: { obra: ObraAutor; onCambio: () => void }
     }
   }
 
-  const tipoTexto = obra.tipo === "modulo" ? `Módulo · ${obra.area ? AREA_NOMBRE[obra.area] : ""}` : "Libro";
+  const tipoTexto = obra.tipo === "libro" ? "Libro" : `${obra.tipo === "modulo" ? "Módulo" : "Curso"}${obra.area ? ` · ${AREA_NOMBRE[obra.area]}` : ""}`;
 
   return (
     <section className="rounded-2xl border border-border bg-card p-4" aria-label={obra.titulo}>
@@ -232,6 +268,11 @@ function ObraPanel({ obra, onCambio }: { obra: ObraAutor; onCambio: () => void }
       </div>
       <h2 className="mt-1 font-display text-xl font-bold text-foreground">{obra.titulo}</h2>
       {obra.descripcion && <p className="mt-1 text-sm text-muted-foreground">{obra.descripcion}</p>}
+      {(obra.variante || obra.publico) && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          {[obra.variante ? VARIANTE_NOMBRE[obra.variante] : null, obra.publico ? `Para: ${obra.publico}` : null].filter(Boolean).join(" · ")}
+        </p>
+      )}
       <p className="mt-1 text-xs text-muted-foreground">
         {obra.lista.length} {obra.lista.length === 1 ? "página" : "páginas"}
         {obra.precioGs ? ` · Precio de venta ${formatoGs(obra.precioGs)}` : obra.precioPropuestoGs ? ` · Propusiste ${formatoGs(obra.precioPropuestoGs)}` : ""}
@@ -304,6 +345,8 @@ function ObraPanel({ obra, onCambio }: { obra: ObraAutor; onCambio: () => void }
                   titulo: String(fd.get("titulo") ?? ""),
                   descripcion: String(fd.get("descripcion") ?? ""),
                   precioPropuestoGs: p ? Number(p) : null,
+                  variante: (String(fd.get("variante") ?? "") || null) as Variante | null,
+                  publico: String(fd.get("publico") ?? ""),
                 },
               });
               setAbiertoDatos(false);
@@ -312,6 +355,13 @@ function ObraPanel({ obra, onCambio }: { obra: ObraAutor; onCambio: () => void }
         >
           <Input name="titulo" defaultValue={obra.titulo} maxLength={200} aria-label="Título" className="h-11" />
           <textarea name="descripcion" defaultValue={obra.descripcion} maxLength={2000} rows={3} aria-label="Descripción" className="w-full rounded-md border border-input bg-background px-3 py-2 text-base" />
+          <select name="variante" defaultValue={obra.variante ?? ""} aria-label="Lengua de la obra" className={`${select} w-full`}>
+            <option value="">¿En qué lengua está?</option>
+            {VARIANTES.map((v) => (
+              <option key={v} value={v}>{VARIANTE_NOMBRE[v]}</option>
+            ))}
+          </select>
+          <Input name="publico" defaultValue={obra.publico} maxLength={300} aria-label="¿Para quién es?" placeholder="¿Para quién es?" className="h-11" />
           <Input name="precio" inputMode="numeric" defaultValue={obra.precioPropuestoGs ?? ""} aria-label="Precio que proponés (Gs.)" placeholder="Precio que proponés (Gs.)" className="h-11" />
           <div className="flex flex-wrap gap-2">
             <Button type="submit" size="sm" disabled={!!ocupado}>Guardar datos</Button>
@@ -350,11 +400,25 @@ function ObraPanel({ obra, onCambio }: { obra: ObraAutor; onCambio: () => void }
   );
 }
 
-function Informe({ filas }: { filas: { mes: string; titulo: string; ventas: number; cobradoGs: number; parteAutorGs: number | null }[] }) {
+function Informe({ filas, saldo }: { filas: { mes: string; titulo: string; ventas: number; cobradoGs: number; parteAutorGs: number | null }[]; saldo: SaldoAutor }) {
   return (
     <section className="mt-8" aria-labelledby="t-ventas">
       <h2 id="t-ventas" className="font-display text-xl font-bold text-foreground">Tus ventas</h2>
       <p className="mt-1 text-sm text-muted-foreground">Ventas en línea confirmadas, por mes. Tu parte sale del porcentaje de tu contrato.</p>
+      {(saldo.devengadoGs > 0 || saldo.pagadoGs > 0) && (
+        <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
+          {[
+            ["Te corresponde", saldo.devengadoGs],
+            ["Ya te pagamos", saldo.pagadoGs],
+            ["Por cobrar", saldo.saldoGs],
+          ].map(([t, v]) => (
+            <div key={t as string} className="rounded-xl bg-muted/60 p-3">
+              <dt className="text-xs text-muted-foreground">{t}</dt>
+              <dd className="mt-0.5 font-display text-base font-bold text-foreground sm:text-lg">{formatoGs(v as number)}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
       {filas.length === 0 ? (
         <p className="mt-3 rounded-xl border border-dashed border-border p-4 text-center text-sm text-muted-foreground">Todavía no hay ventas.</p>
       ) : (
@@ -383,6 +447,130 @@ function Informe({ filas }: { filas: { mes: string; titulo: string; ventas: numb
           </table>
         </div>
       )}
+    </section>
+  );
+}
+
+/** La vitrina pública del autor (jaikuaa.com/autor/…): nombre, presentación y foto. */
+function MiVitrina({ vitrina, onCambio }: { vitrina: VitrinaAutor | null; onCambio: () => void }) {
+  const guardar = useServerFn(guardarMiVitrina);
+  const pedirUrl = useServerFn(urlFotoAutor);
+  const guardarFoto = useServerFn(guardarFotoAutor);
+  const [abierta, setAbierta] = useState(!vitrina?.slug);
+  const [ocupado, setOcupado] = useState<string | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
+  const inFoto = useRef<HTMLInputElement>(null);
+
+  async function correr(etiqueta: string, fn: () => Promise<void>) {
+    setOcupado(etiqueta);
+    setAviso(null);
+    try {
+      await fn();
+      onCambio();
+    } catch (e) {
+      setAviso(e instanceof Error ? e.message : "Algo falló. Probá de nuevo.");
+    } finally {
+      setOcupado(null);
+    }
+  }
+
+  return (
+    <section className="mt-6 rounded-2xl border border-border bg-card p-4" aria-labelledby="t-vitrina">
+      <div className="flex flex-wrap items-center gap-3">
+        {vitrina?.fotoUrl ? (
+          <img src={vitrina.fotoUrl} alt="" className="h-14 w-14 rounded-full object-cover" />
+        ) : (
+          <span className="grid h-14 w-14 place-items-center rounded-full bg-muted" aria-hidden>
+            <UserRound className="h-7 w-7 text-muted-foreground" />
+          </span>
+        )}
+        <div className="min-w-0 flex-1">
+          <h2 id="t-vitrina" className="flex items-center gap-1.5 font-semibold text-foreground">
+            <Store className="h-4 w-4" /> Tu vitrina en la Librería
+          </h2>
+          {vitrina?.slug ? (
+            <p className="text-sm text-muted-foreground">
+              {vitrina.vitrina ? "Visible en " : "Oculta. Dirección: "}
+              <span className="font-medium text-foreground">jaikuaa.com/autor/{vitrina.slug}</span>
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">Contá quién sos: la gente ve tu presentación y todas tus obras juntas.</p>
+          )}
+        </div>
+        <div className="flex gap-2">
+          {vitrina?.slug && vitrina.vitrina && (
+            <Button asChild size="sm" variant="outline">
+              <Link to="/autor/$slug" params={{ slug: vitrina.slug }}>
+                <ExternalLink className="mr-1.5 h-4 w-4" /> Ver
+              </Link>
+            </Button>
+          )}
+          <Button size="sm" variant="outline" onClick={() => setAbierta((v) => !v)} aria-expanded={abierta}>
+            <PenLine className="mr-1.5 h-4 w-4" /> Editar
+          </Button>
+        </div>
+      </div>
+
+      {abierta && (
+        <form
+          className="mt-3 space-y-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const fd = new FormData(e.currentTarget);
+            void correr("Guardando tu vitrina…", async () => {
+              await guardar({
+                data: { nombre: String(fd.get("nombre") ?? ""), bio: String(fd.get("bio") ?? ""), vitrina: fd.get("visible") === "on" },
+              });
+              setAbierta(false);
+            });
+          }}
+        >
+          <Input name="nombre" defaultValue={vitrina?.nombre ?? ""} required minLength={2} maxLength={120} aria-label="Tu nombre como autor" placeholder="Tu nombre como autor (o el de tu editorial)" className="h-11" />
+          <textarea
+            name="bio"
+            defaultValue={vitrina?.bio ?? ""}
+            maxLength={1500}
+            rows={4}
+            aria-label="Tu presentación"
+            placeholder="Tu presentación: quién sos, qué enseñás o escribís, dónde trabajás."
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-base"
+          />
+          <label className="flex items-center gap-2 text-sm text-foreground">
+            <input type="checkbox" name="visible" defaultChecked={vitrina?.vitrina ?? true} className="h-5 w-5" /> Que mi vitrina se vea en la Librería
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <Button type="submit" size="sm" disabled={!!ocupado}>Guardar vitrina</Button>
+            <input
+              ref={inFoto}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (!f) return;
+                void correr("Subiendo tu foto…", async () => {
+                  const img = await prepararImagen(f);
+                  const mime = (img.type || "image/webp") as "image/webp" | "image/jpeg" | "image/png";
+                  const u = await pedirUrl({ data: { mime } });
+                  const { error } = await supabase.storage.from("libros").uploadToSignedUrl(u.path, u.token, img, { contentType: mime });
+                  if (error) throw new Error(error.message);
+                  await guardarFoto({ data: { ruta: u.ruta } });
+                });
+              }}
+            />
+            <Button type="button" size="sm" variant="outline" disabled={!!ocupado} onClick={() => inFoto.current?.click()}>
+              <Camera className="mr-1.5 h-4 w-4" /> {vitrina?.fotoUrl ? "Cambiar foto" : "Subir foto"}
+            </Button>
+          </div>
+        </form>
+      )}
+      {ocupado && (
+        <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground" role="status">
+          <Loader2 className="h-4 w-4 animate-spin" /> {ocupado}
+        </p>
+      )}
+      {aviso && <p className="mt-2 text-sm text-destructive" role="alert">{aviso}</p>}
     </section>
   );
 }

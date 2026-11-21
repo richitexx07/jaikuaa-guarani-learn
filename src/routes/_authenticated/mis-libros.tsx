@@ -6,6 +6,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { misLibros, type LibroCard } from "@/lib/libros.functions";
 import { Portada } from "@/components/libreria/portada";
+import { MisPedidosImpresos } from "@/components/libreria/mis-pedidos";
 
 /** «Mis libros»: la biblioteca de cada persona con los libros y módulos que compró en la Librería Jaikuaa. */
 export const Route = createFileRoute("/_authenticated/mis-libros")({
@@ -69,7 +70,7 @@ function MisLibrosPage() {
           {data && data.libros.length === 0 && (
             <div className="mt-8 rounded-2xl border border-dashed border-border p-8 text-center">
               <BookOpen className="mx-auto h-10 w-10 text-muted-foreground" aria-hidden />
-              <p className="mt-3 font-semibold text-foreground">Todavía no tenés libros ni módulos</p>
+              <p className="mt-3 font-semibold text-foreground">Todavía no tenés libros, módulos ni cursos</p>
               <p className="mt-1 text-sm text-muted-foreground">Cuando compres un libro o un módulo de la Librería Jaikuaa, aparece acá con esta misma cuenta.</p>
               <Button asChild className="mt-4">
                 <Link to="/libreria">Ir a la Librería</Link>
@@ -86,6 +87,8 @@ function MisLibrosPage() {
               ))}
             </ul>
           )}
+
+          <MisPedidosImpresos />
         </div>
       </main>
     </div>
