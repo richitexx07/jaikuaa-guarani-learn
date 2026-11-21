@@ -92,7 +92,7 @@ function CarritoPage() {
   return (
     <div className="flex min-h-screen flex-col" style={{ background: "#F6F3EC" }}>
       <CabeceraMercado />
-      <main className="mx-auto w-full max-w-5xl flex-1 px-3 pb-16 pt-5 sm:px-6">
+      <main className="mercado-claro mx-auto w-full max-w-5xl flex-1 px-3 pb-16 pt-5 sm:px-6">
         <h1 className="font-display text-2xl font-bold sm:text-3xl" style={{ color: C.tinta }}>Tu carrito</h1>
         {lineas.length === 0 ? (
           <div className="mt-6 rounded-3xl bg-white p-8 text-center shadow-sm">

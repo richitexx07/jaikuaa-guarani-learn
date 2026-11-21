@@ -33,7 +33,7 @@ function FichaPage() {
   return (
     <div className="flex min-h-screen flex-col" style={{ background: "#F6F3EC" }}>
       <CabeceraMercado />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-3 pb-16 pt-4 sm:px-6">
+      <main className="mercado-claro mx-auto w-full max-w-6xl flex-1 px-3 pb-16 pt-4 sm:px-6">
         {isLoading && (
           <p className="mt-10 flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" /> Cargando…

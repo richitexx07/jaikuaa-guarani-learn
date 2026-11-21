@@ -197,6 +197,35 @@ html:has(.learning-home), body:has(.learning-home) { overflow-x: clip; }
   --postulation-notice: #FFF3D1;
   color: var(--foreground);
 }
+/* El Mercado tiene fondos claros fijos: sus textos usan siempre los colores del modo claro, aunque el celular esté en modo oscuro. */
+.mercado-claro {
+  color-scheme: only light;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.34618 0.07355 256.04);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.34618 0.07355 256.04);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.34618 0.07355 256.04);
+  --primary: oklch(0.34618 0.07355 256.04);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.96 0.008 260);
+  --secondary-foreground: oklch(0.34618 0.07355 256.04);
+  --muted: oklch(0.95 0.005 260);
+  --muted-foreground: oklch(0.45 0.05 260);
+  --accent: oklch(0.53037 0.2074 22.317);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.53037 0.2074 22.317);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.34618 0.07355 256.04 / 12%);
+  --input: oklch(0.34618 0.07355 256.04 / 25%);
+  color: var(--foreground);
+}
+.mercado-claro :is(input, textarea, select) {
+  background-color: #fff;
+  color: var(--foreground);
+  caret-color: var(--foreground);
+}
+.dark .mercado-claro :where(.bg-card, [data-slot="card"]) { background-image: none; }
 .postulation-light :is(input, textarea, select) {
   background-color: var(--background);
   color: var(--foreground);

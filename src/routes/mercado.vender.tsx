@@ -40,7 +40,7 @@ function VenderPage() {
   return (
     <div className="flex min-h-screen flex-col" style={{ background: "#F6F3EC" }}>
       <CabeceraMercado />
-      <main className="mx-auto w-full max-w-4xl flex-1 px-3 pb-16 pt-5 sm:px-6">
+      <main className="mercado-claro mx-auto w-full max-w-4xl flex-1 px-3 pb-16 pt-5 sm:px-6">
         <section className="rounded-3xl px-5 py-8 text-white sm:px-10" style={{ background: `linear-gradient(120deg, ${C.noche}, ${C.azul})` }}>
           {!abierto && (
             <p className="text-sm font-semibold" style={{ color: C.dorado }}>Inscripciones abiertas: tu vitrina queda lista para la apertura</p>

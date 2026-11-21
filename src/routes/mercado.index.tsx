@@ -93,7 +93,7 @@ function MercadoPage() {
         </ul>
       </nav>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-3 pb-16 sm:px-6">
+      <main className="mercado-claro mx-auto w-full max-w-6xl flex-1 px-3 pb-16 sm:px-6">
         {!filtrando && preinscripcion && (
           <section className="mt-4 overflow-hidden rounded-3xl text-white" style={{ background: `linear-gradient(120deg, ${C.noche}, ${C.azul})` }} aria-labelledby="t-abriendo">
             <div className="grid gap-6 px-5 py-7 sm:px-10 sm:py-10 lg:grid-cols-[1.2fr_1fr] lg:items-center">
