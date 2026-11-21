@@ -240,7 +240,7 @@ function ObraPanel({ obra, onCambio }: { obra: ObraAutor; onCambio: () => void }
         </p>
       )}
       {obra.estado === "en_revision" && (
-        <p className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">La estamos revisando. Te avisamos cuando esté lista o si hace falta algún cambio.</p>
+        <p className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">La estamos revisando. Volvé a esta página para ver si ya está aprobada o si te pedimos algún cambio.</p>
       )}
       {obra.estado === "aprobado" && !obra.publicado && (
         <p className="mt-3 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-900">
