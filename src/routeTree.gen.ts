@@ -73,6 +73,7 @@ import { Route as ApiTutorRouteImport } from './routes/api/tutor'
 import { Route as ClaseIndexRouteImport } from './routes/clase.index'
 import { Route as ClaseNRouteImport } from './routes/clase.$n'
 import { Route as ConvenioProgramaRouteImport } from './routes/convenio.$programa'
+import { Route as MuestraIdRouteImport } from './routes/muestra.$id'
 import { Route as PuraheiIndexRouteImport } from './routes/purahei.index'
 import { Route as PuraheiSlugRouteImport } from './routes/purahei.$slug'
 import { Route as StudioIndexRouteImport } from './routes/studio.index'
@@ -461,6 +462,11 @@ const ClaseNRoute = ClaseNRouteImport.update({
 const ConvenioProgramaRoute = ConvenioProgramaRouteImport.update({
   id: '/convenio/$programa',
   path: '/convenio/$programa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MuestraIdRoute = MuestraIdRouteImport.update({
+  id: '/muestra/$id',
+  path: '/muestra/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PuraheiIndexRoute = PuraheiIndexRouteImport.update({
@@ -903,6 +909,7 @@ export interface FileRoutesByFullPath {
   '/api/tutor': typeof ApiTutorRoute
   '/clase/$n': typeof ClaseNRoute
   '/convenio/$programa': typeof ConvenioProgramaRoute
+  '/muestra/$id': typeof MuestraIdRoute
   '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar-convenio/$codigo': typeof VerificarConvenioCodigoRoute
@@ -1033,6 +1040,7 @@ export interface FileRoutesByTo {
   '/api/tutor': typeof ApiTutorRoute
   '/clase/$n': typeof ClaseNRoute
   '/convenio/$programa': typeof ConvenioProgramaRoute
+  '/muestra/$id': typeof MuestraIdRoute
   '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar-convenio/$codigo': typeof VerificarConvenioCodigoRoute
@@ -1164,6 +1172,7 @@ export interface FileRoutesById {
   '/api/tutor': typeof ApiTutorRoute
   '/clase/$n': typeof ClaseNRoute
   '/convenio/$programa': typeof ConvenioProgramaRoute
+  '/muestra/$id': typeof MuestraIdRoute
   '/purahei/$slug': typeof PuraheiSlugRoute
   '/studio/$': typeof StudioSplatRoute
   '/verificar-convenio/$codigo': typeof VerificarConvenioCodigoRoute
@@ -1297,6 +1306,7 @@ export interface FileRouteTypes {
     | '/api/tutor'
     | '/clase/$n'
     | '/convenio/$programa'
+    | '/muestra/$id'
     | '/purahei/$slug'
     | '/studio/$'
     | '/verificar-convenio/$codigo'
@@ -1427,6 +1437,7 @@ export interface FileRouteTypes {
     | '/api/tutor'
     | '/clase/$n'
     | '/convenio/$programa'
+    | '/muestra/$id'
     | '/purahei/$slug'
     | '/studio/$'
     | '/verificar-convenio/$codigo'
@@ -1557,6 +1568,7 @@ export interface FileRouteTypes {
     | '/api/tutor'
     | '/clase/$n'
     | '/convenio/$programa'
+    | '/muestra/$id'
     | '/purahei/$slug'
     | '/studio/$'
     | '/verificar-convenio/$codigo'
@@ -1670,6 +1682,7 @@ export interface RootRouteChildren {
   ApiTutorRoute: typeof ApiTutorRoute
   ClaseNRoute: typeof ClaseNRoute
   ConvenioProgramaRoute: typeof ConvenioProgramaRoute
+  MuestraIdRoute: typeof MuestraIdRoute
   PuraheiSlugRoute: typeof PuraheiSlugRoute
   StudioSplatRoute: typeof StudioSplatRoute
   VerificarConvenioCodigoRoute: typeof VerificarConvenioCodigoRoute
@@ -2135,6 +2148,13 @@ declare module '@tanstack/react-router' {
       path: '/convenio/$programa'
       fullPath: '/convenio/$programa'
       preLoaderRoute: typeof ConvenioProgramaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/muestra/$id': {
+      id: '/muestra/$id'
+      path: '/muestra/$id'
+      fullPath: '/muestra/$id'
+      preLoaderRoute: typeof MuestraIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/purahei/': {
@@ -2845,6 +2865,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTutorRoute: ApiTutorRoute,
   ClaseNRoute: ClaseNRoute,
   ConvenioProgramaRoute: ConvenioProgramaRoute,
+  MuestraIdRoute: MuestraIdRoute,
   PuraheiSlugRoute: PuraheiSlugRoute,
   StudioSplatRoute: StudioSplatRoute,
   VerificarConvenioCodigoRoute: VerificarConvenioCodigoRoute,

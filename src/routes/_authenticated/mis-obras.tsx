@@ -106,6 +106,10 @@ function MisObrasPage() {
                   </li>
                 ))}
               </ol>
+              <p className="mt-3 text-xs text-muted-foreground">
+                La voz de cada página la podés grabar ahí mismo con el celular, o subir un audio que ya tengas. Cuando la obra está
+                publicada, sus 2 primeras páginas se pueden ver y escuchar gratis, para que la gente se anime a comprarla.
+              </p>
 
               {data.habilitado ? (
                 <NuevaObra onCreada={refrescar} />

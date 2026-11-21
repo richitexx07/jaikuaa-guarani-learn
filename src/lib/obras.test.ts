@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { esRutaDeLaObra, informeVentas, mesPy, nombreMes, puedeEditarObra, puedePublicar, puedeVerSinComprar } from "./obras";
+import { esRutaDeLaObra, informeVentas, mesPy, nombreMes, paginasDeMuestra, puedeEditarObra, puedePublicar, puedeVerSinComprar } from "./obras";
 
 const ID = "11111111-1111-1111-1111-111111111111";
 
@@ -63,5 +63,14 @@ describe("informe de ventas del autor", () => {
       { mes: "2026-11", obraId: "a", titulo: "Guaraní médico I", ventas: 2, cobradoGs: 100000, parteAutorGs: 50000 },
       { mes: "2026-11", obraId: "b", titulo: "Libro de prueba", ventas: 1, cobradoGs: 30000, parteAutorGs: null },
     ]);
+  });
+});
+
+describe("muestra gratis", () => {
+  it("da las 2 primeras páginas por número, aunque vengan desordenadas", () => {
+    const p = [{ n: 3 }, { n: 1 }, { n: 7 }, { n: 2 }];
+    expect(paginasDeMuestra(p).map((x) => x.n)).toEqual([1, 2]);
+    expect(paginasDeMuestra([{ n: 5 }]).map((x) => x.n)).toEqual([5]);
+    expect(paginasDeMuestra([])).toEqual([]);
   });
 });

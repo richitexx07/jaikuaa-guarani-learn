@@ -1,12 +1,12 @@
 /**
  * Las obras ya publicadas en la Librería: módulos de especialización (guaraní médico, jurídico, financiero…)
- * y libros. Cada una con portada, autor y dos caminos: comprar (o pedirla por WhatsApp) y «Leer»,
- * que solo muestra la obra a quien ya tiene acceso. Si todavía no hay obras publicadas, no muestra nada.
+ * y libros. Cada una con portada, autor, comprar (o pedirla por WhatsApp) y una muestra gratis de sus primeras
+ * páginas con voz, sin cuenta. Si todavía no hay obras publicadas, no muestra nada.
  */
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, MessageCircle } from "lucide-react";
+import { BookOpen, Headphones, MessageCircle } from "lucide-react";
 import { catalogoLibros, type LibroCard } from "@/lib/libros.functions";
 import { AREA_NOMBRE } from "@/lib/obras";
 import { SUPPORT_WHATSAPP } from "@/lib/contact";
@@ -41,6 +41,12 @@ export function CatalogoLibreria() {
             obras={libros}
           />
         )}
+        <p className="text-center text-sm text-muted-foreground">
+          ¿Ya compraste?{" "}
+          <Link to="/mis-libros" className="font-semibold underline" style={{ color: C.tinta }}>
+            Tus libros y módulos están en «Mis libros»
+          </Link>
+        </p>
       </div>
     </section>
   );
@@ -82,14 +88,27 @@ function Grupo({ id, titulo, bajada, obras }: { id: string; titulo: string; baja
                   >
                     <MessageCircle className="h-4 w-4" /> Pedirlo
                   </a>
-                  <Link
-                    to="/leer/$id"
-                    params={{ id: l.id }}
-                    className="inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-semibold"
-                    style={{ borderColor: C.tinta, color: C.tinta }}
-                  >
-                    <BookOpen className="h-4 w-4" /> Ya lo tengo: leer
-                  </Link>
+                  {l.tengo ? (
+                    <Link
+                      to="/leer/$id"
+                      params={{ id: l.id }}
+                      className="inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-semibold"
+                      style={{ borderColor: C.tinta, color: C.tinta }}
+                    >
+                      <BookOpen className="h-4 w-4" /> Leer
+                    </Link>
+                  ) : (
+                    l.paginas > 0 && (
+                      <Link
+                        to="/muestra/$id"
+                        params={{ id: l.id }}
+                        className="inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-semibold"
+                        style={{ borderColor: C.tinta, color: C.tinta }}
+                      >
+                        <Headphones className="h-4 w-4" /> Ver muestra gratis
+                      </Link>
+                    )
+                  )}
                 </div>
               </div>
             </li>

@@ -2,7 +2,20 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { marcaDeAgua, partirRuta } from "@/lib/libros";
-import { AREAS, ESTADOS, TIPOS_OBRA, esRutaDeLaObra, puedeEditarObra, puedePublicar, puedeVerSinComprar, type Area, type EstadoRevision, type TipoObra } from "@/lib/obras";
+import {
+  AREAS,
+  ESTADOS,
+  MUESTRA_PAGINAS,
+  TIPOS_OBRA,
+  esRutaDeLaObra,
+  paginasDeMuestra,
+  puedeEditarObra,
+  puedePublicar,
+  puedeVerSinComprar,
+  type Area,
+  type EstadoRevision,
+  type TipoObra,
+} from "@/lib/obras";
 
 /**
  * Librería Jaikuaa: obras (libros y módulos de especialización), su lector y su carga.
@@ -200,6 +213,45 @@ export const leerLibro = createServerFn({ method: "POST" })
       autor: libro.data.autor as string,
       vistaPrevia: revisa && !acceso.data,
       marca: marcaDeAgua(nombre, correo),
+      paginas: filas.map<PaginaLectura>((p) => ({
+        n: p.n,
+        imagen: p.imagen_path ? (urls.get(p.imagen_path) ?? null) : null,
+        audio: p.audio_path ? (urls.get(p.audio_path) ?? null) : null,
+        texto: p.texto ?? "",
+      })),
+    };
+  });
+
+/**
+ * Muestra gratis de una obra publicada: sus primeras páginas con voz, sin cuenta.
+ * Nunca entrega más de MUESTRA_PAGINAS páginas, y nada de obras sin publicar.
+ */
+export const muestraObra = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data }) => {
+    const db = await admin();
+    const { data: libro } = await db
+      .from("libros")
+      .select("id, titulo, autor, descripcion, tipo, area, precio_gs, publicado")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!libro || !libro.publicado) return { estado: "no-existe" as const };
+    const [{ data: pags, error }, total] = await Promise.all([
+      db.from("libro_paginas").select("n, imagen_path, audio_path, texto").eq("libro_id", data.id).order("n").limit(MUESTRA_PAGINAS),
+      contarPaginas([data.id]),
+    ]);
+    if (error) throw new Error(error.message);
+    const filas = paginasDeMuestra((pags ?? []) as { n: number; imagen_path: string | null; audio_path: string | null; texto: string }[]);
+    const urls = await firmar(filas.flatMap((p) => [p.imagen_path, p.audio_path]));
+    return {
+      estado: "ok" as const,
+      titulo: libro.titulo as string,
+      autor: (libro.autor as string) ?? "",
+      descripcion: (libro.descripcion as string) ?? "",
+      tipo: ((libro.tipo as TipoObra) ?? "libro") as TipoObra,
+      area: (libro.area as Area | null) ?? null,
+      precioGs: (libro.precio_gs as number | null) ?? null,
+      totalPaginas: total.get(data.id) ?? filas.length,
       paginas: filas.map<PaginaLectura>((p) => ({
         n: p.n,
         imagen: p.imagen_path ? (urls.get(p.imagen_path) ?? null) : null,

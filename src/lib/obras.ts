@@ -96,3 +96,11 @@ export function informeVentas(ventas: readonly VentaPagada[], obras: readonly Ob
   }
   return out.sort((a, b) => (a.mes === b.mes ? a.titulo.localeCompare(b.titulo) : a.mes < b.mes ? 1 : -1));
 }
+
+/** Páginas que se muestran gratis antes de comprar. */
+export const MUESTRA_PAGINAS = 2;
+
+/** Las primeras páginas de la obra (por número), para la muestra gratis. */
+export function paginasDeMuestra<T extends { n: number }>(paginas: readonly T[], cuantas = MUESTRA_PAGINAS): T[] {
+  return [...paginas].sort((a, b) => a.n - b.n).slice(0, Math.max(0, cuantas));
+}
