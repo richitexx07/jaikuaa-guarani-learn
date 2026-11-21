@@ -28,8 +28,8 @@ export function PanelTienda() {
 }
 
 const SIGUIENTE: Partial<Record<EstadoPedido, { a: EstadoPedido; texto: string }>> = {
-  por_enviar: { a: "enviado", texto: "Marcar enviado" },
-  enviado: { a: "entregado", texto: "Marcar entregado" },
+  por_enviar: { a: "enviado", texto: "Marcar enviado o coordinado" },
+  enviado: { a: "entregado", texto: "Marcar entregado o realizado" },
 };
 
 function PedidosImpresos({ pedidos, onCambio }: { pedidos: PedidoAdmin[]; onCambio: () => void }) {
@@ -57,7 +57,7 @@ function PedidosImpresos({ pedidos, onCambio }: { pedidos: PedidoAdmin[]; onCamb
     <section className="mt-6 rounded-2xl border border-border bg-card p-4" aria-labelledby="t-pedidos">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="t-pedidos" className="flex items-center gap-1.5 font-semibold text-foreground">
-          <Package className="h-4 w-4" /> Pedidos impresos {pendientes.length > 0 && <span className="rounded-full bg-amber-100 px-2 text-xs font-bold text-amber-900">{pendientes.length} por atender</span>}
+          <Package className="h-4 w-4" /> Pedidos por atender {pendientes.length > 0 && <span className="rounded-full bg-amber-100 px-2 text-xs font-bold text-amber-900">{pendientes.length} por atender</span>}
         </h2>
         {pedidos.length > pendientes.length && (
           <Button size="sm" variant="ghost" onClick={() => setVerTodos((v) => !v)}>
@@ -65,7 +65,7 @@ function PedidosImpresos({ pedidos, onCambio }: { pedidos: PedidoAdmin[]; onCamb
           </Button>
         )}
       </div>
-      <p className="mt-1 text-xs text-muted-foreground">Aparecen cuando Pagopar confirma el pago. Coordiná la entrega por WhatsApp con el número que dejó.</p>
+      <p className="mt-1 text-xs text-muted-foreground">Impresos, artesanías, servicios y experiencias: aparecen cuando Pagopar confirma el pago. Coordiná por WhatsApp con el número que dejó la persona.</p>
       {lista.length === 0 ? (
         <p className="mt-3 text-sm text-muted-foreground">No hay pedidos por atender.</p>
       ) : (
@@ -76,7 +76,11 @@ function PedidosImpresos({ pedidos, onCambio }: { pedidos: PedidoAdmin[]; onCamb
             return (
               <li key={p.id} className="rounded-xl bg-muted/50 p-3 text-sm">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-semibold text-foreground">{p.titulo}</span>
+                  <span className="font-semibold text-foreground">
+                    {p.titulo}
+                    {p.cantidad > 1 ? ` ×${p.cantidad}` : ""}
+                    {p.entrega !== "fisico" && <span className="ml-1.5 rounded-full bg-primary/10 px-2 text-xs font-bold text-primary">{p.entrega === "servicio" ? "Servicio" : "Experiencia"}</span>}
+                  </span>
                   <span className="text-xs font-bold text-muted-foreground">
                     {ESTADO_PEDIDO_NOMBRE[p.estado]}
                     {p.prueba ? " · prueba" : ""} · {formatoGs(p.montoGs)}
@@ -88,10 +92,14 @@ function PedidosImpresos({ pedidos, onCambio }: { pedidos: PedidoAdmin[]; onCamb
                     {p.telefono}
                   </a>
                 </p>
-                <p className="text-muted-foreground">
-                  {p.direccion}, {p.ciudad}
-                  {p.referencia ? ` (${p.referencia})` : ""}
-                </p>
+                {p.entrega === "fisico" ? (
+                  <p className="text-muted-foreground">
+                    {p.direccion}, {p.ciudad}
+                    {p.referencia ? ` (${p.referencia})` : ""}
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground">Coordinar día y hora por WhatsApp{p.referencia ? ` · ${p.referencia}` : ""}</p>
+                )}
                 <p className="text-xs text-muted-foreground">{new Date(p.fecha).toLocaleString("es-PY", { dateStyle: "medium", timeStyle: "short" })}</p>
                 {sig && (
                   <Button size="sm" className="mt-2" disabled={ocupado === p.id} onClick={() => void mover(p, sig.a)}>

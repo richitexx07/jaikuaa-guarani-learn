@@ -23,20 +23,27 @@ async function exigirAdmin(supabase: any, userId: string) {
   if (data !== true) throw new Error("Forbidden");
 }
 
-type PagoFila = { id: string; ref_id: string; monto_gs: number; afiliado_id: string | null; porcentaje_afiliado: number | null };
+type PagoFila = { id: string; ref_id: string; item_tipo: string | null; monto_gs: number; afiliado_id: string | null; porcentaje_afiliado: number | null };
 
 /** Ventas cobradas de verdad (sin pruebas ni cancelados), con el autor y porcentaje de cada obra. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function ventasParaReparto(db: any, filtro?: { afiliado?: string }) {
-  let q = db.from("pagos").select("id, ref_id, monto_gs, afiliado_id, porcentaje_afiliado").eq("estado", "pagado").neq("modo", "prueba").limit(50000);
+  let q = db.from("pagos").select("id, ref_id, item_tipo, monto_gs, afiliado_id, porcentaje_afiliado").eq("estado", "pagado").neq("modo", "prueba").limit(50000);
   if (filtro?.afiliado) q = q.eq("afiliado_id", filtro.afiliado);
   const { data } = await q;
   const pagos = (data ?? []) as PagoFila[];
-  const ids = [...new Set(pagos.map((p) => p.ref_id))];
+  const ids = [...new Set(pagos.filter((p) => p.item_tipo !== "producto").map((p) => p.ref_id))];
+  const pids = [...new Set(pagos.filter((p) => p.item_tipo === "producto").map((p) => p.ref_id))];
+  // Obras de la Librería: su autor y porcentaje. Productos del Mercado: su vendedor y porcentaje.
   const obras = new Map<string, { autor_id: string | null; porcentaje_autor: number | null }>();
   for (let i = 0; i < ids.length; i += 200) {
     const { data: ls } = await db.from("libros").select("id, autor_id, porcentaje_autor").in("id", ids.slice(i, i + 200));
     for (const l of (ls ?? []) as { id: string; autor_id: string | null; porcentaje_autor: number | null }[]) obras.set(l.id, l);
+  }
+  for (let i = 0; i < pids.length; i += 200) {
+    const { data: ps } = await db.from("mercado_productos").select("id, vendedor_id, porcentaje_vendedor").in("id", pids.slice(i, i + 200));
+    for (const p of (ps ?? []) as { id: string; vendedor_id: string | null; porcentaje_vendedor: number | null }[])
+      obras.set(p.id, { autor_id: p.vendedor_id, porcentaje_autor: p.porcentaje_vendedor });
   }
   return pagos.map((p) => ({
     montoGs: p.monto_gs,
@@ -60,6 +67,8 @@ export type PedidoAdmin = {
   fecha: string;
   montoGs: number;
   prueba: boolean;
+  entrega: "fisico" | "servicio" | "experiencia";
+  cantidad: number;
 };
 export type SaldoConNombre = Saldo & { nombre: string; correo: string };
 
@@ -72,7 +81,7 @@ export const adminTienda = createServerFn({ method: "GET" })
     const [ped, liq, aj, ventas] = await Promise.all([
       db
         .from("pedidos_fisicos")
-        .select("id, pago_id, titulo, nombre, telefono, ciudad, direccion, referencia, estado, nota, created_at")
+        .select("id, pago_id, titulo, nombre, telefono, ciudad, direccion, referencia, estado, nota, created_at, entrega, cantidad")
         .in("estado", ["por_enviar", "enviado", "entregado"])
         .order("created_at", { ascending: false })
         .limit(300),
@@ -81,6 +90,7 @@ export const adminTienda = createServerFn({ method: "GET" })
       ventasParaReparto(db),
     ]);
     const pedRows = (ped.data ?? []) as (Omit<PedidoAdmin, "fecha" | "montoGs" | "prueba"> & { pago_id: string; created_at: string })[];
+
     const pagoIds = pedRows.map((p) => p.pago_id);
     const montos = new Map<string, { monto_gs: number; modo: string }>();
     if (pagoIds.length) {
@@ -115,6 +125,8 @@ export const adminTienda = createServerFn({ method: "GET" })
         fecha: p.created_at,
         montoGs: montos.get(p.pago_id)?.monto_gs ?? 0,
         prueba: montos.get(p.pago_id)?.modo === "prueba",
+        entrega: p.entrega ?? "fisico",
+        cantidad: p.cantidad ?? 1,
       })),
       saldos: saldos.map<SaldoConNombre>((x) => ({ ...x, nombre: perfiles.get(x.id)?.full_name ?? "", correo: perfiles.get(x.id)?.email ?? "" })),
       porcentajeAfiliado: Number(aj.data?.porcentaje_afiliado ?? 0),
