@@ -19,7 +19,8 @@ export type CoverId =
   | "sopa-de-letras"
   | "memoria"
   | "penales"
-  | "palabra-del-dia";
+  | "palabra-del-dia"
+  | "teclea";
 
 /** Color de fondo y de texto de cada portada (el título va debajo, sobre este color). */
 export const COVER_TONE: Record<CoverId, { bg: string; ink: string }> = {
@@ -38,6 +39,7 @@ export const COVER_TONE: Record<CoverId, { bg: string; ink: string }> = {
   memoria: { bg: "#13294B", ink: "#FFFFFF" },
   penales: { bg: "#0B3D2A", ink: "#FFFFFF" },
   "palabra-del-dia": { bg: "#F28C28", ink: "#3A1A05" },
+  teclea: { bg: "#7FB069", ink: "#13294B" },
 };
 
 export function GameCover({ id, className = "", fit = false }: { id: CoverId; className?: string; fit?: boolean }) {
@@ -293,6 +295,17 @@ const ART: Record<CoverId, ReactElement> = {
         <circle r="12" fill="#FFFFFF" />
         <path d="M0 -5 l5 3.5 -2 6 h-6 l-2 -6z" fill="#13294B" />
       </g>
+    </>
+  ),
+  teclea: (
+    <>
+      <rect width="200" height="150" fill="#CDEBF5" />
+      <rect y="105" width="200" height="45" fill="#7FB069" />
+      <rect x="30" y="70" width="140" height="56" rx="8" fill="#13294B" />
+      {Array.from({ length: 18 }, (_, k) => (
+        <rect key={k} x={38 + (k % 9) * 14.5} y={78 + Math.floor(k / 9) * 15} width="11" height="11" rx="2" fill={k === 4 ? "#F6C445" : "#FFFFFF"} />
+      ))}
+      <rect x="60" y="108" width="80" height="11" rx="2" fill="#FFFFFF" />
     </>
   ),
   "palabra-del-dia": (

@@ -47,15 +47,16 @@ const GAMES: Game[] = [
   { id: "ahorcado", to: "/juegos/ahorcado", title: "Ahorcado con chipas", desc: "Adiviná la palabra antes de quedarte sin chipas.", xp: "≤15 XP" },
   { id: "sopa-de-letras", to: "/juegos/sopa-de-letras", title: "Sopa de letras", desc: "Encontrá 6 palabras escondidas.", xp: "20 XP" },
   { id: "memoria", to: "/juegos/memoria", title: "Memoria", desc: "Uní cada palabra con su significado.", xp: "≤20 XP" },
+  { id: "teclea", to: "/juegos/teclea", title: "Jai Teclea", desc: "Aprendé a escribir en guaraní: cada letra hace correr a Jai.", xp: "10 XP", nuevo: true },
   { id: "palabra-del-dia", to: "/juegos/palabra-del-dia", title: "Palabra del día", desc: "Escuchala y elegí su significado.", xp: "5 XP" },
 ];
 
 const SHELVES: { key: string; title: string; bajada: string; items: CoverId[] }[] = [
-  { key: "estreno", title: "Lo nuevo", bajada: "Recién salidos del horno", items: ["consultorio", "tembiu", "penales"] },
+  { key: "estreno", title: "Lo nuevo", bajada: "Recién salidos del horno", items: ["teclea", "consultorio", "tembiu", "penales"] },
   { key: "cultura", title: "Cultura paraguaya", bajada: "Música, cocina, cine y fútbol", items: ["karaoke", "tembiu", "taanga", "penales"] },
   { key: "trabajo", title: "Guaraní para el trabajo", bajada: "Salud, atención al público, campo y justicia", items: ["consultorio", "ventanilla", "chacra", "tekojoja"] },
   { key: "dos", title: "De a dos", bajada: "En el mismo celular o cada uno en el suyo", items: ["nee-rape", "duelo", "trivia-duelo"] },
-  { key: "clasicos", title: "Clásicos rápidos", bajada: "Cinco minutos por día", items: ["palabra-del-dia", "ahorcado", "sopa-de-letras", "memoria"] },
+  { key: "clasicos", title: "Clásicos rápidos", bajada: "Cinco minutos por día", items: ["palabra-del-dia", "teclea", "ahorcado", "sopa-de-letras", "memoria"] },
 ];
 
 const CSS = `

@@ -27,6 +27,7 @@ export const GUEST_GAMES = [
   // Ñe'ẽ Rape se manda por WhatsApp: quien recibe el desafío juega sin crear cuenta.
   "/juegos/nee-rape",
   "/juegos/palabra-del-dia",
+  "/juegos/teclea",
   "/pronunciar",
   "/trivia",
   // El repaso usa las palabras de las lecciones abiertas que terminó en este celular.

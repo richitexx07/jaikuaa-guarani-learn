@@ -124,6 +124,7 @@ import { Route as AuthenticatedJuegosPalabraDelDiaRouteImport } from './routes/_
 import { Route as AuthenticatedJuegosPenalesRouteImport } from './routes/_authenticated/juegos.penales'
 import { Route as AuthenticatedJuegosSopaDeLetrasRouteImport } from './routes/_authenticated/juegos.sopa-de-letras'
 import { Route as AuthenticatedJuegosTaangaRouteImport } from './routes/_authenticated/juegos.taanga'
+import { Route as AuthenticatedJuegosTecleaRouteImport } from './routes/_authenticated/juegos.teclea'
 import { Route as AuthenticatedJuegosTekojojaRouteImport } from './routes/_authenticated/juegos.tekojoja'
 import { Route as AuthenticatedJuegosTembiuRouteImport } from './routes/_authenticated/juegos.tembiu'
 import { Route as AuthenticatedJuegosTriviaDueloRouteImport } from './routes/_authenticated/juegos.trivia-duelo'
@@ -759,6 +760,12 @@ const AuthenticatedJuegosTaangaRoute =
     path: '/juegos/taanga',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedJuegosTecleaRoute =
+  AuthenticatedJuegosTecleaRouteImport.update({
+    id: '/juegos/teclea',
+    path: '/juegos/teclea',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedJuegosTekojojaRoute =
   AuthenticatedJuegosTekojojaRouteImport.update({
     id: '/juegos/tekojoja',
@@ -1006,6 +1013,7 @@ export interface FileRoutesByFullPath {
   '/juegos/penales': typeof AuthenticatedJuegosPenalesRoute
   '/juegos/sopa-de-letras': typeof AuthenticatedJuegosSopaDeLetrasRoute
   '/juegos/taanga': typeof AuthenticatedJuegosTaangaRoute
+  '/juegos/teclea': typeof AuthenticatedJuegosTecleaRoute
   '/juegos/tekojoja': typeof AuthenticatedJuegosTekojojaRoute
   '/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
@@ -1143,6 +1151,7 @@ export interface FileRoutesByTo {
   '/juegos/penales': typeof AuthenticatedJuegosPenalesRoute
   '/juegos/sopa-de-letras': typeof AuthenticatedJuegosSopaDeLetrasRoute
   '/juegos/taanga': typeof AuthenticatedJuegosTaangaRoute
+  '/juegos/teclea': typeof AuthenticatedJuegosTecleaRoute
   '/juegos/tekojoja': typeof AuthenticatedJuegosTekojojaRoute
   '/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
@@ -1285,6 +1294,7 @@ export interface FileRoutesById {
   '/_authenticated/juegos/penales': typeof AuthenticatedJuegosPenalesRoute
   '/_authenticated/juegos/sopa-de-letras': typeof AuthenticatedJuegosSopaDeLetrasRoute
   '/_authenticated/juegos/taanga': typeof AuthenticatedJuegosTaangaRoute
+  '/_authenticated/juegos/teclea': typeof AuthenticatedJuegosTecleaRoute
   '/_authenticated/juegos/tekojoja': typeof AuthenticatedJuegosTekojojaRoute
   '/_authenticated/juegos/tembiu': typeof AuthenticatedJuegosTembiuRoute
   '/_authenticated/juegos/trivia-duelo': typeof AuthenticatedJuegosTriviaDueloRoute
@@ -1427,6 +1437,7 @@ export interface FileRouteTypes {
     | '/juegos/penales'
     | '/juegos/sopa-de-letras'
     | '/juegos/taanga'
+    | '/juegos/teclea'
     | '/juegos/tekojoja'
     | '/juegos/tembiu'
     | '/juegos/trivia-duelo'
@@ -1564,6 +1575,7 @@ export interface FileRouteTypes {
     | '/juegos/penales'
     | '/juegos/sopa-de-letras'
     | '/juegos/taanga'
+    | '/juegos/teclea'
     | '/juegos/tekojoja'
     | '/juegos/tembiu'
     | '/juegos/trivia-duelo'
@@ -1705,6 +1717,7 @@ export interface FileRouteTypes {
     | '/_authenticated/juegos/penales'
     | '/_authenticated/juegos/sopa-de-letras'
     | '/_authenticated/juegos/taanga'
+    | '/_authenticated/juegos/teclea'
     | '/_authenticated/juegos/tekojoja'
     | '/_authenticated/juegos/tembiu'
     | '/_authenticated/juegos/trivia-duelo'
@@ -2609,6 +2622,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJuegosTaangaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/juegos/teclea': {
+      id: '/_authenticated/juegos/teclea'
+      path: '/juegos/teclea'
+      fullPath: '/juegos/teclea'
+      preLoaderRoute: typeof AuthenticatedJuegosTecleaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/juegos/tekojoja': {
       id: '/_authenticated/juegos/tekojoja'
       path: '/juegos/tekojoja'
@@ -2890,6 +2910,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedJuegosPenalesRoute: typeof AuthenticatedJuegosPenalesRoute
   AuthenticatedJuegosSopaDeLetrasRoute: typeof AuthenticatedJuegosSopaDeLetrasRoute
   AuthenticatedJuegosTaangaRoute: typeof AuthenticatedJuegosTaangaRoute
+  AuthenticatedJuegosTecleaRoute: typeof AuthenticatedJuegosTecleaRoute
   AuthenticatedJuegosTekojojaRoute: typeof AuthenticatedJuegosTekojojaRoute
   AuthenticatedJuegosTembiuRoute: typeof AuthenticatedJuegosTembiuRoute
   AuthenticatedJuegosTriviaDueloRoute: typeof AuthenticatedJuegosTriviaDueloRoute
@@ -2963,6 +2984,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedJuegosPenalesRoute: AuthenticatedJuegosPenalesRoute,
   AuthenticatedJuegosSopaDeLetrasRoute: AuthenticatedJuegosSopaDeLetrasRoute,
   AuthenticatedJuegosTaangaRoute: AuthenticatedJuegosTaangaRoute,
+  AuthenticatedJuegosTecleaRoute: AuthenticatedJuegosTecleaRoute,
   AuthenticatedJuegosTekojojaRoute: AuthenticatedJuegosTekojojaRoute,
   AuthenticatedJuegosTembiuRoute: AuthenticatedJuegosTembiuRoute,
   AuthenticatedJuegosTriviaDueloRoute: AuthenticatedJuegosTriviaDueloRoute,

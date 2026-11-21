@@ -14,6 +14,7 @@ import ahorcado from "@/assets/covers/cover-ahorcado.webp";
 import sopa from "@/assets/covers/cover-sopa-de-letras.webp";
 import memoria from "@/assets/covers/cover-memoria.webp";
 import palabraDelDia from "@/assets/covers/cover-palabra-del-dia.webp";
+import teclea from "@/assets/covers/cover-teclea.webp";
 
 /** Portadas ilustradas de cada juego (Jai en escena, sin texto dentro de la imagen). */
 export const COVER_IMAGE: Record<CoverId, string> = {
@@ -32,4 +33,5 @@ export const COVER_IMAGE: Record<CoverId, string> = {
   "sopa-de-letras": sopa,
   memoria,
   "palabra-del-dia": palabraDelDia,
+  teclea,
 };
