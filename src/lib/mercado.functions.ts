@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { PAGOPAR_API, tokenInicio, urlPagoPagopar } from "@/lib/pagopar";
 import { cleanRefCode } from "@/lib/ambassador";
+import { estadoPropiedadObra } from "@/lib/pagos";
 import { elegirAfiliado, puedePasarPedido, calcularSaldos, ESTADOS_PEDIDO, type EstadoPedido, type TipoObra } from "@/lib/obras";
 import {
   CATEGORIAS_PRODUCTO,
@@ -547,8 +548,8 @@ export const miEstadoItem = createServerFn({ method: "POST" })
       data.tipo === "obra" ? db.from("libro_accesos").select("id").eq("user_id", context.userId).eq("libro_id", data.id).maybeSingle() : Promise.resolve({ data: null }),
       db.from("mercado_resenas").select("estrellas, texto").eq("user_id", context.userId).eq("item_tipo", data.tipo).eq("item_id", data.id).maybeSingle(),
     ]);
-    const comprado = ((compra.data ?? []) as unknown[]).length > 0 || !!acceso.data;
-    return { favorito: !!fav.data, comprado, miResena: (res.data as { estrellas: number; texto: string } | null) ?? null };
+    const propiedad = estadoPropiedadObra(((compra.data ?? []) as unknown[]).length > 0, !!acceso.data);
+    return { favorito: !!fav.data, ...propiedad, miResena: (res.data as { estrellas: number; texto: string } | null) ?? null };
   });
 
 export const alternarFavorito = createServerFn({ method: "POST" })

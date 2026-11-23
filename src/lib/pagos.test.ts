@@ -1,7 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { obraParaLeer } from "./pagos";
+import { estadoPropiedadObra, obraParaLeer } from "./pagos";
 
 const pago = { estado: "pagado", item_tipo: "obra", formato: "digital", ref_id: "libro-1" };
+
+describe("storefront ownership", () => {
+  it("a print-only buyer may review but cannot read digitally", () => {
+    expect(estadoPropiedadObra(true, false)).toEqual({ comprado: true, accesoLectura: false });
+  });
+  it("a buyer with separate digital access can read", () => {
+    expect(estadoPropiedadObra(true, true)).toEqual({ comprado: true, accesoLectura: true });
+    expect(estadoPropiedadObra(false, true)).toEqual({ comprado: true, accesoLectura: true });
+  });
+});
 
 describe("reading destination after payment", () => {
   it("never offers digital reading for a printed book", () => {

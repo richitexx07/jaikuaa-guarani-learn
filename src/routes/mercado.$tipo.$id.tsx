@@ -19,6 +19,10 @@ export const Route = createFileRoute("/mercado/$tipo/$id")({
     meta: [
       { title: "Mercado Jaikuaa" },
       { name: "description", content: "Producto del Mercado Jaikuaa: libros, artesanía, música, clases y experiencias paraguayas." },
+      { property: "og:title", content: "Producto — Mercado Jaikuaa" },
+      { property: "og:description", content: "Obras y productos paraguayos en el Mercado Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: FichaPage,
@@ -171,7 +175,7 @@ function Comprar({ f }: { f: FichaMercado }) {
   };
   const max = f.tipo === "obra" || f.entrega === "digital" ? 1 : Math.min(MAX_CANTIDAD, f.stock ?? MAX_CANTIDAD);
   const agotado = f.agotado;
-  const yaLaTengo = f.tipo === "obra" && mio?.comprado;
+  const yaLaTengo = f.tipo === "obra" && mio?.accesoLectura;
   const { abierto } = useMercadoAbierto();
   // En preinscripción los productos se muestran como vitrina; las obras de la Librería se siguen vendiendo.
   const prontoAbre = f.tipo === "producto" && f.entrega !== "cotizacion" && !abierto;

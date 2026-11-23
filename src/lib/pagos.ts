@@ -12,6 +12,11 @@ export type ResultadoPago = {
   modo: string;
 };
 
+/** Purchase ownership also permits reviews; only a separate access row permits reading. */
+export function estadoPropiedadObra(compraPagada: boolean, accesoDigital: boolean) {
+  return { comprado: compraPagada || accesoDigital, accesoLectura: accesoDigital };
+}
+
 /** Only a paid digital obra can lead directly to the reader. */
 export function obraParaLeer(pago: Pick<ResultadoPago, "estado" | "item_tipo" | "formato" | "ref_id"> | null | undefined): string | null {
   return pago?.estado === "pagado" && pago.item_tipo === "obra" && pago.formato === "digital" && pago.ref_id

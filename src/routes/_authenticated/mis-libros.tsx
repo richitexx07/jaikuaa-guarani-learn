@@ -14,6 +14,10 @@ export const Route = createFileRoute("/_authenticated/mis-libros")({
     meta: [
       { title: "Jaikuaa — Mis libros y módulos" },
       { name: "description", content: "Tus libros y módulos de la Librería Jaikuaa: leelos en el celular y escuchá cada página con voz humana real." },
+      { property: "og:title", content: "Jaikuaa — Mis libros y módulos" },
+      { property: "og:description", content: "Tu biblioteca digital y el estado de tus pedidos impresos en Jaikuaa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -73,8 +77,8 @@ function MisLibrosPage() {
           {data && data.libros.length === 0 && (
             <div className="mt-8 rounded-2xl border border-dashed border-border p-8 text-center">
               <BookOpen className="mx-auto h-10 w-10 text-muted-foreground" aria-hidden />
-              <p className="mt-3 font-semibold text-foreground">Todavía no tenés libros, módulos ni cursos</p>
-              <p className="mt-1 text-sm text-muted-foreground">Cuando compres un libro o un módulo de la Librería Jaikuaa, aparece acá con esta misma cuenta.</p>
+              <p className="mt-3 font-semibold text-foreground">Todavía no tenés libros, módulos ni cursos digitales</p>
+              <p className="mt-1 text-sm text-muted-foreground">Las ediciones digitales aparecen acá con esta misma cuenta. Los pedidos impresos se muestran por separado con el estado del envío.</p>
               <Button asChild className="mt-4">
                 <Link to="/libreria">Ir a la Librería</Link>
               </Button>

@@ -12,7 +12,15 @@ import { Lector } from "@/components/libreria/lector";
  * - Recuerda en qué página quedaste (solo en este aparato).
  */
 export const Route = createFileRoute("/_authenticated/leer/$id")({
-  head: () => ({ meta: [{ title: "Jaikuaa — Lector" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [
+    { title: "Jaikuaa — Lector" },
+    { name: "description", content: "Leé tu obra digital de la Librería Jaikuaa con voces humanas." },
+    { property: "og:title", content: "Jaikuaa — Lector" },
+    { property: "og:description", content: "Leé tu obra digital de la Librería Jaikuaa con voces humanas." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] }),
   component: LectorPage,
 });
 
@@ -62,7 +70,7 @@ function LectorPage() {
         <Aviso
           icono
           titulo={`«${data.titulo}» todavía no está en tu biblioteca`}
-          texto="Cuando completes la compra, aparece en «Mis libros» con esta misma cuenta. Mientras tanto, podés ver la muestra gratis."
+          texto="La edición digital aparece en «Mis libros» con esta misma cuenta. Una compra impresa no incluye acceso digital: podés consultar su envío en «Mis compras». Mientras tanto, podés ver la muestra gratis."
           muestraId={id}
         />
       </Fondo>

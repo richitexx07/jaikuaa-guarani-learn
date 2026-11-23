@@ -17,6 +17,10 @@ export const Route = createFileRoute("/muestra/$id")({
     meta: [
       { title: "Librería Jaikuaa — Muestra gratis" },
       { name: "description", content: "Leé y escuchá gratis las primeras páginas, con voz humana real." },
+      { property: "og:title", content: "Librería Jaikuaa — Muestra gratis" },
+      { property: "og:description", content: "Leé y escuchá gratis las primeras páginas, con voz humana real." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -89,8 +93,8 @@ function MuestraPage() {
           <p className="font-display text-lg font-bold">¿Te gustó?</p>
           <p className="mt-1 text-sm text-[#1B2A44]/80">
             {resto > 0
-              ? `Faltan ${resto} ${resto === 1 ? "página" : "páginas"} más, todas con voz humana real. Queda guardado en «Mis libros» con tu cuenta.`
-              : "Queda guardado en «Mis libros» con tu cuenta, para leerlo y escucharlo cuando quieras."}
+              ? `Faltan ${resto} ${resto === 1 ? "página" : "páginas"} más, todas con voz humana real. La edición digital queda guardada en «Mis libros» con tu cuenta.`
+              : "La edición digital queda guardada en «Mis libros» con tu cuenta, para leerla y escucharla cuando quieras."}
             {data.enPreventa && " Está en preventa: lo reservás ahora y se abre completo cuando esté listo."}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -106,7 +110,7 @@ function MuestraPage() {
             </a>
           </div>
           <p className="mt-3 text-xs text-[#1B2A44]/70">
-            ¿Ya lo compraste?{" "}
+            ¿Ya compraste la edición digital?{" "}
             <Link to="/leer/$id" params={{ id }} className="font-semibold underline">
               Abrilo completo
             </Link>
