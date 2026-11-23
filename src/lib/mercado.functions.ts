@@ -690,8 +690,8 @@ export const verOrden = createServerFn({ method: "POST" })
       .eq("user_id", context.userId)
       .maybeSingle();
     if (!o) return { orden: null };
-    const { data: ps } = await db.from("pagos").select("ref_id, item_tipo, descripcion").eq("orden_id", o.id);
-    return { orden: { id: o.id as string, totalGs: o.total_gs as number, estado: o.estado as string, modo: o.modo as string, items: (ps ?? []) as { ref_id: string; item_tipo: ItemTipo; descripcion: string }[] } };
+    const { data: ps } = await db.from("pagos").select("ref_id, item_tipo, formato, descripcion").eq("orden_id", o.id);
+    return { orden: { id: o.id as string, totalGs: o.total_gs as number, estado: o.estado as string, modo: o.modo as string, items: (ps ?? []) as { ref_id: string; item_tipo: ItemTipo; formato: string; descripcion: string }[] } };
   });
 
 /* ───────────────────────── Vender en el Mercado ───────────────────────── */

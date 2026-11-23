@@ -5,6 +5,7 @@ import { CheckCircle2, Clock, XCircle } from "lucide-react";
 import { verPago } from "@/lib/pagos.functions";
 import { verOrden } from "@/lib/mercado.functions";
 import { formatoGs } from "@/lib/pagopar";
+import { obraParaLeer } from "@/lib/pagos";
 
 export const Route = createFileRoute("/_authenticated/pagos/$ref")({
   head: () => ({
@@ -32,25 +33,29 @@ function Resultado() {
     queryFn: async () => {
       const [a, b] = await Promise.all([ver({ data: { ref } }), verO({ data: { ref } })]);
       if (a.pago) return { pago: a.pago, orden: null };
-      if (b.orden)
+      if (b.orden) {
+        const unicoItem = b.orden.items.length === 1 ? b.orden.items[0] : undefined;
         return {
           orden: b.orden,
           pago: {
             id: b.orden.id,
-            ref_id: b.orden.items.length === 1 && b.orden.items[0].item_tipo === "obra" ? b.orden.items[0].ref_id : "",
-            descripcion: b.orden.items.length === 1 ? b.orden.items[0].descripcion : `${b.orden.items.length} productos del Mercado`,
+            ref_id: unicoItem?.ref_id ?? "",
+            item_tipo: unicoItem?.item_tipo ?? "",
+            formato: unicoItem?.formato ?? "",
+            descripcion: unicoItem?.descripcion ?? `${b.orden.items.length} productos del Mercado`,
             monto_gs: b.orden.totalGs,
             estado: b.orden.estado,
             modo: b.orden.modo,
           },
         };
+      }
       return { pago: null, orden: null };
     },
     refetchInterval: (q) => (q.state.data?.pago?.estado === "pendiente" ? 4000 : false),
   });
   const p = data?.pago;
   const esOrden = !!data?.orden;
-  const soloObra = !esOrden || (data?.orden?.items.length === 1 && data.orden.items[0].item_tipo === "obra");
+  const lecturaId = obraParaLeer(p);
 
   return (
     <main className="mx-auto max-w-md px-4 py-12 pb-28 text-center">
@@ -65,12 +70,15 @@ function Resultado() {
             {p.estado === "pagado" ? "¡Listo, ya es tuyo!" : p.estado === "pendiente" ? "Esperando la confirmación del pago" : "El pago no se completó"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">{p.descripcion} · {formatoGs(p.monto_gs)}</p>
+          {p.estado === "pagado" && p.item_tipo === "obra" && p.formato === "fisico" && (
+            <p className="mt-2 text-sm text-muted-foreground">Compraste la edición impresa. Podés ver el estado del envío en Mis compras; esta compra no incluye acceso digital.</p>
+          )}
           {p.modo === "prueba" && <p className="mt-2 text-xs font-semibold text-muted-foreground">Compra de prueba (sin cobro real)</p>}
           <div className="mt-5 flex flex-col gap-2">
-            {p.estado === "pagado" && soloObra && p.ref_id && (
-              <Link to="/leer/$id" params={{ id: p.ref_id }} className="rounded-2xl bg-primary px-4 py-3 font-bold text-primary-foreground">Leer ahora</Link>
+            {lecturaId && (
+              <Link to="/leer/$id" params={{ id: lecturaId }} className="rounded-2xl bg-primary px-4 py-3 font-bold text-primary-foreground">Leer ahora</Link>
             )}
-            <Link to="/mis-compras" className={`rounded-2xl px-4 py-3 font-semibold ${p.estado === "pagado" && !soloObra ? "bg-primary text-primary-foreground" : "border border-border text-foreground"}`}>Mis compras</Link>
+            <Link to="/mis-compras" className={`rounded-2xl px-4 py-3 font-semibold ${p.estado === "pagado" && !lecturaId ? "bg-primary text-primary-foreground" : "border border-border text-foreground"}`}>Mis compras</Link>
             <Link to={esOrden ? "/mercado" : "/libreria"} className="text-sm font-semibold text-primary">{esOrden ? "Volver al Mercado" : "Volver a la Librería"}</Link>
           </div>
         </div>

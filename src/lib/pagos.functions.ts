@@ -5,6 +5,7 @@ import { PAGOPAR_API, tokenInicio, urlPagoPagopar } from "@/lib/pagopar";
 import { cleanRefCode } from "@/lib/ambassador";
 import { elegirAfiliado } from "@/lib/obras";
 import { enviarAviso } from "@/lib/avisos";
+import { CAMPOS_RESULTADO_PAGO, type ResultadoPago } from "@/lib/pagos";
 
 /**
  * Pagos de la Librería con Pagopar: libros, módulos y cursos (digitales) y ediciones impresas (con envío manual).
@@ -173,9 +174,9 @@ export const verPago = createServerFn({ method: "POST" })
     const esUuid = /^[0-9a-f-]{36}$/i.test(data.ref);
     const { data: p } = await db
       .from("pagos")
-      .select("id, ref_id, descripcion, monto_gs, estado, modo")
+      .select(CAMPOS_RESULTADO_PAGO)
       .eq(esUuid ? "id" : "hash_pedido", data.ref)
       .eq("user_id", context.userId)
       .maybeSingle();
-    return { pago: (p ?? null) as null | { id: string; ref_id: string; descripcion: string; monto_gs: number; estado: string; modo: string } };
+    return { pago: (p ?? null) as ResultadoPago | null };
   });
