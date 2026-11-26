@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Revisar solamente la nota al ministro de Cultura, la nota a Soledad Núñez y la minuta conjunta para Marcelo Centurión, Sebastián Radice, César «Ceres» Escobar, Constantino «Tino» Ayala y Mario Daniel Fernández; entregar Word y PDF sobrios.
 - [x] Check printed versus digital purchases across confirmation, storefront, samples, libraries, fulfillment and refunds; keep historical records unchanged.
 - [x] Rediseñar Aprender: lección protagonista, estanterías ilustradas, meta y racha arriba, ayuda sin superposición; comprobar celular claro/oscuro y computadora.
 - [x] Entregar TXT completo de Jaikuaa: identidad, reglas, módulos, estado y pendientes.
